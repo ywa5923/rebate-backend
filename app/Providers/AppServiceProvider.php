@@ -29,17 +29,16 @@ class AppServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
-        // $this->app->make('hash')->extend('sha256', function() {
-        //     return new ShaHasher;
-        // });
+        $this->app->make('hash')->extend('sha256', function() {
+            return new ShaHasher;
+        });
+
 
         // $this->app->extend(HashManager::class, function (HashManager $hashManager,Application $app) {
         //     return new ShaHasher;
         //    // return new DecoratedService($service);
         // });
         
-        // Hash::extend('sha256', function () {
-        //     return new ShaHasher();
-        // });
+       
     }
 }
