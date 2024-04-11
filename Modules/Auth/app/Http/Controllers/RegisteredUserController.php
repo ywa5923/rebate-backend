@@ -3,7 +3,7 @@
 namespace Modules\Auth\Http\Controllers;
 
 use Modules\Auth\Http\Controllers\Controller;
-use App\Models\User;
+use Modules\Auth\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,6 +44,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+       
 
         return response()->noContent();
     }
