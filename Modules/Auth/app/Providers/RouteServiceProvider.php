@@ -35,6 +35,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')->group(module_path('Auth', '/routes/web.php'));
+        Route::middleware('web')->group(module_path('Auth', '/routes/auth.php'));
     }
 
     /**
@@ -44,6 +45,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.')->group(module_path('Auth', '/routes/api.php'));
+        Route::middleware('api')->prefix('api/v1')->name('api.')->group(module_path('Auth', '/routes/api.php'));
+       
     }
 }

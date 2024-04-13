@@ -71,3 +71,5 @@ https://gist.github.com/rcknr/47d3a175fb32647742850666dbdbc086
 
 
 custom hasher:https://gist.github.com/rcknr/47d3a175fb32647742850666dbdbc086
+
+modules comand https://laravelmodules.com/docs/v11/artisan-commands
