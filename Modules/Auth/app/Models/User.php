@@ -5,6 +5,7 @@ namespace Modules\Auth\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -29,7 +30,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-       // 'password',
+        // 'password',
         'remember_token',
     ];
 
@@ -42,7 +43,14 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-           // 'password' => 'hashed',
+            // 'password' => 'hashed',
         ];
+    }
+
+    public function roles():BelongsToMany
+
+    {
+        return $this->belongsToMany(Role::class)
+            ->withTimestamps();
     }
 }
