@@ -63,7 +63,8 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            //'driver' => 'eloquent',
+            'driver'=>'fx_user_provider',
             'model' => env('AUTH_MODEL', Modules\Auth\Models\User::class),
         ],
 

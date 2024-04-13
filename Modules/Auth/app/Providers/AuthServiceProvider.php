@@ -22,6 +22,11 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+
+        //Register custom UserProvider
+        \Illuminate\Support\Facades\Auth::provider('fx_user_provider', function($app, array $config) {
+            return new FxUserProvider($app['hash'], $config['model']);
+        });
     }
 
     /**
@@ -30,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+    
     }
 
     /**
