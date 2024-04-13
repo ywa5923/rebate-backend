@@ -21,7 +21,7 @@ class FxUserProvider extends EloquentUserProvider
             return false;
         } 
 
-       //TO DO: try both hasher algorithms
+       //TO DO: try both hashers 
 
         return $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]);
     }
