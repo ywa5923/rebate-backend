@@ -8,6 +8,9 @@
     "paths": {
         "/api/v1/login": {
             "post": {
+                "tags": [
+                    "Auth"
+                ],
                 "summary": "Login user",
                 "operationId": "33d7fc07faa3d5c75283036570e14833",
                 "requestBody": {
@@ -40,6 +43,9 @@
         },
         "/api/v1/register": {
             "post": {
+                "tags": [
+                    "Auth"
+                ],
                 "summary": "Register a new user",
                 "operationId": "b8bad4d8e0c29947b13f09791c75889b",
                 "requestBody": {

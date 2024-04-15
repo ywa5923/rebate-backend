@@ -21,6 +21,7 @@ class AuthenticatedSessionController extends Controller
    /**
  * @OA\Post(
  *     path="/api/v1/login",
+ *     tags={"Auth"},
  *     summary="Login user",
  *     @OA\RequestBody(
  *         required=true,
