@@ -4,7 +4,7 @@ namespace Modules\Auth\Providers;
 
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
-
+use Illuminate\Support\Facades\Hash;
 
 class FxUserProvider extends EloquentUserProvider
 {
@@ -21,8 +21,13 @@ class FxUserProvider extends EloquentUserProvider
             return false;
         } 
 
-       //TO DO: try both hasher algorithms
+      //To DO : choose hashing algorithm based on user model settings ($this->model)
 
-        return $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]);
+      return (
+        $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]) ||
+        Hash::driver('bcrypt')->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]))?true:false;
+     
+
+       // return $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]);
     }
 }
