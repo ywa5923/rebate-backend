@@ -23,11 +23,11 @@ class FxUserProvider extends EloquentUserProvider
 
       //To DO : choose hashing algorithm based on user model settings ($this->model)
 
-      return (
-        $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]) ||
-        Hash::driver('bcrypt')->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]))?true:false;
+    //   return (
+    //     $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]) ||
+    //     Hash::driver('bcrypt')->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]))?true:false;
      
 
-       // return $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]);
+        return $this->hasher->check($plain, $user->getAuthPassword(), ['salt' => $user->salt]);
     }
 }
