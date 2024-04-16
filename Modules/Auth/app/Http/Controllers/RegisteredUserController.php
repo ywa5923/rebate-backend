@@ -24,7 +24,8 @@ class RegisteredUserController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string"),
      *             @OA\Property(property="email", type="string"),
-     *             @OA\Property(property="password", type="string")
+     *             @OA\Property(property="password", type="string"),
+     *             @OA\Property(property="password_confirmation", type="string")
      *         )
      *     ),
      *     @OA\Response(

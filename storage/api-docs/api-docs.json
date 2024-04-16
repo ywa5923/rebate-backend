@@ -32,11 +32,28 @@
                     }
                 },
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Successful operation"
                     },
                     "422": {
                         "description": "These credentials do not match our records"
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout",
+                "operationId": "8e0811b846ed9dd82247528f545eb011",
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             }
@@ -61,6 +78,9 @@
                                         "type": "string"
                                     },
                                     "password": {
+                                        "type": "string"
+                                    },
+                                    "password_confirmation": {
                                         "type": "string"
                                     }
                                 },
