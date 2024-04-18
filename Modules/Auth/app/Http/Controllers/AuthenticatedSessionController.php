@@ -13,7 +13,7 @@ use Modules\Auth\Http\Requests\LoginRequest;
  * @OA\Info(
  *      version="1.0.0",
  *      title="FXREBATE PROJECT",
- *      description="A PROGRESSIVE WEB APP"
+ *      description="REACT Progressive Web App / Stand on the shoulders of giants"
  * )
  */
 class AuthenticatedSessionController extends Controller

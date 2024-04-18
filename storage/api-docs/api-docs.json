@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "FXREBATE PROJECT",
-        "description": "A PROGRESSIVE WEB APP",
+        "description": "REACT Progressive Web App / Stand on the shoulders of giants",
         "version": "1.0.0"
     },
     "paths": {
