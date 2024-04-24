@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/brokers",
+    "description": "",
+    "authors": [
+        {
+            "name": "Ion Ivan",
+            "email": "ivanion10@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Brokers\\": "app/",
+            "Modules\\Brokers\\Database\\Factories\\": "database/factories/",
+            "Modules\\Brokers\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Brokers\\Tests\\": "tests/"
+        }
+    }
+}
