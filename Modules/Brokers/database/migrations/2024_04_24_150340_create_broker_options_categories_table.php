@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('broker_options_categories', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('name',100);
+            $table->string('description',500);
             $table->timestamps();
         });
     }
