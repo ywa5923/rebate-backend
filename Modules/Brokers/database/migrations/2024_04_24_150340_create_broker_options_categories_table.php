@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deal_types', function (Blueprint $table) {
+        Schema::create('broker_options_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('code',10);
+            
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deal_types');
+        Schema::dropIfExists('broker_options_categories');
     }
 };

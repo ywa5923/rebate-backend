@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deal_type_texts', function (Blueprint $table) {
+        Schema::create('broker_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('deal_type_id')->constrained();
-            $table->string('language',5);
-            $table->string('name',256);
-            $table->text('description');
-            $table->text('example');
+            $table->string('name',100);
+            $table->string('description',500);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deal_type_texts');
+        Schema::dropIfExists('broker_types');
     }
 };
