@@ -1,0 +1,169 @@
+id,logo,trading_name,user_rating,account_currencies,broker_type_id,support_options,account_type,trading_instruments,language,default_language
+1,XM_Group-logo.png,XM,0.00,"EUR, USD, GBP, JPY, CHF, AUD, HUF, PLN, RUB, SGD, ZAR",1,"Email, Phone, Live Chat","Micro, Standard, XM Zero, XM Ultra Low, Shares","Forex, Precious Metals, Commodities, Stocks, Shares, Equity Indices, Energies, Cryptocurrencies",en,en
+2,FXLider-logo.png,FXLider,0.00,"EUR, USD",1,,,,en,en
+3,Exness-logo.png,Exness,0.00,"EUR, USD, GBP, JPY, RUR, PLN, SEK, TRY, ZAR, TWD, GOLD, SILVER",1,"Email, Phone, Live Chat","Standard Cent, Standard, Standard Plus, Pro, Raw Spread, Zero","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+4,FBS-logo.png,FBS,0.00,"EUR, USD",1,"Email, Phone, Live Chat, WhatsApp, Messanger, Call Back Request","Cent, Standard, Pro","Forex, Metals, Energies, Indices, Stocks, Cryptos",en,en
+5,Alpari_UK-logo.png,"Alpari UK",0.00,"AUD, CHF, EUR, GBP, GLD, JPY, USD",1,"Email, Live Chat, Phone","Market, Alpari Direct, Alpari Direct Pro","Commodity CFDs, Forex, Metals, Indices CFDs",en,en
+6,Axi-logo.png,Axi,0.00,"EUR, USD, GBP, AUD, CAD, CHF, JPY, HKD, NZD, SGD",1,"Email, Phone, Live Chat","Standard, Pro, Elite","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+7,YouTradeFX-logo.png,YouTradeFX,0.00,USD,1,,,,en,en
+8,LQD_Markets-logo.png,"LQD Markets",0.00,"AUD, CHF, DKK, EUR, GBP, HUF, JPY, PLN, SEK, USD, ZAR",1,"Email, Live Chat, Phone","Mini, Premium","Commodity Futures CFDs, Forex, Metals, Futures Indices CFDs",en,en
+9,Smart_Trade_FX-logo.png,"Smart Trade FX",0.00,"USD, EUR, GBP",1,,,,en,en
+10,Tickmill-logo.png,Tickmill,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Classic, Pro, VIP","Forex, Metals, Commodities, Indices, Bonds, Futures",en,en
+11,AvaTrade-logo.png,AvaTrade,0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat, Call Back Request, Toll Free Call","MT4 Fixed Spreads, MT4 Floating Spreads, Ava Trader, Ava Options, Mirror Trader, FIX API","Forex, Metals, Commodities, Indices, ETFs, Vanilla Options, Cryptocurrencies",en,en
+12,ACFX-logo.png,ACFX,0.00,"EUR, USD, GBP, CHF, JPY, CNY",1,"Email, Phone, Live Chat","Fixed Spreads, Floating Spreads, STP, ECN Pro","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+13,HF-Markets-logo.png,"HF Markets",0.00,"EUR, USD, PLN, NGN, JPY, ZAR, KES",1,"Email, Phone, Live Chat","Cent, Premium, Zero, Pro, HFCopy, Strategy Provider Pro","Forex, Metals, Commodities, Indices, Stocks, ETFs, Futures, Bonds, Crypto",en,en
+14,IronFX-logo.png,IronFX,0.00,"AUD, CHF, EUR, GBP, HUF, JPY, PLN, USD",1,"Email, Live Chat, Phone","Cent (Live Floating), Standard (Live Floating), Premium (Live Floating), VIP (Live Floating), Zero (Live Fixed Spread), No Commission (STP/ECN), Zero Spread (STP/ECN), Absolute Zero (STP/ECN)","Commodity Futures CFDs, Forex, Metals, Stock CFDs",en,en
+15,ThinkMarkets-logo.png,ThinkMarkets,0.00,"EUR, USD, GBP, AUD, CAD, JPY, NZD",1,"Email, Phone, Live Chat, Skype","Standard, ThinkZero, ThinkMarkets Pro","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+16,FXCC-logo.png,FXCC,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","ECN XL, ECN Standard, ECN Advanced"," Forex, Metals, Equity Index CFDs",en,en
+17,IBFX_Australia-logo.png,"IBFX Australia",0.00,"USD, AUD",1,,,,en,en
+19,Windsor_Brokers-logo.png,"Windsor Brokers",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Call Back Request","Prime, Zero, VIP Zero","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Futures, Bonds, Cryptocurrencies",en,en
+20,Orbex-logo.png,Orbex,0.00,"EUR, USD",1,"Email, Phone, Live Chat, Skype, Call Back Request","Fixed, Starter, Premium, Ultimate, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Futures",en,en
+21,Zulutrade-logo.png,Zulutrade,0.00,N/A,1,"Email, Phone, Live Chat",Standard,N/A,en,en
+22,aaafx-logo.png,AAAFx,0.00,"USD, EUR, CAD, AUD, CHF",1,"Email, Phone, Live Chat","ECN, ECNplus, ECNzero, Islamic","Forex, Metals, Commodities, Indices, Stocks, Crypto",en,en
+23,FxPro-logo.png,FxPro,0.00,"EUR, USD, GBP, CHF, AUD, JPY, PLN, ZAR",1,"Email, Live Chat, Phone","MT4 Instant, MT4 Standard, FxPro Edge, MT4 Fixed, MT5, MT4 Pro, MT4 Raw Plus, MT4 Elite, MT5 Raw Plus, MT5 Elite (VIP), cTrader","Forex, Metals, Energies, Indices, Shares, Futures, Cryptos",en,en
+24,FxNet-logo.png,FxNet,0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat","Standard, VIP, Platinum","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+25,FXOpen-logo.png,FXOpen,0.00,"EUR, USD, GBP, AUD, CHF, JPY, RUB, SGD, GOLD, mBTC",1,"Email, Phone, Live Chat","Micro, STP, ECN, Crypto","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+26,AccentForex-logo.png,AccentForex,0.00,USD,1,,,,en,en
+27,Pepperstone-logo.png,Pepperstone,0.00,"EUR, USD, GBP, AUD, CHF, JPY, NZD, SGD, HKD",1,"Email, Phone, Live Chat, Skype","Edge Standard, Edge Razor, Edge Swap Free, Edge Active Traders, Islamic","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+28,FXCL_Markets-logo.png,"FXCL Markets",0.00,"EUR, USD",1,"Email, Phone, Live Chat, Skype","Cent, Standard, Interbank Cent, Interbank Standard, ECN Plus, ECN Pro, FIX API","Forex, Metals",en,en
+29,LiteForex-logo.png,LiteForex,0.00,"EUR, USD, GBP, AUD, CAD, CHF, CZK, JPY, NZD, PLN, RUB",1,"Email, Phone, Live Chat, ICQ","Cent, Classic, ECN","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+30,TFI_FX-logo.png,"TFI FX",0.00,"EUR, USD, GBP",1,"Email, Phone",Premium,"Forex, Metals",en,en
+31,Markets.com-logo.png,Markets.com,0.00,"USD, EUR, GBP, JPY, CAD, PLN",1,,,,en,en
+32,Forex.com-logo.png,Forex.com,0.00,"EUR, USD, GBP, AUD, CAD, CHF, JPY",1,"Email, Phone, Live Chat","Micro, Mini, Standard","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Futures, Options",en,en
+33,Falcon_Brokers-logo.png,"Falcon Brokers",0.00,USD,1,"Email, Live Chat, Phone","Standard, Professional, ECN","Commodity CFDs, Forex, Metals, Stock CFDs, Stock Indices CFDs, Options",en,en
+34,FortFS-logo.png,FortFS,0.00,"EUR, USD, RUR",1,"Email, Phone, Live Chat","Newbie, Fort, Flex, Pro","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Futures, Cryptocurrencies",en,en
+35,RoboForex-logo.png,RoboForex,0.00,"EUR, USD, CNY, GOLD",1,"Email, Phone, Live Chat, Skype","ProCent, Pro, ECN, Prime, R StocksTrader, CopyFX Pro","Forex, Metals, Equity Index CFDs, Equity CFDs, ETFs, Crypto CFDs",en,en
+36,FinFx-logo.png,FinFx,0.00,"EUR, USD, GBP, CHF",1,"Email, Phone, Live Chat","Micro, ECN, ECN Pro, Signal Trader, Savi Trading","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+37,FxPrimus-logo.png,FxPrimus,0.00,"USD, EUR, GBP, SGD, PLN",1,"Email, Phone, Live Chat","PrimusCENT, PrimusCLASSIC, PrimusPRO, PrimusZERO","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+38,Mayzus-logo.png,Mayzus,0.00,"EUR, USD, GBP, AUD, CAD, CHF, CZK, JPY, NZD, PLN, RUB",1,"Email, Phone, Live Chat, Skype, Call Back Request","STP Mini, STP Classic, STP Platinum, Currenex Classic, Currenex Viking ","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+39,Forex-Metal-logo.png,Forex-Metal,0.00,"USD, EUR, GBP, AUD, JPY, CHF",1,,,,en,en
+40,EasyMarkets-logo.png,EasyMarkets,0.00,"EUR, USD, GBP, AUD, CAD, CHF, JPY, NZD, CNY,CZK, HKD, MXN, NOK, PLN, SEK, SGD, TRY, ZAR",1,"Email, Phone, Live Chat",Standard,"Forex, Metals, Commodity CFDs, Equity Index CFDs, Options, Cryptocurrencies",en,en
+41,IC_Markets-logo.png,"IC Markets",0.00,"EUR, USD, GBP, AUD, CHF, JPY, NZD, SGD, HKD, CAD",1,"Email, Phone, Live Chat","Standard, Raw Spread, cTrader Raw Spread","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+42,InstaForex-logo.png,InstaForex,0.00,"EUR, USD, RUR",1,"Email, Phone, Live Chat, Skype","Insta.Standard, Insta.Eurica, Cent.Standard, Cent.Eurica","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Futures, Options, Cryptocurrencies",en,en
+44,FXCM_UK-logo.png,"FXCM UK",0.00,"EUR, USD, GBP, CAD, CHF, JPY, NZD",1,"Email, Phone, Live Chat","Mini, Standard, Active Trader, Spread Betting account (UK and Ireland Residents only)","Forex, Metals, Equity CFDs, Equity Index CFDs",en,en
+45,FXTM-logo.png,FXTM,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Skype","Micro, Advantage, Advantage Plus","Forex, Metals, Commodities, Indices, Stocks",en,en
+46,Blackwell_Global-logo.png,"Blackwell Global",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Mini (BVI), Standard (BVI), Standard (BS), ECN (BS), Premium (BS), Turbo (BS)","Forex, Metals, Commodities, Indices",en,en
+47,Traders-Trust-logo.png,Traders-Trust,0.00,"EUR, USD, GBP, CHF, JPY",1,"Email, Phone, Live Chat","Classic, Pro, VIP","Forex, Metals, Commodities, Indices, Crypto (available only for accounts under Bermuda and Seychelles jurisdictions)",en,en
+48,GCMFX-logo.png,GCMFX,0.00,"EUR, USD, GBP, AUD, CAD, CHF, JPY",1,"Email, Phone, Live Chat","Micro, Standard, Pro","Forex, Metals, Commodity Futures CFDs, Equity Index CFDs",en,en
+49,Bulbrokers-logo.png,Bulbrokers,0.00,"EUR, USD",1,"Email, Phone, Live Chat","Forex Fixed, ECN Standard, ECN Premium","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+50,ETX_Capital-logo.png,"ETX Capital",0.00,"EUR, USD, GBP",1,"Email, Phone","MetaTrader, ETX Trader, ETX Trader Pro, ETX Binary","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Spread Betting, Binary Options",en,en
+51,Hantec_Markets-logo.png,"Hantec Markets",0.00,"EUR, USD, GBP, AUD, AED, CAD, CHF ",1,"Email, Phone, Live Chat","Standard, ECN, FIX API","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+52,SuperTradingOnline-logo.png,SuperTradingOnline,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","STO Classic, STO Premium, Pro, VIP, AFX Fast","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Bonds",en,en
+53,X_Global_Markets-logo.png,"X Global Markets",0.00,"EUR, USD",1,"Email, Phone, Live Chat, Skype, Call Back Request","XG Raw, XG Standard, XG Islamic","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+56,DirectFX-logo.png,DirectFX,0.00,USD,1,"Email, Phone, Live Chat, Skype","MT4, Tradable, CQG","Forex, Metals, Commodity CFDs, Equity Index CFDs, Bonds",en,en
+57,KVB_Kunlun-logo.png,"KVB Kunlun",0.00,USD,1,"Email, Phone, Live Chat","Standard, ECN","Forex, Metals, Commodity CFDs, Futures Index CFDs",en,en
+58,Swissquote-logo.png,Swissquote,0.00,"EUR, USD, GBP, CAD, CHF, HKD, HUF, JPY, PLN",1,"Email, Phone, Live Chat","Standard, Premium, Prime, Professional, FIX API","Forex, Metals, Commodities, Indices, Bonds, Options",en,en
+59,SpediaFX-logo.png,SpediaFX,0.00,USD,1,"Email, Live Chat, Phone","Micro, Standard, Advanced, Premium","Forex, Metals",en,en
+60,OANDA_Europe-logo.png,"OANDA Europe",0.00,"EUR, USD, GBP, AUD, CAD, CHF, HKD, JPY, SGD",1,"Email, Phone, Live Chat","MT4, fxTrade","Forex, Metals, Commodity CFDs, Equity Index CFDs, Bonds",en,en
+61,TEST-logo.png,TEST,0.00,,1,,,,en,en
+62,Alpha_Capital_Markets-logo.png,"Alpha Capital Markets",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat ","Micro, Standard, Premier, DMA","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+63,FIBO_Group-logo.png,"FIBO Group",0.00,"EUR, USD, GBP, CHF, RUR",1,"Email, Phone, Live Chat","MT4 NDD, MT4 Cent, MT4 NDD No Commission, MT4 Fixed, MT5 NDD, cTrader NDD, FIX API","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+64,MXTrade-logo.png,MXTrade,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Regular, Silver, Gold, Platinum","Forex, Metals, Commodity CFDs,  Equity CFDs, Equity Index CFDs, Futures",en,en
+65,hycm-logo.jpg,HYCM,0.00,"USD, EUR, GBP, RUB, AED",1,"Email, Phone, Live Chat, Call Back Request","Fixed, Classic, Raw","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+66,Fidelis_CM-logo.png,"Fidelis CM",0.00,USD,1,"Email, Phone, Live Chat, Skype, Call Back Request","Mini, Standard, VIP, ECN Classic, ECN Gold, Rookie Cent, Rookie, Prime, Elite, Unique","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+67,ADS_Securities_London-logo.png,"ADS Securities London",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Standard, ECN, Spread Betting","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, Treasury Bonds, Spread Betting",en,en
+69,LMAX_Global-logo.png,"LMAX Global",0.00,"EUR, USD, GBP, AUD, JPY, SGD, HKD, SEK",1,"Email, Phone, Live Chat","Standard, Pro","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+70,AMarkets-logo.png,AMarkets,0.00,"EUR, USD, RUR",1,"Email, Phone, Live Chat, Skype, Telegram","Bitcoin, Fixed, Standard, ECN, FIX API","Forex, Metals, Commodities, Indices, Stocks, Treasury Bonds, ETFs, Cryptocurrencies",en,en
+71,AETOS_CG-logo.png,"AETOS CG",0.00,"USD, GBP, EUR",1,"Email, Phone, Live Chat, Skype","General, Premium, FIX API","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs",en,en
+72,Land-FX-logo.png,Land-FX,0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat, Call Back Request","Standard, Islamic, Prime, ECN","Forex, Metals, Commodities, Indices",en,en
+73,Yadix-logo.png,Yadix,0.00,"EUR, USD",1,"Email, Phone, Live Chat, Skype","Classic, Scalper, Pro","Forex, Metals, Commodities, Indices",en,en
+74,Tradeview-logo.png,Tradeview,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Innovated Liquitity Connector, X Leverage Account","Forex, Metals, Commodity CFDs, Equity CFDs, Equity Index CFDs, US ETFs, Cryptocurrencies",en,en
+75,trive-logo.png,Trive,0.00,"USD, EUR, GBP",1,"Email, Phone, Live Chat, Messenger, WhatsApp, Skype, Call back Request","Standard, Raw, ECN Zero, VIP","Forex, Metals, Commodities, Indices, Stocks, Cryptos",en,en
+76,FXDD_Malta-logo.png,"FXDD Malta",0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat","MetaTrader 4, Mirror Trader, JForex, Viking, Spot Option","Forex, Metals, Commodity CFDs, Equity Index CFDs, Options",en,en
+77,Capital_Index-logo.png,"Capital Index",0.00,"EUR, USD, GBP, AUD",1,"Email, Phone, Live Chat","Classic, Advanced, Pro, Islamic","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+79,Valutrades-logo.png,Valutrades,0.00,"AUD, CHF, EUR, GBP, JPY, USD, ZAR, NZD, CAD, HKD, NOK, SEK, SGD, MXN",1,"Email, Phone, Live Chat",ECN,"Forex, Metals, Oil, Commodities, Indices",en,en
+80,Vipro_Markets-logo.png,"Vipro Markets",0.00,"EUR, USD, GBP, PLN",1,"Email, Phone, Live Chat, Skype","Classic, ECN Pro, VIP","Forex, Metals, Commodity CFDs, Equity Index CFDs, Bonds",en,en
+82,KeyStock-logo.png,KeyStock,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Mini, Standard, Exclusive","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs",en,en
+83,Trade.com-logo.png,Trade.com,0.00,"EUR, USD, GBP",1,"Email, Phone","Classic, Gold, Platinum","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Bonds, Cryptocurrencies",en,en
+84,GBE_Brokers-logo.png,"GBE Brokers",0.00,"EUR, USD, CHF",1,"Email, Phone, Live Chat, Skype","GBE Classic, GBE Plus, FIX API","Forex, Metals, Commodities, Indices, Treasury Bonds, Cryptocurrencies",en,en
+85,Dukascopy_Europe-logo.png,"Dukascopy Europe",0.00," USD, EUR, GBP, CHF, JPY, CAD, AUD, SGD, DKK, NOK, RUB, SEK, PLN, HKD",1,"Email, Phone, Live Chat","Personal, Joint, Corporate, JForex API, FIX API","Forex, Metals, Commodities, Indices, Stocks, Bonds, Cryptocurrencies",en,en
+86,Solforex-logo.png,Solforex,0.00,"EUR, USD, JPY, NZD",1,"Email, Phone","Volt-Premium, Volt-Standard, STP-Standard, Volt-Mini, Volt-Swap Free","Forex, Metals",en,en
+87,FxGrow-logo.png,FxGrow,0.00,"EUR, USD, PLN",1,"Email, Phone, Live Chat, Skype, Call Back Request","ECN, ECN Plus, ECN VIP, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Futures CFDs",en,en
+88,TrioMarkets-logo.png,TrioMarkets,0.00,"EUR, USD, GBP, CHF",1,"Email, Phone","Basic, Standard, Advanced, Premium","Forex, Metals, Commodities, Indices, Stocks (EU only), Cryptocurrencies",en,en
+89,BDSwiss-logo.png,BDSwiss,0.00,"EUR, USD, GBP, CHF, PLN, NOK, SEK, DKK",1,"Email, Phone, Live Chat","Basic, Raw Spread, Black, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+90,ForexMart-logo.png,ForexMart,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Skype, Viber, Telegram, WhatsApp, Call Back Request","Cent, Classic, Pro, Zero Spread","Forex, Metals, Indices, Stocks, Commodities, Cryptocurrencies",en,en
+91,Tallinex-logo.png,Tallinex,0.00,"EUR, USD",1,"Email, Phone, Live Chat","ECN-Micro, ECN-Pro, Pro-Managed Micro, Pro-Managed Pro","Forex, Metals, Equity Index CFDs",en,en
+92,CentroFX-logo.png,CentroFX,0.00,"EUR, USD, GBP, JPY, PLN, CZK",1,"Email, Phone, Live Chat","Beginner, Professional, VIP","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs",en,en
+93,Matador_Prime-logo.png,"Matador Prime",0.00,"EUR, USD, GBP, JPY",1,"Email, Phone","Classic, ECN","Forex, Metals, Equity Index CFDs",en,en
+94,USGFX-logo.png,USGFX,0.00,"EUR, USD, GBP, AUD",1,"Email, Phone, Live Chat, Skype","Mini, Standard, VIP, Pro-ECN","Forex, Metals, Commodities, Indices, Shares, Cryptocurrencies",en,en
+95,MaxFX-logo.png,MaxFX,0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat","ZeroAccount, ECNMAX, VIPMAX","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs",en,en
+96,LCG-logo.png,LCG,0.00,"EUR, USD, GBP, CHF",1,"Email, Phone, Live Chat","Classic, ECN","Forex, Metals, Commodities, Indices, Stocks, Futures, Bonds, ETFs, Cryptocurrencies",en,en
+97,CM_Trading-logo.png,"CM Trading",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Mini, Classic, Executive, Premium, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+98,ApolloFX-logo.png,ApolloFX,0.00,"EUR, USD, GBP",1,"Email, Phone, Skype, Whatsapp","Silver, Gold, Platinum, ECN","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+99,GO_Markets-logo.png,"GO Markets",0.00,"EUR, USD, GBP, AUD, NZD, CHF, SGD",1,"Email, Phone, Live Chat","Standard, GO Plus+","Forex, Metals, Commodities, Indices, Shares",en,en
+100,Fortrade-logo.png,Fortrade,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat",STP,"Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, ETFs, Treasury Bonds, Cryptocurrencies",en,en
+101,CMC_Markets-logo.png,"CMC Markets",0.00,"EUR, USD, GBP, AUD, CHF, HKD, NOL, SEK",1,"Email, Phone","Classic, Prime","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Treasury Bonds",en,en
+102,MultiBank_Group-logo.png,"MultiBank Group",0.00,"EUR, USD, GBP, AUD, JPY",1,"Email, Phone, Live Chat","Standard, Pro, ECN","Forex, Metals, Commodities, Indices, Treasury Bonds, Cryptocurrencies",en,en
+103,Deltastock-logo.png,Deltastock,0.00,"EUR, USD, GBP, BGN, CHF, RON",1,"Email, Phone, Live Chat","Delta Trading, Deltastock MT4","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Futures, Cryptocurrencies",en,en
+104,Destek_Markets-logo.png,"Destek Markets",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Skype, WhatsApp","Standard, Gold, VIP, ECN","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+105,Vantage-Markets-logo.jpg,"Vantage Markets",0.00,"EUR, USD, AUD, GBP, NZD, SGD, JPY, CAD",1,"Email, Phone, Live Chat","Standard STP, Raw ECN, Pro ECN","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+107,UGL_Exchange-logo.png,"UGL Exchange",0.00,"EUR, USD",1,"Email, Phone, Live Chat, WhatsApp, Telegram, Viber","Standard, Pro, VIP, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+108,Infinox_Capital-logo.png,Infinox,0.00,"EUR, USD, GBP, AUD",1,"Email, Phone, Live Chat","STP, ECN, IX Social","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+109,CrescoFX-logo.png,CrescoFX,0.00,"EUR, GBP, USD",1,"Email, Phone, Live Chat, Skype, Viber, WhatsApp, Call Back Request","Standard, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Bonds, Futures, Cryptocurrencies",en,en
+110,Eurotrader-logo.png,Eurotrader,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Micro, Zero, Hero","Forex, Metals, Commodities, Indices, Cryptocurrencies, Stocks",en,en
+111,DecodeFX-logo.png,"Decode FX",0.00,"EUR, USD, GBP, AUD",1,"Email, Phone","Standard, Pro","Forex, Metals, Commodities, Indices",en,en
+112,NordFX-logo.png,NordFX,0.00,"USD, ETH, BTC",1,"Email, Phone, Live Chat","Fix, Pro, Zero, Savings","Forex, Metals, Commodities, Indices, Equities, Cryptocurrencies",en,en
+113,Libertex-logo.png,Libertex,0.00,USD,1,"Email, Phone, Live Chat, WhatsApp, Facebook Messanger",Regular,"Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, Cryptocurrencies, ETFs",en,en
+114,FP-Markets-logo.png,"FP Markets",0.00,"AUD, USD, EUR, GBP, SGD, CHF, CAD, NZD, JPY, HKD, PLN, MXN, BRL, ZAR",1,"Email, Phone, Live Chat","Standard, Raw","Forex, Metals, Commodities, Indices, Stocks, Cryptos",en,en
+115,Capital.com-logo.png,Capital,0.00,"EUR, GBP, USD, PLN",1,"Email, Phone, Live Chat, Viber, WhatsApp, Telegram, Facebook","Retail, Professional","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies, ETFs",en,en
+116,One-Royal-logo.png,"One Royal",0.00,"EUR, USD, AUD, CAD, GBP, HKD, NZD, SGD, CHF, PLN, LBP, BTC",1,"Phone, Email, Live Chat, WhatsApp, Toll Free Call","Zero Commission (Classic), Zero Commission (VIP), Zero Commission (Cent), ECN (Classic), ECN Elite (VIP)","Forex, Metals, Commodities, Indices, Shares, ETFs, Cryptos",en,en
+117,TMGM-logo.png,TMGM,0.00,"USD, AUD",1,"Phone, Email, Live Chat, WhatsApp, Skype","Classic, Edge, Standard, Premium, Pro, ECN","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+118,TitanFX-logo.png,TitanFX,0.00,"EUR, USD, JPY, AUD, SGD",1,"Email, Live Chat, Phone","Blade, Standard","Forex, Metals, Commodities, Indices",en,en
+119,LMFX-logo.png,LMFX,0.00,"EUR, USD",1,"Email, Phone, Live Chat","Premium, Fixed, Zero","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs",en,en
+120,Global_Prime-logo.png,"Global Prime",0.00,"EUR, USD, CAD, SGD, GBP, AUD",1,"Email, Phone, LiveChat, Skype, Facebook, WhatsApp, Discord, Forums, Call Back Request","ECN, FIX API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+121,Axiance-logo.jpg,Axiance,0.00,"EUR, USD",1,"Email, Live Chat, Phone","Entry, Standard, Premium, VIP","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+122,Exante-logo.png,Exante,0.00,"EUR , USD, GBP, JPY, CHF, RUB, SEK, CAD, HKD, MXN, PLN, CNY, NOK, SGD, AUD",1,"Email, Phone, Live Chat","Individual, Corporate, FIX API, Web API","Forex, Metals, Commodity CFDs, Equity Index CFDs, Equity CFDs, ETFs, Futures, Options, Bonds, Cryptocurrencies",en,en
+123,Scope-Markets-logo.png,"Scope Markets",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Standard, Raw","Forex, Metals, Energies, Indices, Futures, Shares, Cryptos",en,en
+124,TIOmarkets-logo.png,TIOmarkets,0.00,"USD, GBP, EUR, CAD, AUD, CZK, ZAR",1,"Email, Phone, Live Chat","Spread, Standard, VIP, VIP Black","Forex, Metals, Commodities, Indices, Stocks, Futures, Cryptos",en,en
+125,Solidary_Markets_FX-logo.png,"Solidary Markets FX",0.00,"EUR, USD, BTC, ETH",1,"Email, Phone, Live Chat, Skype","Standard, Elite, Top","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrency",en,en
+126,Blue_Suisse-logo.png,"Blue Suisse",0.00,"EUR, USD, CHF, GBP",1,"Email, Phone, Live Chat, WhatsApp, Telegram, Viber, Call Back Request","Denim Blue, Sky Blue, Sapphire Blue","Forex, Metals, Commodity CFDs, Equity Index CFDs, Cryptocurrencies",en,en
+127,Proton_Capital_Markets-logo.png,"Proton Capital Markets",0.00,"EUR, USD, GBP, CHF",1,"Email, Phone, Live Chat, WhatsApp, Telegram, Viber, Call Back Request","Mini, Standard, Pro, Raw Spread","Forex, Metals, Commodities, Indices, Cryptocurrencies",en,en
+128,JFD-logo.png,JFD,0.00,"EUR, USD, GBP, CHF",1,"Email, Phone, Live Chat","Individual, Corporate","Forex, Metals, Commodities, Indices, Stocks, ETFs, ETNs, Cryptocurrencies",en,en
+129,Charterprime-logo.png,Charterprime,0.00,"EUR, USD, AUD",1,"Email, Phone","Variable, ECN, Swap Free","Forex, Metals, Commodity CFDs, Equity Index CFDs",en,en
+130,CWG_Markets-logo.png,"CWG Markets",0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Instant, Classic, Advanced, Institutional","Forex, Metals, Commodities, Indices, Stocks, Futures",en,en
+131,NAGA-logo.png,Naga,0.00,"EUR, USD, GBP, PLN, BTC, ETH",1,"Email, Phone, Live Chat","Iron, Bronze, Silver, Gold, Diamond, Crystal","Forex, Metals, Oil, Commodities, Indices, Futures, Stocks, ETFs, Crypto",en,en
+132,SGT_Markets-logo.png,"SGT Markets",0.00,"EUR, USD, GBP",1,"Email, Live Chat","Direct, Prime, FIX API","Forex, Metals, Commodities, Indices, Stocks",en,en
+133,Errante-logo.png,Errante,0.00,"EUR, USD",1,"Email, Phone, Live Chat, WhatsApp, Telegram, Viber","Standard, Premium, VIP","Forex, Metals, Commodities, Indices, Shares, Cryptocurrencies",en,en
+134,xchief-logo.png,ForexChief,0.00,"USD, CHF, GBP, EUR, JPY, RUB",1,"Email, Phone, Live Chat","DirectFX, Classic+, CENT, xPRIME","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+135,Axiory-logo.png,Axiory,0.00,"EUR, USD",1,"Email, Phone, Live Chat","Nano, Standard, Max, Tera, Alpha","Forex, Metals, Commodities, Indices, Stocks, ETFs",en,en
+136,Thunder_Forex-logo.png,"Thunder Forex",0.00,"EUR, USD, CHF, AUD",1,"Email, Phone","Traditional, Raw","Forex, Metals, Commodities, Indices, Shares, Futures",en,en
+138,,Bonus,0.00,,1,,,,en,en
+139,Fondex-logo.jpg,Fondex,0.00,"USD, EUR, GBP, RUB, JPY, CHF, CNY, CAD, THB, PLN, AUD, MYR, VND, HKD, IDR, MAD, INR, SCR, PKR",1,"Email, Phone, Live Chat","Individual, Corporate","Forex, Metals, Energies, Indices, Stocks, ETFs, Cryptocurrencies",en,en
+140,etoro-logo.png,eToro,0.00,USD,1,"Email, Phone, Live Chat","Individual, Corporate","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+142,Fusion_Markets-logo.png,"Fusion Markets",0.00,"AUD, USD, GBP, EUR, CAD, SGD, JPN, NZD, THB",1,"Email, Phone, Live Chat, Telegram, Facebook Messenger, WhatsAapp","Classic, Zero","Forex, Metals, Commodities, Indices, Cryptos",en,en
+143,Currency.com-logo.png,Currency,0.00,"BTC, LTC, BCH, EHT, USDT, XRP, USD, EUR, GBP, BYN, RUB",1,"Email, Live Chat, Messanger, Telegram, Viber, WhatsApp","Individual, Corporate","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+144,Markets-Vox-logo.png,MarketsVox,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Skype, WhatsApp, Call Back Request","Cent, Standard, ECN","Forex, Metals, Commodities, Indices, Cryptos",en,en
+145,M4Markets-logo.jpg,M4Markets,0.00,"EUR, USD, GBP, JPY",1,"Email, Phone, Live Chat, WhatsApp, Call back request, Skype, Telegram","Standard, Raw Spread, Premium","Forex, Metals, Commodities, Indices, Shares, Cryptocurrencies",en,en
+146,CLSA_Premium-logo.png,"CLSA Premium",0.00,"USD, EUR, JPY, NZD",1,"Email, Phone, WhatsApp, Skype","Premium, Premium Pro","Forex, Metals, Commodities, Indices, Shares",en,en
+147,FXChoice-logo.png,FXChoice,0.00,"EUR, USD, GBP, AUD, CAD, BTC, BCH, LTC, ETH, XRP, USDT, USDC, DOGE, mAU",1,"Email, Phone, Live Chat","MT4 Classic, MT4 Pro, MT5 Pro, MT5 Pro Hedged","Forex, Metals, Commodities, Indices, Shares, Cryptocurrencies",en,en
+148,ACY_Securities-logo.png,"ACY Securities",0.00,"AUD, EUR, GBP, JPY, HKD, TWD, SGD, CNY, CAD, INR, CHF, AED, MYR, PHP, IDR, TBH, VND, Cryptos",1,"Email, Phone, Live Chat, Skype, Messanger, WhatsApp, Call Back Request, Telegram, Toll Free Call","Standard, ProZero, Bespoke","Forex, Metals, Commodities, Indices, Shares, ETFs, Cryptocurrencies",en,en
+149,CFI_Financial-logo.png,"CFI Financial",0.00,"USD, EUR, GBP, Others",1,"Email, Phone, Live Chat","Zero Commission, Dynamic Trader","Forex, Metals, Commodities, Indices, Equities, ETFs, Cryptos",en,en
+150,Binance-logo.png,Binance,0.00,"EUR, GBP, AUD, TRY, USD, KZT, BRL, HKD, PEN, RUB, UAH, UGX, PHP, PLN, RON, CHF, CNY, CAD, DKK, HUF, INR, IDL, ILS, JPY, NZD, NGN, PEN, SEK, SAR, TWD, THB, VND, VES, ZAR, BTC, ETH, USDT, BNB, EOS",2,"Email, Phone, Live Chat","Individual, Corporate","Spot Crytocurrencies, Futures Cryptocurrencies, Vanilla Options Cryptocurrencies, Leveraged Tokens",en,en
+152,MEX_Exchange-logo.png,"MEX Exchange",0.00,"AUD, EUR, USD, GBP",1,"Email, Phone, Live Chat","Classic, ECN","Forex, Metals, Commodities, Indices",en,en
+153,Squared_Financial-logo.png,"Squared Financial",0.00,"EUR, USD, GBP, CHF, ZAR",1,"Email, Phone, Live Chat, WhatsApp, anydest, Zoom","SquaredPro, SquaredElite","Forex, Metals, Energies, Indices, Stocks, Futures, Cryptocurrencies",en,en
+154,BlackBull-Markets-logo.png,"BlackBull Markets",0.00,"USD, GBP, EUR, AUD, NZD, SGD, JPY, CAD, CHF",1,"Email, Phone, Live Chat","Standard, Prime","Forex, Metals, Commodities, Futures, Indices, Equities, Cryptos",en,en
+155,Blueberry_Markets-logo.png,"Blueberry Markets",0.00,"USD, EUR, CAD, SGD, NZD, GBP, AUD",1,,,,en,en
+156,Key_To_Markets-logo.png,"Key To Markets",0.00,"EUR, USD, GBP",1,"Email, Phone, Skype, Messanger, WhatsApp, Call Back Request","Standard, Pro","Forex, Metals, Commodities, Indices, Shares, Cryptocurrencies",en,en
+157,FreshForex.jpg,FreshForex,0.00,"EUR, USD, BTC",1,"Email, Phone, Live Chat, Call Back Request, Telegram","Cent, Classic, Market Pro, ECN","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+158,4XC-logo.png,4XC,0.00,"USD, EUR, GBP, BRL",1,"Email, Phone, Live Chat, Call Back Request","Standard, Pro, VIP","Forex, Metals, Commodities, Indices, Crypto",en,en
+159,Skilling-logo.png,Skilling,0.00,"USD, EUR, GBP, NOK, SEK",1,"Email, Phone, Live Chat, Messenger, WhatsApp, Telegram","Standard, Premium","Forex, Metals, Commodities, Indices, Shares, Cryptos",en,en
+160,fxview-logo.png,Fxview,0.00,"USD, EUR, GBP, AUD, ZAR",1,"Email, Phone, Live Chat","Raw ECN","Forex, Metals, Commodities, Indices, Stocks, Cryptocurrencies",en,en
+161,PUPRIME-logo.png,"PU Prime",0.00,"USD, GBP, CAD, AUD, EUR, SGD, NZD, HKD, JPY",1,"Email, Phone, Live Chat, Skype","Standard, Prime, ECN, Pro, Cent, Islamic Standard, Islamic Prime","Forex, Metals, Commodities, Indices, Shares, Cryptos",en,en
+162,Equiti-logo.png,Equiti,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat, Messenger, WhatsApp, Call back Request","Executive, Executive Swap Free, Premiere, Standard, Standard Swap Free, Advanced, Advanced Swap Free, Elite, Elite Swap Free, Pro, Pro Swap Free, ProPlus, ProPlus Swap Free, Equiti, Equiti Swap Free","Forex, Metals, Commodities, Indices, Shares, Futures, ETFs, Cryptocurrencies",en,en
+163,GTC-logo.png,GTC,0.00,USD,1,"Email, Phone, Live Chat, WhatsApp","Cent, Standard, ECN","Forex, Metals, Commodities, Indices, Stocks, Cryptos",en,en
+164,Intertrader-logo.jpg,Intertrader,0.00,"EUR, USD, GBP",1,"Email, Phone, Call Back Request","Individual, Corporate, Individual Spread Betting, Corporate Spread Betting","Forex, Metals, Commodities, Indices, Shares, Bonds",en,en
+165,ICM-logo.jpg,ICM.com,0.00,"USD, GBP, EUR, JPY, CHF, others",1,"E-mail, Phone, Live Chat, WhatsApp, Social Channels, Call Back Request ","ICM Zero, ICM Direct, ICM Securities","Spot FX CFDs, Cash CFDs, Futures CFDs, Commodities, Soft Commodities, US Stocks CFDs, Global Equities, Crypto CFDs",en,en
+166,Ingot-Brokers-logo.png,"Ingot Brokers",0.00,"USD, EUR, GBP, AUD",1,"Email, Phone, Live Chat, Call Back Request","Professional, ECN, Prime","Spot Currencies, Spot Metals, Spot Energies, Spot Indices, EU Stocks, US Stocks, UK Stocks, ETFs, Futures, Cryptocurrencies",en,en
+167,gmi-markets-logo.png,"GMI Markets",0.00,USD,1,"Email, Live Chat","Cent, Standard, ECN","Forex, Metals, Commodities, Energies, Indices, Futures",en,en
+168,ActivTrades-Logo.png,ActivTrades,0.00,"EUR, USD, GBP",1,"Email, Phone, Live Chat","Individual, Professional, Islamic","Forex, Metals, Commodities, Indices, Stocks, ETFs, Bonds, Cryptos",en,en
+169,Startrader-logo.jpg,STARTRADER,0.00,USD,1,"Email, Live Chat","STP, ECN","Forex, Metals, Commodities, Indices, Bonds, Crypto",en,en
+170,,TopFX,0.00,,1,,,,en,en
+171,Trust-Capital-logo.png,"Trust Capital",0.00,"USD, EUR",1,"Email, Skype, Live chat, Phone, WhatsApp","TrustSolo, TrustTogether","Forex, Metals, Commodities, Energies, Indices, Shares, Cryptos",en,en
+172,vt-markets-logo.png,"VT Markets",0.00,"USD, AUD, CAD, GBP, EUR, JPY",1,"Email, Phone, Live Chat, WhatsApp, Call Back Request","Standard STP, VIP STP, RAW ECN","Forex, Metals, Energy, Commodities, Indices, Shares, ETFs, Bonds, Cryptos",en,en
+174,Amana-logo.jpg,Amana,0.00,"USD, EUR, GBP",1,"Email, Phone, Live Chat, WhatsApp, Call Back Request, Telegram","Classic, Raw","Forex, Metals, Commodities, Energies, Indices, Share CFDs, Share ETFs, Share ETP, Bonds, Futures, Cryptos",en,en
+175,qsq-markets-logo.jpg,"QSQ Markets",0.00,"USD, EUR",1,"Email, Phone, Live Chat, Telegram","Standard, Pro, Elite","Forex, Metals, Commodities, Energies, Indices, Shares, Cryptos",en,en
+176,exclusive-markets-logo.png,"Exclusive Markets",0.00,"USD, JPY, EUR, GBP",1,"Email, Phone, Live Chat, Call Back Request","Exclusive, Standard, Standard Plus, Cent, Shares","Forex, Metals, Commodities, Indices, Equities, CFD Stocks, CFD ETFs, CFD Cryptos",en,en
+177,doo-prime-logo.png,"Doo Prime",0.00,USD,1,"Email, Phone, Live Chat","Cent, STP, ECN","Forex, Metals, Commodities, Spot Indices, US Stocks CFD, HK Stocks CFD, Futures CFD, Cryptos",en,en
+178,finveo-logo.png,FINVEO,0.00,"EUR, USD",1,"Email, Live Chat, Phone, WhatsApp","Standard, Gold, Platinum, ECN Pro","Forex, Metals, Energies, Indices, Futures, Bond CFDs, Equity CFDs",en,en
+179,dna-markets-logo.png,"DNA Markets",0.00,"AUD, USD, EUR, GBP, NZD, CAD, SGD",1,"Live Chat, Phone, Email","Standard, Raw","Forex, Metals, Commodities, Indices, Shares, Cryptos",en,en
+180,eightcap-logo.png,Eightcap,0.00,"EUR, USD, GBP, AUD",1,"Email, Phone, Live Chat, WhatsApp","Standard, Raw","Forex, Metals, Oil, Commodities, Indices, Shares, Cryptos",en,en

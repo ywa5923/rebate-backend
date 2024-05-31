@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/translations",
+    "description": "",
+    "authors": [
+        {
+            "name": "Ion Ivan",
+            "email": "ivanion10@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Translations\\": "app/",
+            "Modules\\Translations\\Database\\Factories\\": "database/factories/",
+            "Modules\\Translations\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Translations\\Tests\\": "tests/"
+        }
+    }
+}

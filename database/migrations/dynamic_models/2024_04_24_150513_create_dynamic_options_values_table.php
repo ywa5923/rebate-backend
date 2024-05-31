@@ -11,19 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broker_types', function (Blueprint $table) {
+        Schema::create('dynamic_options_values', function (Blueprint $table) {
             $table->id();
-            $table->string('name',100);
-            $table->string('description',500);
+            $table->morphs('dynamicable');
+            $table->string('option_name',100);
+            $table->foreignId('dynamic_option_id')
+            ->constrained();
+            $table->text('value'); 
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('broker_types');
+        Schema::dropIfExists('dynamic_options_values');
     }
 };

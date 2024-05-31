@@ -98,6 +98,243 @@
                     }
                 }
             }
+        },
+        "/api/v1/brokers/": {
+            "get": {
+                "tags": [
+                    "Broker"
+                ],
+                "summary": "Get all brokers",
+                "operationId": "ec4cb31fd1f33834dcb884ba228ad72e",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These request do not match our records"
+                    }
+                }
+            }
+        },
+        "/api/v1/brokers": {
+            "post": {
+                "tags": [
+                    "Broker"
+                ],
+                "summary": "Add a new broker",
+                "operationId": "60a61cac11e93f5f9cb5bc38d2d7948c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "favicon": {
+                                        "type": "string"
+                                    },
+                                    "trading_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These credentials do not match our records"
+                    }
+                }
+            }
+        },
+        "/api/v1/broker/{id}": {
+            "get": {
+                "tags": [
+                    "Broker"
+                ],
+                "summary": "Show a broker",
+                "operationId": "fb382c8caef7d7e1be19438f21cd0f2b",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These request do not match our records"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Broker"
+                ],
+                "summary": "Update broker",
+                "operationId": "17715e762a5918b1fce4ab878b538f60",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "favicon": {
+                                        "type": "string"
+                                    },
+                                    "trading_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These credentials do not match our records"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Broker"
+                ],
+                "summary": "Delete broker",
+                "operationId": "084f3abaae194c1242baf66a2d03e26d",
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "/api/v1/translation": {
+            "post": {
+                "tags": [
+                    "Translation"
+                ],
+                "summary": "Add translation data",
+                "operationId": "752ea594f8bcf2e2597136e21a5e0314",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "translationable_type": {
+                                        "type": "string"
+                                    },
+                                    "translationable_id": {
+                                        "type": "string"
+                                    },
+                                    "language_code": {
+                                        "type": "string"
+                                    },
+                                    "metadata": {
+                                        "type": "json"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These credentials do not match our records"
+                    }
+                }
+            }
+        },
+        "/api/v1/translation/{id}": {
+            "get": {
+                "tags": [
+                    "Translation"
+                ],
+                "summary": "Translate service API",
+                "operationId": "05be1aacb6bd92955ca2744502dbc90e",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These request do not match our records"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Translation"
+                ],
+                "summary": "Add translation data",
+                "operationId": "0c615cde8244fbb6745decca413782a4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "translationable_type": {
+                                        "type": "string"
+                                    },
+                                    "translationable_id": {
+                                        "type": "string"
+                                    },
+                                    "language_code": {
+                                        "type": "string"
+                                    },
+                                    "metadata": {
+                                        "type": "json"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These credentials do not match our records"
+                    }
+                }
+            }
+        },
+        "/api/v1/transaltion/{id}": {
+            "delete": {
+                "tags": [
+                    "Translation"
+                ],
+                "summary": "Delete translation",
+                "operationId": "cc3a5c03d2bf497fd46c4f8c2e096e44",
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
         }
     }
 }

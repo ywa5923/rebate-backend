@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Brokers\Http\Controllers\BrokersController;
+use Modules\Brokers\Http\Controllers\BrokerController;
 
 /*
  *--------------------------------------------------------------------------
@@ -14,6 +14,10 @@ use Modules\Brokers\Http\Controllers\BrokersController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('brokers', BrokersController::class)->names('brokers');
+// Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+//     Route::apiResource('brokers', BrokerController::class)->names('brokers');
+// });
+
+Route::group(["prefix"=>'v1'], function () {
+    Route::apiResource('brokers', BrokerController::class)->names('brokers');
 });

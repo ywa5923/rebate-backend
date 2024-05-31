@@ -1,0 +1,30 @@
+<?php
+
+namespace Modules\Brokers\Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Database\Seeders\BatchImporter;
+
+class OptionsCategoriesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+         //$this->call();
+        
+         $csvFile = module_path('Brokers', 'database/seeders/csv/categories.csv');
+
+         
+        $importer=new BatchImporter(filePath:$csvFile);
+        $importer->setTableInfo(tableName:"option_categories",rowMapping:[
+            "id"=>1,
+            "name"=>2,
+            "default_language"=>3
+        ]);
+      
+        $importer->import();
+        
+    }
+}

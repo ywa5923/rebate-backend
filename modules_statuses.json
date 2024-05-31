@@ -1,5 +1,6 @@
 {
     "Auth": true,
     "Test": true,
-    "Brokers": true
+    "Brokers": true,
+    "Translations": true
 }

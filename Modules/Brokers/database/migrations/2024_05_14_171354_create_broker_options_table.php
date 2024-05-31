@@ -14,19 +14,17 @@ return new class extends Migration
         Schema::create('broker_options', function (Blueprint $table) {
             $table->id();
             $table->string('name',100);
-            $table->string('description',500)->nullable();
-            $table->enum('type',['int','float','double','numeric','string','text','radio','checkbox']);
-            $table->string('requirements',500)->nullable();
-            $table->json('metadata')->nullable();
-            $table->integer('position');
-            $table->foreignId('broker_type_id')
-            ->constrained()
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
-
-            $table->foreignId('category_id')
-            ->constrained(table: 'broker_options_categories');
-            
+            $table->string('slug',100);
+            $table->string('data_type',100);
+            $table->string('form_type',200);
+            $table->json('meta_data')->nullable();
+            $table->boolean('for_crypto');
+            $table->boolean('for_brokers');
+            $table->boolean('for_props');
+            $table->boolean('required');
+            $table->integer('position')->nullable();
+            $table->string("default_language",50)->nullable();
+            $table->foreignId("option_category_id")->constrained("option_categories");
             $table->timestamps();
         });
     }

@@ -82,3 +82,21 @@ php artisan key:generate
 php artisan config:cache
 
  git push origin HEAD:master
+
+ ////php artisan module:make-migration alter_table_translations_change_value Translations
+ php artisan module:seed Brokers
+php artisan module:migrate translations
+php artisan migrate:rollback --batch=8
+ php artisan l5-swagger:generate
+ php artisan db:seed --class=\\Modules\\Brokers\\Database\\Seeders\\DatabaseSeeder
+
+php artisan route:list
+php artisan cache:clear
+
+php artisan module:make-model Broker --controller --factory --seed Brokers
+
+php artisan module:make-migration create_translations_table Translations
+php artisan module:make-factory BrokerTypeFactory Brokers
+
+php artisan make:seeder UserSeeder
+php artisan module:make-seed OtionsCategories Brokers

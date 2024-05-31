@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broker_options_categories', function (Blueprint $table) {
+        Schema::create('brokers_companies', function (Blueprint $table) {
             $table->id();
-            $table->string('name',100);
-            $table->string('description',500);
+            $table->foreignId("broker_id")->constrained();
+            $table->foreignId("company_id")->constrained("companies");
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('broker_options_categories');
+        Schema::dropIfExists('brokers_companies');
     }
 };

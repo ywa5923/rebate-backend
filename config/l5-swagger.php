@@ -41,6 +41,8 @@ return [
                 'annotations' => [
                    base_path('app'),
                     base_path('Modules/Auth'),
+                    base_path('Modules/Translations'),
+                    base_path('Modules/Brokers'),
 
                 ],
 
