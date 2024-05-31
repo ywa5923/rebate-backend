@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 /docker
 csv
+/Modules/Brokers/database/seeders/csv/
