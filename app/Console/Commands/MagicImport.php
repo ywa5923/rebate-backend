@@ -52,9 +52,10 @@ class MagicImport extends Command
      //  $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
 
         $this->info("\\\///...importing URLs ");
-        $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
+       // $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
 
-       
-       
+       $this->info("\\\///...importing broker_options ");
+       $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+
     }
 }
