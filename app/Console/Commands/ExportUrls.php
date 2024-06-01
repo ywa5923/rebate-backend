@@ -57,6 +57,7 @@ class ExportUrls extends Command
         $refineResults=[];
         foreach($results as $row)
         {
+            //format links same as urls table's columns
             $mobileLinks=$this->formatLink($row->id,$row->mobile,"mobile",3);
             $tradingAccountLinks=$this->formatLink($row->id,$row->links,"live_trading_account",1);
             $partnerAccountLinks=$this->formatLink($row->id,$row->links_partner,"partner_account",1);
@@ -75,9 +76,7 @@ class ExportUrls extends Command
       return [];
         $formatedRows=[];
         $foundMatch=preg_match_all('|<a[^>]*href="(.+)"[^>]*>(.+)</[^>]*a[^>]*>|U',$link,$out,PREG_PATTERN_ORDER);
-        //$foundMatch=preg_match_all('|<a href="(.+)"[^>]*>(.+)</[^>]*a[^>]*>|',$row2->mobile,$out,PREG_PATTERN_ORDER);
-      
-      
+       
         if($foundMatch){
                
             foreach($out[1] as $k=>$v)
