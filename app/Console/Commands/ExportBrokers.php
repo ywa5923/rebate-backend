@@ -30,7 +30,8 @@ class ExportBrokers extends Command
         'trading_name' => "name",
         "user_rating" => "rating",
         'account_currencies' => "currency",
-        "broker_type_id" => "type"
+        "broker_type_id" => "type",
+        'home_url'=>'home_url'
     ];
     // "overall_rating">""
     // 

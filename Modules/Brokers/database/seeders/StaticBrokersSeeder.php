@@ -40,15 +40,15 @@ class StaticBrokersSeeder extends Seeder
             "user_rating" => 4,
             "account_currencies" => 5,
             "broker_type_id" => 6,
-            "support_options" => 7,
-            "account_type" => 8,
-            "trading_instruments" => 9,
-            "language" => 10,
-            "default_language" => 11
-
+            "home_url"=>7,
+            "support_options" => 8,
+            "account_type" => 9,
+            "trading_instruments" => 10,
+            "language" => 11,
+            "default_language" => 12
         ]);
-        // id,logo,trading_name,user_rating,account_currencies,broker_type_id,support_options,account_type,trading_instruments,language,default_language
-
-        $importer->import(1,1);
+        
+        //id,logo,trading_name,user_rating,account_currencies,broker_type_id,home_url,support_options,account_type,trading_instruments,language,default_language
+         $importer->import(1,1);
     }
 }
