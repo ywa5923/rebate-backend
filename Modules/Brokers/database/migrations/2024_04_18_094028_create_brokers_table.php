@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreignId('broker_type_id')
             ->constrained();
             $table->timestamps();
+            //trebuie adaugat home_url
         });
     }
 

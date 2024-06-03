@@ -31,6 +31,7 @@ class MagicImport extends Command
         $this->call('app:export-companies');
         $this->call('app:export-deal-types');
         $this->call('app:export-urls');
+        $this->call('app:export-dynamic-options');
 
         $this->info("====...switching to new database...====");
         DB::statement("use fxrebate");
@@ -55,7 +56,7 @@ class MagicImport extends Command
        // $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
 
        $this->info("\\\///...importing broker_options ");
-       $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+       //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
 
     }
 }
