@@ -26,11 +26,11 @@ class MagicImport extends Command
      */
     public function handle()
     {
-        $this->call('app:export-brokers');
-        $this->call( 'app:export-regulators');
-        $this->call('app:export-companies');
-        $this->call('app:export-deal-types');
-        $this->call('app:export-urls');
+        // $this->call('app:export-brokers');
+        // $this->call( 'app:export-regulators');
+        // $this->call('app:export-companies');
+        // $this->call('app:export-deal-types');
+        // $this->call('app:export-urls');
         $this->call('app:export-dynamic-options');
 
         $this->info("====...switching to new database...====");
@@ -43,17 +43,17 @@ class MagicImport extends Command
         //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\CompaniesSeeder"]);
         
         $this->info("\\\///...importing regulators ");
-       // $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\RegulatorsSeeder"]);
+        //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\RegulatorsSeeder"]);
        
     
         $this->info("\\\///...importing dealtypes ");
-       // $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\DealTypesSeeder"]);
+       //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\DealTypesSeeder"]);
 
        $this->info("\\\///...importing Option Categories");
-     //  $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
+        //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
 
         $this->info("\\\///...importing URLs ");
-       // $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
+        //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
 
        $this->info("\\\///...importing broker_options ");
        //$this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);

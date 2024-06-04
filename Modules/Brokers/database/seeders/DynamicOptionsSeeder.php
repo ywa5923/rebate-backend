@@ -12,7 +12,7 @@ class DynamicOptionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic-options.csv');
+        $csvFile = module_path('Brokers', 'database/seeders/csv/broker_options.csv');
         $importer=new BatchImporter(filePath:$csvFile);
         $importer->setTableInfo(tableName:"broker_options",rowMapping:[
             "id"=>1,
@@ -20,15 +20,18 @@ class DynamicOptionsSeeder extends Seeder
             "slug"=>3,
             "data_type"=>4,
             "form_type"=>5,
-            "required"=>6,
-            "position"=>7,
-            "option_category_id"=>8,
-            "for_brokers"=>9,
-            "for_crypto"=>10,
-            "for_props"=>11,
+            //"meta_data"=>6,
+            "for_brokers"=>7,
+            "for_crypto"=>8,
+            "for_props"=>9,
+            "required"=>10,
+            "position"=>11,
             "default_language"=>12,
+            "option_category_id"=>13
+        
         ]);
        //id,name,slug,data_type,form_type,required,position,option_category_id,for_brokers,for_crypto,for_props,default_language
-        $importer->import(1,1);
+       //id,name,slug,data_type,form_type,meta_data,for_crypto,for_brokers,for_props,required,position,default_language,option_category_id
+       $importer->import(1,1);
     }
 }

@@ -9,9 +9,9 @@ use Nwidart\Modules\Facades\Module;
 trait TraitCommand
 {
 
-    function savetoCsv($fileName, $rows, $headers, ...$defaultCols)
+    function savetoCsv($fileName,$fileOpenMode, $rows, $headers, ...$defaultCols)
     {
-        $fp = fopen($fileName, 'w');
+        $fp = fopen($fileName, $fileOpenMode);
         fputcsv($fp, $headers);
         foreach ($rows as $row) {
             $rowArray = array_values((array)$row);

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('option_values', function (Blueprint $table) {
             $table->id();
             $table->string("option_slug");
-            $table->string("value",5000);
+            $table->text("value");
             $table->boolean("status");//de bagat si in broker options;
             $table->string("status_message")->nullable();
             $table->string("unit",100)->nullable();
