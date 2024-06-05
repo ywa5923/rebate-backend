@@ -112,61 +112,10 @@ class ExportDynamicOptions extends Command
         $sql = "select {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en'";
         $results = $this->DbSelect($sql);
 
-        //dd($results[116]);
         $newHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
-        $csvFile = $this->getCsvSeederPath("Brokers", "dynamic-options-values.csv");
-        //$this->savetoCsv($csvFile,'w' $results, $newHeaders);
+        $csvFile = $this->getCsvSeederPath("Brokers", "dynamic_options_values.csv");
+        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
 
-        $handle = fopen($csvFile, "r");
-        DB::statement("use fxrebate");
-        $rowIndex = 0;
-       
-        $optionsFile= $this->getCsvSeederPath("Brokers", "dynamic-options-values2.csv");
-        
-        while (($row = fgetcsv($handle, 4096)) !== FALSE) {
-           
-            if ( $rowIndex === 0) {
-                $rowIndex++;
-                $optionsId=$this->getOptionsId($row);
-                $options=$row;
-                continue;
-                //var_dump($options);
-            }
-            foreach ($row as $k=>$v)
-            {
-                if($k==0){
-                    continue;
-                }
-                OptionValue::insert([
-                    [
-                        "broker_id"=>$row[0],
-                        "broker_option_id"=>$optionsId[$k],
-                         "option_slug"=>$options[$k],
-                         "value"=>$v,
-                         "status"=>1
-                    ]
-                ]);
-                
-            }
-           
-           // dd($row[0]);
-        }
     }
-    public function getOptionsId($row)
-    {
-        $optionsId = [];
-        foreach ($row as $k => $v) {
-            if ($v !== 'broker_id') {
-                $option = BrokerOption::where('slug', $v)->first();
-                if($option!=null){
-                    $optionsId[$k] = $option->id;
-                }else{
-                    throw new \Exception("Option with slug {$v} not found");
-                }
-               
-               
-            }
-        }
-        return $optionsId;
-    }
+    
 }

@@ -68,7 +68,7 @@ class ExportRegulators extends Command
         $results = DB::select($sql);
         $newHeaders = array_keys(array_merge($this->regulatorsMap, $this->regulatorsTextsMap));
         $csvFile = $this->getCsvSeederPath("Brokers", "regulators.csv");
-        $this->savetoCsv($csvFile, $results, $newHeaders);
+        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
     }
 
     public function exportBrokersRegulators()
@@ -78,7 +78,7 @@ class ExportRegulators extends Command
         $results = $this->filterResults($results);
         $newHeaders = ["broker_id", "regulator_id"];
         $csvFile = $this->getCsvSeederPath("Brokers", "brokers_regulators.csv");
-        $this->savetoCsv($csvFile, $results, $newHeaders);
+        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
     }
     public function filterResults($rows)
     {

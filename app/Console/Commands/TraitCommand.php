@@ -11,6 +11,7 @@ trait TraitCommand
 
     function savetoCsv($fileName,$fileOpenMode, $rows, $headers, ...$defaultCols)
     {
+       
         $fp = fopen($fileName, $fileOpenMode);
         fputcsv($fp, $headers);
         foreach ($rows as $row) {

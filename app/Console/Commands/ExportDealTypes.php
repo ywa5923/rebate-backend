@@ -60,7 +60,7 @@ class ExportDealTypes extends Command
          $newHeaders=array_keys(array_merge($this->dealtypesMap,$this->dealtypeTextsMap));
           $csvFile=$this->getCsvSeederPath("Brokers","dealtypes.csv");
          
-         $this->savetoCsv( $csvFile,$results, $newHeaders,"en");
+         $this->savetoCsv( $csvFile,'w',$results, $newHeaders,"en");
 
     }
 
@@ -74,6 +74,6 @@ class ExportDealTypes extends Command
     
         $newHeaders=["broker_id","dealtype_id"];
         $csvFile=$this->getCsvSeederPath("Brokers","brokers_dealtypes.csv");
-        $this->savetoCsv( $csvFile,$filteredResults, $newHeaders);
+        $this->savetoCsv($csvFile,'w',$filteredResults, $newHeaders);
     }
 }

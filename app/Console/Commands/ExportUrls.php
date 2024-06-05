@@ -49,7 +49,7 @@ class ExportUrls extends Command
        
         $newHeaders = ["broker_id","url_type","name","slug","url","option_category_id"];
         $csvFile=$this->getCsvSeederPath("Brokers","urls.csv");
-        $this->savetoCsv($csvFile, $refinedResults, $newHeaders);
+        $this->savetoCsv($csvFile, 'w',$refinedResults, $newHeaders);
     }
 
     public function refineResults($results)

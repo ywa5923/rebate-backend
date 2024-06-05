@@ -34,4 +34,14 @@ class DynamicOptionsSeeder extends Seeder
        //id,name,slug,data_type,form_type,meta_data,for_crypto,for_brokers,for_props,required,position,default_language,option_category_id
        $importer->import(1,1);
     }
+
+    public function importData()
+    {
+        $csvFile = module_path('Brokers', 'database/seeders/csv/option_values.csv');
+        $importer=new BatchImporter(filePath:$csvFile);
+        $importer->setTableInfo(tableName:"option_values",rowMapping:[
+         
+        ]);
+
+    }
 }

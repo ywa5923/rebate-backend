@@ -56,7 +56,7 @@ class ExportCompanies extends Command
         $newHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
         $csvFile=$this->getCsvSeederPath("Brokers", "companies.csv");
 
-        $this->savetoCsv($csvFile, $results, $newHeaders);
+        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
        
     }
 }
