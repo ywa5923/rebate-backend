@@ -109,12 +109,21 @@ class ExportDynamicOptions extends Command
         $this->info("...exporting dynamics options from brokers and broker_texts tables");
         $brokersCols = $this->formatForSelectSql(array_values($this->brokersMap), "b");
         $brokerTextsCols = $this->formatForSelectSql(array_values($this->brokersTextsMap), "t");
-        $sql = "select {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en'";
-        $results = $this->DbSelect($sql);
+        //get optins values in english language
+        $sqlEn = "select {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en'";
+        $resultsEn = $this->DbSelect($sqlEn);
+        //get optins values in romanian language
+        $sqlRo = "select b.id,{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='ro'";
+        $resultsRo = $this->DbSelect($sqlRo);
 
         $newHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
-        $csvFile = $this->getCsvSeederPath("Brokers", "dynamic_options_values.csv");
-        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
+        $csvFileEn = $this->getCsvSeederPath("Brokers", "dynamic_options_values.csv");
+        $this->savetoCsv($csvFileEn,'w',  $resultsEn, $newHeaders);
+
+        $roHeaders=array_keys($this->brokersTextsMap);
+        array_unshift($roHeaders,"broker_id");
+        $csvFileRo = $this->getCsvSeederPath("Brokers", "dynamic_options_values_ro.csv");
+        $this->savetoCsv( $csvFileRo,'w',  $resultsRo , $roHeaders);
 
     }
     

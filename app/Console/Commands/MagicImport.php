@@ -58,8 +58,13 @@ class MagicImport extends Command
     //    $this->info("\\\\///...importing broker_options ");
     //    $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
 
-       $this->info("\\\\///...importing broker options value ");
-       $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsValuesSeeder"]);
+    //    $this->info("\\\\///...importing broker options value ");
+    //    $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsValuesSeeder"]);
+
+     
+
+       $this->info("\\\\///...translate broker options value ");
+       $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\TranslateDynamicOptionsSeeders"]);
 
     }
 }
