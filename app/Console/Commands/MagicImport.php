@@ -27,9 +27,9 @@ class MagicImport extends Command
     public function handle()
     {
     //     $this->call('app:export-brokers');
-    //     $this->call( 'app:export-regulators');
+        $this->call( 'app:export-regulators');
     //     $this->call('app:export-companies');
-    //     $this->call('app:export-deal-types');
+          $this->call('app:export-deal-types');
     //     $this->call('app:export-urls');
     //     $this->call('app:export-dynamic-options');
 
@@ -63,8 +63,8 @@ class MagicImport extends Command
 
      
 
-       $this->info("\\\\///...translate broker options value ");
-       $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\TranslateDynamicOptionsSeeders"]);
+    //    $this->info("\\\\///...translate broker options value ");
+    //    $this->call('db:seed',["class"=>"\\Modules\\Brokers\\Database\\Seeders\TranslateDynamicOptionsSeeders"]);
 
     }
 }

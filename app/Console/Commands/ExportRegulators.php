@@ -65,10 +65,17 @@ class ExportRegulators extends Command
         $regulatorsTextsCols = $this->formatForSelectSql(array_values($this->regulatorsTextsMap), "t");
 
         $sql = "select {$regulatorsCols},{$regulatorsTextsCols} from regulators r left join regulator_texts t on r.id=t.regulator_id and t.language='en' ";
-        $results = DB::select($sql);
+        $results=$this->DbSelect($sql);
         $newHeaders = array_keys(array_merge($this->regulatorsMap, $this->regulatorsTextsMap));
         $csvFile = $this->getCsvSeederPath("Brokers", "regulators.csv");
         $this->savetoCsv($csvFile,'w', $results, $newHeaders);
+
+        $sqlRo = "select r.id,{$regulatorsTextsCols} from regulators r left join regulator_texts t on r.id=t.regulator_id and t.language='ro' ";
+        $resultsRo = $this->DbSelect($sqlRo);
+        $newHeadersRo = array_keys($this->regulatorsTextsMap);
+        array_unshift($newHeadersRo,'id');
+        $csvFileRo = $this->getCsvSeederPath("Brokers", "regulators_ro.csv");
+        $this->savetoCsv($csvFileRo,'w',  $resultsRo, $newHeadersRo);
     }
 
     public function exportBrokersRegulators()
