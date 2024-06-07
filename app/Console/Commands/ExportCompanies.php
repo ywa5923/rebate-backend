@@ -52,11 +52,16 @@ class ExportCompanies extends Command
         $sql0 = "set @rownum := 0";
         DB::select($sql0);
         $sql = "select @rownum := @rownum + 1 as row_number, {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en' where b.company !=''";
-        $results = DB::select($sql);
+        $results = $this->DbSelect($sql);
         $newHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
-        $csvFile=$this->getCsvSeederPath("Brokers", "companies.csv");
+        $csvFile = $this->getCsvSeederPath("Brokers", "companies.csv");
+        $this->savetoCsv($csvFile, 'w', $results, $newHeaders);
 
-        $this->savetoCsv($csvFile,'w', $results, $newHeaders);
-       
+        $sqlRo = "select b.id,{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='ro' where b.company !=''";
+        $resultsRo = $this->DbSelect($sqlRo);
+        $newHeadersRo = array_keys($this->brokersTextsMap);
+        array_unshift($newHeadersRo, "broker_id");
+        $csvFileRo = $this->getCsvSeederPath("Brokers", "companies_ro.csv");
+        $this->savetoCsv($csvFileRo, 'w',  $resultsRo, $newHeadersRo);
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -14,16 +15,20 @@ use Modules\Translations\Models\Translation;
 class Broker extends Model
 {
     use HasFactory;
+
+     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'brokers';
+
   
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [ "logo","favicon", "trading_name"];
 
-    protected static function newFactory(): BrokerFactory
-    {
-        return BrokerFactory::new();
-    }
 
     public function translations():MorphMany
     {
@@ -33,6 +38,12 @@ class Broker extends Model
     public function options():HasMany
     {
         return $this->hasMany(OptionValue::class);
+    }
+
+    public function companies():BelongsToMany
+    {
+         return $this->belongsToMany(Company::class);
+
     }
 
  

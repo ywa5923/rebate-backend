@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('language_code',10);
             $table->string('property',100)->nullable();
             $table->text('value')->nullable();
-            $table->json('metadata');
+            $table->json('metadata')->nullable();
             $table->enum('translation_type',['columns','property',"properties"]);
             $table->timestamps();
         });

@@ -37,7 +37,7 @@ class DealTypesSeeder extends Seeder
     {
         $csvFile = module_path('Brokers', 'database/seeders/csv/brokers_dealtypes.csv');
         $importer=new BatchImporter(filePath:$csvFile);
-        $importer->setTableInfo(tableName:"brokers_dealtypes",rowMapping:[
+        $importer->setTableInfo(tableName:"broker_dealtype",rowMapping:[
             "broker_id"=>1,
             "dealtype_id"=>2
         ]);

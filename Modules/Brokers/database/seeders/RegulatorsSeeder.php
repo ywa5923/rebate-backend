@@ -44,7 +44,7 @@ class RegulatorsSeeder extends Seeder
 
          
         $importer=new BatchImporter(filePath:$csvFile);
-        $importer->setTableInfo(tableName:"brokers_regulators",rowMapping:[
+        $importer->setTableInfo(tableName:"broker_regulator",rowMapping:[
             "broker_id"=>1,
             "regulator_id"=>2
         ]);

@@ -46,4 +46,11 @@ trait TraitCommand
         $csvPath=$brokersModulePath.DIRECTORY_SEPARATOR."database".DIRECTORY_SEPARATOR."seeders".DIRECTORY_SEPARATOR."csv";
         return $csvPath.DIRECTORY_SEPARATOR.$csvFile;
     }
+
+    public function exportToCSV($sqlQuery,$moduleName,$fileName,$headers)
+    {
+        $rows = $this->DbSelect($sqlQuery);
+        $csvFileRo=$this->getCsvSeederPath($moduleName, $fileName);
+        $this->savetoCsv($csvFileRo,'w',  $rows , $headers);
+    }
 }

@@ -32,7 +32,7 @@ class CompaniesSeeder extends Seeder
         //company_id,broker_id,name,licence_number,year_founded,employees,headquartes,description,offices
         $importer->import(1);
 
-        $importer->setTableInfo(tableName:"brokers_companies",rowMapping:[
+        $importer->setTableInfo(tableName:"broker_company",rowMapping:[
             "company_id"=>1,
             "broker_id"=>2
         ]);
