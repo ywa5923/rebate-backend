@@ -14,9 +14,11 @@ use Modules\Brokers\Models\BrokerOptionsCategory;
 use Modules\Brokers\Models\BrokerOptionsValue;
 use Modules\Brokers\Models\BrokerType;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+
 class BrokerController extends Controller
 {
-     /**
+    /**
      * @OA\Get(
      *     path="/api/v1/brokers/",
      *     tags={"Broker"},
@@ -34,8 +36,24 @@ class BrokerController extends Controller
      */
     public function index()
     {
-       return Broker::with('translations')->get();
-     
+        $language = "ro";
+
+        //get brokers registered with  default language = $language
+
+        $defaultLanguageBrokers= Broker::with('dynamicOptionsValues')->where('default_language',  $language)->get();
+
+        //get brokers registered with other default language and was translated to $language by AI
+
+        $translatedBrokers=Broker::with(['translations'=>function (Builder $query) use ($language){
+            $query->where('language_code', $language);
+        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($language) {
+            $query->where('language_code', $language);
+         }])->where('default_language','!=',  $language)->get();
+
+       
+         return  $defaultLanguageBrokers->merge($translatedBrokers);
+
+        
     }
 
     /**
@@ -46,7 +64,7 @@ class BrokerController extends Controller
     //     return view('brokers::create');
     // }
 
-     /**
+    /**
      * @OA\Post(
      *     path="/api/v1/brokers",
      *     tags={"Broker"},
@@ -72,7 +90,6 @@ class BrokerController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        
     }
 
     /**
@@ -104,7 +121,7 @@ class BrokerController extends Controller
     //     return view('brokers::edit');
     // }
 
-      /**
+    /**
      * @OA\Put(
      *     path="/api/v1/broker/{id}",
      *     tags={"Broker"},
@@ -133,7 +150,7 @@ class BrokerController extends Controller
         //
     }
 
-     /**
+    /**
      * @OA\Delete(
      *     path="/api/v1/broker/{id}",
      *     tags={"Broker"},
