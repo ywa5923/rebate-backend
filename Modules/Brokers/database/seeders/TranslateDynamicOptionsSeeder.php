@@ -57,10 +57,8 @@ class TranslateDynamicOptionsSeeder extends Seeder
                 if($rowIndex % 50==0)
                 {
                     Translation::insert($translationRows);
-                 
                     //remove all elements from array
                     array_splice($translationRows,0,count($translationRows));
-                   
                 }
 
                
@@ -74,7 +72,6 @@ class TranslateDynamicOptionsSeeder extends Seeder
         }
        
         Translation::insert($translationRows);
-      echo count($translationRows);
-
+     
     }
 }

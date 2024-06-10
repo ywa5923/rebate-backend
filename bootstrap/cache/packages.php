@@ -1,4 +1,11 @@
 <?php return array (
+  'abbasudo/laravel-purity' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Abbasudo\\Purity\\PurityServiceProvider',
+    ),
+  ),
   'darkaonline/l5-swagger' => 
   array (
     'providers' => 

@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string("option_slug");
             $table->text("value");
-            $table->boolean("status");//de bagat si in broker options;
+            $table->boolean("status")->default(1);//de bagat si in broker options;
             $table->string("status_message")->nullable();
+            $table->boolean("default_loading")->default(1);
             $table->string("unit",100)->nullable();
             $table->string("metadata",1000)->nullable();
             $table->foreignId("broker_id")->constrained();

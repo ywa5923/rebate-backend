@@ -34,15 +34,8 @@ class BrokerController extends Controller
      */
     public function index()
     {
-        //return Broker::with('translations')->get();
-
-        // $options= DynamicOptionsCategory::all()[0]->options;
-        // foreach($options as $option)
-        // {
-        //     return $option;
-        // }
-        return DynamicOption::all()[0]->values;
-       //return BrokerOptionsValue::all();
+       return Broker::with('translations')->get();
+     
     }
 
     /**

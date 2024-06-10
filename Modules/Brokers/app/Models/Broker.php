@@ -35,14 +35,14 @@ class Broker extends Model
         return $this->morphMany(Translation::class,'translationable');
     }
 
-    public function options():HasMany
+    public function dynamicOptions():HasMany
     {
         return $this->hasMany(OptionValue::class);
     }
 
-    public function companies():BelongsToMany
+    public function companies():HasMany
     {
-         return $this->belongsToMany(Company::class);
+         return $this->hasMany(Company::class);
 
     }
 

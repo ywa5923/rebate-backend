@@ -58,6 +58,18 @@ class ExportBrokers extends Command
         $newHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
         $csvFile=$this->getCsvSeederPath("Brokers","brokers.csv");
         $this->savetoCsv($csvFile,'w', $results, $newHeaders, "en", "en");
+
+        $sqlRo = "select b.id,{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='ro'";
+        $resultsRo = $this->DbSelect($sqlRo);
+        $newHeadersRo = array_filter($this->brokersTextsMap,function($v){
+            if(!empty($v)) return true;
+        });
+        $newHeadersRo = array_keys($newHeadersRo);
+        array_unshift( $newHeadersRo ,'id');
+        $csvFileRo=$this->getCsvSeederPath("Brokers","brokers_ro.csv");
+        $this->savetoCsv($csvFileRo,'w', $resultsRo, $newHeadersRo);
+
+
         
     }
 }
