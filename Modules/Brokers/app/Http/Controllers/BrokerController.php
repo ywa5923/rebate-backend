@@ -40,7 +40,7 @@ class BrokerController extends Controller
 
         //get brokers registered with  default language = $language
 
-        $defaultLanguageBrokers= Broker::with('dynamicOptionsValues')->where('default_language',  $language)->get();
+       // $defaultLanguageBrokers= Broker::with('dynamicOptionsValues')->where('default_language',  $language)->get();
 
         //get brokers registered with other default language and was translated to $language by AI
 
@@ -50,10 +50,10 @@ class BrokerController extends Controller
         },'dynamicOptionsValues.translations'=> function (Builder $query) use ($language) {
            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
             $query->where('language_code', $language);
-         }])->where('default_language','!=',  $language)->get();
+         }])->get();
 
        
-         return  $defaultLanguageBrokers->merge($translatedBrokers);
+         return   $translatedBrokers;
 
         
     }
