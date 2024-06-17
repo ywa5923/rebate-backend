@@ -39,78 +39,22 @@ class Broker extends Model
 
 
     /**
-     * @OA\Property(type="integer", format="int64")
-     * @var int
+     * @OA\Property(property="id",type="integer", format="int64")
+     * @OA\Property(property="logo",type="string",nullable=true)
+     * @OA\Property(property="favicon",type="string",nullable=true)
+     * @OA\Property(property="trading_name",type="string",nullable=false)
+     * @OA\Property(property="home_url",type="string",nullable=false)
+     * @OA\Property(property="overall_rating",type="string",nullable=false)
+     * @OA\Property(property="user_rating",type="string",nullable=false)
+     * @OA\Property(property="support_options",type="string",nullable=false)
+     * @OA\Property(property="account_type",type="string",nullable=false)
+     * @OA\Property(property="trading_instruments",type="string",nullable=false)
+     * @OA\Property(property="account_currencies",type="string",nullable=false)
+     * @OA\Property(property="default_language",type="string",nullable=false)
+     * @OA\Property(property="created_at",type="datetime",nullable=false)
+     * @OA\Property(property="updated_at",type="datetime",nullable=false)
+     * 
      */
-    public $id;
-
-    /**
-     * @OA\Property(type="string",nullable=true)
-     * @var string
-     */
-    public $logo;
-
-    /**
-     * @OA\Property(type="string",nullable=true)
-     * @var string
-     */
-    public $favicon;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $trading_name;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $home_url;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $overall_rating;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $user_rating;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $support_options;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $account_type;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $trading_instruments;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $account_currencies;
-
-  
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $default_language;
-
 
     public function translations(): MorphMany
     {
@@ -122,8 +66,8 @@ class Broker extends Model
         return $this->hasMany(OptionValue::class);
     }
 
-    public function companies(): HasMany
+    public function companies(): BelongsToMany
     {
-        return $this->hasMany(Company::class);
+        return $this->belongsToMany(Company::class,"broker_company");
     }
 }

@@ -14,7 +14,7 @@ class OptionsCategoriesSeeder extends Seeder
     {
          //$this->call();
         
-         $csvFile = module_path('Brokers', 'database/seeders/csv/categories.csv');
+         $csvFile = module_path('Brokers', 'database/seeders/csv/default/categories.csv');
 
          
         $importer=new BatchImporter(filePath:$csvFile);

@@ -100,3 +100,16 @@ php artisan module:make-factory BrokerTypeFactory Brokers
 
 php artisan make:seeder UserSeeder
 php artisan module:make-seed OtionsCategories Brokers
+
+
+
+
+
+
+
+
+
+
+
+
+https://laracasts.com/discuss/channels/laravel/progress-bars-on-other-class

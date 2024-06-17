@@ -5,6 +5,8 @@ namespace Modules\Brokers\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+//use OpenApi\Annotations\Property;
+use OpenApi\Attributes\Property;
 
 /**
  * @OA\Schema(
@@ -23,83 +25,24 @@ class BrokerOption extends Model
      */
     protected $fillable = [];
 
-     /**
-     * @OA\Property(type="integer", format="int64")
-     * @var int
-     */
-    public $id;
 
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
+      /**
+       * @OA\Property(property="id",type="integer",nullable=false)
+       * @OA\Property(property="name",type="string",nullable=false)
+       * @OA\Property(property="slug",type="string",nullable=false)
+       * @OA\Property(property="default_language",type="string",nullable=false)
+       * @OA\Property(property="data_type",type="string",nullable=false)
+       * @OA\Property(property="form_type",type="string",nullable=false)
+       * @OA\Property(property="meta_data",type="string",nullable=true)
+       * @OA\Property(property="for_crypto",type="boolean",nullable=false)
+       * @OA\Property(property="for_brokers",type="boolean",nullable=false)
+       * @OA\Property(property="for_props",type="boolean",nullable=false)
+       * @OA\Property(property="required",type="boolean",nullable=false)
+       * @OA\Property(property="publish",type="boolean",nullable=false,default=true)
+       * @OA\Property(property="position",type="integer",nullable=true)
+       * @OA\Property(property="created_at",type="datetime",nullable=false)
+       * @OA\Property(property="updated_at",type="datetime",nullable=false)
      */
-    public $name;
-
-     /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $slug;
-
-     /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $data_type;
-
-     /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $form_type;
-
-     /**
-     * @OA\Property(type="string",nullable=true)
-     * @var string
-     */
-    public $metadata;
-
-    /**
-     * @OA\Property(type="boolean",nullable=false)
-     * @var boolean
-     */
-    public $for_crypto;
-
-     /**
-     * @OA\Property(type="boolean",nullable=false)
-     * @var boolean
-     */
-    public $for_brokers;
-
-     /**
-     * @OA\Property(type="boolean",nullable=false)
-     * @var boolean
-     */
-    public $for_props;
-
-     /**
-     * @OA\Property(type="boolean",nullable=false)
-     * @var boolean
-     */
-    public $required;
-
-     /**
-     * @OA\Property(type="boolean",nullable=false,default=true)
-     * @var boolean
-     */
-    public $publish;
-
-     /**
-     * @OA\Property(type="integer",nullable=true)
-     * @var int
-     */
-    public $position;
-
-     /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $default_language;
 
   
     public function category():BelongsTo

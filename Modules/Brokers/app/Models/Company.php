@@ -25,7 +25,7 @@ class Company extends Model
 
     public function brokers():BelongsToMany
     {
-        return $this->belongsToMany(Broker::class);
+        return $this->belongsToMany(Broker::class,"broker_company");
     }
 
    

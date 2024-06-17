@@ -30,10 +30,8 @@ class TranslateCompaniesSeeder extends Seeder
             $brokerId=$row[0];
            // dd(  $brokerId);
             //get company Id 
-           // $companyId= Broker::find($brokerId)->companies()->first()->id;
-
-             dd($companyId= Broker::find($brokerId)->companies()->first());
-         
+          
+           $companyId= Broker::find($brokerId)->companies()->first()->id;
             foreach($row as $k=>$v){
 
                 if($k==0 || empty($v)){
@@ -56,5 +54,3 @@ class TranslateCompaniesSeeder extends Seeder
         //Translation::insert($translationRows);
     }
 }
-// // $this->info("\\\\///...translating companies ");
-        //$this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateCompaniesSeeder"]);

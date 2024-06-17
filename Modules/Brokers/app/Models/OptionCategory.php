@@ -24,44 +24,14 @@ class OptionCategory extends Model
     protected $fillable = [];
 
       /**
-     * @OA\Property(type="integer", format="int64")
-     * @var int
+     * @OA\Property(property="id",type="integer", format="int64")
+     * @OA\Property(property="name",type="string",nullable=false)
+     * @OA\Property(property="description",type="string",nullable=true)
+     * @OA\Property(property="default_language",type="string",nullable=false)
+     * @OA\Property(property="created_at",type="datetime",nullable=false)
+     * @OA\Property(property="updated_at",type="datetime",nullable=false)
      */
-    public $id;
-
-    /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $name;
-
-     /**
-     * @OA\Property(type="string",nullable=true)
-     * @var string
-     */
-    public $description;
-
-     /**
-     * @OA\Property(type="string",nullable=false)
-     * @var string
-     */
-    public $default_language;
-
-     /**
-     * @OA\Property(type="datetime",nullable=false)
-     * @var datetime
-     */
-    public $created_at;
-
-     /**
-     * @OA\Property(type="datetime",nullable=false)
-     * @var datetime
-     */
-    public $updated_at;
-
-
    
-
     public function options():HasMany
     {
         return $this->hasMany(BrokerOption::class);

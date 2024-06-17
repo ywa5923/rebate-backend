@@ -391,6 +391,16 @@
                     "default_language": {
                         "type": "string",
                         "nullable": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
                     }
                 },
                 "type": "object"
@@ -411,13 +421,17 @@
                 "properties": {
                     "id": {
                         "type": "integer",
-                        "format": "int64"
+                        "nullable": false
                     },
                     "name": {
                         "type": "string",
                         "nullable": false
                     },
                     "slug": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "default_language": {
                         "type": "string",
                         "nullable": false
                     },
@@ -429,7 +443,7 @@
                         "type": "string",
                         "nullable": false
                     },
-                    "metadata": {
+                    "meta_data": {
                         "type": "string",
                         "nullable": true
                     },
@@ -458,8 +472,14 @@
                         "type": "integer",
                         "nullable": true
                     },
-                    "default_language": {
+                    "created_at": {
                         "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
                         "nullable": false
                     }
                 },
@@ -486,6 +506,60 @@
                     "default_language": {
                         "type": "string",
                         "nullable": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            },
+            "Translation": {
+                "required": [
+                    "language_code"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "translationable_type": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "translationable_id": {
+                        "type": "integer",
+                        "nullable": false
+                    },
+                    "language_code": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "property": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "value": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "translation_type": {
+                        "type": "string",
+                        "enum": [
+                            "columns",
+                            "property",
+                            "properties"
+                        ]
+                    },
+                    "metadata": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",

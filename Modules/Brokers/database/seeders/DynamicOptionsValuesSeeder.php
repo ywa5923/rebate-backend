@@ -24,6 +24,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                 //first row is with options name, get the id for every option name and keep in array to store in options value table
                 $rowIndex++;
                 $optionsId = $this->getOptionsId($row);
+
                 $options = $row;
                 continue;
             }
@@ -32,6 +33,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                     continue;
                 }
 
+              
                 OptionValue::insert(
                     [
                         "broker_id" => $row[0],
@@ -41,6 +43,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                         "status" => 1
                     ]
                 );
+
             }
         }
     }
@@ -49,6 +52,7 @@ class DynamicOptionsValuesSeeder extends Seeder
         $optionsId = [];
         foreach ($row as $k => $v) {
             if ($v !== 'broker_id') {
+                
                 $option = BrokerOption::where('slug', $v)->first();
                 if ($option != null) {
                     $optionsId[$k] = $option->id;

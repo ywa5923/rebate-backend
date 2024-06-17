@@ -12,7 +12,7 @@ class DynamicOptionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $csvFile = module_path('Brokers', 'database/seeders/csv/broker_options.csv');
+        $csvFile = module_path('Brokers', 'database/seeders/csv/default/broker_options.csv');
         $importer=new BatchImporter(filePath:$csvFile);
         $importer->setTableInfo(tableName:"broker_options",rowMapping:[
             "id"=>1,
