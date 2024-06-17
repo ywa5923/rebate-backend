@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('logo',100)->nullable();
             $table->string('favicon',100)->nullable();
             $table->string('trading_name',256);
-            $table->string('home_url',256);
+            $table->string('home_url',256)->nullable();
             $table->decimal("overall_rating",3,1)->nullable();
             $table->decimal("user_rating",3,1)->nullable();
             $table->string('support_options',500)->nullable();

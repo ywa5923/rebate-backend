@@ -14,5 +14,5 @@ use Modules\Translations\Http\Controllers\TranslationController;
 */
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('translation', TranslationController::class)->names('translation');
+    Route::apiResource('translations', TranslationController::class)->names('translations');
 });

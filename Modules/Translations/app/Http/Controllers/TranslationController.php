@@ -6,15 +6,48 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Brokers\Models\Broker;
+use Modules\Brokers\Models\BrokerOption;
+use Modules\Translations\Models\Translation;
 
 class TranslationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('translations::index');
+        $model=ucfirst($request->query("model"));
+        $properties=$request->query("properties");
+      
+        $dynamicProperties=$request->query("dynamicProperties");
+        $fullClass="Modules\Brokers\Models\\".$model;
+
+       
+        if ($properties=='all'){
+            $columns=Translation::where([
+                ["translationable_type",$fullClass],
+                ["translation_type","columns"]
+            ])->get()->first()->metadata;
+            
+            return $columns;
+        }else if(  $dynamicProperties){
+          $propertiesArray=explode(",", $dynamicProperties);
+          $translatedColumns=Translation::where([
+            ["translationable_type",BrokerOption::class],
+            [ "translation_type","property"],
+            ["language_code","ro"]
+           
+            ]
+        )->whereIn("property",$propertiesArray)->get();
+      
+        return $translatedColumns;
+        }
+      
+        //{{PATH}}/translations?model=broker&dynamicProperties=promotion_details,short_payment_options,commission_value
+        //{{PATH}}/translations?model=broker&properties=all
+        //{{PATH}}/translations?model=broker&properties=all
+     
     }
 
     /**

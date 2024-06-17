@@ -44,6 +44,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.translations.')->group(module_path('Translations', '/routes/api.php'));
+        Route::middleware('web')->prefix('api')->name('api.translations.')->group(module_path('Translations', '/routes/api.php'));
     }
 }

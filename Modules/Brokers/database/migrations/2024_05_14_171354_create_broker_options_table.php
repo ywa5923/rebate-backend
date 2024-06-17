@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('required');
             $table->boolean('publish')->default(1);
             $table->integer('position')->nullable();
-            $table->string("default_language",50)->nullable();
+            $table->string("default_language",50);
             $table->foreignId("option_category_id")->constrained("option_categories");
             $table->timestamps();
         });

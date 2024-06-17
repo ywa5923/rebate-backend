@@ -336,5 +336,170 @@
                 }
             }
         }
+    },
+    "components": {
+        "schemas": {
+            "Broker": {
+                "required": [
+                    "trading_name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "logo": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "favicon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "trading_name": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "home_url": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "overall_rating": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "user_rating": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "support_options": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "account_type": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "trading_instruments": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "account_currencies": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "default_language": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            },
+            "BrokerOption": {
+                "required": [
+                    "name",
+                    "slug",
+                    "data_type",
+                    "form_type",
+                    "meta_data",
+                    "for_crypto",
+                    "for_brokers",
+                    "for_props",
+                    "required",
+                    "default_language"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "slug": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "data_type": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "form_type": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "for_crypto": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "for_brokers": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "for_props": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "required": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "publish": {
+                        "type": "boolean",
+                        "default": true,
+                        "nullable": false
+                    },
+                    "position": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "default_language": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            },
+            "OptionCategory": {
+                "required": [
+                    "name",
+                    "default_language"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "default_language": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            }
+        }
     }
 }

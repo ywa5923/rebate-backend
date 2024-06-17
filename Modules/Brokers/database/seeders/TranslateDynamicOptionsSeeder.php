@@ -3,7 +3,8 @@
 namespace Modules\Brokers\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Models\Broker;
+use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
 
 class TranslateDynamicOptionsSeeder extends Seeder
@@ -13,65 +14,57 @@ class TranslateDynamicOptionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values_ro.csv');
-        $handle = fopen($csvFile, "r");
-        $rowIndex=0;
-        $optionSlugs=[];
-        $translationRows=[];
-        while (($row = fgetcsv($handle, 4096)) !== FALSE) {
+        Translation::insert([
+            [
+                "translationable_type"=>BrokerOption::class,
+                "translationable_id"=>16,
+                "language_code"=>"ro",
+                "property"=>'promotion_details',
+                "value"=>"Detalii promotie",
+                "translation_type"=>"property"
+            ],
+            [
+                "translationable_type"=>BrokerOption::class,
+                "translationable_id"=>21,
+                "language_code"=>"ro",
+                "property"=>'short_payment_options',
+                "value"=>"Optiuni rapide de plata",
+                "translation_type"=>"property"
+            ],
+            [
+                "translationable_type"=>BrokerOption::class,
+                "translationable_id"=>33,
+                "language_code"=>"ro",
+                "property"=>'commission_value',
+                "value"=>"Valoarea comisionului",
+                "translation_type"=>"property"
+            ]
 
-            if ($rowIndex === 0) {
-                //first row is with options name, get the id for every option name and keep in array to store in options value table
-                $rowIndex++;
-                $optionSlugs = $row;
-                continue;
-            }
-  
-            foreach($row as $k=>$v){
-               
-                if($k==0 || empty($v)){
-                    //first element is broker_id, skip it
-                    continue;
-                }
-                $brokerId=$row[0];
-                $optionSlug=$optionSlugs[$k];
-                //find option value id
-                $optionValueObj=OptionValue::where([
-                    ['option_slug', $optionSlug],
-                     ['broker_id', $brokerId]
-                    ])->first();
+        ]);
 
-                  
-                if($optionValueObj!=null){
-                   $translationRow=[
-                    "translationable_type"=>OptionValue::class,
-                    "translationable_id"=>  $optionValueObj->id,
-                    "language_code"=>"ro",
-                    "translation_type"=>"property",
-                    "property"=> $optionSlug,
-                    "value"=>$v
-                   ];
+        Translation::insert([
+            [
+                "translationable_type"=>Broker::class,
+                "translationable_id"=>null,
+                "language_code"=>"ro",
+                "property"=>'promotion_details',
+                 "metadata"=>json_encode([
+                    "support_options"=>"Optiuni de suport",
+                    "account_type"=>"Tipul contului",
+                    "trading_instrumets"=>"Instrumente de tranzactionare",
+                    "account_currencies"=>"Monedele contului",
+                    "trading_name"=>"Nume comercial",
+                    "overall_rating"=>"Rating general",
+                    'user_rating'=>"Rating utilizatori",
+                    'logo'=>'Sigla',
+                    'favicon'=>'Favicon',
+                    'home_url'=>'Link Acasa'
 
-                //Translation::insert($translationRow);
-                $translationRows[]=$translationRow;
-                if($rowIndex % 50==0)
-                {
-                    Translation::insert($translationRows);
-                    //remove all elements from array
-                    array_splice($translationRows,0,count($translationRows));
-                }
 
-               
-                }else{
-                    dd($optionSlugs,$k,$optionSlug,$brokerId); 
-                }   
-                
-            }
-
-            $rowIndex++;
-        }
-       
-        Translation::insert($translationRows);
-     
+                 ]),
+                "translation_type"=>"columns"
+            ]
+           
+        ]);
     }
 }

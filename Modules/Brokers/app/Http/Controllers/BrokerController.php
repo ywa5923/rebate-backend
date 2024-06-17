@@ -50,7 +50,7 @@ class BrokerController extends Controller
         },'dynamicOptionsValues.translations'=> function (Builder $query) use ($language) {
            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
             $query->where('language_code', $language);
-         }])->get();
+         }])->paginate();
 
        
          return   $translatedBrokers;

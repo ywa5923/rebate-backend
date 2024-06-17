@@ -65,11 +65,13 @@ class MagicImport extends Command
         $this->info("\\\\///...translating brokers table ");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateStaticBrokersSeeder"]);
 
-        $this->info("\\\\///...translating broker's dynamic options value ");
+        $this->info("\\\\///...translating broker's dynamic options");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateDynamicOptionsSeeder"]);
 
-        $this->info("\\\\///...translating companies ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateCompaniesSeeder"]);
+        $this->info("\\\\///...translating broker's dynamic options values ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateDynamicOptionsValuesSeeder"]);
+
+       
 
         $this->info("\\\\///...translating regulators");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateRegulatorsSeeder"]);
