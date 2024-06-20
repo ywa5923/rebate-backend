@@ -9,45 +9,42 @@ use Illuminate\Http\Response;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
+use Modules\Translations\Services\TranslationService;
 
 class TranslationController extends Controller
 {
+
+    public function __construct(private TranslationService $translator)
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $model=ucfirst($request->query("model"));
-        $properties=$request->query("properties");
-      
-        $dynamicProperties=$request->query("dynamicProperties");
-        $fullClass="Modules\Brokers\Models\\".$model;
+        $language = "ro";
 
-       
-        if ($properties=='all'){
-            $columns=Translation::where([
-                ["translationable_type",$fullClass],
-                ["translation_type","columns"]
-            ])->get()->first()->metadata;
+        $model = ucfirst($request->query("model"));
+        $properties = $request->query("properties");
+
+        $dynamicProperties = $request->query("dynamicProperties");
+        $fullClass = "Modules\Brokers\Models\\" . $model;
+
+
+        if ($properties == 'all') {
+
+            return $this->translator->translateTableColumns($fullClass, $language);
+
+        } else if ($dynamicProperties) {
+
+            return $this->translator->translatePropertyArray(BrokerOption::class, $language, explode(",", $dynamicProperties));
             
-            return $columns;
-        }else if(  $dynamicProperties){
-          $propertiesArray=explode(",", $dynamicProperties);
-          $translatedColumns=Translation::where([
-            ["translationable_type",BrokerOption::class],
-            [ "translation_type","property"],
-            ["language_code","ro"]
-           
-            ]
-        )->whereIn("property",$propertiesArray)->get();
-      
-        return $translatedColumns;
         }
-      
+
         //{{PATH}}/translations?model=broker&dynamicProperties=promotion_details,short_payment_options,commission_value
         //{{PATH}}/translations?model=broker&properties=all
         //{{PATH}}/translations?model=broker&properties=all
-     
+
     }
 
     /**
@@ -109,9 +106,9 @@ class TranslationController extends Controller
         return view('translations::show');
     }
 
-   
 
-     /**
+
+    /**
      * @OA\Put(
      *     path="/api/v1/translation/{id}",
      *     tags={"Translation"},
@@ -141,7 +138,7 @@ class TranslationController extends Controller
         //
     }
 
-     /**
+    /**
      * @OA\Delete(
      *     path="/api/v1/transaltion/{id}",
      *     tags={"Translation"},

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\RepositoryInterface;
 use App\Services\Auth\ShaHasher;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Application;
@@ -16,8 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        
-
+       
     }
 
     /**

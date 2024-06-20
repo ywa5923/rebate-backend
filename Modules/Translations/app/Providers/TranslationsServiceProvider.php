@@ -2,8 +2,11 @@
 
 namespace Modules\Translations\Providers;
 
+use App\Repositories\RepositoryInterface;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Translations\Repositories\TranslationRepository;
+use Modules\Translations\Services\TranslationService;
 
 class TranslationsServiceProvider extends ServiceProvider
 {
@@ -30,6 +33,10 @@ class TranslationsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->app->bind(TranslationRepository::class);
+        $this->app->bind(TranslationService::class, function ($app) {
+            return new TranslationService($app->make(TranslationRepository::class));
+        });
     }
 
     /**
