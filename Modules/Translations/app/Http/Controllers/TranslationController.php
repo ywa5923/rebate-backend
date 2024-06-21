@@ -10,6 +10,8 @@ use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
 use Modules\Translations\Services\TranslationService;
+use Modules\Translations\Transformers\TranslationCollection;
+use Modules\Translations\Transformers\TranslationResource;
 
 class TranslationController extends Controller
 {
@@ -33,11 +35,12 @@ class TranslationController extends Controller
 
         if ($properties == 'all') {
 
+           
             return $this->translator->translateTableColumns($fullClass, $language);
 
         } else if ($dynamicProperties) {
 
-            return $this->translator->translatePropertyArray(BrokerOption::class, $language, explode(",", $dynamicProperties));
+            return new TranslationCollection($this->translator->translatePropertyArray(BrokerOption::class, $language, explode(",", $dynamicProperties)));
             
         }
 
