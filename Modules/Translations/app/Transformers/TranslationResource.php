@@ -13,11 +13,13 @@ class TranslationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-          "id"=>$this->translationable_id,
+          "id"=>$this->id,
           "language" =>$this->language_code,
+          "translation_type"=>$this->whenNotNull($this->translation_type),
           "property"=>$this->whenNotNull($this->property),
           "value"=>$this->whenNotNull($this->value),
-          "metadata"=>$this->whenNotNull($this->metadata)
+          "metadata"=>$this->whenNotNull($this->metadata),
+         
         ];
     }
 }

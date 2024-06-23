@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
+use Modules\Translations\Services\TranslationQuery;
 use Modules\Translations\Services\TranslationService;
 use Modules\Translations\Transformers\TranslationCollection;
 use Modules\Translations\Transformers\TranslationResource;
@@ -24,29 +25,29 @@ class TranslationController extends Controller
      */
     public function index(Request $request)
     {
-        $language = "ro";
 
-        $model = ucfirst($request->query("model"));
-        $properties = $request->query("properties");
+        $translationQuery = new TranslationQuery();
+        $queryParams = $translationQuery->transform($request);
 
-        $dynamicProperties = $request->query("dynamicProperties");
-        $fullClass = "Modules\Brokers\Models\\" . $model;
+        if (count($queryParams) != 0) {
+            $queryBuilder = Translation::query();
+            if (isset($queryParams["whereParams"]))
+                foreach ($queryParams["whereParams"] as $param) {
+                    $queryBuilder->where(...$param);
+                }
 
+            if (isset($queryParams["whereInParams"]))
 
-        if ($properties == 'all') {
-
-           
-            return $this->translator->translateTableColumns($fullClass, $language);
-
-        } else if ($dynamicProperties) {
-
-            return new TranslationCollection($this->translator->translatePropertyArray(BrokerOption::class, $language, explode(",", $dynamicProperties)));
-            
+                foreach ($queryParams["whereInParams"] as $param) {
+                    $queryBuilder->whereIn($param[0], $param[1]);
+                }
         }
 
-        //{{PATH}}/translations?model=broker&dynamicProperties=promotion_details,short_payment_options,commission_value
-        //{{PATH}}/translations?model=broker&properties=all
-        //{{PATH}}/translations?model=broker&properties=all
+
+        return new TranslationCollection($queryBuilder->get());
+
+        //{{PATH}}/translations?model[eq]=Broker&lang[eq]=ro&translation_type[eq]=columns
+        // {{PATH}}/translations?model[eq]=BrokerOption&lang[eq]=ro&property[in]=promotion_details,short_payment_options,commission_value
 
     }
 
