@@ -11,7 +11,7 @@ use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
 use Modules\Translations\Services\TranslationQuery;
 use Modules\Translations\Services\TranslationService;
-use Modules\Translations\Transformers\TranslationCollection;
+
 use Modules\Translations\Transformers\TranslationResource;
 
 class TranslationController extends Controller
@@ -20,34 +20,32 @@ class TranslationController extends Controller
     public function __construct(private TranslationService $translator)
     {
     }
-    /**
-     * Display a listing of the resource.
+  
+     /**
+     * @OA\Get(
+     *     path="/api/v1/transaltions/",
+     *     tags={"Translation"},
+     *     summary="Get translations",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation"
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=422,
+     *         description="These request do not match our records"
+     *     )
+     * )
      */
     public function index(Request $request)
     {
 
         $translationQuery = new TranslationQuery();
         $queryParams = $translationQuery->transform($request);
-
-        if (count($queryParams) != 0) {
-            $queryBuilder = Translation::query();
-            if (isset($queryParams["whereParams"]))
-                foreach ($queryParams["whereParams"] as $param) {
-                    $queryBuilder->where(...$param);
-                }
-
-            if (isset($queryParams["whereInParams"]))
-
-                foreach ($queryParams["whereInParams"] as $param) {
-                    $queryBuilder->whereIn($param[0], $param[1]);
-                }
-        }
-
-
-        return new TranslationCollection($queryBuilder->get());
-
+        return $this->translator->process($queryParams);
+     
         //{{PATH}}/translations?model[eq]=Broker&lang[eq]=ro&translation_type[eq]=columns
-        // {{PATH}}/translations?model[eq]=BrokerOption&lang[eq]=ro&property[in]=promotion_details,short_payment_options,commission_value
+        //{{PATH}}/translations?model[eq]=BrokerOption&lang[eq]=ro&property[in]=promotion_details,short_payment_options,commission_value
 
     }
 
@@ -56,7 +54,7 @@ class TranslationController extends Controller
      */
     public function create()
     {
-        return view('translations::create');
+        //return view('translations::create');
     }
 
     /**

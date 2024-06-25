@@ -222,6 +222,23 @@
                 }
             }
         },
+        "/api/v1/transaltions/": {
+            "get": {
+                "tags": [
+                    "Translation"
+                ],
+                "summary": "Get translations",
+                "operationId": "d9672fe3a00d8a312a1a6d0586689657",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "422": {
+                        "description": "These request do not match our records"
+                    }
+                }
+            }
+        },
         "/api/v1/translation": {
             "post": {
                 "tags": [

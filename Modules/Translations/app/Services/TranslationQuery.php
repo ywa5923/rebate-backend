@@ -2,9 +2,10 @@
 
 namespace Modules\Translations\Services;
 
+use App\Services\Query\BaseQuery;
 use Illuminate\Http\Request;
 
-class TranslationQuery
+class TranslationQuery extends BaseQuery
 {
 
   protected $querySafeParams = [
@@ -12,8 +13,8 @@ class TranslationQuery
     'properties' => ['eq'],
     'property' => ['in'],
     'lang' => ['eq'],
-    'translation_type' => ['eq']
-
+    'translation_type' => ['eq'],
+    'order_by' => ['eq']
   ];
 
   protected $columnMap = [
@@ -36,37 +37,5 @@ class TranslationQuery
     "BrokerOption" => "Modules\Brokers\Models\BrokerOption"
   ];
 
-  public function transform(Request $request): array
-  {
-
-    //['column','operator','value']]
-    $whereParams = [];
-    //['column',['valuesArray']]
-    $whereInParams = [];
-    foreach ($this->querySafeParams as $param => $operators) {
-      $query = $request->query($param);
-      if (!isset($query))
-        continue;
-
-      $tableColumn = $this->columnMap[$param] ?? $param;
-
-      foreach ($operators as $operator) {
-
-        $paramValue = ($param === "model") ? ($this->modelClassMap[$query[$operator]]) : ($query[$operator]);
-
-        if (isset($query[$operator])) {
-          if ($operator === 'in') {
-            $whereInParams[] = [$tableColumn, explode(',',   $paramValue)];
-          } else {
-            $whereParams[] = [$tableColumn, $this->operatorMap[$operator],   $paramValue];
-          }
-        }
-      }
-    }
-
-    return [
-      "whereParams" =>   $whereParams,
-      "whereInParams" =>  $whereInParams
-    ];
-  }
+ 
 }
