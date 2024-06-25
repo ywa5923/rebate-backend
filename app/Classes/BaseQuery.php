@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Query;
+namespace App\Classes;
 
 use Illuminate\Http\Request;
 

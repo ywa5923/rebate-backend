@@ -7,7 +7,6 @@ use Modules\Translations\Repositories\TranslationRepository;
 use Modules\Translations\Models\Translation;
 use Modules\Translations\Transformers\TranslationCollection;
 
-
 class TranslationService
 {
 
@@ -26,7 +25,7 @@ class TranslationService
     }
 
 
-    public function process(array $queryParams): ?Collection
+    public function process(array $queryParams):?TranslationCollection
     {
         if (count($queryParams) == 0)
             return null;

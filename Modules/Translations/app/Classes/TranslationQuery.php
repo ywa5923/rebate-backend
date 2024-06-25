@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Translations\Services;
+namespace Modules\Translations\Classes;
 
-use App\Services\Query\BaseQuery;
+use App\Classes\BaseQuery;
 use Illuminate\Http\Request;
 
 class TranslationQuery extends BaseQuery

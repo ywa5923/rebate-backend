@@ -5,14 +5,9 @@ namespace Modules\Translations\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Modules\Brokers\Models\Broker;
-use Modules\Brokers\Models\BrokerOption;
 use Modules\Translations\Models\Translation;
-use Modules\Translations\Services\TranslationQuery;
+use Modules\Translations\Classes\TranslationQuery;
 use Modules\Translations\Services\TranslationService;
-
-use Modules\Translations\Transformers\TranslationResource;
 
 class TranslationController extends Controller
 {
