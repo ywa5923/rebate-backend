@@ -15,6 +15,8 @@ use Modules\Brokers\Models\BrokerOptionsValue;
 use Modules\Brokers\Models\BrokerType;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Modules\Brokers\Services\BrokerQueryParser;
+use Modules\Brokers\Services\BrokerService;
 
 class BrokerController extends Controller
 {
@@ -34,9 +36,17 @@ class BrokerController extends Controller
      *     )
      * )
      */
-    public function index()
+
+     public function __construct()
+     {
+     }
+
+    public function index(BrokerQueryParser $queryParser,BrokerService $brokerService,Request $request)
     {
-        $language = "ro";
+       
+       return $brokerService->process($queryParser->parse($request));
+
+        //brokerService->process($queryParams,repository)
 
         //get brokers registered with  default language = $language
 
@@ -44,18 +54,6 @@ class BrokerController extends Controller
 
         //get brokers registered with other default language and was translated to $language by AI
 
-        $translatedBrokers=Broker::with(['translations'=>function (Builder $query) use ($language){
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where('language_code', $language);
-        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($language) {
-           /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where('language_code', $language);
-         }])->paginate();
-
-       
-         return   $translatedBrokers;
-
-        
     }
 
     /**

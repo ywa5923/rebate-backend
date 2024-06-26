@@ -4,6 +4,8 @@ namespace Modules\Brokers\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Brokers\Repositories\BrokerRepository;
+use Modules\Brokers\Services\BrokerService;
 
 class BrokersServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,11 @@ class BrokersServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+
+        $this->app->bind(BrokerRepository::class);
+        $this->app->bind(BrokerService::class, function ($app) {
+            return new BrokerService($app->make(BrokerRepository::class));
+        });
     }
 
     /**

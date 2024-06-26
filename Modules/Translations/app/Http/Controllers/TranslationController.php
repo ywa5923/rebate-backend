@@ -5,16 +5,13 @@ namespace Modules\Translations\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Modules\Translations\Models\Translation;
-use Modules\Translations\Classes\TranslationQuery;
 use Modules\Translations\Services\TranslationService;
+use Modules\Translations\Services\TranslationQueryParser;
 
 class TranslationController extends Controller
 {
 
-    public function __construct(private TranslationService $translator)
-    {
-    }
+   
   
      /**
      * @OA\Get(
@@ -32,12 +29,11 @@ class TranslationController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(TranslationQueryParser $queryParser,TranslationService $translatorService,Request $request)
     {
 
-        $translationQuery = new TranslationQuery();
-        $queryParams = $translationQuery->transform($request);
-        return $this->translator->process($queryParams);
+      
+        return $translatorService->process($queryParser->parse($request));
      
         //{{PATH}}/translations?model[eq]=Broker&lang[eq]=ro&translation_type[eq]=columns
         //{{PATH}}/translations?model[eq]=BrokerOption&lang[eq]=ro&property[in]=promotion_details,short_payment_options,commission_value

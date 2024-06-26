@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Translations\Classes;
+namespace Modules\Translations\Services;
 
-use App\Classes\BaseQuery;
+use App\Services\BaseQueryParser;
 use Illuminate\Http\Request;
 
-class TranslationQuery extends BaseQuery
+class TranslationQueryParser extends BaseQueryParser
 {
 
   protected $querySafeParams = [
@@ -22,15 +22,7 @@ class TranslationQuery extends BaseQuery
     "lang" => "language_code"
   ];
 
-  protected $operatorMap = [
-    'eq' => '=',
-    'lt' => '<',
-    'lte' => '<=',
-    'gt' => '>',
-    'gte' => '>=',
-    'in' => 'IN'
 
-  ];
 
   protected $modelClassMap = [
     "Broker" => "Modules\Brokers\Models\Broker",

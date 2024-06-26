@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Classes;
+namespace App\Services;
 
 use Illuminate\Http\Request;
 
-class BaseQuery
+class BaseQueryParser
 {
     protected $querySafeParams = [
        
@@ -28,7 +28,7 @@ class BaseQuery
        
       ];
     
-      public function transform(Request $request): array
+      public function parse(Request $request): array
       {
     
         //['column','operator','value']]
@@ -74,7 +74,7 @@ class BaseQuery
           "whereParams" =>   $whereParams,
           "whereInParams" =>  $whereInParams,
           "orderBy" => $orderBy,
-           "orderDirection"=>$orderDirection
+          "orderDirection"=>$orderDirection
         ];
       }
 }
