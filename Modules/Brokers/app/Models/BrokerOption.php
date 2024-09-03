@@ -5,6 +5,8 @@ namespace Modules\Brokers\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Translations\Models\Translation;
 //use OpenApi\Annotations\Property;
 use OpenApi\Attributes\Property;
 
@@ -53,6 +55,11 @@ class BrokerOption extends Model
     public function values():HasMany
     {
         return $this->hasMany(OptionValue::class);
+    }
+
+    public function translations():MorphMany
+    {
+        return $this->morphMany(Translation::class,'translationable');
     }
    
 }

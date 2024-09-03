@@ -13,6 +13,10 @@ use Modules\Translations\Http\Controllers\TranslationController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+// Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+//    // Route::apiResource('translations', TranslationController::class)->names('translations');
+// });
+
+Route::prefix('v1')->group(function () {
     Route::apiResource('translations', TranslationController::class)->names('translations');
 });

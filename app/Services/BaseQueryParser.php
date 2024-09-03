@@ -39,6 +39,7 @@ class BaseQueryParser
         $orderDirection = "";
         foreach ($this->querySafeParams as $param => $operators) {
           $query = $request->query($param);
+         
           if (!isset($query))
             continue;
     
@@ -59,6 +60,7 @@ class BaseQueryParser
               }
     
               $orderBy= explode(',', $orderByString);
+            
               continue;
             }
             $paramValue = ($param === "model") ? ($this->modelClassMap[$query[$operator]]) : ($query[$operator]);

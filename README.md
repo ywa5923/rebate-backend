@@ -101,9 +101,24 @@ php artisan module:make-factory BrokerTypeFactory Brokers
 php artisan make:seeder UserSeeder
 php artisan module:make-seed OtionsCategories Brokers
 
+{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_home,position_list,short_payment_options,trading_fees&filters[in]=a,b,c
 
 
 
+[
+    logo=>logo,
+    trading_name=>"Denumire comerciala",
+    home_url=>"Link acasa",
+    overall_rating=>"Rating general",
+    user_rating=>"Rating utilizator",
+    support_options=>"Optiuni suport",
+    account_type=>"Tipul contului",
+    trading_instruments=>"Instrumente de tranzactionare",
+    account_currencies=>"Moneda cont",
+    language=>"limba",
+    default_language=>"Limba implicita"
+
+]
 
 
 

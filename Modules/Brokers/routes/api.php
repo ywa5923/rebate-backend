@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Brokers\Http\Controllers\BrokerController;
+use Modules\Brokers\Http\Controllers\BrokerOptionController;
 
 /*
  *--------------------------------------------------------------------------
@@ -20,4 +21,5 @@ use Modules\Brokers\Http\Controllers\BrokerController;
 
 Route::group(["prefix"=>'v1'], function () {
     Route::apiResource('brokers', BrokerController::class)->names('brokers');
+    Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
 });

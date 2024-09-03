@@ -27,5 +27,4 @@ class DynamicOptionValueResource extends JsonResource
           ];
 
     }
-
 }

@@ -19,24 +19,33 @@ class BrokerService
     }
 
    
-    public function test()
-    {
-        
-    }
-
     public function process(array $queryParams)
     {
 
-              
+      
+       $columns=$this->extractDynamicColumns($queryParams);
+       
+      
         /** @var  Modules\Brokers\Repositories\BrokerRepository $repo*/
         $repo=$this->repository;
-        return $repo->getFullProfile($queryParams["language"]);
-         
-     
-
-        $queryBuilder = Translation::query();
+    
+        return $repo->getDynamicColumns($queryParams["language"],$columns,$queryParams["orderBy"],$queryParams["orderDirection"]);
        
+    }
 
-        return new BrokerCollection($queryBuilder->get());
+    public function extractDynamicColumns(array $queryParams):array|null
+    {
+      
+        foreach($queryParams["whereInParams"] as $k=>$v )
+        {
+            if($v[0]==="columns")
+            {
+               
+                unset($queryParams["whereInParmas"][$k]);
+                return $v[1];
+            }
+        }
+
+        return [];
     }
 }

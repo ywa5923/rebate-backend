@@ -35,6 +35,7 @@ class TranslationController extends Controller
       
         return $translatorService->process($queryParser->parse($request));
      
+       // {{PATH}}/translations?model[eq]=Broker&property[in]=promotion_details,short_payment_options,commission_value
         //{{PATH}}/translations?model[eq]=Broker&lang[eq]=ro&translation_type[eq]=columns
         //{{PATH}}/translations?model[eq]=BrokerOption&lang[eq]=ro&property[in]=promotion_details,short_payment_options,commission_value
 

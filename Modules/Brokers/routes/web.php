@@ -15,5 +15,5 @@ use Modules\Brokers\Http\Controllers\BrokersController;
 */
 
 Route::group([], function () {
-    Route::resource('brokers', BrokersController::class)->names('brokers');
+   // Route::resource('brokers', BrokersController::class)->names('brokers');
 });

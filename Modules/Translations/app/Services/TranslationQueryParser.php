@@ -23,7 +23,6 @@ class TranslationQueryParser extends BaseQueryParser
   ];
 
 
-
   protected $modelClassMap = [
     "Broker" => "Modules\Brokers\Models\Broker",
     "BrokerOption" => "Modules\Brokers\Models\BrokerOption"

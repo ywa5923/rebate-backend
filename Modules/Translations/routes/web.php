@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Translations\Http\Controllers\TranslationController;
 
 
 /*
@@ -15,5 +16,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([], function () {
-   // Route::resource('translations', TranslationsController::class)->names('translations');
+    Route::resource('translations', TranslationsController::class)->names('translations');
 });

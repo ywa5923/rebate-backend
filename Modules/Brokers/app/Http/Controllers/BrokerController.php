@@ -18,6 +18,8 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Services\BrokerQueryParser;
 use Modules\Brokers\Services\BrokerService;
 
+//{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
+
 class BrokerController extends Controller
 {
     /**
