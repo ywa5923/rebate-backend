@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Brokers\Repositories;
 
 use App\Repositories\RepositoryInterface;
@@ -16,77 +17,77 @@ class BrokerRepository implements RepositoryInterface
     public function getFullProfile($languageCondition)
     {
         //dd($languageCondition);
-        $bc=new BrokerCollection(Broker::with(['translations'=>function (Builder $query) use ($languageCondition){
+        $bc = new BrokerCollection(Broker::with(['translations' => function (Builder $query) use ($languageCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($languageCondition) {
-           /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-         }])->paginate());
+            $query->where("language_code", $languageCondition[2]);
+        }, 'dynamicOptionsValues.translations' => function (Builder $query) use ($languageCondition) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+            $query->where("language_code", $languageCondition[2]);
+        }])->paginate());
 
-      return $bc;
+        return $bc;
 
-     // $this->borkerJsonFilter($bc->toJson());
+        // $this->borkerJsonFilter($bc->toJson());
 
-    
+
     }
 
-    public function getDynamicColumns2($languageCondition,$dynamicColumns)
+    public function getDynamicColumns2($languageCondition, $dynamicColumns)
     {
-        $bc=Broker::select(["id","logo"])->with(['translations'=>function (Builder $query) use ($languageCondition){
+        $bc = Broker::select(["id", "logo"])->with(['translations' => function (Builder $query) use ($languageCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-        },'dynamicOptionsValues'=>function (Builder $query) use ($dynamicColumns){
-             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->whereIn("option_slug",$dynamicColumns);
-        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($languageCondition) {
-           /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-         }])->paginate();
+            $query->where("language_code", $languageCondition[2]);
+        }, 'dynamicOptionsValues' => function (Builder $query) use ($dynamicColumns) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+            $query->whereIn("option_slug", $dynamicColumns);
+        }, 'dynamicOptionsValues.translations' => function (Builder $query) use ($languageCondition) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+            $query->where("language_code", $languageCondition[2]);
+        }])->paginate();
 
-      return $bc;
+        return $bc;
     }
 
-    public function getDynamicColumns($languageCondition,$columns,$orderBy,$orderDirection)
+    public function getDynamicColumns($languageCondition, $columns, $orderBy, $orderDirection)
     {
-      
+
         //to be added in env.file or global params
-        $tableStaticColumns=['home_url','user_rating','account_type','trading_name','overall_rating','support_options','account_currencies','trading_instruments'];
-        if(empty($columns))
-        $columns=$tableStaticColumns;
+        $tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
+        if (empty($columns))
+            $columns = $tableStaticColumns;
 
-        $dynamicColumns=array_diff($columns,$tableStaticColumns);
-        $selctedStaticColumns=array_intersect($tableStaticColumns,$columns);
-        
-        if(empty($selctedStaticColumns) && empty($dynamicColumns))
-        $selctedStaticColumns=$tableStaticColumns;
+        $dynamicColumns = array_diff($columns, $tableStaticColumns);
+        $selctedStaticColumns = array_intersect($tableStaticColumns, $columns);
 
-        $jsonResult=$this->getQueryJson($languageCondition, $selctedStaticColumns,$dynamicColumns,$orderBy,$orderDirection);
-       
-       return new BrokerCollection($jsonResult);
+        if (empty($selctedStaticColumns) && empty($dynamicColumns))
+            $selctedStaticColumns = $tableStaticColumns;
 
-         //return $jsonResult;
+        $jsonResult = $this->getQueryJson($languageCondition, $selctedStaticColumns, $dynamicColumns, $orderBy, $orderDirection);
+
+        return new BrokerCollection($jsonResult);
+
+        //return $jsonResult;
     }
-    public function getQueryJson($languageCondition,$staticColumns,$dynamicColumns,$orderBy,$orderDirection)
+    public function getQueryJson($languageCondition, $staticColumns, $dynamicColumns, $orderBy, $orderDirection)
     {
-             
         DB::enableQueryLog();
-        $bc=Broker::select(["id",...$staticColumns])->with([
-            'translations'=>function (Builder $query) use ($languageCondition){
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-        },
-        'dynamicOptionsValues'=>function (Builder $query) use ($dynamicColumns){
+        $bc = Broker::select(["id", ...$staticColumns])->with([
+            'translations' => function (Builder $query) use ($languageCondition) {
+                /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                $query->where("language_code", $languageCondition[2]);
+            },
+            'dynamicOptionsValues' => function (Builder $query) use ($dynamicColumns) {
 
-             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->whereIn("option_slug",$dynamicColumns);
+                /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                $query->whereIn("option_slug", $dynamicColumns);
+            },
+            'dynamicOptionsValues.translations' => function (Builder $query) use ($languageCondition) {
+                /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                $query->where("language_code", $languageCondition[2]);
+            }
+        ]);
 
-        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($languageCondition) {
-           /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-         }]);
-
-         if(!empty($orderBy) && !empty($orderDirection)){
+        if (!empty($orderBy) && !empty($orderDirection)) {
             // $bc=$bc->addSelect([
             //     $orderBy[0]=>Translation::select("translations.value")
             //     ->join("option_values",function ($join) use ($languageCondition,$orderBy){
@@ -95,85 +96,97 @@ class BrokerRepository implements RepositoryInterface
             //        ->where("translations.language_code","=",$languageCondition[2])
             //        ->where("translations.property","=", $orderBy[0]);
             //    })->whereColumn("option_values.broker_id",'=',"brokers.id")->where("option_values.option_slug","=", $orderBy[0])
-                
+
             //     ])
             //     ->orderBy( $orderBy[0],$orderDirection);
 
-            $tableStaticColumns=['home_url','user_rating','account_type','trading_name','overall_rating','support_options','account_currencies','trading_instruments'];
-        $orderQueryType="";
-        $orderQueryType=in_array($orderBy[0], $tableStaticColumns)?"static":"dynamic";
-        $translatedEntry=Translation::where(
-            [$languageCondition,['property','=',$orderBy[0]] ])->first();
-        if(!is_null($translatedEntry))
-        {
-            if($translatedEntry->translationable_type==Broker::class){
-                $orderQueryType="translated-static";
+            $tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
+            $orderQueryType = "";
+            $orderQueryType = in_array($orderBy[0], $tableStaticColumns) ? "static" : "dynamic";
+            $translatedEntry = Translation::where(
+                [$languageCondition, ['property', '=', $orderBy[0]]]
+            )->first();
+            if (!is_null($translatedEntry)) {
+                if ($translatedEntry->translationable_type == Broker::class) {
+                    $orderQueryType = "translated-static";
+                }
+
+                if ($translatedEntry->translationable_type == OptionValue::class) {
+                    $orderQueryType = "translated-dynamic";
+                }
             }
 
-            if($translatedEntry->translationable_type==OptionValue::class){
-                $orderQueryType="translated-dynamic";
-            }
-        }    
+            $bc = $this->addOrderBy($bc, $orderBy, $orderDirection, $languageCondition, $orderQueryType);
+        }
 
-            $bc=$this->addOrderBy($bc,$orderBy,$orderDirection,$languageCondition,$orderQueryType);
-         }
-      
-      
-         //  ->where("brokers.trading_name",'LIKE','%Trade%')
+
+        //  ->where("brokers.trading_name",'LIKE','%Trade%')
         //  ->orWhereHas('dynamicOptionsValues.translations',function(Builder $query){
         //     /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
         //     $query->where("translations.property","=","trading_fees")->where("translations.language_code","=",'ro')->where("translations.value","=","NU");
         //  })
-      
-        $bc=$bc->paginate();
 
-         
-     
-      // dd(DB::getQueryLog());
-      return $bc;
+        $bc = $bc->paginate();
+
+
+
+       //  dd(DB::getQueryLog());
+        // dd($bc->toSql());
+       return $bc;
     }
 
-    public function addOrderBy($queryBuilder,$orderBy,$orderDirection,$languageCondition,$queryType)
+    public function addOrderBy($queryBuilder, $orderBy, $orderDirection, $languageCondition, $queryType)
     {
-        if($queryType=="translated-dynamic"){
+        if ($queryType == "translated-dynamic") {
+            return $queryBuilder->addSelect([
+                $orderBy[0] => Translation::select("translations.value")
+                    ->join("option_values", function ($join) use ($languageCondition, $orderBy) {
+                        $join->on("translations.translationable_id", "=", "option_values.id")
+                            ->where("translations.translationable_type", '=', OptionValue::class)
+                            ->where("translations.language_code", "=", $languageCondition[2])
+                            ->where("translations.property", "=", $orderBy[0]);
+                    })->whereColumn("option_values.broker_id", '=', "brokers.id")->where("option_values.option_slug", "=", $orderBy[0])
+
+            ])
+                ->orderBy($orderBy[0], $orderDirection);
+        }
+
+        if($queryType=="translated-static"){
+           
             return $queryBuilder->addSelect([
                 $orderBy[0]=>Translation::select("translations.value")
-                ->join("option_values",function ($join) use ($languageCondition,$orderBy){
-                   $join->on("translations.translationable_id","=","option_values.id")
-                   ->where("translations.translationable_type",'=',OptionValue::class)
-                   ->where("translations.language_code","=",$languageCondition[2])
-                   ->where("translations.property","=", $orderBy[0]);
-               })->whereColumn("option_values.broker_id",'=',"brokers.id")->where("option_values.option_slug","=", $orderBy[0])
-                
-                ])
-                ->orderBy( $orderBy[0],$orderDirection);
+            ->whereColumn("translations.translationable_id","=","brokers.id")
+            ->where("translations.language_code","=",$languageCondition[2])
+            ->where("translations.property","=",$orderBy[0])
+            ->where("translationable_type","=",Broker::class)])
+            ->orderBy($orderBy[0], $orderDirection);
         }
 
-        if($queryType=='static'){
-            return $queryBuilder->orderBy($orderBy[0],$orderDirection);
+        if ($queryType == 'static') {
+            return $queryBuilder->orderBy($orderBy[0], $orderDirection);
         }
 
-        if($queryType=='dynamic'){
-           
-            return $queryBuilder->addSelect([$orderBy[0]=>OptionValue::select("value")->whereColumn("option_values.broker_id",'=',"brokers.id")
-            ->where("option_values.option_slug","=", $orderBy[0])])
-            ->orderBy( $orderBy[0],$orderDirection);
+        if ($queryType == 'dynamic') {
+
+            return $queryBuilder->addSelect([$orderBy[0] => OptionValue::select("value")->whereColumn("option_values.broker_id", '=', "brokers.id")
+                ->where("option_values.option_slug", "=", $orderBy[0])])
+                ->orderBy($orderBy[0], $orderDirection);
         }
     }
-    public function getDynamicColumns12($languageCondition,$dynamicColumns)
+    public function getDynamicColumns12($languageCondition, $dynamicColumns)
     {
-        $bc=Broker::with(['translations'=>function (Builder $query) use ($languageCondition){
+        $bc = Broker::with(['translations' => function (Builder $query) use ($languageCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-        },'dynamicOptionsValues'=>function (Builder $query) use ($dynamicColumns){
-             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->whereIn("option_slug",$dynamicColumns);
-        },'dynamicOptionsValues.translations'=> function (Builder $query) use ($languageCondition) {
-           /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-         }])->get();
-          
-        
+            $query->where("language_code", $languageCondition[2]);
+        }, 'dynamicOptionsValues' => function (Builder $query) use ($dynamicColumns) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+            $query->whereIn("option_slug", $dynamicColumns);
+        }, 'dynamicOptionsValues.translations' => function (Builder $query) use ($languageCondition) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+            $query->where("language_code", $languageCondition[2]);
+        }])->get();
+
+
 
         //nu ordoneaza dupa o relatie a relatiei
         //  ->orderBy(OptionValue::select("value")->whereColumn("option_values.broker_id","brokers.id")
@@ -183,53 +196,51 @@ class BrokerRepository implements RepositoryInterface
         //  ->orderBy(Translation::select("value")->whereColumn("translations.translationable_id","brokers.id")
         //  ->where("translations.translationable_type",'=',"Modules\\Brokers\\Models\\Broker")
         //  ->where("translations.property","=",'account_type'),"asc")
-      return $bc;
+        return $bc;
     }
 
-    public function getDynamicColumns5($languageCondition,$dynamicColumns)
+    public function getDynamicColumns5($languageCondition, $dynamicColumns)
     {
-        $bc=Broker::leftJoin('translations',function ($join) use($languageCondition){
+        $bc = Broker::leftJoin('translations', function ($join) use ($languageCondition) {
 
-            $join->on("translations.translationable_id",'=','brokers.id')
-            ->where("translations.translationable_type",'=','Modules\Brokers\Models\Broker')
-            ->where("translations.language_code",'=',$languageCondition[2]);
-            
-        })->with(['translations'=>function (Builder $query) use ($languageCondition){
+            $join->on("translations.translationable_id", '=', 'brokers.id')
+                ->where("translations.translationable_type", '=', 'Modules\Brokers\Models\Broker')
+                ->where("translations.language_code", '=', $languageCondition[2]);
+        })->with(['translations' => function (Builder $query) use ($languageCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-           // $query->where("language_code",$languageCondition[2]);
+            // $query->where("language_code",$languageCondition[2]);
         }])->paginate();
 
-      return $bc;
+        return $bc;
     }
-    public function getDynamicColumns34($languageCondition,$dynamicColumns)
+    public function getDynamicColumns34($languageCondition, $dynamicColumns)
     {
-        $bc=Broker::leftJoin('translations',"translations.translationable_id",'=','brokers.id')
-        ->orderBy("translations.property","desc")->orderBy("translations.value","desc")
-        ->with(['translations'=>function (Builder $query) use ($languageCondition){
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code",$languageCondition[2]);
-        }])->select('brokers.*')->get();
-      return $bc;
+        $bc = Broker::leftJoin('translations', "translations.translationable_id", '=', 'brokers.id')
+            ->orderBy("translations.property", "desc")->orderBy("translations.value", "desc")
+            ->with(['translations' => function (Builder $query) use ($languageCondition) {
+                /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                $query->where("language_code", $languageCondition[2]);
+            }])->select('brokers.*')->get();
+        return $bc;
 
-      //https://www.youtube.com/watch?v=U-5ZhWqmUdI
+        //https://www.youtube.com/watch?v=U-5ZhWqmUdI
     }
-    public function getDynamicColumns123($languageCondition,$dynamicColumns)
+    public function getDynamicColumns123($languageCondition, $dynamicColumns)
     {
-        $bc=Broker::where("language_code",$languageCondition[2])->leftJoin('translations',"translations.translationable_id",'=','brokers.id')
-        ->orderBy("translations.property","desc")->orderBy("translations.value","desc")
-        ->select('brokers.*','translations.property','translations.value')->get();
-      return $bc;
+        $bc = Broker::where("language_code", $languageCondition[2])->leftJoin('translations', "translations.translationable_id", '=', 'brokers.id')
+            ->orderBy("translations.property", "desc")->orderBy("translations.value", "desc")
+            ->select('brokers.*', 'translations.property', 'translations.value')->get();
+        return $bc;
 
-      //https://www.youtube.com/watch?v=U-5ZhWqmUdI
+        //https://www.youtube.com/watch?v=U-5ZhWqmUdI
     }
 
     public function borkerJsonFilter($jsonSting)
     {
-        $jsonArray=json_decode($jsonSting);
+        $jsonArray = json_decode($jsonSting);
 
-        foreach($jsonArray as $broker)
-        {
-           dd($broker);
+        foreach ($jsonArray as $broker) {
+            dd($broker);
         }
     }
 

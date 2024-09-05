@@ -56,6 +56,8 @@ class BrokerController extends Controller
 
         //get brokers registered with other default language and was translated to $language by AI
 
+        //tested with http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&columns[in]=trading_name,trading_fees,account_type,jurisdictions,promotion_title,fixed_spreads,support_options&order_by[eq]=+account_type
+
     }
 
     /**
@@ -171,5 +173,10 @@ class BrokerController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function filter()
+    {
+        return "ok";
     }
 }

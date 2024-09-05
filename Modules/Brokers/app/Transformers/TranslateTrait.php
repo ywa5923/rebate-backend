@@ -14,7 +14,7 @@ trait TranslateTrait
 
         foreach($translations as $translation)
         {
-            if($translation->property==$field)
+            if($translation->property==$field )
            return $translation->value;
         }
         return ($isOptionValueSlug)?$this->value:$this->$field;
@@ -29,6 +29,18 @@ trait TranslateTrait
         }
      return ($this->getTranslatedProperty($prop))??$this->name;
        
+    }
+
+    public function translateProp($prop){
+
+      
+       
+        if($this->translations->isEmpty()){
+            return $this->{$prop};
+         }
+      
+        return ($this->getTranslatedProperty($prop))??$this->{$prop};
+        
     }
 
     public function getTranslatedProperty($prop)

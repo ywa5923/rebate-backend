@@ -119,7 +119,7 @@ php artisan module:make-seed OtionsCategories Brokers
     default_language=>"Limba implicita"
 
 ]
-
+//https://www.youtube.com/watch?v=MF0jFKvS4SI despre api rest design
 
 
 
