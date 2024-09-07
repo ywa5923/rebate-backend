@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Brokers\Repositories\CompanyRepository;
 use Modules\Brokers\Repositories\CompanyUniqueListInterface;
+use Modules\Brokers\Repositories\RegulatorRepository;
 
 class BrokerFilterController extends Controller
 {
@@ -16,15 +17,39 @@ class BrokerFilterController extends Controller
      */
     public function index()
     {
-        $rep= new CompanyRepository();
+       $rep= new CompanyRepository();
+       $regulatorRepo=new RegulatorRepository();
+       $officesList= $rep->getUniqueList(["language_code","=","ro"],CompanyUniqueListInterface::OFFICES);
+       $headquartersList= $rep->getUniqueList(["language_code","=","ro"],CompanyUniqueListInterface::HEADQUARTERS);
+       $regulatorsList=$regulatorRepo->getUniqueList(["language_code","=","ro"]);
 
-       $allCompanies= $rep->getUniqueList(["language_code","=","ro
-       "],CompanyUniqueListInterface::OFFICES);
+       return  [[
+        "field"=>"office",
+         "type"=>"checkbox",
+         "options"=>$this->transform($officesList)
+       ],
+       [
+        "field"=>"headquarters",
+         "type"=>"checkbox",
+         "options"=>$this->transform($headquartersList)
+       ],
+       [
+        "field"=>"regulator",
+         "type"=>"checkbox",
+         "options"=>$this->transform($regulatorsList)
+       ]
+       ];
+      
+    }
 
-       return $allCompanies;
-     
-
-
+    public function transform(array $data)
+    {
+        $result=[];
+        foreach ($data as $key=>$value)
+        {
+           $result[]=["name"=>$key,"value"=>$value];
+        }
+        return $result;
     }
 
     /**

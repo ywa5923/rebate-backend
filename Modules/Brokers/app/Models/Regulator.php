@@ -5,6 +5,8 @@ namespace Modules\Brokers\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Brokers\Database\Factories\RegulatorFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Translations\Models\Translation;
 
 class Regulator extends Model
 {
@@ -15,8 +17,10 @@ class Regulator extends Model
      */
     protected $fillable = [];
 
-    protected static function newFactory(): RegulatorFactory
+
+    public function translations(): MorphMany
     {
-        //return RegulatorFactory::new();
+        return $this->morphMany(Translation::class, 'translationable');
     }
+
 }

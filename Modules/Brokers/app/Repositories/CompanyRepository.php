@@ -18,11 +18,16 @@ class CompanyRepository
               $companyCollection=new CompanyCollection($companies);
               foreach($companyCollection->resolve() as $company)
               {
-                array_push($list,...explode(",",$company[$fieldName]));
+                $items=explode(",",$company[$fieldName]);
+                foreach($items as $item){
+                   if(!array_key_exists(trim($item),$list) && trim($item)!=="")
+                   $list[trim($item)]=trim($item);
+                }
+                
               }
-              array_push($results,...array_unique($list));
+             
+              $results= array_merge($results,$list);
          });
-
          return array_unique($results);
     }
 
