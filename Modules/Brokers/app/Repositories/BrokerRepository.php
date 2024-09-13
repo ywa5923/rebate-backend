@@ -6,6 +6,7 @@ use App\Repositories\RepositoryInterface;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\Broker;
+use Modules\Brokers\Models\Company;
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Models\Translation;
@@ -48,7 +49,7 @@ class BrokerRepository implements RepositoryInterface
         return $bc;
     }
 
-    public function getDynamicColumns($languageCondition, $columns, $orderBy, $orderDirection)
+    public function getDynamicColumns($languageCondition, $columns, $orderBy, $orderDirection,$filters)
     {
 
         //to be added in env.file or global params
@@ -62,14 +63,69 @@ class BrokerRepository implements RepositoryInterface
         if (empty($selctedStaticColumns) && empty($dynamicColumns))
             $selctedStaticColumns = $tableStaticColumns;
 
-        $jsonResult = $this->getQueryJson($languageCondition, $selctedStaticColumns, $dynamicColumns, $orderBy, $orderDirection);
+        $jsonResult = $this->getQueryJson($languageCondition, $selctedStaticColumns, $dynamicColumns, $orderBy, $orderDirection,$filters);
 
-        return new BrokerCollection($jsonResult);
+        
 
-        //return $jsonResult;
+        //return new BrokerCollection($jsonResult);
+
+        return $jsonResult;
     }
-    public function getQueryJson($languageCondition, $staticColumns, $dynamicColumns, $orderBy, $orderDirection)
+    public function getQueryJson($languageCondition, $staticColumns, $dynamicColumns, $orderBy, $orderDirection,$filters)
     {
+        // $query=Company::query();
+        // $brokersId=[];
+        // if(isset($filters["offices"]) && !empty($filters["offices"]) && $languageCondition[2]=="en")
+        // {
+        //     $offices=$filters["offices"];
+        //     $brokers = Broker::whereHas('companies', function ($query) use ($offices) {
+        //         $index=0;
+        //         foreach($offices as $office)
+        //     {
+        //         if($index==0){
+        //             $query->where("offices",'LIKE',"%".$office."%");
+        //         }else{
+        //             $query->orWhere("offices",'LIKE',"%".$office."%");
+        //         }
+               
+        //         $index++;
+        //     }
+        //     });
+
+       
+           
+        // //dd(DB::getQueryLog());
+
+        //    // $result=$query->pluck('id')->toArray();
+          
+        // }else{
+        //     $offices=$filters["offices"];
+        //     $brokers = Broker::whereHas('companies.translations', function ($query) use ($offices) {
+        //         $index=0;
+        //         $query->where(function($query){
+        //             $query->where("translations.property",'=','offices');
+        //         })->where(function($query) use ($offices){
+        //            $index=0;
+        //             foreach($offices as $office)
+        //             {
+        //                 if($index==0){
+        //                     $query->where("translations.value",'LIKE',"%".$office."%");
+        //                 }else{
+        //                     $query->orWhere("translations.value",'LIKE',"%".$office."%");
+        //                 }
+                       
+        //                 $index++;
+        //             }
+        //         });
+               
+               
+        //     });
+        //     //Seychelles,Cyprus
+        //    // dd($brokers->toSql(),$brokers->getBindings());
+        //     $brokersId=$brokers->pluck('id')->toArray();
+        // }
+
+        //dd($brokersId);
         DB::enableQueryLog();
         $bc = Broker::select(["id", ...$staticColumns])->with([
             'translations' => function (Builder $query) use ($languageCondition) {

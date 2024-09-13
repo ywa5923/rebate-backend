@@ -12,7 +12,7 @@ class BrokerQueryParser extends BaseQueryParser
        "order_by"=>['eq'],
        "order_direction"=>['eq'],
        "columns"=>['in'],
-       "filters"=>['in']
+       "offices"=>['in']
     ];
   
     protected $columnMap = [

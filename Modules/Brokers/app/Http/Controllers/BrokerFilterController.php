@@ -19,12 +19,12 @@ class BrokerFilterController extends Controller
     {
        $rep= new CompanyRepository();
        $regulatorRepo=new RegulatorRepository();
-       $officesList= $rep->getUniqueList(["language_code","=","ro"],CompanyUniqueListInterface::OFFICES);
-       $headquartersList= $rep->getUniqueList(["language_code","=","ro"],CompanyUniqueListInterface::HEADQUARTERS);
-       $regulatorsList=$regulatorRepo->getUniqueList(["language_code","=","ro"]);
+       $officesList= $rep->getUniqueList(["language_code","=","en"],CompanyUniqueListInterface::OFFICES);
+       $headquartersList= $rep->getUniqueList(["language_code","=","en"],CompanyUniqueListInterface::HEADQUARTERS);
+       $regulatorsList=$regulatorRepo->getUniqueList(["language_code","=","en"]);
 
        return  [[
-        "field"=>"office",
+        "field"=>"offices",
          "type"=>"checkbox",
          "options"=>$this->transform($officesList)
        ],
@@ -34,7 +34,7 @@ class BrokerFilterController extends Controller
          "options"=>$this->transform($headquartersList)
        ],
        [
-        "field"=>"regulator",
+        "field"=>"regulators",
          "type"=>"checkbox",
          "options"=>$this->transform($regulatorsList)
        ]

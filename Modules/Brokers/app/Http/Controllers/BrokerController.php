@@ -45,7 +45,7 @@ class BrokerController extends Controller
 
     public function index(BrokerQueryParser $queryParser,BrokerService $brokerService,Request $request)
     {
-       
+      
        return $brokerService->process($queryParser->parse($request));
 
         //brokerService->process($queryParams,repository)

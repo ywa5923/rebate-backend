@@ -23,26 +23,33 @@ class BrokerService
     {
 
       
-       $columns=$this->extractDynamicColumns($queryParams);
+       $columns=$this->extractFromWhereInParams($queryParams,"columns");
        
+       $offices=$this->extractFromWhereInParams($queryParams,"offices");
+       $filters=[];
+       if(!empty($offices))
+       {
+        $filters["offices"]=$offices;
+       }
       
         /** @var  Modules\Brokers\Repositories\BrokerRepository $repo*/
         $repo=$this->repository;
     
-        return $repo->getDynamicColumns($queryParams["language"],$columns,$queryParams["orderBy"],$queryParams["orderDirection"]);
+        return $repo->getDynamicColumns($queryParams["language"],$columns,$queryParams["orderBy"],$queryParams["orderDirection"],$filters);
        
     }
 
-    public function extractDynamicColumns(array $queryParams):array|null
+    public function extractFromWhereInParams(array &$queryParams,string $field):array|null
     {
       
         foreach($queryParams["whereInParams"] as $k=>$v )
         {
-            if($v[0]==="columns")
+            if($v[0]===$field)
             {
-               
-                unset($queryParams["whereInParmas"][$k]);
-                return $v[1];
+               $columns=$v[1];
+                unset($queryParams["whereInParams"][$k]);
+              // array_splice($queryParams["whereInParams"],$k,1);
+                return $columns;
             }
         }
 
