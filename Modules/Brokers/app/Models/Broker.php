@@ -70,4 +70,9 @@ class Broker extends Model
     {
         return $this->belongsToMany(Company::class,"broker_company");
     }
+
+    public function regulators():BelongsToMany
+    {
+        return $this->belongsToMany(Regulator::class);
+    }
 }

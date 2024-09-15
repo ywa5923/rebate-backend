@@ -106,18 +106,51 @@ php artisan module:make-seed OtionsCategories Brokers
 
 
 [
-    logo=>logo,
-    trading_name=>"Denumire comerciala",
-    home_url=>"Link acasa",
-    overall_rating=>"Rating general",
-    user_rating=>"Rating utilizator",
-    support_options=>"Optiuni suport",
-    account_type=>"Tipul contului",
-    trading_instruments=>"Instrumente de tranzactionare",
-    account_currencies=>"Moneda cont",
-    language=>"limba",
-    default_language=>"Limba implicita"
+    'broker_static_columns'=>[
+    'logo'=>'Sigla',
+    'trading_name'=>"Denumire comerciala",
+    'home_url'=>"Link acasa",
+    'overall_rating'=>"Rating general",
+    'user_rating'=>"Rating utilizator",
+    'support_options'=>"Optiuni suport",
+    'account_type'=>"Tipul contului",
+    'trading_instruments'=>"Instrumente de tranzactionare",
+    'account_currencies'=>"Moneda cont",
+    'language'=>"limba",
+    'default_language'=>"Limba implicita"
+    ],
+    'broker_ext_columns'=>[
+        "regulators"=>"Regulatori"
+    ],
+    'filters'=>[
+        'offices'=>'Birouri',
+        'headquarters'=>'Sediu',
+        'regulators'=>'Regulatori'
+    ]
+]
 
+[
+    'broker_static_columns'=>[
+    'logo'=>'Logo',
+    'trading_name'=>"Trading Name",
+    'home_url'=>"Home URL",
+    'overall_rating'=>"Overall Rating",
+    'user_rating'=>"User Rating",
+    'support_options'=>"Support Options",
+    'account_type'=>"Account Type",
+    'trading_instruments'=>"Trading Instruments",
+    'account_currencies'=>"Account Currencies",
+    'language'=>"Language",
+    'default_language'=>"Default Language"
+    ],
+    'broker_ext_columns'=>[
+        "regulators"=>"Regulators"
+    ],
+    'filters'=>[
+        'offices'=>'Offices',
+        'headquarters'=>'Headquarters',
+        'regulators'=>'Regulators'
+    ]
 ]
 //https://www.youtube.com/watch?v=MF0jFKvS4SI despre api rest design
 

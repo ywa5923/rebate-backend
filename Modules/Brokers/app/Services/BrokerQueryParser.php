@@ -12,40 +12,22 @@ class BrokerQueryParser extends BaseQueryParser
        "order_by"=>['eq'],
        "order_direction"=>['eq'],
        "columns"=>['in'],
-       "offices"=>['in']
+       "filter_offices"=>['in']
     ];
   
     protected $columnMap = [
        "language"=>"language_code",
+       "filter_offices"=>"offices"
       
     ];
 
-    public function parse(Request $request):array
+    public function parse(Request $request)
     {
-      $initial=parent::parse($request);
-    
-      //extract language from whereParams and put it in array['langugage'] 
-     return $this->extractLanguage( $initial);
-     
+      return parent::parse($request);
       
     }
     
 
-    public function extractLanguage(array $paramsArray):array
-    {
-      $languageParams=[];
-
-      foreach($paramsArray["whereParams"] as $k=>$v){
-         if(in_array("language_code",$v)){
-            $languageParams=$v;
-            unset($paramsArray["whereParams"][$k]);
-         }
-      }
-
-       $paramsArray["language"]= $languageParams;
-
-       return $paramsArray;
-
-    }
+   
 }
 

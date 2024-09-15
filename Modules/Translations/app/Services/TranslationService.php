@@ -2,6 +2,7 @@
 
 namespace Modules\Translations\Services;
 
+use App\Services\BaseQueryParser;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Translations\Repositories\TranslationRepository;
 use Modules\Translations\Models\Translation;
@@ -25,25 +26,27 @@ class TranslationService
     }
 
 
-    public function process(array $queryParams):?TranslationCollection
+    public function process(BaseQueryParser $queryParser):?TranslationCollection
     {
-        if (count($queryParams) == 0)
-            return null;
+
+        //dd($queryParser->getWhereParams());
+        // if (count($queryParser->getWhereParams()) == 0 || count($queryParser->getWhereInParams()) == 0)
+        //     return null;
 
         $queryBuilder = Translation::query();
-        if (isset($queryParams["whereParams"]))
-            foreach ($queryParams["whereParams"] as $param) {
-                $queryBuilder->where(...$param);
+        
+            foreach ($queryParser->getWhereParams() as $k=>$v) {
+                $queryBuilder->where(...$v);
             }
 
-        if (isset($queryParams["whereInParams"])) {
-            foreach ($queryParams["whereInParams"] as $param) {
-                $queryBuilder->whereIn($param[0], $param[1]);
+       
+            foreach ($queryParser->getWhereInParams() as $k=>$v) {
+                $queryBuilder->whereIn($v[0], $v[1]);
             }
-        }
+        
 
-        if (isset($queryParams["orderBy"][0]) && isset($queryParams["orderDirection"]))
-            $queryBuilder->orderBy($queryParams["orderBy"][0], $queryParams["orderDirection"]);
+        if (!empty($queryParser->getOrderBy()) && !empty($queryParser->getOrderDirection()))
+            $queryBuilder->orderBy($queryParser->getOrderBy()[0], $queryParser->getOrderDirection());
 
 
         return new TranslationCollection($queryBuilder->get());

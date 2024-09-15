@@ -20,6 +20,8 @@ class RegulatorRepository
           {
             //array_push($list, [$regulator["abreviation"]=>$regulator["abreviation"]."-".$regulator["country"]]);
             $list[trim($regulator["abreviation"])]=$regulator["abreviation"]."-".$regulator["country"];
+          //  $key=$regulator["abreviation"]."-".$regulator["country"];
+          //   $list[$key]=trim($regulator["abreviation"]);
           }
 
           $results=array_merge($results,$list);

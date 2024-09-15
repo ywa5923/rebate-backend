@@ -9,19 +9,25 @@ use Illuminate\Http\Response;
 use Modules\Brokers\Repositories\CompanyRepository;
 use Modules\Brokers\Repositories\CompanyUniqueListInterface;
 use Modules\Brokers\Repositories\RegulatorRepository;
+use Modules\Brokers\Services\BrokerFilterQueryParser;
 
 class BrokerFilterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BrokerFilterQueryParser $queryParser,Request $request)
     {
-       $rep= new CompanyRepository();
+       $queryParser->parse($request);
+       $language=$queryParser->getWhereParam("language");
+        
+        
+       $companyRepo= new CompanyRepository();
        $regulatorRepo=new RegulatorRepository();
-       $officesList= $rep->getUniqueList(["language_code","=","en"],CompanyUniqueListInterface::OFFICES);
-       $headquartersList= $rep->getUniqueList(["language_code","=","en"],CompanyUniqueListInterface::HEADQUARTERS);
-       $regulatorsList=$regulatorRepo->getUniqueList(["language_code","=","en"]);
+       $officesList= $companyRepo->getUniqueList($language,CompanyUniqueListInterface::OFFICES);
+      
+       $headquartersList= $companyRepo->getUniqueList($language,CompanyUniqueListInterface::HEADQUARTERS);
+       $regulatorsList=$regulatorRepo->getUniqueList($language);
 
        return  [[
         "field"=>"offices",
@@ -47,7 +53,7 @@ class BrokerFilterController extends Controller
         $result=[];
         foreach ($data as $key=>$value)
         {
-           $result[]=["name"=>$key,"value"=>$value];
+           $result[]=["name"=>$value,"value"=>$key];
         }
         return $result;
     }

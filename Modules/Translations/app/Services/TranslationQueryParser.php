@@ -11,7 +11,7 @@ class TranslationQueryParser extends BaseQueryParser
   protected $querySafeParams = [
     'model' => ['eq'],
     'properties' => ['eq'],
-    'property' => ['in'],
+    'property' => ['in','eq'],
     'lang' => ['eq'],
     'translation_type' => ['eq'],
     'order_by' => ['eq']

@@ -3,6 +3,7 @@
 namespace Modules\Brokers\Services;
 
 use App\Repositories\RepositoryInterface;
+use App\Services\BaseQueryParser;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Repositories\TranslationRepository;
@@ -19,40 +20,27 @@ class BrokerService
     }
 
    
-    public function process(array $queryParams)
+    public function process(BaseQueryParser $queryParser)
     {
 
+       // dd( $queryParser->getOrderBy());
       
-       $columns=$this->extractFromWhereInParams($queryParams,"columns");
-       
-       $offices=$this->extractFromWhereInParams($queryParams,"offices");
-       $filters=[];
-       if(!empty($offices))
-       {
-        $filters["offices"]=$offices;
-       }
       
         /** @var  Modules\Brokers\Repositories\BrokerRepository $repo*/
         $repo=$this->repository;
+     //   dd($queryParser->getWhereInParam("columns"));
+        $columns=!empty($queryParser->getWhereInParam("columns"))?$queryParser->getWhereInParam("columns")[1]:null;
+
+        $orderBy=!empty($queryParser->getOrderBy())?$queryParser->getOrderBy()[0]:null;
     
-        return $repo->getDynamicColumns($queryParams["language"],$columns,$queryParams["orderBy"],$queryParams["orderDirection"],$filters);
+        return $repo->getDynamicColumns(
+            $queryParser->getWhereParam("language"),
+            $columns,
+            $orderBy,
+            $queryParser->getOrderDirection(),
+            $queryParser->getAllFilters());
        
     }
 
-    public function extractFromWhereInParams(array &$queryParams,string $field):array|null
-    {
-      
-        foreach($queryParams["whereInParams"] as $k=>$v )
-        {
-            if($v[0]===$field)
-            {
-               $columns=$v[1];
-                unset($queryParams["whereInParams"][$k]);
-              // array_splice($queryParams["whereInParams"],$k,1);
-                return $columns;
-            }
-        }
-
-        return [];
-    }
+   
 }

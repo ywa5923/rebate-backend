@@ -19,11 +19,11 @@ class BrokerOptionController extends Controller
     public function index(BrokerOptionQueryParser $queryParser,BrokerOptionRepository $rep, Request $request)
     {
         //{{PATH}}/broker_options?language[eq]=ro
-        $parsedQuery=$queryParser->parse($request);
+       $queryParser->parse($request);
        
-        if(!empty($parsedQuery["whereParams"])){
+        if(!empty($queryParser->getWhereParams())){
         //ex: ['language_code','=','ro']
-        $languageParams=$parsedQuery["whereParams"][0];
+        $languageParams=$queryParser->getWhereParam("language");
         $collection=new BrokerOptionCollection($rep->translate($languageParams));
         return $collection;
         }else

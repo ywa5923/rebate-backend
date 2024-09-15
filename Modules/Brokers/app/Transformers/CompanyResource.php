@@ -16,12 +16,12 @@ class CompanyResource extends JsonResource
     {
         return [
             //"id"=>$this->id,
-            "name" =>$this->name,
-            "licence_number"=>$this->licence_number,
-            "banner"=>$this->banner,
-           "description"=>$this->translateProp("description"),
-            "year_founded"=>$this->year_founded,
-            "employees"=>$this->employees,
+           // "name" =>$this->name,
+           // "licence_number"=>$this->licence_number,
+          //  "banner"=>$this->banner,
+         //  "description"=>$this->translateProp("description"),
+           // "year_founded"=>$this->year_founded,
+          //  "employees"=>$this->employees,
             "headquarters"=>$this->translateProp("headquarters"),
             "offices"=>$this->translateProp("offices"),
           ];
