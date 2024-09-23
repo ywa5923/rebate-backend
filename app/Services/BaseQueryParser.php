@@ -43,7 +43,7 @@ class BaseQueryParser
         
         foreach ($this->querySafeParams as $param => $operators) {
           $query = $request->query($param);
-         
+        
           if (!isset($query))
             continue;
     
@@ -68,6 +68,10 @@ class BaseQueryParser
               continue;
             }
             $paramValue = ($param === "model") ? ($this->modelClassMap[$query[$operator]]) : ($query[$operator]);
+
+            //remove mysql string operators from the begining of the param value. Ex lt1000=>1000
+            $paramValue=$this->removeMysqlOperators($paramValue);
+
             if ($operator === 'in') {
               $this->whereInParams[$param] = [$tableColumn, explode(',',   $paramValue)];
             } else {
@@ -80,6 +84,21 @@ class BaseQueryParser
     
        
       }
+
+      public function removeMysqlOperators(string $paramValue):string
+      {
+        foreach($this->operatorMap as $k=>$v)
+        {
+          if(strpos($paramValue,$k)===0)
+          {
+            return preg_replace("/^{$k}/", "", $paramValue);
+            
+          }
+        }
+
+        return $paramValue;
+      }
+
 
       /**
        * Get the parsed query as an array

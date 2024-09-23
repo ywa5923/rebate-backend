@@ -54,7 +54,7 @@ class ExportUrls extends Command
 
     public function refineResults($results)
     {
-        $refineResults=[];
+        $refinedResults=[];
         foreach($results as $row)
         {
             //format links same as urls table's columns
@@ -62,11 +62,11 @@ class ExportUrls extends Command
             $tradingAccountLinks=$this->formatLink($row->id,$row->links,"live_trading_account",1);
             $partnerAccountLinks=$this->formatLink($row->id,$row->links_partner,"partner_account",1);
 
-            $refineResults=array_merge($refineResults, $mobileLinks, $tradingAccountLinks,$partnerAccountLinks);
+            $refinedResults=array_merge($refinedResults, $mobileLinks, $tradingAccountLinks,$partnerAccountLinks);
             
         }
         
-        return $refineResults;
+        return $refinedResults;
     }
 
     public function formatLink($brokerId,$link,$linkType,$categoryId)

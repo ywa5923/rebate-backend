@@ -23,9 +23,9 @@ class BrokerService
     public function process(BaseQueryParser $queryParser)
     {
 
-       // dd( $queryParser->getOrderBy());
-      
-      
+        //dd( isset($queryParser->getAllFilters()["whereIn"]["filter_offices"]));
+       
+       // dd($queryParser->getAllFilters());
         /** @var  Modules\Brokers\Repositories\BrokerRepository $repo*/
         $repo=$this->repository;
      //   dd($queryParser->getWhereInParam("columns"));
