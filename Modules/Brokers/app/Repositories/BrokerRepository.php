@@ -561,8 +561,8 @@ class BrokerRepository implements RepositoryInterface
     public function dumpSql(Builder $queryBuilder)
     {
          /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
-        dd($queryBuilder->toSql(),$queryBuilder->getBindings());
-        dd(DB::getQueryLog());
+        dd($queryBuilder->toSql(),$queryBuilder->getBindings(),DB::getQueryLog());
+       
     }
 
     //https://dev.to/othmane_nemli/laravel-wherehas-and-with-550o
