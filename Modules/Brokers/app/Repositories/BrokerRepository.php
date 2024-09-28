@@ -6,33 +6,31 @@ use App\Repositories\RepositoryInterface;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\Broker;
-use Modules\Brokers\Models\Company;
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Models\Translation;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class BrokerRepository implements RepositoryInterface
 {
+
+    const TRANSLATED_DYNAMIC = 'translated-dynamic';
+    const TRANSLATED_STATIC = 'translated-static';
+    const STATIC="static";
+    const DYNAMIC="dynamic";
     use BrokerTrait;
 
-    public function getFullProfile($languageCondition)
-    {
-        //dd($languageCondition);
-        $bc = new BrokerCollection(Broker::with(['translations' => function (Builder $query) use ($languageCondition) {
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code", $languageCondition[2]);
-        }, 'dynamicOptionsValues.translations' => function (Builder $query) use ($languageCondition) {
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where("language_code", $languageCondition[2]);
-        }])->paginate());
-
-        return $bc;
-
-        // $this->borkerJsonFilter($bc->toJson());
 
 
-    }
-
+    /**
+     * Get dynamic columns from broker table, translated and filtered.
+     * @param array $languageCondition - language condition array [language_code, language_id, lang]
+     * @param array $columns - array of columns to return
+     * @param string $orderBy - column to order by
+     * @param string $orderDirection - direction of order
+     * @param array $filters - array of filters
+     * @return BrokerCollection - collection of broker data
+     */
 
     public function getDynamicColumns($languageCondition, $columns, $orderBy, $orderDirection, $filters)
     {
@@ -42,7 +40,6 @@ class BrokerRepository implements RepositoryInterface
         $tableExtRelations = ['regulators'];
         if (empty($columns))
             $columns = $tableStaticColumns;
-
 
         $dynamicColumns = array_diff($columns, array_merge($tableStaticColumns, $tableExtRelations));
         $selectedStaticColumns = array_intersect($tableStaticColumns, $columns);
@@ -57,11 +54,27 @@ class BrokerRepository implements RepositoryInterface
 
         //return $jsonResult;
     }
-    public function makeQuery($languageCondition, $staticColumns, $dynamicColumns, $extRelations, $orderBy, $orderDirection, $filters)
+
+
+    /**
+     * Build a query for retrieving broker data, with translations and dynamic options,
+     * filtered and ordered according to the given parameters.
+     *
+     * @param array $languageCondition - language condition array [language_code, language_id, lang]
+     * @param array $staticColumns - array of static columns from broker table
+     * @param array $dynamicColumns - array of dynamic columns (option values) from broker table
+     * @param array $extRelations - array of external relations (regulators, etc) to load
+     * @param string $orderBy - column to order by
+     * @param string $orderDirection - direction of order
+     * @param array $filters - array of filters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator - paginated result
+     */
+
+    public function makeQuery($languageCondition, $staticColumns, $dynamicColumns, $extRelations, $orderBy, $orderDirection, $filters):LengthAwarePaginator
     {
        
         DB::enableQueryLog();
-        $bc = Broker::select(["id", ...$staticColumns])->with([
+        $qb = Broker::select(["id", ...$staticColumns])->with([
             'translations' => function (Builder $query) use ($languageCondition) {
                 /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
                 $query->where("language_code", $languageCondition[2]);
@@ -79,7 +92,7 @@ class BrokerRepository implements RepositoryInterface
         if (!empty($extRelations)) {
             foreach ($extRelations as $relationName) {
 
-                $bc = $bc->with([$relationName, $relationName . ".translations" => function (Builder $query) use ($languageCondition) {
+                $qb->with([$relationName, $relationName . ".translations" => function (Builder $query) use ($languageCondition) {
                     /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
                     $query->where("language_code", $languageCondition[2]);
                 }]);
@@ -87,43 +100,106 @@ class BrokerRepository implements RepositoryInterface
         }
 
         if (isset($filters["whereIn"])) {
-             $this->addWhereInFilters($bc, $filters["whereIn"], $languageCondition);
+             $this->addWhereInFilters($qb, $filters["whereIn"], $languageCondition);
         }
 
         
         if (isset($filters["where"])) {
-            $this->addWhereFilters($bc, $filters["where"], $languageCondition);
+            $this->addWhereFilters($qb, $filters["where"], $languageCondition);
        }
       
         if (!empty($orderBy) && !empty($orderDirection)) {
            
             $tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
             $orderQueryType = "";
-            $orderQueryType = in_array($orderBy, $tableStaticColumns) ? "static" : "dynamic";
+            $orderQueryType = in_array($orderBy, $tableStaticColumns) ? self::STATIC : self::DYNAMIC;
             $translatedEntry = Translation::where(
                 [$languageCondition, ['property', '=', $orderBy]]
             )->first();
             if (!is_null($translatedEntry)) {
                 if ($translatedEntry->translationable_type == Broker::class) {
-                    $orderQueryType = "translated-static";
+                    $orderQueryType = self::TRANSLATED_STATIC;
                 }
 
                 if ($translatedEntry->translationable_type == OptionValue::class) {
-                    $orderQueryType = "translated-dynamic";
+                    $orderQueryType = self::TRANSLATED_DYNAMIC;
                 }
             }
 
-            $this->addOrderBy($bc, $orderBy, $orderDirection, $languageCondition, $orderQueryType);
+            $this->addOrderBy($qb, $orderBy, $orderDirection, $languageCondition, $orderQueryType);
         }
-        $bc=$bc->paginate();
-        return $bc;
+         return $qb->paginate();
+       
     }
+
+
+    /**
+     * @param Builder $queryBuilder
+     * @param array $filters
+     * @param array $languageCondition
+     *
+     * Add filters to the query builder. The filters array is structured like Eloquent where(). Example:["filter_min_deposit"=>["min_deposit",'<',100]]
+     */
 
     public function addWhereFilters(Builder $queryBuilder,array $filters, array $languageCondition):void {
         if(isset($filters["filter_min_deposit"])){
             $this->addWhereDynamicOption($queryBuilder,$filters["filter_min_deposit"]);
         }
     }
+
+
+/**
+ * @param Builder $queryBuilder
+ * @param array $filters
+ * @param array $languageCondition
+ * 
+ * Apply WHERE IN filters to the query builder
+ *
+ * The filter array is structured like Eloquent whereIn(). Example:
+ * [
+ *     "filter_offices" => [
+ *         0 => "offices",
+ *         1 => ["Greece"]
+ *     ],
+ *     "filter_trading_instruments" => [
+ *         0 => "trading_instruments",
+ *         1 => ["Forex", "Stocks"]
+ *     ],
+ *     "filter_support_options" => [
+ *         0 => "support_options",
+ *         1 => ["Phone", "Email"]
+ *     ],
+ *     "filter_account_currency" => [
+ *         0 => "account_currency",
+ *         1 => ["USD", "EUR", "GBP"]
+ *     ],
+ *     "filter_headquarters" => [
+ *         0 => "headquarters",
+ *         1 => ["USA", "UK", "Germany"]
+ *     ],
+ *     "filter_withdrawal_methods" => [
+ *         0 => "withdrawal_methods",
+ *         1 => ["Credit/Debit Card", "PayPal", "Skrill"]
+ *     ],
+ *     "filter_group_trading_account_info" => [
+ *         0 => "filter_group_trading_account_info",
+ *         1 => [
+ *             "trading_account_info_1" => true,
+ *             "trading_account_info_2" => false,
+ *             "trading_account_info_3" => true
+ *         ]
+ *     ],
+ *     "filter_group_fund_managers_features" => [
+ *         0 => "filter_group_fund_managers_features",
+ *         1 => [
+ *             "fund_managers_features_1" => true,
+ *             "fund_managers_features_2" => false,
+ *             "fund_managers_features_3" => true
+ *         ]
+ *     ]
+ * ]
+ *
+ */
 
     public function addWhereInFilters(Builder $queryBuilder, array $filters, array $languageCondition):void
     {
@@ -180,6 +256,25 @@ class BrokerRepository implements RepositoryInterface
 
     }
 
+    
+
+    /**
+     * Adds a where has filter to the given query builder for broker regulators.
+     *
+     * The filter array should be in the format:
+     * array:1 [
+     *     "filter_regulators" => array:2 [
+     *       0 => "regulators"
+     *       1 => array:1 [
+     *         0 => "Greece"
+     *       ]
+     *     ]
+     *   ]
+     *
+     * @param Builder $queryBuilder
+     * @param array $filters
+     */
+
     public function addRegulatorWhereInFilters(Builder $queryBuilder,array $filters):void
     {
          /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
@@ -192,6 +287,23 @@ class BrokerRepository implements RepositoryInterface
         }])
         ->having('regulators_count', '=', count($filters[1]));
     }
+
+
+
+    /**
+     * Adds a where like query to the given query builder for broker static culumns with translations.
+     *
+     * @param Builder $queryBuilder
+     * @param string $columnName
+     * @param array $filters
+     * @param array $languageCondition
+     * @param bool $translate
+     *
+     * If $translate is true and the language code in $languageCondition is not 'en',
+     * the query will be translated.
+     *
+     * If $translate is false, the query will not be translated.
+     */
 
     public function addWhereLikeStaticColumn(Builder $queryBuilder,string $columnName, array $filters,array $languageCondition,bool $translate=true):void
     {
@@ -400,7 +512,7 @@ class BrokerRepository implements RepositoryInterface
     public function addOrderBy(Builder $queryBuilder, string $orderBy, string $orderDirection, array $languageCondition,  string $queryType):void
     {
          /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
-        if ($queryType == "translated-dynamic") {
+        if ($queryType == self::TRANSLATED_DYNAMIC) {
              $queryBuilder->addSelect([
                 $orderBy => Translation::select("translations.value")
                     ->join("option_values", function ($join) use ($languageCondition, $orderBy) {
@@ -414,7 +526,7 @@ class BrokerRepository implements RepositoryInterface
                 ->orderBy($orderBy, $orderDirection);
         }
 
-        if ($queryType == "translated-static") {
+        if ($queryType == self::TRANSLATED_STATIC) {
 
            $queryBuilder->addSelect([
                 $orderBy => Translation::select("translations.value")
@@ -426,11 +538,11 @@ class BrokerRepository implements RepositoryInterface
                 ->orderBy($orderBy, $orderDirection);
         }
 
-        if ($queryType == 'static') {
+        if ($queryType == self::STATIC) {
              $queryBuilder->orderBy($orderBy, $orderDirection);
         }
 
-        if ($queryType == 'dynamic') {
+        if ($queryType == self::DYNAMIC) {
 
             $queryBuilder->addSelect([$orderBy => OptionValue::select("value")->whereColumn("option_values.broker_id", '=', "brokers.id")
                 ->where("option_values.option_slug", "=", $orderBy)])
