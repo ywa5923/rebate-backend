@@ -151,7 +151,28 @@ class BrokerFilterController extends Controller
             [
                 "field" => "filter_group_spread_types",
                 "type" => "checkbox",
-                "options" => []
+                "options" => [[
+                    "name" => "Fixed Spreads",
+                    "value" => 'fixed_spreads'
+                ]]
+            ],
+            [
+                "field" => "filter_group_fund_managers_features",
+                "type" => "checkbox",
+                "options" => [
+                    [
+                    "name" => "MAM/PAMM Platforms",
+                    "value" => 'mam_pamm_platforms'
+                ],
+                [
+                    "name"=>"MAM/PAMM Leaderboards",
+                    "value"=>"mam_pamm_leaderboards"
+                ],
+                [
+                    "name"=>"Managed Accounts",
+                    "value"=>"managed_accounts"
+                ]
+                ]
             ],
 
             [
