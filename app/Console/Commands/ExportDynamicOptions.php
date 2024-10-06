@@ -91,7 +91,7 @@ class ExportDynamicOptions extends Command
         'trading_nstruments' => 'instruments',
         'fixed_spreads' => 'spreads',
         'min_deposit' => 'min_deposit',
-        'max_leverage' => 'max_leverage',
+        //'max_leverage' => 'max_leverage',
         'min_trade_size' => 'min_trade',
         'max_trade_size' => 'max_trade',
         'stop_out_level' => 'stopout_level',
@@ -99,7 +99,8 @@ class ExportDynamicOptions extends Command
         'deposit_methods' => 'deposit',
         'withdrawal_methods' => 'withdrawal',
         'client_funds_bank' => 'bank',
-        'description' => 'description'
+        'support_languages'=>'support_languages',
+        'description' => 'description',
 
     ];
 

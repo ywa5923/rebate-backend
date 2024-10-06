@@ -24,7 +24,8 @@ class ExportUrls extends Command
     protected $description = 'Command description';
     protected $brokersMap = [
         "broker_id" => "id",
-        'mobile' => "mobile"
+        'mobile' => "mobile",
+        'web'=>"platforms"
     ];
     // "overall_rating">""
     // 
@@ -61,8 +62,9 @@ class ExportUrls extends Command
             $mobileLinks=$this->formatLink($row->id,$row->mobile,"mobile",3);
             $tradingAccountLinks=$this->formatLink($row->id,$row->links,"live_trading_account",1);
             $partnerAccountLinks=$this->formatLink($row->id,$row->links_partner,"partner_account",1);
+            $platformLinks=$this->formatLink($row->id,$row->platforms,"web-platform",3);
 
-            $refinedResults=array_merge($refinedResults, $mobileLinks, $tradingAccountLinks,$partnerAccountLinks);
+            $refinedResults=array_merge($refinedResults, $mobileLinks, $tradingAccountLinks,$partnerAccountLinks, $platformLinks);
             
         }
         
