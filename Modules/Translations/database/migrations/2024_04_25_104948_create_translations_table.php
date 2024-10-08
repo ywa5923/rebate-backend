@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->nullableMorphs('translationable');
             $table->string('language_code',10);
+            $table->string('zone_code',50)->nullable();
             $table->string('property',100)->nullable();
             $table->text('value')->nullable();
             $table->json('metadata')->nullable();
-            $table->enum('translation_type',['columns','property',"properties"]);
+            $table->string('translation_type',50)->default("property");
             $table->timestamps();
         });
     }

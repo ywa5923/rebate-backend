@@ -62,7 +62,15 @@ class ExportDynamicOptions extends Command
         'accept_japanese_clients' => 'japan',
         'accept_european_clients' => 'europe',
         'accept_canadian_clients' => 'canada',
-        "trustpilot_ranking" => "trustpilot"
+        "trustpilot_ranking" => "trustpilot",
+        'logo' => "logo",
+        'trading_name' => "name",
+        "user_rating" => "rating",
+        'account_currencies' => "currency",
+       // "broker_type_id" => "type",
+        'home_url'=>'home_url',
+        'mobile_platform_link' => "mobile",
+        'web_platform_link'=>"platforms"
 
 
     ];
@@ -88,8 +96,7 @@ class ExportDynamicOptions extends Command
         'old_account_notes' => 'old_account_notes',
         'partner_notes' => 'become_partner_notes',
         'account_type' => 'account_types',
-        'trading_nstruments' => 'instruments',
-        'fixed_spreads' => 'spreads',
+        'fixed_spreads_link' => 'spreads',
         'min_deposit' => 'min_deposit',
         //'max_leverage' => 'max_leverage',
         'min_trade_size' => 'min_trade',
@@ -101,7 +108,13 @@ class ExportDynamicOptions extends Command
         'client_funds_bank' => 'bank',
         'support_languages'=>'support_languages',
         'description' => 'description',
-
+        'support_options' => 'support_options',
+        "account_type" => "account_types",
+        "trading_instruments" => "instruments",
+        'live_trading_account_link' => 'links',
+        "partner_account_link" => "links_partner",
+         "commission_link"=>"commission",
+         "rollover_link"=>"rollover"
     ];
 
 
@@ -110,6 +123,7 @@ class ExportDynamicOptions extends Command
         $this->info("...exporting dynamics options from brokers and broker_texts tables");
         $brokersCols = $this->formatForSelectSql(array_values($this->brokersMap), "b");
         $brokerTextsCols = $this->formatForSelectSql(array_values($this->brokersTextsMap), "t");
+        
         //get optins values in english language
         $sqlEn = "select {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en'";
         $resultsEn = $this->DbSelect($sqlEn);
@@ -122,6 +136,7 @@ class ExportDynamicOptions extends Command
         $this->savetoCsv($csvFileEn,'w',  $resultsEn, $newHeaders);
 
         $roHeaders=array_keys($this->brokersTextsMap);
+        
         array_unshift($roHeaders,"broker_id");
         $csvFileRo = $this->getCsvSeederPath("Brokers", "dynamic_options_values_ro.csv");
         $this->savetoCsv( $csvFileRo,'w',  $resultsRo , $roHeaders);

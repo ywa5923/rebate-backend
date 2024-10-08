@@ -13,6 +13,11 @@ class TranslateStaticBrokersSeeder extends Seeder
      */
     public function run(): void
     {
+        
+    }
+
+    public function translate()
+    {
         $csvFile = module_path('Brokers', 'database/seeders/csv/brokers_ro.csv');
         $handle = fopen($csvFile, "r");
         $rowIndex=0;

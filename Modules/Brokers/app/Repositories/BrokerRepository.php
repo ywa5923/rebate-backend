@@ -10,6 +10,7 @@ use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Models\Translation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\Brokers\Models\BrokerOption;
 
 class BrokerRepository implements RepositoryInterface
 {
@@ -32,27 +33,39 @@ class BrokerRepository implements RepositoryInterface
      * @return BrokerCollection - collection of broker data
      */
 
-    public function getDynamicColumns($languageCondition, $columns, $orderBy, $orderDirection, $filters)
+    public function getDynamicColumns($languageCondition,  $dynamicColumns, $orderBy, $orderDirection, $filters)
     {
 
         //to be added in env.file or global params
-        $tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
+        //$tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
         $tableExtRelations = ['regulators'];
-        if (empty($columns))
-            $columns = $tableStaticColumns;
+        // if (empty($columns))
+        //     $columns = $tableStaticColumns;
 
-        $dynamicColumns = array_diff($columns, array_merge($tableStaticColumns, $tableExtRelations));
-        $selectedStaticColumns = array_intersect($tableStaticColumns, $columns);
-        $selectedExtRelations = array_intersect( $tableExtRelations, $columns);
+      //  $dynamicColumns = array_diff($columns, array_merge($tableStaticColumns, $tableExtRelations));
+      //  $selectedStaticColumns = array_intersect($tableStaticColumns, $columns);
+     
 
-        if (empty($selctedStaticColumns) && empty($dynamicColumns))
-            $selctedStaticColumns = $tableStaticColumns;
+    if ( empty($dynamicColumns))
+        $dynamicColumns=$this->getDynamicColumnsFromDB();
+       
+       
 
-        $jsonResult = $this->makeQuery($languageCondition,  $selectedStaticColumns, $dynamicColumns,   $selectedExtRelations, $orderBy, $orderDirection, $filters);
+        $selectedExtRelations = array_intersect( $tableExtRelations, $dynamicColumns);
 
-        return new BrokerCollection($jsonResult);
+         $jsonResult = $this->makeQuery($languageCondition,   $dynamicColumns,   $selectedExtRelations, $orderBy, $orderDirection, $filters);
+
+         return new BrokerCollection($jsonResult);
 
         //return $jsonResult;
+    }
+
+    public function getDynamicColumnsFromDB()
+    {
+        return BrokerOption::where([['for_brokers','=',1],['load_in_table','=','1']])
+        ->orderBy('column_position','asc')
+        ->pluck("slug")->toArray();
+        
     }
 
 
@@ -61,7 +74,6 @@ class BrokerRepository implements RepositoryInterface
      * filtered and ordered according to the given parameters.
      *
      * @param array $languageCondition - language condition array [language_code, language_id, lang]
-     * @param array $staticColumns - array of static columns from broker table
      * @param array $dynamicColumns - array of dynamic columns (option values) from broker table
      * @param array $extRelations - array of external relations (regulators, etc) to load
      * @param string $orderBy - column to order by
@@ -70,11 +82,11 @@ class BrokerRepository implements RepositoryInterface
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator - paginated result
      */
 
-    public function makeQuery($languageCondition, $staticColumns, $dynamicColumns, $extRelations, $orderBy, $orderDirection, $filters):LengthAwarePaginator
+    public function makeQuery($languageCondition, $dynamicColumns, $extRelations, $orderBy, $orderDirection, $filters):LengthAwarePaginator
     {
        
         DB::enableQueryLog();
-        $qb = Broker::select(["id", ...$staticColumns])->with([
+        $qb = Broker::select(["id"])->with([
             'translations' => function (Builder $query) use ($languageCondition) {
                 /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
                 $query->where("language_code", $languageCondition[2]);

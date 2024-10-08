@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('broker_types', function (Blueprint $table) {
             $table->id();
             $table->string("name",100);
-            $table->string("default_language",50)->nullable();
             $table->timestamps();
         });
     }

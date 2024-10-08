@@ -16,18 +16,16 @@ class StaticBrokersSeeder extends Seeder
         DB::table('broker_types')->insert([
             [
                 "id" => 1,
-                "name" => "Brokers",
-                "default_language" => "en"
+                "name" => "Brokers"
+               
             ],
             [
                 "id" => 2,
-                "name" => "Crypto",
-                "default_language" => "en"
+                "name" => "Crypto"
             ],
             [
                 "id" => 3,
-                "name" => "Prop Firms",
-                "default_language" => "en"
+                "name" => "Prop Firms"
             ]
         ]);
         
@@ -35,17 +33,17 @@ class StaticBrokersSeeder extends Seeder
         $importer = new BatchImporter(filePath: $csvFile);
         $importer->setTableInfo(tableName: "brokers", rowMapping: [
             "id" => 1,
-            "logo" => 2,
-            "trading_name" => 3,
-            "user_rating" => 4,
-            "account_currencies" => 5,
-            "broker_type_id" => 6,
-            "home_url"=>7,
-            "support_options" => 8,
-            "account_type" => 9,
-            "trading_instruments" => 10,
-            "language" => 11,
-            "default_language" => 12
+            // "logo" => 2,
+            // "trading_name" => 3,
+            // "user_rating" => 4,
+            // "account_currencies" => 5,
+             "broker_type_id" => 2,
+            // "home_url"=>7,
+            // "support_options" => 8,
+            // "account_type" => 9,
+            // "trading_instruments" => 10,
+            // "language" => 11,
+            // "default_language" => 12
         ]);
         
         //id,logo,trading_name,user_rating,account_currencies,broker_type_id,home_url,support_options,account_type,trading_instruments,language,default_language

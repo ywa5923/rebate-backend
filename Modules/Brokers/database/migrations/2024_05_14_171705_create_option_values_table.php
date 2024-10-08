@@ -18,8 +18,8 @@ return new class extends Migration
             $table->boolean("status")->default(1);//de bagat si in broker options;
             $table->string("status_message")->nullable();
             $table->boolean("default_loading")->default(1);
-            $table->string("unit",100)->nullable();
-            $table->string("metadata",1000)->nullable();
+            $table->string("type",100)->nullable();
+            $table->json('metadata')->nullable();
             $table->foreignId("broker_id")->constrained();
             $table->foreignId("broker_option_id")->constrained();
             $table->timestamps();

@@ -33,8 +33,7 @@ class ExportBrokers extends Command
         "broker_type_id" => "type",
         'home_url'=>'home_url'
     ];
-    // "overall_rating">""
-    // 
+   
 
     protected $brokersTextsMap = [
         'support_options' => 'support_options',
@@ -51,6 +50,20 @@ class ExportBrokers extends Command
     public function handle()
     {
         $this->info("...exporting brokers table");
+       // $this->exportBrokers();
+        $this->exportBrokersId();
+
+    }
+
+    public function exportBrokersId()
+    {
+        $results = $this->DbSelect("select id,type from brokers order by id");
+        $csvFile=$this->getCsvSeederPath("Brokers","brokers.csv");
+        $this->savetoCsv($csvFile,'w', $results,["id","broker_type_id"]);
+    }
+
+    public function exportBrokers()
+    {
         $brokersCols = $this->formatForSelectSql(array_values($this->brokersMap), "b");
         $brokerTextsCols = $this->formatForSelectSql(array_values($this->brokersTextsMap), "t");
         $sql = "select {$brokersCols},{$brokerTextsCols} from brokers b left join broker_texts t on b.id=t.broker_id and t.language='en'";
@@ -68,8 +81,5 @@ class ExportBrokers extends Command
         array_unshift( $newHeadersRo ,'id');
         $csvFileRo=$this->getCsvSeederPath("Brokers","brokers_ro.csv");
         $this->savetoCsv($csvFileRo,'w', $resultsRo, $newHeadersRo);
-
-
-        
     }
 }
