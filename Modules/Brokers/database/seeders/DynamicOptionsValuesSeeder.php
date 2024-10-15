@@ -29,7 +29,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                 continue;
             }
             foreach ($row as $k => $v) {
-                if ($k == 0 ) {
+                if ($k == 0 || empty($v)) {
                     continue;
                 }
                 [$brokerOptionId,$optionFormType]=$optionsInfo[$k];

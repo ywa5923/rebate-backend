@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('translations', function (Blueprint $table) {
             $table->id();
             $table->nullableMorphs('translationable');
-            $table->string('language_code',10);
-            $table->string('zone_code',50)->nullable();
+            $table->string('language_code',10)->nullable()->default(null);
             $table->string('property',100)->nullable();
             $table->text('value')->nullable();
             $table->json('metadata')->nullable();

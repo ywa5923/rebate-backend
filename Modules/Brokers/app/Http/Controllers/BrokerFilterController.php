@@ -13,6 +13,7 @@ use Modules\Brokers\Repositories\FilterRepository;
 use Modules\Brokers\Repositories\OptionValueRepository;
 use Modules\Brokers\Repositories\RegulatorRepository;
 use Modules\Brokers\Services\BrokerFilterQueryParser;
+use Modules\Brokers\Transformers\SettingCollection;
 use PHPUnit\Util\Filter;
 
 class BrokerFilterController extends Controller
@@ -25,19 +26,27 @@ class BrokerFilterController extends Controller
         $queryParser->parse($request);
         $language = $queryParser->getWhereParam("language");
 
-        $filterRepo = new FilterRepository();
-        $currencies = $filterRepo->getBrokerCurrencyList();
-
-
-        $tradingInstruments = $filterRepo->getBrokerStaticFieldList($language, 'trading_instruments');
-        $supportOptions = $filterRepo->getBrokerStaticFieldList($language, 'support_options');
-
-
-
-
         $companyRepo = new CompanyRepository();
         $regulatorRepo = new RegulatorRepository();
         $optionsValuesRepo = new OptionValueRepository();
+        $filterRepo = new FilterRepository();
+        //$currencies = $filterRepo->getBrokerCurrencyList();
+       
+        $filterNames=$filterRepo->getSettingsParam("page_brokers",$language)["filters"];
+
+       
+
+        //$tradingInstruments = $filterRepo->getBrokerStaticFieldList($language, 'trading_instruments');
+        $tradingInstruments = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::TRADING_INSTRUMENTS);
+
+        //$supportOptions = $filterRepo->getBrokerStaticFieldList($language, 'support_options');
+        $supportOptions = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::SUPPORT_OPTIONS);
+
+        $currencies=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::ACCOUNT_CURRENCIES);
+
+
+
+
         $officesList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::OFFICES);
 
         $headquartersList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::HEADQUARTERS);
@@ -50,26 +59,31 @@ class BrokerFilterController extends Controller
         return  [
             [
                 "field" => "filter_offices",
+                "name"=>$filterNames["filter_offices"],
                 "type" => "checkbox",
                 "options" => $this->transform($officesList)
             ],
             [
                 "field" => "filter_headquarters",
+                "name"=>$filterNames["filter_headquarters"],
                 "type" => "checkbox",
                 "options" => $this->transform($headquartersList)
             ],
             [
                 "field" => "filter_regulators",
+                "name"=>$filterNames["filter_regulators"],
                 "type" => "checkbox",
                 "options" => $this->transform($regulatorsList)
             ],
             [
                 "field" => "filter_withdrawal_methods",
+                "name"=>$filterNames["filter_withdrawal_methods"],
                 "type" => "checkbox",
                 "options" => $this->transform($withdrawalMethods)
             ],
             [
                 "field" => "filter_min_deposit",
+                "name"=>$filterNames["filter_min_deposit"],
                 "type" => "radio",
                 "options" => [
                     [
@@ -92,6 +106,7 @@ class BrokerFilterController extends Controller
             ],
             [
                 "field" => "filter_group_trading_account_info",
+                "name"=>$filterNames["filter_group_trading_account_info"],
                 "type" => "checkbox",
                 "options" => [
                     [
@@ -150,6 +165,7 @@ class BrokerFilterController extends Controller
             ],
             [
                 "field" => "filter_group_spread_types",
+                "name"=>$filterNames["filter_group_spread_types"],
                 "type" => "checkbox",
                 "options" => [[
                     "name" => "Fixed Spreads",
@@ -158,6 +174,7 @@ class BrokerFilterController extends Controller
             ],
             [
                 "field" => "filter_group_fund_managers_features",
+                "name"=>$filterNames["filter_group_fund_managers_features"],
                 "type" => "checkbox",
                 "options" => [
                     [
@@ -177,16 +194,19 @@ class BrokerFilterController extends Controller
 
             [
                 "field" => "filter_account_currency",
+                "name"=>$filterNames["filter_account_currency"],
                 "type" => "checkbox",
                 "options" => $this->transform($currencies, false)
             ],
             [
                 "field" => "filter_trading_instruments",
+                "name"=>$filterNames["filter_trading_instruments"],
                 "type" => "checkbox",
                 "options" => $this->transform($tradingInstruments)
             ],
             [
                 "field" => "filter_support_options",
+                "name"=>$filterNames["filter_support_options"],
                 "type" => "checkbox",
                 "options" => $this->transform($supportOptions)
             ]

@@ -5,7 +5,9 @@ namespace Modules\Brokers\Repositories;
 use Modules\Brokers\Models\Broker;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Modules\Brokers\Models\Setting;
 use Modules\Brokers\Transformers\BrokerCollection;
+use Modules\Brokers\Transformers\SettingCollection;
 
 class FilterRepository 
 {
@@ -71,6 +73,17 @@ public function getBrokerQB($langaugeCondition)
              $query->where(...$langaugeCondition);
          }]);
     
+}
+
+public function getSettingsParam($key,$languageCondition)
+{
+
+ $setting= Setting::with(["translations"=>function ( Builder $query) use ($languageCondition){
+    /** @var  Illuminate\Contracts\Database\Eloquent\Builder   $query */
+     $query->where(...$languageCondition);
+ }])->where("key",$key)->get();
+ $collection=(new SettingCollection($setting))->resolve();
+ return json_decode($collection[0]["value"],true);
 }
 
 }

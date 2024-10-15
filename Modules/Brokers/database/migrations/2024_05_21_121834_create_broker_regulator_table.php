@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId("broker_id")->constrained();
             $table->foreignId("regulator_id")->constrained();
+            $table->string('zone_code',200)->nullable()->default(null);
+            $table->boolean('is_invariant')->default(1);
             $table->timestamps();
         });
     }

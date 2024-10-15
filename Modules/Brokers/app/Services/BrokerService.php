@@ -23,6 +23,7 @@ class BrokerService
     public function process(BaseQueryParser $queryParser)
     {
 
+        //dd($queryParser->getWhereParam("zone"));
         //dd( isset($queryParser->getAllFilters()["whereIn"]["filter_offices"]));
        
        // dd($queryParser->getAllFilters());
@@ -35,6 +36,7 @@ class BrokerService
     
         return $repo->getDynamicColumns(
             $queryParser->getWhereParam("language"),
+            $queryParser->getWhereParam("zone"),
             $columns,
             $orderBy,
             $queryParser->getOrderDirection(),

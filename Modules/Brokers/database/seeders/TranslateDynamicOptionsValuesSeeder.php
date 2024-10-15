@@ -14,6 +14,15 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
     public function run(): void
     {
         $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values_ro.csv');
+        $this->translate($csvFile,"ro");
+
+        $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
+        $this->translate($csvFile,"en");
+
+    }
+
+    public function translate(string $csvFile,$language):void
+    {
         $handle = fopen($csvFile, "r");
         $rowIndex=0;
         $optionSlugs=[];
@@ -61,7 +70,7 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
                             $translateLinks[]=[
                                 "translationable_type"=>OptionValue::class,
                                 "translationable_id"=>  $optionValueId,
-                                "language_code"=>"ro",
+                                "language_code"=>$language,
                                 "translation_type"=>"property",
                                 "property"=> $optionSlug,
                                 "value"=>$text
@@ -80,7 +89,7 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
                         $translateLinks[]=[
                             "translationable_type"=>OptionValue::class,
                             "translationable_id"=>  $optionValueId,
-                            "language_code"=>"ro",
+                            "language_code"=>$language,
                             "translation_type"=>"property",
                             "property"=> $optionSlug,
                             "value"=>$parsedLinks
@@ -115,7 +124,7 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
                        $translationRow=[
                         "translationable_type"=>OptionValue::class,
                         "translationable_id"=>  $optionValueObj->id,
-                        "language_code"=>"ro",
+                        "language_code"=>$language,
                         "translation_type"=>"property",
                         "property"=> $optionSlug,
                         "value"=>$value,
@@ -133,7 +142,7 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
     
                    
                     }else{
-                        dd($optionSlugs,$k,$optionSlug,$brokerId); 
+                        var_dump($k,$optionSlug,$brokerId); 
                     }   
                 }//end else
 
@@ -148,7 +157,6 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
         }
        
         Translation::insert($translationRows);
-     
     }
 
 

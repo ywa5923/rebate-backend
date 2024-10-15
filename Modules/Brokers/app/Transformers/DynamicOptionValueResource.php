@@ -21,8 +21,7 @@ class DynamicOptionValueResource extends JsonResource
             "status" => $this->whenNotNull($this->status),
             "status_message" => $this->whenNotNull($this->translate("status_message")),
             "default_loading" => $this->default_loading,
-            "unit" => $this->whenNotNull($this->unit),
-            "metadata" => $this->whenNotNull($this->metadata),
+            "metadata" => $this->whenNotNull($this->translate("metadata")),
            // "translations"=>TranslationResource::collection($this->whenLoaded('translations'))
           ];
 
