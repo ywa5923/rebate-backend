@@ -79,6 +79,9 @@ class MagicImport extends Command
 
         $this->info("\\\\///...translating dealtypes");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\TranslateDealtypesSeeder"]);
+
+        $this->info("\\\\///...importing settings table ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\SettingsSeeder"]);
     
     }
 }

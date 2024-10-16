@@ -16,8 +16,8 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
         $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values_ro.csv');
         $this->translate($csvFile,"ro");
 
-        $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
-        $this->translate($csvFile,"en");
+        //$csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
+      // $this->translate($csvFile,"en");
 
     }
 

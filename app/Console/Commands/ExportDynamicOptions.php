@@ -136,8 +136,8 @@ class ExportDynamicOptions extends Command
         $csvFileEn = $this->getCsvSeederPath("Brokers", "dynamic_options_values.csv");
         $this->savetoCsv($csvFileEn,'w',  $resultsEn, $newHeaders);
 
-        $roHeaders=array_keys($this->brokersTextsMap);
-        // $roHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
+       $roHeaders=array_keys($this->brokersTextsMap);
+        //$roHeaders = array_keys(array_merge($this->brokersMap, $this->brokersTextsMap));
         
         array_unshift($roHeaders,"broker_id");
         $csvFileRo = $this->getCsvSeederPath("Brokers", "dynamic_options_values_ro.csv");

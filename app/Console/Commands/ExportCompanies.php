@@ -36,7 +36,7 @@ class ExportCompanies extends Command
 
 
     protected $brokersTextsMap = [
-        "headquartes" => 'headquarters',
+        "headquarters" => 'headquarters',
         'description' => "description",
         "offices" => "offices"
     ];
