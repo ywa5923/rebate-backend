@@ -5,6 +5,7 @@ namespace Modules\Brokers\Transformers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Translations\Transformers\TranslationResource;
+use Illuminate\Http\Resources\MissingValue;
 
 class BrokerResource extends JsonResource
 {
@@ -15,8 +16,43 @@ class BrokerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-       // dd($this->dynamic_options_values);
-        
+       
+     
+       $dynamic_columns = $this->additional['dynamic_columns'] ?? null;
+       if(empty($dynamic_columns))
+       {
+        return $this->getBrokerWithRelations();
+       }
+   
+       $dynamicOptionsValues=DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues'));
+       
+       if($dynamicOptionsValues->resource instanceof MissingValue){
+           return null;
+       }
+       $dynamicOptionsValuesResolved= $dynamicOptionsValues->resolve();
+       // $dynamicOptionsValues=DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues'))->resolve();
+   
+        $obj=["id"=>$this->id];
+       foreach($dynamic_columns as $column){
+
+          if($column=="regulators"){
+            $obj[$column]=$this->getRegulatorString();
+            continue;
+          }
+          $dynamicOptions=array_filter($dynamicOptionsValuesResolved,fn($option) =>$option['option_slug']===$column);
+          //concatenate dynamic options if thare are some with same slug
+          $dynamicOptionValue="";
+          foreach($dynamicOptions as $dynOpt){
+            //to do :concatenate for options with unit and urls
+            $dynamicOptionValue.=$dynOpt["value"]."; ";
+          }
+         
+          $obj[$column]=rtrim($dynamicOptionValue,"; ");
+       }
+      
+       return $obj;
+    }
+    public function getBrokerWithRelations():array{
         return [
             "id"=>$this->id,
             //"logo" =>$this->whenNotNull($this->logo),
@@ -37,6 +73,21 @@ class BrokerResource extends JsonResource
            "companies"=>CompanyResource::collection($this->whenLoaded('companies')),
            "regulators"=>RegualtorResource::collection($this->whenLoaded('regulators'))
           ];
+    }
+
+    public function getRegulatorString():string|null
+    {
+        $regulators=RegualtorResource::collection($this->whenLoaded('regulators'));
+       
+        if($regulators->resource instanceof MissingValue){
+            return null;
+        }
+        $regulatorsResolved=$regulators->resolve();
+        $regulatorsString="";
+        foreach($regulatorsResolved as $r){
+            $regulatorsString.=$r["abreviation"]."-".$r["country"]."; ";
+        }
+       return rtrim($regulatorsString,"; ");
     }
 
    

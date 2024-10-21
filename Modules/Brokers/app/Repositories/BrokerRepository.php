@@ -56,7 +56,7 @@ class BrokerRepository implements RepositoryInterface
 
         $jsonResult = $this->makeQuery($languageCondition, $zoneCondition,  $dynamicColumns,   $selectedExtRelations, $orderBy, $orderDirection, $filters);
 
-        return new BrokerCollection($jsonResult);
+        return (new BrokerCollection($jsonResult,["dynamic_columns"=>$dynamicColumns]));
 
         //return $jsonResult;
     }
@@ -635,12 +635,16 @@ class BrokerRepository implements RepositoryInterface
 
         if ($queryType == self::DYNAMIC) {
 
-            $queryBuilder->addSelect([$orderBy => OptionValue::select("value")->whereColumn("option_values.broker_id", '=', "brokers.id")
-                ->where("option_values.option_slug", "=", $orderBy)])
-                // ->where(function ($query) use ($zoneCondition){
-                //   // $this->addZoneCondition($query,$zoneCondition);
-                // })
-                ->orderBy($orderBy, $orderDirection);
+            $queryBuilder->addSelect([$orderBy => OptionValue::select(DB::raw('CAST(value AS UNSIGNED) AS value'))->whereColumn("option_values.broker_id", '=', "brokers.id")
+                ->where("option_values.option_slug", "=", $orderBy)
+                ->where(function (Builder $query) use ($zoneCondition) {
+                    /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                    $query->where("option_values.zone_code",$zoneCondition[2])->orWhere('is_invariant', true);
+                })
+            
+            ]) ->orderBy($orderBy, $orderDirection);
+                
+               
         }
     }
 
