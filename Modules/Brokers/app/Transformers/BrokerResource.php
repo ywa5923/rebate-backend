@@ -32,7 +32,8 @@ class BrokerResource extends JsonResource
             // "broker_type_id"=>$this->whenNotNull($this->broker_type_id),
             // "default_language"=>$this->whenNotNull($this->default_language),
           // "translations"=>TranslationResource::collection($this->whenLoaded('translations')),
-           "dynamic_options_values"=> $this->whenNotNull(DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues'))),
+          // "dynamic_options_values"=> $this->whenNotNull(DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues'))),
+           "dynamic_options_values"=> DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues')),
            "companies"=>CompanyResource::collection($this->whenLoaded('companies')),
            "regulators"=>RegualtorResource::collection($this->whenLoaded('regulators'))
           ];

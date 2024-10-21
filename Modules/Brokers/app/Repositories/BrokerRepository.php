@@ -63,8 +63,8 @@ class BrokerRepository implements RepositoryInterface
 
     public function getDynamicColumnsFromDB()
     {
-        return BrokerOption::where([['for_brokers', '=', 1], ['load_in_table', '=', '1']])
-            ->orderBy('column_position', 'asc')
+        return BrokerOption::where([['for_brokers', '=', 1], ['default_loading', '=', '1']])
+            ->orderBy('default_loading_position', 'asc')
             ->pluck("slug")->toArray();
     }
 
@@ -146,10 +146,11 @@ class BrokerRepository implements RepositoryInterface
                 if ($translatedEntry->translationable_type == OptionValue::class) {
                     $orderQueryType = self::TRANSLATED_DYNAMIC;
                 }
-            }
-
-            $this->addOrderBy($qb, $orderBy, $orderDirection, $languageCondition, $orderQueryType);
         }
+        $this->addOrderBy($qb, $orderBy, $orderDirection, $languageCondition, $orderQueryType,$zoneCondition);
+        
+     }
+    
         return $qb->paginate();
     }
 
@@ -159,7 +160,7 @@ class BrokerRepository implements RepositoryInterface
         /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
         $query->where(function (Builder $query) use ($zoneCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
-            $query->where(...$zoneCondition)->orWhere('is_invariant', true);
+            $query->where("option_values.zone_code",$zoneCondition[2])->orWhere('is_invariant', true);
         });
     }
 
@@ -597,8 +598,9 @@ class BrokerRepository implements RepositoryInterface
      * 
      */
 
-    public function addOrderBy(Builder $queryBuilder, string $orderBy, string $orderDirection, array $languageCondition,  string $queryType): void
+    public function addOrderBy(Builder $queryBuilder, string $orderBy, string $orderDirection, array $languageCondition,  string $queryType,$zoneCondition): void
     {
+       // dd($queryType);
         /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
         if ($queryType == self::TRANSLATED_DYNAMIC) {
             $queryBuilder->addSelect([
@@ -614,26 +616,30 @@ class BrokerRepository implements RepositoryInterface
                 ->orderBy($orderBy, $orderDirection);
         }
 
-        if ($queryType == self::TRANSLATED_STATIC) {
+        // if ($queryType == self::TRANSLATED_STATIC) {
 
-            $queryBuilder->addSelect([
-                $orderBy => Translation::select("translations.value")
-                    ->whereColumn("translations.translationable_id", "=", "brokers.id")
-                    ->where("translations.language_code", "=", $languageCondition[2])
-                    ->where("translations.property", "=", $orderBy)
-                    ->where("translationable_type", "=", Broker::class)
-            ])
-                ->orderBy($orderBy, $orderDirection);
-        }
+        //     $queryBuilder->addSelect([
+        //         $orderBy => Translation::select("translations.value")
+        //             ->whereColumn("translations.translationable_id", "=", "brokers.id")
+        //             ->where("translations.language_code", "=", $languageCondition[2])
+        //             ->where("translations.property", "=", $orderBy)
+        //             ->where("translationable_type", "=", Broker::class)
+        //     ])
+        //         ->orderBy($orderBy, $orderDirection);
+        // }
 
-        if ($queryType == self::STATIC) {
-            $queryBuilder->orderBy($orderBy, $orderDirection);
-        }
+        // if ($queryType == self::STATIC) {
+        //     $queryBuilder->orderBy($orderBy, $orderDirection);
+        // }
+       
 
         if ($queryType == self::DYNAMIC) {
 
             $queryBuilder->addSelect([$orderBy => OptionValue::select("value")->whereColumn("option_values.broker_id", '=', "brokers.id")
                 ->where("option_values.option_slug", "=", $orderBy)])
+                // ->where(function ($query) use ($zoneCondition){
+                //   // $this->addZoneCondition($query,$zoneCondition);
+                // })
                 ->orderBy($orderBy, $orderDirection);
         }
     }

@@ -23,11 +23,11 @@ return new class extends Migration
             $table->boolean('for_props');
             $table->boolean('required');
             $table->boolean('load_in_dropdown')->default(1);
-            $table->boolean('load_in_table')->default(0);
-            $table->integer('column_position')->nullable();
-            $table->integer('dropdown_position')->nullable();
+            $table->boolean('default_loading')->nullable();
+            $table->integer('default_loading_position')->default(1)->nullable();
+            $table->integer('dropdown_position')->default(1);
             $table->boolean('publish')->default(1);
-            $table->integer('position')->nullable();
+            $table->integer('position')->default(1);
             $table->string("default_language",50);
             $table->foreignId("option_category_id")->constrained("option_categories");
             $table->timestamps();

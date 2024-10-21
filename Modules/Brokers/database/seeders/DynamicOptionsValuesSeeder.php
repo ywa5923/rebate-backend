@@ -15,9 +15,10 @@ class DynamicOptionsValuesSeeder extends Seeder
     {
         $rowIndex = 0;
 
+      
         $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
         $handle = fopen($csvFile, "r");
-
+       
         while (($row = fgetcsv($handle, 4096)) !== FALSE) {
 
             if ($rowIndex === 0) {
@@ -28,6 +29,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                 $slugs = $row;
                 continue;
             }
+           
             foreach ($row as $k => $v) {
                 if ($k == 0 || empty($v)) {
                     continue;
@@ -52,12 +54,17 @@ class DynamicOptionsValuesSeeder extends Seeder
                           $metadata=json_encode(["unit"=>$unit]);
                       }
                     }
+                  
                     OptionValue::insert(
                         [
                             "broker_id" => $row[0],
                             "broker_option_id" => $brokerOptionId,
                             "option_slug" => $slugs[$k],
                             "value" => $value,
+                           // "default_loading"=>$default_loading??0,
+                            //"default_loading_position"=>($default_loading_position)?($default_loading_position):1,
+                            //"default_loading_position"=>$default_loading_position??1,
+                            //  "default_loading_position"=>1,
                             "status" => 1,
                             "metadata"=>$metadata
                         ]

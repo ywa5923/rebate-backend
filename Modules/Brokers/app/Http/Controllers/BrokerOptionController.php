@@ -25,7 +25,42 @@ class BrokerOptionController extends Controller
         //ex: ['language_code','=','ro']
         $languageParams=$queryParser->getWhereParam("language");
         $collection=new BrokerOptionCollection($rep->translate($languageParams));
-        return $collection;
+        $options=[];
+        $slugOptions=[];
+        $defaultLoadedOptions=[];
+        foreach($collection->resolve() as $brokerOption)
+        {
+            $options[]=$brokerOption;
+        }
+        usort($options, fn($a, $b) => $a['dropdown_position'] <=> $b['dropdown_position']); 
+          
+        foreach($options as $brokerOption)
+        {
+            //dd($brokerOption);
+            //$brokerOption is an array like:
+            // array:2 [ 
+            //     "position_home" => "Position Home"
+            //     "default_laoding" => 1,
+            //      "default_loading_position"=>2,
+            //      "dropndown_position" =>3 
+            //   ]
+            $slug=array_key_first($brokerOption);
+            $slugOptions[$slug]=$brokerOption[$slug];
+
+            //extract default loaded options
+            if($brokerOption["default_loading"]==true){
+                $position=(int)$brokerOption["default_loading_position"];
+                $defaultLoadedOptions[$position]=$brokerOption[$slug];
+            }
+           
+           
+        }
+        ksort($defaultLoadedOptions);
+       // return $collection;
+       return new Response(json_encode([
+        "options"=>$slugOptions,
+        "defaultLoadedOptions"=>array_values($defaultLoadedOptions)
+    ]),200);
         }else
         return new Response("not found",404);
         

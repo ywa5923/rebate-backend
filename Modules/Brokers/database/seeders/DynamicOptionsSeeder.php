@@ -4,6 +4,7 @@ namespace Modules\Brokers\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Database\Seeders\BatchImporter;
+use Modules\Brokers\Models\BrokerOption;
 
 class DynamicOptionsSeeder extends Seeder
 {
@@ -33,6 +34,20 @@ class DynamicOptionsSeeder extends Seeder
        //id,name,slug,data_type,form_type,required,position,option_category_id,for_brokers,for_crypto,for_props,default_language
        //id,name,slug,data_type,form_type,meta_data,for_crypto,for_brokers,for_props,required,position,default_language,option_category_id
        $importer->import(1,1);
+       
+      $this->update();
+    }
+
+    public function update()
+    {
+        $default_loaded=["trading_name","logo","home_url","overall_rating","user_rating","account_currencies","trading_instruments"];
+        
+        foreach($default_loaded as $k=>$v){
+            BrokerOption::where("slug",$v)->update([
+                "default_loading"=>1,
+                "default_loading_position"=>$k+1
+            ]);
+        }    
     }
 
     public function importData()

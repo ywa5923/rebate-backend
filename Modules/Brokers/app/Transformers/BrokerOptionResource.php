@@ -16,8 +16,10 @@ class BrokerOptionResource extends JsonResource
     {
         return [
           
-            $this->slug=>$this->translateBrokerOption($this->slug)
-          
+            $this->slug=>$this->translateBrokerOption($this->slug),
+            "default_loading"=>$this->default_loading,
+            "default_loading_position"=>$this->default_loading_position,
+            "dropdown_position"=>$this->dropdown_position
           ];
     }
 
