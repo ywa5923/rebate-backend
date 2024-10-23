@@ -610,7 +610,12 @@ class BrokerRepository implements RepositoryInterface
                             ->where("translations.translationable_type", '=', OptionValue::class)
                             ->where("translations.language_code", "=", $languageCondition[2])
                             ->where("translations.property", "=", $orderBy);
-                    })->whereColumn("option_values.broker_id", '=', "brokers.id")->where("option_values.option_slug", "=", $orderBy)
+                    })->whereColumn("option_values.broker_id", '=', "brokers.id")
+                    ->where("option_values.option_slug", "=", $orderBy)
+                    ->where(function (Builder $query) use ($zoneCondition) {
+                        /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+                        $query->where("option_values.zone_code",$zoneCondition[2])->orWhere('is_invariant', true);
+                    })
 
             ])
                 ->orderBy($orderBy, $orderDirection);
@@ -634,16 +639,21 @@ class BrokerRepository implements RepositoryInterface
        
 
         if ($queryType == self::DYNAMIC) {
-
-            $queryBuilder->addSelect([$orderBy => OptionValue::select(DB::raw('CAST(value AS UNSIGNED) AS value'))->whereColumn("option_values.broker_id", '=', "brokers.id")
+//DB::raw('CAST(value AS UNSIGNED) AS value')
+            $queryBuilder->addSelect([$orderBy => OptionValue::select('value')->whereColumn("option_values.broker_id", '=', "brokers.id")
                 ->where("option_values.option_slug", "=", $orderBy)
                 ->where(function (Builder $query) use ($zoneCondition) {
                     /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
                     $query->where("option_values.zone_code",$zoneCondition[2])->orWhere('is_invariant', true);
                 })
             
-            ]) ->orderBy($orderBy, $orderDirection);
-                
+            ])
+            //->orderByRaw(" CAST(TRIM(`{$orderBy}`) AS DECIMAL) `{$orderBy}`)) {$orderDirection}");
+            //->orderByRaw("CAST(TRIM(`{$orderBy}`) AS DECIMAL) {$orderDirection}");
+           //->orderByRaw("{$orderBy}+0 {$orderDirection}");
+           ->orderByRaw("cast(concat('0', {$orderBy})+0 as char)={$orderBy} {$orderDirection}, 0+{$orderBy} {$orderDirection}, {$orderBy} {$orderDirection}");
+           //$this->dumpSql($queryBuilder);
+            //order by cast(concat('0', txt)+0 as char)=txt DESC, 0+txt, txt;    
                
         }
     }
