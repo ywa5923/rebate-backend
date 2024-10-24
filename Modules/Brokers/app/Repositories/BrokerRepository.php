@@ -48,10 +48,12 @@ class BrokerRepository implements RepositoryInterface
 
         if (empty($dynamicColumns))
             $dynamicColumns = $this->getDynamicColumnsFromDB();
+     
+         
+            array_unshift($dynamicColumns,'logo','home_url','trading_name'); 
 
-
-
-
+          // dd($dynamicColumns);
+       
         $selectedExtRelations = array_intersect($tableExtRelations, $dynamicColumns);
 
         $jsonResult = $this->makeQuery($languageCondition, $zoneCondition,  $dynamicColumns,   $selectedExtRelations, $orderBy, $orderDirection, $filters);
@@ -176,7 +178,7 @@ class BrokerRepository implements RepositoryInterface
     public function addWhereFilters(Builder $queryBuilder, array $filters, array $languageCondition, array $zoneCondition): void
     {
         if (isset($filters["filter_min_deposit"])) {
-            $this->addWhereDynamicOption($queryBuilder, $filters["filter_min_deposit"]);
+            $this->addWhereDynamicOption($queryBuilder, $filters["filter_min_deposit"],$zoneCondition);
         }
     }
 
@@ -487,7 +489,7 @@ class BrokerRepository implements RepositoryInterface
      * If translate is set to true, then the $whereCondiion will be applied to translations table
      */
 
-    public function addWhereDynamicOption(Builder $queryBuilder, array $whereCondition, array $zoneCondition, array $languageCondition = []): void
+    public function addWhereDynamicOption(Builder $queryBuilder, array $whereCondition, array $zoneCondition): void
     {
         /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
        
@@ -653,7 +655,7 @@ class BrokerRepository implements RepositoryInterface
            //->orderByRaw("{$orderBy}+0 {$orderDirection}");
            ->orderByRaw("cast(concat('0', {$orderBy})+0 as char)={$orderBy} {$orderDirection}, 0+{$orderBy} {$orderDirection}, {$orderBy} {$orderDirection}");
            //$this->dumpSql($queryBuilder);
-            //order by cast(concat('0', txt)+0 as char)=txt DESC, 0+txt, txt;    
+          
                
         }
     }

@@ -31,26 +31,38 @@ class BrokerResource extends JsonResource
        }
        $dynamicOptionsValuesResolved= $dynamicOptionsValues->resolve();
        // $dynamicOptionsValues=DynamicOptionValueResource::collection ($this->whenLoaded('dynamicOptionsValues'))->resolve();
-   
-        $obj=["id"=>$this->id];
+      
+       // $obj=["id"=>$this->id];
+        $obj=[];
+        $home_url="";
+        $logo="";
        foreach($dynamic_columns as $column){
 
           if($column=="regulators"){
             $obj[$column]=$this->getRegulatorString();
             continue;
           }
+
+         
           $dynamicOptions=array_filter($dynamicOptionsValuesResolved,fn($option) =>$option['option_slug']===$column);
           //concatenate dynamic options if thare are some with same slug
           $dynamicOptionValue="";
           foreach($dynamicOptions as $dynOpt){
             //to do :concatenate for options with unit and urls
-            $dynamicOptionValue.=$dynOpt["value"]."; ";
+         
+            $metadata=(isset($dynOpt["metadata"]))?(current(json_decode($dynOpt["metadata"],true))):"";
+            $dynamicOptionValue.=$dynOpt["value"]." ".$metadata."; ";
           }
          
-          $obj[$column]=rtrim($dynamicOptionValue,"; ");
+          if($column=="home_url" || $column=="logo"){
+             ${$column}=rtrim($dynamicOptionValue,"; ");
+          }else{
+            $obj[$column]=rtrim($dynamicOptionValue,"; ");
+          }
+        
        }
-      
-       return $obj;
+       $logoValue=$logo." ".$home_url;
+       return ["logo"=>$logoValue]+$obj;
     }
     public function getBrokerWithRelations():array{
         return [

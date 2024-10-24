@@ -32,34 +32,33 @@ class BrokerOptionController extends Controller
         {
             $options[]=$brokerOption;
         }
-        usort($options, fn($a, $b) => $a['dropdown_position'] <=> $b['dropdown_position']); 
-          
-        foreach($options as $brokerOption)
-        {
-            //dd($brokerOption);
-            //$brokerOption is an array like:
-            // array:2 [ 
-            //     "position_home" => "Position Home"
-            //     "default_laoding" => 1,
-            //      "default_loading_position"=>2,
-            //      "dropndown_position" =>3 
-            //   ]
-            $slug=array_key_first($brokerOption);
-            $slugOptions[$slug]=$brokerOption[$slug];
+        //dd($options);
+        $dropdownOptions=array_filter($options, function($option){
+            return $option['default_loading']==false;
+        });
+        $defaultLoadedOptions=array_filter($options, function($option){
+            return $option['default_loading']==true;
+        });
 
-            //extract default loaded options
-            if($brokerOption["default_loading"]==true){
-                $position=(int)$brokerOption["default_loading_position"];
-                $defaultLoadedOptions[$position]=$brokerOption[$slug];
-            }
-           
-           
-        }
-        ksort($defaultLoadedOptions);
+
+        usort($dropdownOptions, fn($a, $b) => $a['dropdown_position'] <=> $b['dropdown_position']); 
+        usort($defaultLoadedOptions, fn($a, $b) => $a['default_loading_position'] <=> $b['default_loading_position']); 
+
+        $defaultLoadedOptions=array_merge(...array_map(function ($option) {
+            $slug=array_key_first($option);
+            return [$slug=>$option[$slug]];
+        }, $defaultLoadedOptions));
+        $dropdownOptions=array_merge(...array_map(function ($option) {
+            $slug=array_key_first($option);
+            return [$slug=>$option[$slug]];
+        }, $dropdownOptions)); 
+      
        // return $collection;
        return new Response(json_encode([
-        "options"=>$slugOptions,
-        "defaultLoadedOptions"=>array_values($defaultLoadedOptions)
+        "options"=> $dropdownOptions,
+        //"defaultLoadedOptions"=>array_values($defaultLoadedOptions)
+        "defaultLoadedOptions"=> $defaultLoadedOptions
+
     ]),200);
         }else
         return new Response("not found",404);
