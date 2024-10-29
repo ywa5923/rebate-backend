@@ -32,12 +32,15 @@ class BrokerOptionController extends Controller
         {
             $options[]=$brokerOption;
         }
-        //dd($options);
+      //  dd($options);
         $dropdownOptions=array_filter($options, function($option){
-            return $option['default_loading']==false;
+            return $option['load_in_dropdown']==true;
         });
         $defaultLoadedOptions=array_filter($options, function($option){
             return $option['default_loading']==true;
+        });
+        $allowSortingOptions=array_filter($options, function($option){
+            return $option['allow_sorting']==true;
         });
 
 
@@ -52,12 +55,17 @@ class BrokerOptionController extends Controller
             $slug=array_key_first($option);
             return [$slug=>$option[$slug]];
         }, $dropdownOptions)); 
+        $allowSortingOptions=array_merge(...array_map(function ($option) {
+            $slug=array_key_first($option);
+            return [$slug=>$option[$slug]];
+        }, $allowSortingOptions)); 
       
        // return $collection;
        return new Response(json_encode([
         "options"=> $dropdownOptions,
         //"defaultLoadedOptions"=>array_values($defaultLoadedOptions)
-        "defaultLoadedOptions"=> $defaultLoadedOptions
+        "defaultLoadedOptions"=> $defaultLoadedOptions,
+        "allowSortingOptions"=>$allowSortingOptions
 
     ]),200);
         }else

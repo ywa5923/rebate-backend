@@ -222,7 +222,7 @@ class BrokerFilterController extends Controller
             $result[] = ($isAssociative) ? (["name" => $value, "value" => $key]) : (["name" => $value, "value" => $value]);
         }
 
-
+     usort($result,fn($a,$b)=>$a["value"]<=>$b["value"]);
         return $result;
     }
 

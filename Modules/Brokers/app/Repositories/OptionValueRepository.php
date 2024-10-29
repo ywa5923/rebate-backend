@@ -21,7 +21,12 @@ class OptionValueRepository
              $list=[];
             foreach($collection->resolve() as $option)
             {
-                $items=explode(",",$option["value"]);
+                //if the optionValue contain a link we will keep only the text
+                preg_match('/<a[^>]*>(.*?)<\/a>/', $option["value"], $match);
+                $optionValue=($match)?$match[1]:$option["value"];
+
+                //$items=explode(",",$option["value"]);
+                $items=explode(",",$optionValue);
                 foreach($items as $item){
                    if(!array_key_exists(trim($item),$list) && trim($item)!=="")
                    $list[trim($item)]=trim($item);

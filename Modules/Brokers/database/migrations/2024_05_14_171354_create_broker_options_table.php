@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('dropdown_position')->default(1);
             $table->boolean('publish')->default(1);
             $table->integer('position')->default(1);
+            $table->boolean("allow_sorting")->default(0);
             $table->string("default_language",50);
             $table->foreignId("option_category_id")->constrained("option_categories");
             $table->timestamps();

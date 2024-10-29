@@ -19,7 +19,9 @@ class BrokerOptionResource extends JsonResource
             $this->slug=>$this->translateBrokerOption($this->slug),
             "default_loading"=>$this->default_loading,
             "default_loading_position"=>$this->default_loading_position,
-            "dropdown_position"=>$this->dropdown_position
+            "dropdown_position"=>$this->dropdown_position,
+            "load_in_dropdown"=>$this->load_in_dropdown,
+            "allow_sorting"=>$this->allow_sorting,
           ];
     }
 
