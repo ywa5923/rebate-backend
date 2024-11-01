@@ -254,16 +254,16 @@ class BrokerRepository implements RepositoryInterface
             $this->addRegulatorWhereInFilters($queryBuilder, $filters["filter_regulators"], $zoneCondition);
         }
         if (isset($filters["filter_trading_instruments"])) {
-            //$this->addWhereLikeStaticColumn($queryBuilder,$filters["filter_trading_instruments"][0],$filters["filter_trading_instruments"][1],$languageCondition);
+           
             $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_trading_instruments"], $languageCondition, $zoneCondition);
         }
         if (isset($filters["filter_support_options"])) {
-            // $this->addWhereLikeStaticColumn($queryBuilder,$filters["filter_support_options"][0],$filters["filter_support_options"][1],$languageCondition);
+           
             $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_support_options"], $languageCondition, $zoneCondition);
         }
         if (isset($filters["filter_account_currency"])) {
-            //$this->addWhereLikeStaticColumn($queryBuilder,$filters["filter_account_currency"][0],$filters["filter_account_currency"][1],$languageCondition,false);
-            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_account_currency"], $languageCondition, $zoneCondition);
+           
+            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_account_currency"], NULL, $zoneCondition);
         }
         if (isset($filters["filter_withdrawal_methods"])) {
             $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_withdrawal_methods"], $languageCondition, $zoneCondition);
@@ -277,12 +277,14 @@ class BrokerRepository implements RepositoryInterface
         }
 
 
-
         if (isset($filters["filter_group_trading_account_info"])) {
-            $this->groupBooleanDynamicOptions($queryBuilder, $filters["filter_group_trading_account_info"][1], $languageCondition, $zoneCondition);
+            [$fiteredField,$slugArray]=$filters["filter_group_trading_account_info"];
+           
+            $this->groupBooleanDynamicOptions($queryBuilder,$fiteredField, $slugArray, $languageCondition, $zoneCondition);
         }
         if (isset($filters["filter_group_fund_managers_features"])) {
-            $this->groupBooleanDynamicOptions($queryBuilder, $filters["filter_group_fund_managers_features"][1], $languageCondition, $zoneCondition);
+            [$fiteredField,$slugArray]=$filters["filter_group_fund_managers_features"];
+            $this->groupBooleanDynamicOptions($queryBuilder,$fiteredField,$slugArray, $languageCondition, $zoneCondition);
         }
     }
 
@@ -369,11 +371,11 @@ class BrokerRepository implements RepositoryInterface
      * @param array $slugArray
      */
 
-    public function groupBooleanDynamicOptions(Builder $queryBuilder, array $slugArray, array $languageCondition, array $zoneCondition): void
+    public function groupBooleanDynamicOptions(Builder $queryBuilder, string $filteredField,array $slugArray, array $languageCondition, array $zoneCondition): void
     {
-        if (true) {
+      
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
-            $queryBuilder->withCount(['dynamicOptionsValues as matching_options_count' => function ($query) use ($slugArray, $zoneCondition) {
+            $queryBuilder->withCount(["dynamicOptionsValues as {$filteredField}" => function ($query) use ($slugArray, $zoneCondition) {
 
                 $this->addZoneCondition($query, $zoneCondition);
                 $query->where(function ($query) use ($slugArray) {
@@ -384,39 +386,7 @@ class BrokerRepository implements RepositoryInterface
                         });
                     }
                 });
-            }])
-                ->having('matching_options_count', '=', count($slugArray));
-        } else {
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
-            $queryBuilder->withCount(['dynamicOptionsValues as matching_options_count' => function ($query) use ($slugArray, $languageCondition, $zoneCondition) {
-                $this->addZoneCondition($query, $zoneCondition);
-                $query->where(function ($query) use ($slugArray,$languageCondition){
-                    foreach ($slugArray as $slug) {
-                        $query->orWhere(function ($query) use ($slug, $languageCondition) {
-                            $query->where("option_slug", $slug);
-                        });
-                    }
-            });
-
-                $query->whereHas('translations', function ($query) use ($slugArray, $languageCondition, $zoneCondition) {
-                    $query->where(...$languageCondition);
-                    
-                    $query->where(function ($query) use ($slugArray,$languageCondition){
-                        foreach ($slugArray as $slug) {
-                            $query->orWhere(function ($query) use ($slug, $languageCondition) {
-                                $query->where("property", $slug)->where("value", true);
-                            });
-                        }
-                });
-
-                    
-                });
-                   
-            }])
-                ->having('matching_options_count', '=', count($slugArray));
-
-                //$this->dumpSql($queryBuilder);
-        }//end else
+            }])->having($filteredField, '=', count($slugArray));       
     }
 
 
@@ -528,11 +498,11 @@ class BrokerRepository implements RepositoryInterface
      * @return void
      */
 
-    public function addWhereLikeDynamicOption(Builder $queryBuilder, array $whereInCondition, array $languageCondition, array $zoneCondition): void
+    public function addWhereLikeDynamicOption(Builder $queryBuilder, array $whereInCondition, array|null $languageCondition, array $zoneCondition): void
     {
         /** @var Illuminate\Contracts\Database\Eloquent\Builder   $queryBuilder */
 
-        if ($languageCondition[2] == 'en') {
+        if ( is_null($languageCondition) || $languageCondition[2] == 'en' ) {
 
             $queryBuilder->whereHas('dynamicOptionsValues', function ($query) use ($whereInCondition, $zoneCondition) {
                
@@ -691,3 +661,5 @@ class BrokerRepository implements RepositoryInterface
     //https://dev.to/othmane_nemli/laravel-wherehas-and-with-550o
     //https://dev.to/othmane_nemli/laravel-wherehas-and-with-550o
 }
+
+//http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&filter_group_trading_account_info[in]=islamic_accounts,1_click_trading,allow_expert_advisors&filter_group_fund_managers_features[in]=mam_pamm_leaderboards&filter_account_currency[in]=AUD&zone[eq]=zone1

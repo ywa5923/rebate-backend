@@ -24,6 +24,7 @@ class BrokerFilterController extends Controller
     public function index(BrokerFilterQueryParser $queryParser, Request $request)
     {
         $queryParser->parse($request);
+        $zonecondition=$queryParser->getWhereParam("zone");
         $language = $queryParser->getWhereParam("language");
 
         $companyRepo = new CompanyRepository();
@@ -34,17 +35,17 @@ class BrokerFilterController extends Controller
        
         $filterNames=$filterRepo->getSettingsParam("page_brokers",$language)["filters"];
 
-       
+        $currencies=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
+
+        
 
         //$tradingInstruments = $filterRepo->getBrokerStaticFieldList($language, 'trading_instruments');
-        $tradingInstruments = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::TRADING_INSTRUMENTS);
+        $tradingInstruments = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::TRADING_INSTRUMENTS,  $zonecondition);
 
         //$supportOptions = $filterRepo->getBrokerStaticFieldList($language, 'support_options');
-        $supportOptions = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::SUPPORT_OPTIONS);
+        $supportOptions = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::SUPPORT_OPTIONS,  $zonecondition);
 
-        $currencies=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::ACCOUNT_CURRENCIES);
-
-
+        
 
 
         $officesList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::OFFICES);
@@ -52,38 +53,38 @@ class BrokerFilterController extends Controller
         $headquartersList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::HEADQUARTERS);
         $regulatorsList = $regulatorRepo->getUniqueList($language);
 
-        $withdrawalMethods = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::WITHDRAWAL_METHODS);
+        $withdrawalMethods = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::WITHDRAWAL_METHODS,  $zonecondition);
 
         // dd($withdrawalMethods);
 
         return  [
             [
                 "field" => "filter_offices",
-                "name"=>$filterNames["filter_offices"],
+                "name"=>$filterNames["offices"],
                 "type" => "checkbox",
                 "options" => $this->transform($officesList)
             ],
             [
                 "field" => "filter_headquarters",
-                "name"=>$filterNames["filter_headquarters"],
+                "name"=>$filterNames["headquarters"],
                 "type" => "checkbox",
                 "options" => $this->transform($headquartersList)
             ],
             [
                 "field" => "filter_regulators",
-                "name"=>$filterNames["filter_regulators"],
+                "name"=>$filterNames["regulators"],
                 "type" => "checkbox",
                 "options" => $this->transform($regulatorsList)
             ],
             [
                 "field" => "filter_withdrawal_methods",
-                "name"=>$filterNames["filter_withdrawal_methods"],
+                "name"=>$filterNames["withdrawal_methods"],
                 "type" => "checkbox",
                 "options" => $this->transform($withdrawalMethods)
             ],
             [
                 "field" => "filter_min_deposit",
-                "name"=>$filterNames["filter_min_deposit"],
+                "name"=>$filterNames["min_deposit"],
                 "type" => "radio",
                 "options" => [
                     [
@@ -106,87 +107,87 @@ class BrokerFilterController extends Controller
             ],
             [
                 "field" => "filter_group_trading_account_info",
-                "name"=>$filterNames["filter_group_trading_account_info"],
+                "name"=>$filterNames["group_trading_account_info"],
                 "type" => "checkbox",
                 "options" => [
                     [
-                        "name" => "Islamic Accounts",
+                        "name" => $filterNames["islamic_accounts"],
                         "value" => "islamic_accounts"
                     ],
                     [
-                        "name" => "One Click Trading",
+                        "name" => $filterNames["1_click_trading"],
                         "value" => "1_click_trading"
                     ],
                     [
-                        "name" => "Trailling Stops",
+                        "name" => $filterNames["trailing_stops"],
                         "value" => "trailing_stops"
                     ],
                     [
-                        "name" => "Allow Scalping",
+                        "name" => $filterNames["allow_scalping"],
                         "value" => "allow_scalping"
                     ],
                     [
-                        "name" => "Allow Hedging",
+                        "name" => $filterNames["allow_hedging"],
                         "value" => "allow_hedging"
                     ],
                     [
-                        "name" => "Demo accounts",
+                        "name" => $filterNames['non-expiring_demo_accounts'],
                         "value" => 'non-expiring_demo_accounts'
                     ],
                     [
-                        "name" => "Trading API",
+                        "name" => $filterNames['trading_api'],
                         "value" => 'trading_api'
                     ],
                     [
-                        "name" => "allow news Trading",
+                        "name" => $filterNames['allow_news_trading'],
                         "value" => 'allow_news_trading'
                     ],
                     [
-                        "name" => "Allow expert advisors",
+                        "name" => $filterNames['allow_expert_advisors'],
                         "value" => 'allow_expert_advisors'
                     ],
                     [
-                        "name" => "Copy trading",
+                        "name" => $filterNames['copy_trading'],
                         "value" => 'copy_trading'
                     ],
                     [
-                        "name" => "Segregated Accounts",
+                        "name" => $filterNames['segregated_accounts'],
                         "value" => 'segregated_accounts'
                     ],
                     [
-                        "name" => "Interest on free margin",
+                        "name" => $filterNames['interest_on_free_margin'],
                         "value" => 'interest_on_free_margin'
                     ],
                     [
-                        "name" => "VPS",
+                        "name" => $filterNames['free_vps'],
                         "value" => 'free_vps'
                     ]
                 ]
             ],
             [
                 "field" => "filter_group_spread_types",
-                "name"=>$filterNames["filter_group_spread_types"],
+                "name"=>$filterNames["group_spread_types"],
                 "type" => "checkbox",
                 "options" => [[
-                    "name" => "Fixed Spreads",
+                    "name" => $filterNames['fixed_spreads'],
                     "value" => 'fixed_spreads'
                 ]]
             ],
             [
                 "field" => "filter_group_fund_managers_features",
-                "name"=>$filterNames["filter_group_fund_managers_features"],
+                "name"=>$filterNames["group_fund_managers_features"],
                 "type" => "checkbox",
                 "options" => [
                     [
-                    "name" => "MAM/PAMM Platforms",
+                    "name" => $filterNames['mam_pamm_platforms'],
                     "value" => 'mam_pamm_platforms'
                 ],
                 [
-                    "name"=>"MAM/PAMM Leaderboards",
+                    "name"=>$filterNames["mam_pamm_leaderboards"],
                     "value"=>"mam_pamm_leaderboards"
                 ],
                 [
-                    "name"=>"Managed Accounts",
+                    "name"=>$filterNames["managed_accounts"],
                     "value"=>"managed_accounts"
                 ]
                 ]
@@ -194,19 +195,19 @@ class BrokerFilterController extends Controller
 
             [
                 "field" => "filter_account_currency",
-                "name"=>$filterNames["filter_account_currency"],
+                "name"=>$filterNames["account_currency"],
                 "type" => "checkbox",
                 "options" => $this->transform($currencies, false)
             ],
             [
                 "field" => "filter_trading_instruments",
-                "name"=>$filterNames["filter_trading_instruments"],
+                "name"=>$filterNames["trading_instruments"],
                 "type" => "checkbox",
                 "options" => $this->transform($tradingInstruments)
             ],
             [
                 "field" => "filter_support_options",
-                "name"=>$filterNames["filter_support_options"],
+                "name"=>$filterNames["support_options"],
                 "type" => "checkbox",
                 "options" => $this->transform($supportOptions)
             ]

@@ -13,13 +13,23 @@ class DynamicOptionsValuesSeeder extends Seeder
      */
     public function run(): void
     {
-        $rowIndex = 0;
+       
 
       
         $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
         $handle = fopen($csvFile, "r");
+        $this->loadFile($handle,null);
+        rewind($handle);
+       $this->loadFile($handle,"zone2");
+        rewind($handle);
+       $this->loadFile($handle,"zone3");
        
-        while (($row = fgetcsv($handle, 4096)) !== FALSE) {
+       
+    }
+
+    public function loadFile($fileHandle,$zone){
+        $rowIndex = 0;
+        while (($row = fgetcsv($fileHandle, 4096)) !== FALSE) {
 
             if ($rowIndex === 0) {
                 //first row is with options name, get the id for every option name and keep in array to store in options value table
@@ -39,7 +49,7 @@ class DynamicOptionsValuesSeeder extends Seeder
 
                 if($optionFormType=="Link")
                 {
-                   $this->parseAndInsertLinkType($v,$row[0],$brokerOptionId,$slugs[$k]);
+                   $this->parseAndInsertLinkType($v,$row[0],$brokerOptionId,$slugs[$k],$zone);
                 }else{
 
                     $value=$v;
@@ -60,7 +70,8 @@ class DynamicOptionsValuesSeeder extends Seeder
                             "broker_id" => $row[0],
                             "broker_option_id" => $brokerOptionId,
                             "option_slug" => $slugs[$k],
-                            "value" => $value,
+                            "value" => (is_numeric($value))?$value:$zone.$value,
+                            "zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
                            // "default_loading"=>$default_loading??0,
                             //"default_loading_position"=>($default_loading_position)?($default_loading_position):1,
                             //"default_loading_position"=>$default_loading_position??1,
@@ -76,7 +87,7 @@ class DynamicOptionsValuesSeeder extends Seeder
         }
     }
 
-    public function parseAndInsertLinkType($data,$brokerId,$brokerOptionId,$slug)
+    public function parseAndInsertLinkType($data,$brokerId,$brokerOptionId,$slug,$zone)
     {
         $foundMatch=preg_match_all('|<a[^>]*href="(.+)"[^>]*>(.+)</[^>]*a[^>]*>|U',$data,$out,PREG_PATTERN_ORDER);
         if($foundMatch){
@@ -87,8 +98,9 @@ class DynamicOptionsValuesSeeder extends Seeder
                         "broker_id" => $brokerId,
                         "broker_option_id" => $brokerOptionId,
                         "option_slug" => $slug,
-                        "value" => $out[2][$i],
+                        "value" => $zone.$out[2][$i],
                         "metadata"=>json_encode(["url"=>$url]),
+                        "zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
                         "status" => 1
                     ]
                 );
@@ -99,9 +111,10 @@ class DynamicOptionsValuesSeeder extends Seeder
                 [
                     "broker_id" =>  $brokerId,
                     "broker_option_id" => $brokerOptionId,
-                    "option_slug" => $slug,
-                    "value" => $data,
-                    "status" => 1
+                    "option_slug" => $zone.$slug,
+                    "value" => $zone.$data,
+                    "status" => 1,
+                    "zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
                 ]
             );
         }

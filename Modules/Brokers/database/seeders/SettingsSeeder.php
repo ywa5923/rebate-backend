@@ -39,18 +39,34 @@ class SettingsSeeder extends Seeder
                 "regulators"=>"Regulatori"
             ],
             'filters'=>[
-                'filter_offices'=>'Sedii',
-                'filter_headquarters'=>'Sedii Centrale',
-                'filter_regulators'=>'Regulatori',
-                "filter_withdrawal_methods"=>"Metode de Retragere",
-                "filter_min_deposit"=>"Depozit Min.",
-                "filter_group_trading_account_info"=>"Info cont tranzactie",
-                "filter_group_spread_types"=>"Tipuri de Spreaduri",
-                "filter_group_fund_managers_features"=>"Optiuni Administrare de Fonduri",
-                "filter_account_currency"=>"Moneda Cont",
-                "filter_trading_instruments"=>"Platforme de Tranzationare",
-                "filter_support_options"=>"Optiuni Suport"
-               
+                'offices'=>'Sedii',
+                'headquarters'=>'Sedii Centrale',
+                'regulators'=>'Regulatori',
+                "withdrawal_methods"=>"Metode de Retragere",
+                "min_deposit"=>"Depozit Min.",
+                "group_trading_account_info"=>"Info cont tranzactie",
+                "group_spread_types"=>"Tipuri de Spreaduri",
+                "group_fund_managers_features"=>"Optiuni Administrare de Fonduri",
+                "account_currency"=>"Moneda Cont",
+                "trading_instruments"=>"Platforme de Tranzationare",
+                "support_options"=>"Optiuni Suport",
+                "islamic_accounts"=>"Conturi Islamice",
+                "1_click_trading"=>"Tranzacționarea cu un Singur Click",
+                "trailing_stops"=>"Trailling Stops",
+                "allow_scalping" => "Permiterea Scalpingului",
+                "allow_hedging"=> "Permiterea Hedgingului",
+                'non-expiring_demo_accounts' => "Conturi Demo Fără Termen de Expirare",
+                'trading_api' => "Trading API",
+                'allow_news_trading'=> "Permite News Trading",
+                'allow_expert_advisors'=>"Acceptă Expert Advisors",
+                'copy_trading'=>"Copiere Tranzacții",
+                'segregated_accounts'=> "Conturi Individuale",
+                'interest_on_free_margin'=> "Dobândă pe Marja Liberă",
+                'free_vps'=> "VPS (Server Virtual Privat)",
+                'mam_pamm_platforms' => "Platforme MAM/PAMM",
+                "mam_pamm_leaderboards"=>"Platforme Principale MAM/PAMM",
+                "managed_accounts"=>"Conturi Administrate",
+                 'fixed_spreads'=>"Spread-uri Fixe"
             ]
             ];
 
@@ -64,19 +80,38 @@ class SettingsSeeder extends Seeder
                 "regulators"=>"Regulators"
             ],
             'filters'=>[
-                'filter_offices'=>'Offices',
-                'filter_headquarters'=>'Headquarters',
-                'filter_regulators'=>'Regulators',
-                "filter_withdrawal_methods"=>"Withdrawal Methods",
-                "filter_min_deposit"=>"Min Deposit",
-                "filter_group_trading_account_info"=>"Trading Account Info",
-                "filter_group_spread_types"=>"Spread Types",
-                "filter_group_fund_managers_features"=>"Fund Managers Features",
-                "filter_account_currency"=>"Account Currency",
-                "filter_trading_instruments"=>"Trading Instruments",
-                "filter_support_options"=>"Support Options"
+                'offices'=>'Offices',
+                'headquarters'=>'Headquarters',
+                'regulators'=>'Regulators',
+                "withdrawal_methods"=>"Withdrawal Methods",
+                "min_deposit"=>"Min Deposit",
+                "group_trading_account_info"=>"Trading Account Info",
+                "group_spread_types"=>"Spread Types",
+                "group_fund_managers_features"=>"Fund Managers Features",
+                "account_currency"=>"Account Currency",
+                "trading_instruments"=>"Trading Instruments",
+                "support_options"=>"Support Options",
+                "islamic_accounts"=>"Islamic Accounts",
+                "1_click_trading"=>"One Click Trading",
+                "trailing_stops"=>"Trailling Stops",
+                "allow_scalping" => "Allow Scalping",
+                "allow_hedging"=> "Allow Hedging",
+                'non-expiring_demo_accounts' => "Demo accounts",
+                'trading_api' => "Trading API",
+                'allow_news_trading'=> "Allow News Trading",
+                'allow_expert_advisors'=>"Allow Expert Advisors",
+                'copy_trading'=>"Copy Trading",
+                'segregated_accounts'=> "Segregated Accounts",
+                'interest_on_free_margin'=> "Interest on Free Margin",
+                'free_vps'=> "VPS",
+                'mam_pamm_platforms' => "MAM/PAMM Platforms",
+                "mam_pamm_leaderboards"=>"MAM/PAMM Leaderboards",
+                "managed_accounts"=>"Managed Accounts",
+                'fixed_spreads'=>"Fixed Spreads"
+
                
             ]
             ];
     }
 }
+  
