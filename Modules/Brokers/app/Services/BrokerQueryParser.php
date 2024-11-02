@@ -23,7 +23,9 @@ class BrokerQueryParser extends BaseQueryParser
        "filter_account_currency"=>["in"],
        "filter_support_options"=>["in"],
        "filter_trading_instruments"=>["in"],
-       "filter_regulators"=>["in"]
+       "filter_regulators"=>["in"],
+       "filter_mobile"=>["in"],
+       "filter_web"=>["in"]
 
     ];
   
@@ -37,7 +39,9 @@ class BrokerQueryParser extends BaseQueryParser
        "filter_account_currency"=>"account_currencies",
        "filter_support_options"=>"support_options",
        "filter_trading_instruments"=>"trading_instruments",
-       "filter_regulators"=>"abreviation"
+       "filter_regulators"=>"abreviation",
+       "filter_mobile"=>"mobile_platform_link",
+       "filter_web"=>"web_platform_link",
       
     ];
 

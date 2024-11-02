@@ -66,7 +66,10 @@ class SettingsSeeder extends Seeder
                 'mam_pamm_platforms' => "Platforme MAM/PAMM",
                 "mam_pamm_leaderboards"=>"Platforme Principale MAM/PAMM",
                 "managed_accounts"=>"Conturi Administrate",
-                 'fixed_spreads'=>"Spread-uri Fixe"
+                'fixed_spreads'=>"Spread-uri Fixe",
+                "mobile_platform_link"=>"Platforme de Mobil",
+                "web_platform_link"=>"Platforme Web"
+
             ]
             ];
 
@@ -107,7 +110,9 @@ class SettingsSeeder extends Seeder
                 'mam_pamm_platforms' => "MAM/PAMM Platforms",
                 "mam_pamm_leaderboards"=>"MAM/PAMM Leaderboards",
                 "managed_accounts"=>"Managed Accounts",
-                'fixed_spreads'=>"Fixed Spreads"
+                'fixed_spreads'=>"Fixed Spreads",
+                "mobile_platform_link"=>"Mobile Platforms",
+                "web_platform_link"=>"Web Platforms"
 
                
             ]

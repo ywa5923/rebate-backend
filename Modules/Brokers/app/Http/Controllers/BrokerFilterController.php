@@ -37,7 +37,8 @@ class BrokerFilterController extends Controller
 
         $currencies=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
 
-        
+        $mobilePlatforms=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::MOBILE_PLATFORM_LINK,  $zonecondition);
+        $webPlatforms=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::WEB_PLATFORM_LINK,  $zonecondition);
 
         //$tradingInstruments = $filterRepo->getBrokerStaticFieldList($language, 'trading_instruments');
         $tradingInstruments = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::TRADING_INSTRUMENTS,  $zonecondition);
@@ -58,6 +59,7 @@ class BrokerFilterController extends Controller
         // dd($withdrawalMethods);
 
         return  [
+           
             [
                 "field" => "filter_offices",
                 "name"=>$filterNames["offices"],
@@ -210,7 +212,19 @@ class BrokerFilterController extends Controller
                 "name"=>$filterNames["support_options"],
                 "type" => "checkbox",
                 "options" => $this->transform($supportOptions)
-            ]
+            ],
+            [
+                "field" => "filter_mobile",
+                "name"=>$filterNames["mobile_platform_link"],
+                "type" => "checkbox",
+                "options" => $this->transform( $mobilePlatforms)
+            ],
+            [
+                "field" => "filter_web",
+                "name"=>$filterNames["web_platform_link"],
+                "type" => "checkbox",
+                "options" => $this->transform( $webPlatforms)
+            ],
 
         ];
     }

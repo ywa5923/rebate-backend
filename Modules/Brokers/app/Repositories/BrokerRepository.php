@@ -131,11 +131,7 @@ class BrokerRepository implements RepositoryInterface
 
         if (!empty($orderBy) && !empty($orderDirection)) {
 
-            // $tableStaticColumns = ['home_url', 'user_rating', 'account_type', 'trading_name', 'overall_rating', 'support_options', 'account_currencies', 'trading_instruments'];
-
-            // $orderQueryType = in_array($orderBy, $tableStaticColumns) ? self::STATIC : self::DYNAMIC;
-
-            //to do==>query option_values first
+         
             $orderQueryType = self::DYNAMIC;
             $translatedEntry = Translation::where(
                 [$languageCondition, ['property', '=', $orderBy]]
@@ -285,6 +281,14 @@ class BrokerRepository implements RepositoryInterface
         if (isset($filters["filter_group_fund_managers_features"])) {
             [$fiteredField,$slugArray]=$filters["filter_group_fund_managers_features"];
             $this->groupBooleanDynamicOptions($queryBuilder,$fiteredField,$slugArray, $languageCondition, $zoneCondition);
+        }
+
+        if (isset($filters["filter_mobile"])) {
+          
+            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_mobile"], $languageCondition, $zoneCondition);
+        }
+        if (isset($filters["filter_web"])) {
+            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_web"], $languageCondition, $zoneCondition);
         }
     }
 
@@ -515,16 +519,7 @@ class BrokerRepository implements RepositoryInterface
                
             });
         } else {
-            // $queryBuilder->whereHas('dynamicOptionsValues', function ($query) use ($whereInCondition, $zoneCondition) {
-            //     // $query->where("option_slug",$whereInCondition[0])->where(function ($query) use ($whereInCondition) {
-            //     //     foreach ($whereInCondition[1]  as $filter) {
-            //     //         $query->where("value", 'LIKE', "%" . $filter . "%");
-            //     //     }
-            //     // });
-            //     $query->where("option_slug", $whereInCondition[0]);
-            //     $this->addZoneCondition($query, $zoneCondition);
-            // });
-
+            
             $queryBuilder->whereHas('dynamicOptionsValues.translations', function ($query) use ($whereInCondition, $languageCondition, $zoneCondition) {
                 $query->where("option_slug", $whereInCondition[0]);
                 $this->addZoneCondition($query, $zoneCondition);
@@ -539,8 +534,6 @@ class BrokerRepository implements RepositoryInterface
                 });
             });
         }
-
-
 
 
         // $this->dumpSql($queryBuilder);
@@ -589,29 +582,15 @@ class BrokerRepository implements RepositoryInterface
                         $query->where("option_values.zone_code",$zoneCondition[2])->orWhere('is_invariant', true);
                     })
 
-            ])
-                ->orderBy($orderBy, $orderDirection);
+            ])->orderBy($orderBy, $orderDirection);
+                
         }
 
-        // if ($queryType == self::TRANSLATED_STATIC) {
-
-        //     $queryBuilder->addSelect([
-        //         $orderBy => Translation::select("translations.value")
-        //             ->whereColumn("translations.translationable_id", "=", "brokers.id")
-        //             ->where("translations.language_code", "=", $languageCondition[2])
-        //             ->where("translations.property", "=", $orderBy)
-        //             ->where("translationable_type", "=", Broker::class)
-        //     ])
-        //         ->orderBy($orderBy, $orderDirection);
-        // }
-
-        // if ($queryType == self::STATIC) {
-        //     $queryBuilder->orderBy($orderBy, $orderDirection);
-        // }
+        
        
 
         if ($queryType == self::DYNAMIC) {
-//DB::raw('CAST(value AS UNSIGNED) AS value')
+            //DB::raw('CAST(value AS UNSIGNED) AS value')
             $queryBuilder->addSelect([$orderBy => OptionValue::select('value')->whereColumn("option_values.broker_id", '=', "brokers.id")
                 ->where("option_values.option_slug", "=", $orderBy)
                 ->where(function (Builder $query) use ($zoneCondition) {
@@ -620,13 +599,9 @@ class BrokerRepository implements RepositoryInterface
                 })
             
             ])
-            //->orderByRaw(" CAST(TRIM(`{$orderBy}`) AS DECIMAL) `{$orderBy}`)) {$orderDirection}");
-            //->orderByRaw("CAST(TRIM(`{$orderBy}`) AS DECIMAL) {$orderDirection}");
-           //->orderByRaw("{$orderBy}+0 {$orderDirection}");
+        
            ->orderByRaw("cast(concat('0', {$orderBy})+0 as char)={$orderBy} {$orderDirection}, 0+{$orderBy} {$orderDirection}, {$orderBy} {$orderDirection}");
-           //$this->dumpSql($queryBuilder);
-          
-               
+   
         }
     }
 
