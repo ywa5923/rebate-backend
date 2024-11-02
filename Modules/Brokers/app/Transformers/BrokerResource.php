@@ -18,6 +18,8 @@ class BrokerResource extends JsonResource
     {
        
      
+
+      // return $this->getBrokerWithRelations();
        $dynamic_columns = $this->additional['dynamic_columns'] ?? null;
        if(empty($dynamic_columns))
        {
@@ -45,7 +47,7 @@ class BrokerResource extends JsonResource
 
          
           $dynamicOptions=array_filter($dynamicOptionsValuesResolved,fn($option) =>$option['option_slug']===$column);
-          //concatenate dynamic options if thare are some with same slug
+          //concatenate dynamic options if there are more with same slug
           $dynamicOptionValue="";
           foreach($dynamicOptions as $dynOpt){
             //to do :concatenate for options with unit and urls

@@ -23,6 +23,28 @@ trait TranslateTrait
         return ($isOptionValueSlug)?$this->value:$this->$field;
     }
 
+
+    /**
+     * Return the translated metadata for a given field
+     * 
+     * @param string $field
+     * @return array|null
+     */
+
+    public function translateOptionMeta($field)
+    {
+        
+        // if($this->$field===null)
+        // return null;
+       
+
+        foreach($this->translations as $translation)
+        {
+            if($translation->property==$field )
+           return $translation->metadata;
+        }
+    }
+
     public function translateBrokerOption($prop)
     {
         //for default language, translations relationship is not loaded, so just return the name
