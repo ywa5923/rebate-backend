@@ -15,6 +15,7 @@ use Modules\Brokers\Repositories\RegulatorRepository;
 use Modules\Brokers\Services\BrokerFilterQueryParser;
 use Modules\Brokers\Transformers\SettingCollection;
 use PHPUnit\Util\Filter;
+use Modules\Brokers\Models\Zone;
 
 class BrokerFilterController extends Controller
 {
@@ -24,39 +25,44 @@ class BrokerFilterController extends Controller
     public function index(BrokerFilterQueryParser $queryParser, Request $request)
     {
         $queryParser->parse($request);
-        $zonecondition=$queryParser->getWhereParam("zone");
-        $language = $queryParser->getWhereParam("language");
-
+        $countryCondition=$queryParser->getWhereParam("country");
+       
+        $languageCondition = $queryParser->getWhereParam("language");
+        if(empty($languageCondition) || empty($countryCondition)){
+            //throw new \Exception("country or language not found");
+            return response()->json(['error' => 'Country and language parameters are required'], 422);
+        }
+        $country=$countryCondition[2];
+        $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
+        //to be changed in production to $zone
+        $zonecondition=["zone_code","=","zone1"];
         $companyRepo = new CompanyRepository();
         $regulatorRepo = new RegulatorRepository();
         $optionsValuesRepo = new OptionValueRepository();
         $filterRepo = new FilterRepository();
         //$currencies = $filterRepo->getBrokerCurrencyList();
        
-        $filterNames=$filterRepo->getSettingsParam("page_brokers",$language)["filters"];
+        $filterNames=$filterRepo->getSettingsParam("page_brokers",$languageCondition)["filters"];
 
-        $currencies=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
+        $currencies=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
 
-        $mobilePlatforms=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::MOBILE_PLATFORM_LINK,  $zonecondition);
-        $webPlatforms=$optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::WEB_PLATFORM_LINK,  $zonecondition);
+        $mobilePlatforms=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::MOBILE_PLATFORM_LINK,  $zonecondition);
+        $webPlatforms=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::WEB_PLATFORM_LINK,  $zonecondition);
 
         //$tradingInstruments = $filterRepo->getBrokerStaticFieldList($language, 'trading_instruments');
-        $tradingInstruments = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::TRADING_INSTRUMENTS,  $zonecondition);
+        $tradingInstruments = $optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::TRADING_INSTRUMENTS,  $zonecondition);
 
         //$supportOptions = $filterRepo->getBrokerStaticFieldList($language, 'support_options');
-        $supportOptions = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::SUPPORT_OPTIONS,  $zonecondition);
-
-        
+        $supportOptions = $optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::SUPPORT_OPTIONS,  $zonecondition);
 
 
-        $officesList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::OFFICES);
+        $officesList = $companyRepo->getUniqueList($languageCondition, CompanyUniqueListInterface::OFFICES);
 
-        $headquartersList = $companyRepo->getUniqueList($language, CompanyUniqueListInterface::HEADQUARTERS);
-        $regulatorsList = $regulatorRepo->getUniqueList($language);
+        $headquartersList = $companyRepo->getUniqueList($languageCondition, CompanyUniqueListInterface::HEADQUARTERS);
+        $regulatorsList = $regulatorRepo->getUniqueList($languageCondition);
 
-        $withdrawalMethods = $optionsValuesRepo->getUniqueList($language, BrokerOptionInterface::WITHDRAWAL_METHODS,  $zonecondition);
+        $withdrawalMethods = $optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::WITHDRAWAL_METHODS,  $zonecondition);
 
-        // dd($withdrawalMethods);
 
         return  [
            

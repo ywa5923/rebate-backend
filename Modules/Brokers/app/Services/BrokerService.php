@@ -5,6 +5,7 @@ namespace Modules\Brokers\Services;
 use App\Repositories\RepositoryInterface;
 use App\Services\BaseQueryParser;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Brokers\Models\Zone;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Repositories\TranslationRepository;
 use Modules\Translations\Models\Translation;
@@ -23,24 +24,28 @@ class BrokerService
     public function process(BaseQueryParser $queryParser)
     {
 
-        //dd($queryParser->getWhereParam("zone"));
-        //dd( isset($queryParser->getAllFilters()["whereIn"]["filter_offices"]));
-       
-       // dd($queryParser->getAllFilters());
         /** @var  Modules\Brokers\Repositories\BrokerRepository $repo*/
         $repo=$this->repository;
-     //   dd($queryParser->getWhereInParam("columns"));
         $columns=!empty($queryParser->getWhereInParam("columns"))?$queryParser->getWhereInParam("columns")[1]:null;
-
         $orderBy=!empty($queryParser->getOrderBy())?$queryParser->getOrderBy()[0]:null;
-    
+        $countryCondition= $queryParser->getWhereParam("country");
+        $languageCondition = $queryParser->getWhereParam("language");
+        if(empty($countryCondition) || empty($languageCondition)){
+            return response()->json(['error' => 'Country and language parameters are required'], 422);
+        }
+        $country=$countryCondition[2];
+      
+        $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
+        
         return $repo->getDynamicColumns(
-            $queryParser->getWhereParam("language"),
-            $queryParser->getWhereParam("zone"),
+            $languageCondition,
+            //change to zone code in production
+            ["zone_code","=","zone1"],
             $columns,
             $orderBy,
             $queryParser->getOrderDirection(),
-            $queryParser->getAllFilters());
+            $queryParser->getAllFilters()
+        );
        
     }
 

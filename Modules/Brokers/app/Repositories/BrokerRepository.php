@@ -285,10 +285,10 @@ class BrokerRepository implements RepositoryInterface
 
         if (isset($filters["filter_mobile"])) {
           
-            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_mobile"], $languageCondition, $zoneCondition);
+            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_mobile"], null, $zoneCondition);
         }
         if (isset($filters["filter_web"])) {
-            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_web"], $languageCondition, $zoneCondition);
+            $this->addWhereLikeDynamicOption($queryBuilder, $filters["filter_web"], null, $zoneCondition);
         }
     }
 

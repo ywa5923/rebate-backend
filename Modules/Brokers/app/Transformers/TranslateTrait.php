@@ -43,6 +43,8 @@ trait TranslateTrait
             if($translation->property==$field )
            return $translation->metadata;
         }
+        //if the translation is not found,return null
+        return $this->metadata;
     }
 
     public function translateBrokerOption($prop)

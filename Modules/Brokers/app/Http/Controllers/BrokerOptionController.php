@@ -10,6 +10,7 @@ use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Repositories\BrokerOptionRepository;
 use Modules\Brokers\Services\BrokerOptionQueryParser;
 use Modules\Brokers\Transformers\BrokerOptionCollection;
+use Modules\Brokers\Repositories\FilterRepository;
 
 class BrokerOptionController extends Controller
 {
@@ -24,26 +25,57 @@ class BrokerOptionController extends Controller
         if(!empty($queryParser->getWhereParams())){
         //ex: ['language_code','=','ro']
         $languageParams=$queryParser->getWhereParam("language");
-        $collection=new BrokerOptionCollection($rep->translate($languageParams));
+       
+        $optionsCollection=new BrokerOptionCollection($rep->translate($languageParams));
+        $filterRepo = new FilterRepository();
+        
+        $brokerExtColumns=$filterRepo->getSettingsParam("page_brokers", $languageParams)["broker_ext_columns"];
+        
+
         $options=[];
         $slugOptions=[];
+        $dropdownOptions=[];
         $defaultLoadedOptions=[];
-        foreach($collection->resolve() as $brokerOption)
+        $ratingOptions=[];
+        $allowSortingOptions=[];
+        $booleanOptions=[];
+
+        foreach($optionsCollection->resolve() as $brokerOption)
         {
+            $slug=array_key_first($brokerOption);
             $options[]=$brokerOption;
+            if($brokerOption["form_type"]=="rating"){
+                $ratingOptions[$slug]=$brokerOption[$slug];
+            }
+             if($brokerOption["allow_sorting"]==true){
+
+                $allowSortingOptions[$slug]=$brokerOption[$slug];
+            }
+            if($brokerOption["data_type"]=="boolean"){
+                $booleanOptions[$slug]=$brokerOption[$slug];
+            }
+            if($brokerOption["load_in_dropdown"]==true){
+                $dropdownOptions[]=$brokerOption;
+            }
+            if($brokerOption["default_loading"]==true){
+                    $defaultLoadedOptions[]=$brokerOption;
+            }
         }
-      //  dd($options);
-        $dropdownOptions=array_filter($options, function($option){
-            return $option['load_in_dropdown']==true;
-        });
-        $defaultLoadedOptions=array_filter($options, function($option){
-            return $option['default_loading']==true;
-        });
-        $allowSortingOptions=array_filter($options, function($option){
-            return $option['allow_sorting']==true;
-        });
+       
+        // $dropdownOptions=array_filter($options, function($option){
+        //     return $option['load_in_dropdown']==true;
+        // });
+        // $defaultLoadedOptions=array_filter($options, function($option){
+        //     return $option['default_loading']==true;
+        // });
+        // $allowSortingOptions=array_filter($options, function($option){
+        //     return $option['allow_sorting']==true;
+        // });
+        // $booleanOptions=array_filter($options, function($option){
+        //     return $option['data_type']=="boolean";
+        // });
 
-
+       
         usort($dropdownOptions, fn($a, $b) => $a['dropdown_position'] <=> $b['dropdown_position']); 
         usort($defaultLoadedOptions, fn($a, $b) => $a['default_loading_position'] <=> $b['default_loading_position']); 
 
@@ -55,17 +87,27 @@ class BrokerOptionController extends Controller
             $slug=array_key_first($option);
             return [$slug=>$option[$slug]];
         }, $dropdownOptions)); 
-        $allowSortingOptions=array_merge(...array_map(function ($option) {
-            $slug=array_key_first($option);
-            return [$slug=>$option[$slug]];
-        }, $allowSortingOptions)); 
+        // $allowSortingOptions=array_merge(...array_map(function ($option) {
+        //     $slug=array_key_first($option);
+        //     return [$slug=>$option[$slug]];
+        // }, $allowSortingOptions)); 
+
+        // $booleanOptions=array_merge(...array_map(function ($option) {
+        //     $slug=array_key_first($option);
+        //     return [$slug=>$option[$slug]];
+        // },  $booleanOptions)); 
       
+        //add ext relation column to be shown in dropdown
+        $dropdownOptions=$brokerExtColumns+$dropdownOptions;
+       
        // return $collection;
        return new Response(json_encode([
         "options"=> $dropdownOptions,
         //"defaultLoadedOptions"=>array_values($defaultLoadedOptions)
         "defaultLoadedOptions"=> $defaultLoadedOptions,
-        "allowSortingOptions"=>$allowSortingOptions
+        "allowSortingOptions"=>$allowSortingOptions,
+        "booleanOptions"=>$booleanOptions,
+        "ratingOptions"=>$ratingOptions
 
     ]),200);
         }else

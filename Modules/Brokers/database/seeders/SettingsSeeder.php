@@ -9,6 +9,7 @@ use Modules\Translations\Models\Translation;
 
 class SettingsSeeder extends Seeder
 {
+    //php artisan db:seed --class=\\Modules\\Brokers\\Database\\Seeders\\SettingsSeeder
     /**
      * Run the database seeds.
      */
@@ -19,7 +20,8 @@ class SettingsSeeder extends Seeder
             "value"=>json_encode($this->getEnData())
         ]);
         
-   
+       
+
     Translation::insert([
         "translationable_type"=>Setting::class,
         "translationable_id"=> $settingId,
@@ -29,7 +31,9 @@ class SettingsSeeder extends Seeder
         "value"=>json_encode($this->getRoData())
     ]);
 
+
     }
+
 
     public function getRoData()
     {
