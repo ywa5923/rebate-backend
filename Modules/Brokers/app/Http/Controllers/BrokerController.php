@@ -13,10 +13,13 @@ use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Models\BrokerOptionsCategory;
 use Modules\Brokers\Models\BrokerOptionsValue;
 use Modules\Brokers\Models\BrokerType;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Modules\Brokers\Services\BrokerQueryParser;
+use Modules\Brokers\Services\BrokersQueryParser;
 use Modules\Brokers\Services\BrokerService;
+use Modules\Brokers\Services\BrokerQueryParser;
+use Modules\Brokers\Models\Zone;
+use Modules\Brokers\Models\Setting;
 
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
@@ -43,9 +46,9 @@ class BrokerController extends Controller
      {
      }
 
-    public function index(BrokerQueryParser $queryParser,BrokerService $brokerService,Request $request)
+    public function index(BrokersQueryParser $queryParser,BrokerService $brokerService,Request $request)
     {
-      //dd($queryParser->parse($request)->getArrayResults());
+     // dd($queryParser->parse($request)->getArrayResults());
       //dd($queryParser->parse($request)->getWhereInParam("filter_offices"));
        return $brokerService->process($queryParser->parse($request));
 
@@ -113,9 +116,58 @@ class BrokerController extends Controller
      *     )
      * )
      */
-    public function show($id)
+    public function show($id,Request $request)
     {
-        return view('brokers::show');
+      
+    $validator = Validator::make($request->query(), [
+        'language.eq' => 'required|string',
+        'country.eq' => 'required|string',
+        'tab.eq' => 'nullable|string|in:reviews,default',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+    $brokerData = Broker::findOrFail($id);
+    // Retrieve query parameters
+    $lang = $request->query('language')['eq']; // Fetch `lang[eq]`
+    $country = $request->query('country')['eq'];
+    $tab = $request->query('tab')['eq']??"all";
+
+    $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
+    if($tab=="all"){
+        //return all options
+    }else{
+        $setting=Setting::where('key',"tab_".$tab)->firstOrFail();
+       //return options of a specific tab
+       $tabData=json_decode($setting->value,1);
+       if (!empty($tabData['options'])) {
+        $options = $tabData['options'];
+    
+        // If 'relations' is absent, set to null, otherwise use the value
+        $relations = $tabData['relations'] ?? null;
+         
+        dd($options,$relations);
+
+    } else {
+        return response()->json([
+            'error' => "The required keys 'options' or 'relations' are missing in the settings tab for key={$tab}.",
+        ], 422);
+    }
+        
+    }
+
+
+    $additionalInfo = [
+        'language' => $lang ?? 'default',
+        'zone' => $zone ?? 'default',
+        'tab' => $tab ?? 'default',
+    ];
+
+    return response()->json([
+        'broker' => $brokerData,
+        'additional_info' => $additionalInfo,
+    ]);
     }
 
     /**

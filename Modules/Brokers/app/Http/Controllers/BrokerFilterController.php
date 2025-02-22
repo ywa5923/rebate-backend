@@ -42,6 +42,7 @@ class BrokerFilterController extends Controller
         $filterRepo = new FilterRepository();
         //$currencies = $filterRepo->getBrokerCurrencyList();
        
+        //get translated names for filter's names
         $filterNames=$filterRepo->getSettingsParam("page_brokers",$languageCondition)["filters"];
 
         $currencies=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
@@ -65,173 +66,258 @@ class BrokerFilterController extends Controller
 
 
         return  [
+
+            "simple_filters" => [
+                [
+                    "field"=>"filter_popularity",
+                    "name"=>$filterNames["client_popularity"],
+                    "type"=>"rating",
+                    "expanded"=>true,
+                    "options"=>[
+                        [
+                            "name" => "5.0",
+                            "value" => "5"
+                        ],
+                        [
+                            "name" => "4.0-5.0",
+                            "value" => "4"
+                        ],
+                        [
+                            "name" => "3.0-4.0",
+                            "value" => "3"
+                        ],
+                        [
+                            "name" => "2.0-3.0",
+                            "value" => "2"
+                        ],
+                        
+                        [
+                            "name" => "1.0-2.0",
+                            "value" => "1"
+                        ]
+                       
+                    ]
+    
+                ],
+                [
+                "field"=>"filter_regulator_rating",
+                "name"=>$filterNames["regulator_rating"],
+                "type"=>"rating",
+                "expanded"=>true,
+                
+                "options"=>[
+                        [
+                            "name" => "5.0",
+                            "value" => "5"
+                        ],
+                        [
+                            "name" => "4.0-5.0",
+                            "value" => "4"
+                        ],
+                        [
+                            "name" => "3.0-4.0",
+                            "value" => "3"
+                        ],
+                        [
+                            "name" => "2.0-3.0",
+                            "value" => "2"
+                        ],
+                        
+                        [
+                            "name" => "1.0-2.0",
+                            "value" => "1"
+                        ]
+                       
+                    ]
+    
+               ]
+
+            ],
+            "advanced_filters" => [
+                [
+                    "field" => "filter_offices",
+                    "name"=>$filterNames["offices"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($officesList)
+                ],
+                [
+                    "field" => "filter_headquarters",
+                    "name"=>$filterNames["headquarters"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($headquartersList)
+                ],
+                [
+                    "field" => "filter_regulators",
+                    "name"=>$filterNames["regulators"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($regulatorsList)
+                ],
+                [
+                    "field" => "filter_withdrawal_methods",
+                    "name"=>$filterNames["withdrawal_methods"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($withdrawalMethods)
+                ],
+                [
+                    "field" => "filter_min_deposit",
+                    "name"=>$filterNames["min_deposit"],
+                    "type" => "radio",
+                    "expanded"=>false,
+                    "options" => [
+                        [
+                            "name" => "< 100",
+                            "value" => "lt100"
+                        ],
+                        [
+                            "name" => "< 200",
+                            "value" => "lt200"
+                        ],
+                        [
+                            "name" => "< 500",
+                            "value" => "lt500"
+                        ],
+                        [
+                            "name" => "< 1000",
+                            "value" => "lt1000"
+                        ]
+                    ]
+                ],
+                [
+                    "field" => "filter_group_trading_account_info",
+                    "name"=>$filterNames["group_trading_account_info"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => [
+                        [
+                            "name" => $filterNames["islamic_accounts"],
+                            "value" => "islamic_accounts"
+                        ],
+                        [
+                            "name" => $filterNames["1_click_trading"],
+                            "value" => "1_click_trading"
+                        ],
+                        [
+                            "name" => $filterNames["trailing_stops"],
+                            "value" => "trailing_stops"
+                        ],
+                        [
+                            "name" => $filterNames["allow_scalping"],
+                            "value" => "allow_scalping"
+                        ],
+                        [
+                            "name" => $filterNames["allow_hedging"],
+                            "value" => "allow_hedging"
+                        ],
+                        [
+                            "name" => $filterNames['non-expiring_demo_accounts'],
+                            "value" => 'non-expiring_demo_accounts'
+                        ],
+                        [
+                            "name" => $filterNames['trading_api'],
+                            "value" => 'trading_api'
+                        ],
+                        [
+                            "name" => $filterNames['allow_news_trading'],
+                            "value" => 'allow_news_trading'
+                        ],
+                        [
+                            "name" => $filterNames['allow_expert_advisors'],
+                            "value" => 'allow_expert_advisors'
+                        ],
+                        [
+                            "name" => $filterNames['copy_trading'],
+                            "value" => 'copy_trading'
+                        ],
+                        [
+                            "name" => $filterNames['segregated_accounts'],
+                            "value" => 'segregated_accounts'
+                        ],
+                        [
+                            "name" => $filterNames['interest_on_free_margin'],
+                            "value" => 'interest_on_free_margin'
+                        ],
+                        [
+                            "name" => $filterNames['free_vps'],
+                            "value" => 'free_vps'
+                        ]
+                    ]
+                ],
+                [
+                    "field" => "filter_group_spread_types",
+                    "name"=>$filterNames["group_spread_types"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => [[
+                        "name" => $filterNames['fixed_spreads'],
+                        "value" => 'fixed_spreads'
+                    ]]
+                ],
+                [
+                    "field" => "filter_group_fund_managers_features",
+                    "name"=>$filterNames["group_fund_managers_features"],
+                    "type" => "checkbox",
+                    "expanded"=>true,
+                    "headless"=>true,
+                    "options" => [
+                        [
+                        "name" => $filterNames['mam_pamm_platforms'],
+                        "value" => 'mam_pamm_platforms'
+                    ],
+                    [
+                        "name"=>$filterNames["mam_pamm_leaderboards"],
+                        "value"=>"mam_pamm_leaderboards"
+                    ],
+                    [
+                        "name"=>$filterNames["managed_accounts"],
+                        "value"=>"managed_accounts"
+                    ]
+                    ]
+                ],
+    
+                [
+                    "field" => "filter_account_currency",
+                    "name"=>$filterNames["account_currency"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($currencies, false)
+                ],
+                [
+                    "field" => "filter_trading_instruments",
+                    "name"=>$filterNames["trading_instruments"],
+                    "type" => "checkbox",
+                    "options" => $this->transform($tradingInstruments)
+                ],
+                [
+                    "field" => "filter_support_options",
+                    "name"=>$filterNames["support_options"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform($supportOptions)
+                ],
+                [
+                    "field" => "filter_mobile",
+                    "name"=>$filterNames["mobile_platform_link"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform( $mobilePlatforms)
+                ],
+                [
+                    "field" => "filter_web",
+                    "name"=>$filterNames["web_platform_link"],
+                    "type" => "checkbox",
+                    "expanded"=>false,
+                    "options" => $this->transform( $webPlatforms)
+                ],
+    
+
+            ]
            
-            [
-                "field" => "filter_offices",
-                "name"=>$filterNames["offices"],
-                "type" => "checkbox",
-                "options" => $this->transform($officesList)
-            ],
-            [
-                "field" => "filter_headquarters",
-                "name"=>$filterNames["headquarters"],
-                "type" => "checkbox",
-                "options" => $this->transform($headquartersList)
-            ],
-            [
-                "field" => "filter_regulators",
-                "name"=>$filterNames["regulators"],
-                "type" => "checkbox",
-                "options" => $this->transform($regulatorsList)
-            ],
-            [
-                "field" => "filter_withdrawal_methods",
-                "name"=>$filterNames["withdrawal_methods"],
-                "type" => "checkbox",
-                "options" => $this->transform($withdrawalMethods)
-            ],
-            [
-                "field" => "filter_min_deposit",
-                "name"=>$filterNames["min_deposit"],
-                "type" => "radio",
-                "options" => [
-                    [
-                        "name" => "< 100",
-                        "value" => "lt100"
-                    ],
-                    [
-                        "name" => "< 200",
-                        "value" => "lt200"
-                    ],
-                    [
-                        "name" => "< 500",
-                        "value" => "lt500"
-                    ],
-                    [
-                        "name" => "< 1000",
-                        "value" => "lt1000"
-                    ]
-                ]
-            ],
-            [
-                "field" => "filter_group_trading_account_info",
-                "name"=>$filterNames["group_trading_account_info"],
-                "type" => "checkbox",
-                "options" => [
-                    [
-                        "name" => $filterNames["islamic_accounts"],
-                        "value" => "islamic_accounts"
-                    ],
-                    [
-                        "name" => $filterNames["1_click_trading"],
-                        "value" => "1_click_trading"
-                    ],
-                    [
-                        "name" => $filterNames["trailing_stops"],
-                        "value" => "trailing_stops"
-                    ],
-                    [
-                        "name" => $filterNames["allow_scalping"],
-                        "value" => "allow_scalping"
-                    ],
-                    [
-                        "name" => $filterNames["allow_hedging"],
-                        "value" => "allow_hedging"
-                    ],
-                    [
-                        "name" => $filterNames['non-expiring_demo_accounts'],
-                        "value" => 'non-expiring_demo_accounts'
-                    ],
-                    [
-                        "name" => $filterNames['trading_api'],
-                        "value" => 'trading_api'
-                    ],
-                    [
-                        "name" => $filterNames['allow_news_trading'],
-                        "value" => 'allow_news_trading'
-                    ],
-                    [
-                        "name" => $filterNames['allow_expert_advisors'],
-                        "value" => 'allow_expert_advisors'
-                    ],
-                    [
-                        "name" => $filterNames['copy_trading'],
-                        "value" => 'copy_trading'
-                    ],
-                    [
-                        "name" => $filterNames['segregated_accounts'],
-                        "value" => 'segregated_accounts'
-                    ],
-                    [
-                        "name" => $filterNames['interest_on_free_margin'],
-                        "value" => 'interest_on_free_margin'
-                    ],
-                    [
-                        "name" => $filterNames['free_vps'],
-                        "value" => 'free_vps'
-                    ]
-                ]
-            ],
-            [
-                "field" => "filter_group_spread_types",
-                "name"=>$filterNames["group_spread_types"],
-                "type" => "checkbox",
-                "options" => [[
-                    "name" => $filterNames['fixed_spreads'],
-                    "value" => 'fixed_spreads'
-                ]]
-            ],
-            [
-                "field" => "filter_group_fund_managers_features",
-                "name"=>$filterNames["group_fund_managers_features"],
-                "type" => "checkbox",
-                "options" => [
-                    [
-                    "name" => $filterNames['mam_pamm_platforms'],
-                    "value" => 'mam_pamm_platforms'
-                ],
-                [
-                    "name"=>$filterNames["mam_pamm_leaderboards"],
-                    "value"=>"mam_pamm_leaderboards"
-                ],
-                [
-                    "name"=>$filterNames["managed_accounts"],
-                    "value"=>"managed_accounts"
-                ]
-                ]
-            ],
-
-            [
-                "field" => "filter_account_currency",
-                "name"=>$filterNames["account_currency"],
-                "type" => "checkbox",
-                "options" => $this->transform($currencies, false)
-            ],
-            [
-                "field" => "filter_trading_instruments",
-                "name"=>$filterNames["trading_instruments"],
-                "type" => "checkbox",
-                "options" => $this->transform($tradingInstruments)
-            ],
-            [
-                "field" => "filter_support_options",
-                "name"=>$filterNames["support_options"],
-                "type" => "checkbox",
-                "options" => $this->transform($supportOptions)
-            ],
-            [
-                "field" => "filter_mobile",
-                "name"=>$filterNames["mobile_platform_link"],
-                "type" => "checkbox",
-                "options" => $this->transform( $mobilePlatforms)
-            ],
-            [
-                "field" => "filter_web",
-                "name"=>$filterNames["web_platform_link"],
-                "type" => "checkbox",
-                "options" => $this->transform( $webPlatforms)
-            ],
-
+           
+           
         ];
     }
 

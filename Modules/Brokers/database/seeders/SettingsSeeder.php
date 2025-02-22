@@ -123,4 +123,4 @@ class SettingsSeeder extends Seeder
             ];
     }
 }
-  
+  //{"options":["notes","min_deposit","min_trade_size"],"relations":"regulators"}
