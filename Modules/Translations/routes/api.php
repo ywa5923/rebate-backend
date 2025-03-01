@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Translations\Http\Controllers\TranslationController;
+use Modules\Translations\Http\Controllers\LocaleResourceController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -19,4 +20,5 @@ use Modules\Translations\Http\Controllers\TranslationController;
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('translations', TranslationController::class)->names('translations');
+    Route::apiResource("locale_resources",LocaleResourceController::class)->names("locale_resources");
 });

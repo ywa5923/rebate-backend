@@ -16,5 +16,5 @@ use Modules\Translations\Http\Controllers\TranslationController;
 */
 
 Route::group([], function () {
-    Route::resource('translations', TranslationsController::class)->names('translations');
+    Route::resource('translations', TranslationController::class)->names('translations');
 });
