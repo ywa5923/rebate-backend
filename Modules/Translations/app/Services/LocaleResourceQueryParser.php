@@ -10,11 +10,9 @@ class LocaleResourceQueryParser extends BaseQueryParser
 
   protected $querySafeParams = [
     'key' => ['eq'],
-    'group' => ['eq'],
     'section' => ['in','eq'],
     'lang' => ['eq'],
-    'zone' => ['eq'],
-    
+    'zone' => ['eq']
   ];
 
   protected $columnMap = [

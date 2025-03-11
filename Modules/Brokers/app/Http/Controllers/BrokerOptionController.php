@@ -28,6 +28,7 @@ class BrokerOptionController extends Controller
        
         $optionsCollection=new BrokerOptionCollection($rep->translate($languageParams));
         $filterRepo = new FilterRepository();
+       
         
         $brokerExtColumns=$filterRepo->getSettingsParam("page_brokers", $languageParams)["broker_ext_columns"];
         
@@ -99,7 +100,7 @@ class BrokerOptionController extends Controller
       
         //add ext relation column to be shown in dropdown
         $dropdownOptions=$brokerExtColumns+$dropdownOptions;
-       
+        
        // return $collection;
        return new Response(json_encode([
         "options"=> $dropdownOptions,

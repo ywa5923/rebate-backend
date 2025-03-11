@@ -5,6 +5,8 @@ namespace Modules\Translations\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Translations\Database\Factories\LocaleResourceFactory;
+use Modules\Translations\Models\Translation;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class LocaleResource extends Model
 {
@@ -15,8 +17,9 @@ class LocaleResource extends Model
      */
     protected $fillable = [];
 
-    protected static function newFactory(): LocaleResourceFactory
+
+    public function translations():MorphMany
     {
-        //return LocaleResourceFactory::new();
+        return $this->morphMany(Translation::class,'translationable');
     }
 }

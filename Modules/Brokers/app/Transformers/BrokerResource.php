@@ -4,8 +4,8 @@ namespace Modules\Brokers\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Translations\Transformers\TranslationResource;
 use Illuminate\Http\Resources\MissingValue;
+use App\Services\TranslateTrait;
 
 class BrokerResource extends JsonResource
 {
@@ -14,11 +14,9 @@ class BrokerResource extends JsonResource
     /**
      * Transform the resource into an array.
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request): array|null
     {
        
-     
-
       // return $this->getBrokerWithRelations();
        $dynamic_columns = $this->additional['dynamic_columns'] ?? null;
        if(empty($dynamic_columns))

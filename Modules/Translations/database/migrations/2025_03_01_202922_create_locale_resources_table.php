@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('locale_resources', function (Blueprint $table) {
             $table->id();
             $table->string('key');
-            $table->string('group')->nullable();
-            $table->string('language_code')->nullable();
+            $table->string('section');
             $table->string('zone_code')->nullable();
-            $table->json('value');
+            $table->boolean('is_invariant')->default(0);
+            $table->json('json_content');
             $table->text('description')->nullable();
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('texts');
+        Schema::dropIfExists('locale_resources');
     }
 };

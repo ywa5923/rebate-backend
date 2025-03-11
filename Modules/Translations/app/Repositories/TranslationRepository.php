@@ -13,7 +13,7 @@ class TranslationRepository implements RepositoryInterface
     use TranslationTrait;
 
 
-    public function translateTableColumns(string $fullClass, string $language):stdClass
+    public function translateTableColumns(string $fullClass, string $language):string
     {
         return json_decode(Translation::where([
             ["translationable_type", $fullClass],
@@ -23,7 +23,7 @@ class TranslationRepository implements RepositoryInterface
     }
 
 
-    public function translatePropertyArray(string $fullClass, string $language, array $propertyArray):Collection
+    public function translatePropertyArray(string $fullClass, string $language, array $propertyArray):stdClass
     {
         return  Translation::where(
             [

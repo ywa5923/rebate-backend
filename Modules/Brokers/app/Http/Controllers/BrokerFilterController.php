@@ -63,8 +63,7 @@ class BrokerFilterController extends Controller
         $regulatorsList = $regulatorRepo->getUniqueList($languageCondition);
 
         $withdrawalMethods = $optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::WITHDRAWAL_METHODS,  $zonecondition);
-
-
+        
         return  [
 
             "simple_filters" => [

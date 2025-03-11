@@ -8,6 +8,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Models\Setting;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Brokers\Transformers\SettingCollection;
+use Modules\Brokers\Transformers\SettingResource;
 
 class FilterRepository 
 {
@@ -83,6 +84,7 @@ public function getSettingsParam($key,$languageCondition)
      $query->where(...$languageCondition);
  }])->where("key",$key)->get();
  $collection=(new SettingCollection($setting))->resolve();
+
  return json_decode($collection[0]["value"],true);
 }
 

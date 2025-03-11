@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Brokers\Transformers;
+namespace App\Services;
 
 trait TranslateTrait
 {

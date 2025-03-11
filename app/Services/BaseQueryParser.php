@@ -124,9 +124,24 @@ class BaseQueryParser
        * @return array|null
        */
 
-      public function getWhereParam($param):array|null
+      public function getWhereParam(string $param):array|null
       {
         return $this->whereParams[$param]??null;
+      }
+
+
+      /**
+       * Extracts and deletes the where param from whereParams
+       *
+       * @param string $param
+       * @return array|null
+       */
+
+      public function extractWhereParam(string $param):array|null
+      {
+        $extractedParam=$this->whereParams[$param]??null;
+        unset($this->whereParams[$param]);
+        return $extractedParam;
       }
 
       /**

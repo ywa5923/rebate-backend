@@ -4,6 +4,7 @@ namespace Modules\Brokers\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Services\TranslateTrait;
 
 class RegualtorResource extends JsonResource
 {

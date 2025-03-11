@@ -101,6 +101,12 @@ php artisan module:make-factory BrokerTypeFactory Brokers
 php artisan make:seeder UserSeeder
 php artisan module:make-seed OtionsCategories Brokers
 
+//rollback latest migration
+php artisan module:migrate-rollback --pretend Translations
+ php artisan migrate:refresh --step=1
+php artisan migrate --path=/Modules/Translations/database/migrations/2025_03_01_202922_create_locale_resources_table.php
+//{"main_header": "This is the main header text"}
+
 {{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_home,position_list,short_payment_options,trading_fees&filters[in]=a,b,c
 
 

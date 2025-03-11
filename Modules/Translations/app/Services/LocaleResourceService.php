@@ -1,30 +1,45 @@
 <?php
 
 namespace Modules\Translations\Services;
-
 use App\Services\BaseQueryParser;
-use Illuminate\Database\Eloquent\Collection;
-use Modules\Translations\Models\LocaleResource;
-use Modules\Translations\Repositories\TranslationRepository;
-use Modules\Translations\Models\Translation;
 use Modules\Translations\Transformers\LocaleResourceCollection;
+use Modules\Translations\Repositories\LocaleResourceRepository;
 
 class LocaleResourceService
 {
+    public function __construct(public LocaleResourceRepository $repository) {}
 
-   
+
+    /**
+     * Processes the query parameters to retrieve locale messages.
+     *
+     * @param BaseQueryParser $queryParser Instance of query parser containing request parameters.
+     * 
+     * @return ?LocaleResourceCollection Returns a collection of locale resources or null.
+     * 
+     * @throws \InvalidArgumentException If the 'lang' or 'zone' parameter is missing.
+     */
 
 
-    public function process(BaseQueryParser $queryParser):?LocaleResourceCollection
+    public function process(BaseQueryParser $queryParser): ?LocaleResourceCollection
     {
+        //$params=$queryParser->getWhereParams();
+        $langCondition =  $queryParser->extractWhereParam("lang");
+        $zoneCondition =  $queryParser->extractWhereParam("zone");
 
-        $queryBuilder = LocaleResource::query();
-        
-            foreach ($queryParser->getWhereParams() as $k=>$v) {
-                $queryBuilder->where(...$v);
-            }
+        if (empty($langCondition)) {
+            throw new \InvalidArgumentException("The 'lang' parameter is required.");
+        }
 
-        return new LocaleResourceCollection($queryBuilder->get());
+        if (empty($zoneCondition)) {
+            throw new \InvalidArgumentException("The 'zone' parameter is required.");
+        }
+
+        return $this->repository->getLocaleMessages(
+            $langCondition,
+            $zoneCondition,
+            $queryParser->getWhereParams(),
+            $queryParser->getWhereInParams()
+        );
     }
 }
-
