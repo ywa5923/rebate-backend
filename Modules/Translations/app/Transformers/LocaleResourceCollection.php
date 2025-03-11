@@ -12,7 +12,12 @@ class LocaleResourceCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+       
+        //return parent::toArray($request);
+        return $this->collection->reduce(function ($carry, $item) use ($request) {
+            return array_merge($carry, $item->toArray($request)); // Pass $request here
+        }, []);
+        
     }
 }
 

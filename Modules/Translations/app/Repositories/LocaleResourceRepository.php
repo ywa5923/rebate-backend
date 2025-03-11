@@ -13,7 +13,7 @@ class LocaleResourceRepository implements RepositoryInterface
 {
     use LocaleResourceTrait;
 
-    public function getLocaleMessages(array $langCondition,array $zoneCondition, array $whereConditions, array $whereInConditions): LocaleResourceCollection
+    public function getLocaleMessages(array $langCondition,array $zoneCondition, array $whereConditions, array $whereInConditions)
     {
         $queryBuilder = LocaleResource::with(["translations" => function (Builder $query) use ($langCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
