@@ -1,0 +1,13 @@
+{
+    "navbar":{
+        "home":"(eu)Home",
+        "about":"(eu)About",
+        "services":"(eu)Services",
+        "contact":"(eu)Contact"
+    },
+    "top-header":{
+        "title":"(eu)Best broker site",
+        "description":"(eu)Lorem ipsum lorem ipsum"
+    }
+
+}

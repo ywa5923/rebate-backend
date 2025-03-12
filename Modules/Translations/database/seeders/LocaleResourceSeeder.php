@@ -8,73 +8,106 @@ use Modules\Translations\Models\Translation;
 
 class LocaleResourceSeeder extends Seeder
 {
-    //php artisan db:seed --class=\\Modules\\Brokers\\Database\\Seeders\\LocaleResourceSeeder
+    //sectiunile care sunt invariante se adauga zona ca invariant:
+    //ex:   'database/seeders/home_page_en-invariant.json',
+    //-------------------------------------------------------//
+    //se adauga mai intai fisierele in limba engleza 
+
+    public $files=[
+        'database/seeders/home_page_en-eu.json',
+        'database/seeders/home_page_en-sua.json',
+        'database/seeders/home_page_en-invariant.json',
+        'database/seeders/home_page_ro-eu.json',
+        'database/seeders/home_page_ro-sua.json',
+        'database/seeders/home_page_ro-invariant.json',
+    ];
+
+    public function run()
+    {
+        foreach($this->files as $file)
+        {
+            $fileName = module_path('Translations', $file);
+            $this->insertJsonFile($fileName);
+        }
+     
+    }
+
+    public function insertJsonFile($fileName)
+    {
+      
+        $latestDash = strrpos($fileName, '_');
+        $latestDot = strrpos($fileName, '.');
+        $latestSlash = strrpos($fileName, "/");
+
+        $key = substr($fileName, $latestSlash + 1, $latestDash - $latestSlash - 1);
+        $localeInfo = substr($fileName, $latestDash + 1, $latestDot - $latestDash - 1);
+        [$locale, $zone] = explode("-", $localeInfo);
+
+        if(empty($key) || empty($locale) || empty($zone))
+        {
+            throw new \Exception("Invalid file name: " . $fileName);
+        }
+
+        // Read and decode JSON file
+        $jsonContent = json_decode(file_get_contents($fileName), true);
+
+        if (!$jsonContent) {
+            throw new \Exception("Invalid JSON content in: " . $fileName);
+        }
+
+        // Insert into LocaleResource or Translation
+        if ($locale === "en") {
+            $this->insertEnglishLocale($jsonContent, $key, $zone);
+        } else {
+            $this->insertTranslatedLocale($jsonContent, $key, $zone, $locale);
+        }
+
+    }
+
     /**
-     * Run the database seeds.
+     * Insert English locale resources.
      */
-    public function run(): void
+    function insertEnglishLocale(array $jsonArray, string $key, string $zone): void
     {
-       $localeResourceId=LocaleResource::insertGetId([
-            "key"=>"page_brokers",
-            "section"=>"server",
-            "zone_code"=>"eu",
-            "json_content"=>json_encode($this->getServerComponentEnData())
-        ]);
 
-        Translation::insert([
-            "translationable_type"=>LocaleResource::class,
-            "translationable_id"=> $localeResourceId,
-            "language_code"=>"ro",
-            "translation_type"=>"property",
-            "property"=> "json_content",
-            "value"=>json_encode($this->getServerComponentRoData())
-        ]);
-
-        $localeResourceId=LocaleResource::insertGetId([
-            "key"=>"page_brokers",
-            "section"=>"client",
-            "is_invariant"=>1,
-            "json_content"=>json_encode($this->getClientComponentEnData())
-        ]);
-
-        Translation::insert([
-            "translationable_type"=>LocaleResource::class,
-            "translationable_id"=> $localeResourceId,
-            "language_code"=>"ro",
-            "translation_type"=>"property",
-            "property"=> "json_content",
-            "value"=>json_encode($this->getClientComponentRoData())
-        ]);
-        
+        foreach ($jsonArray as $section => $content) {
+            LocaleResource::insert([
+                "key" => $key,
+                "section" => $section,
+                "zone_code" => $zone,
+                "is_invariant"=>$zone==="invariant"?1:0,
+                "json_content" => json_encode($content)
+            ]);
+        }
     }
 
-    public function getServerComponentEnData()
+    /**
+     * Insert translated locale resources.
+     */
+    function insertTranslatedLocale(array $jsonArray, string $key, string $zone, string $locale): void
     {
-        return [
-            "title_test"=>"Title Test",
-            "content_test"=>"Content Test"
-        ];
+        foreach ($jsonArray as $section => $content) {
+            $enResource = LocaleResource::where([
+                "key" => $key,
+                "section" => $section,
+                "zone_code" => $zone,
+                "is_invariant"=>($zone==="invariant")?1:0
+            ])->first();
+
+            if (!$enResource) {
+                throw new \Exception("No matching English resource found for section: $section");
+            }
+
+            Translation::insert([
+                "translationable_type" => LocaleResource::class,
+                "translationable_id" => $enResource->id,
+                "language_code" => $locale,
+                "translation_type" => "property",
+                "property" => "json_content",
+                "value" => json_encode($content)
+            ]);
+        }
     }
 
-    public function getServerComponentRoData()
-    {
-        return [
-            "title_test"=>"Titlu Test",
-            "content_test"=>"Conteniu Test"
-        ];
-    }
-
-    public function getClientComponentEnData(){
-        return [
-            "title_test"=>"Title Test",
-            "content_test"=>"Content Test"
-        ];
-    }
-
-    public function getClientComponentRoData(){
-        return [
-            "title_test"=>"Titlu Test",
-            "content_test"=>"Conteniu Test"
-        ];
-    }
+   
 }

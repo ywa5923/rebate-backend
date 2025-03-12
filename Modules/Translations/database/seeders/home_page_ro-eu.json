@@ -1,0 +1,13 @@
+{
+    "navbar": {
+        "home": "(eu)Acasa",
+        "about": "(eu)Despre noi",
+        "services": "(eu)Servicii",
+        "contact": "(eu)Contact"
+    },
+    "top-header": {
+        "title": "(eu)Cel mai bun site de brokeri",
+        "description": "(eu)Lorem ipsum lorem ipsum"
+    }
+
+}
