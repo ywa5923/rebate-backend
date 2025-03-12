@@ -31,10 +31,6 @@ class LocaleResourceService
             throw new \InvalidArgumentException("The 'lang' parameter is required.");
         }
 
-        if (empty($zoneCondition)) {
-            throw new \InvalidArgumentException("The 'zone' parameter is required.");
-        }
-
         return $this->repository->getLocaleMessages(
             $langCondition,
             $zoneCondition,

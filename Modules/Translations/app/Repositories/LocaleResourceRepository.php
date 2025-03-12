@@ -13,7 +13,7 @@ class LocaleResourceRepository implements RepositoryInterface
 {
     use LocaleResourceTrait;
 
-    public function getLocaleMessages(array $langCondition,array $zoneCondition, array $whereConditions, array $whereInConditions)
+    public function getLocaleMessages(array $langCondition,array|null $zoneCondition, array $whereConditions, array $whereInConditions)
     {
         $queryBuilder = LocaleResource::with(["translations" => function (Builder $query) use ($langCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
@@ -21,8 +21,13 @@ class LocaleResourceRepository implements RepositoryInterface
         }]);
 
         $queryBuilder->where(function ($query) use ($zoneCondition) {
-            $query->where(... $zoneCondition)
-            ->orWhere("is_invariant",1);
+            if($zoneCondition!==null){
+                $query->where(... $zoneCondition)
+                ->orWhere("is_invariant",1);
+            }else{
+                $query->where("is_invariant",1);
+            }
+           
         });
 
         // Apply additional where conditions for key and section params if present
