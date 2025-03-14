@@ -48,7 +48,8 @@ class BrokerController extends Controller
 
     public function index(BrokersQueryParser $queryParser,BrokerService $brokerService,Request $request)
     {
-     // dd($queryParser->parse($request)->getArrayResults());
+
+      //dd($queryParser->parse($request)->getArrayResults());
       //dd($queryParser->parse($request)->getWhereInParam("filter_offices"));
        return $brokerService->process($queryParser->parse($request));
 
