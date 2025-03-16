@@ -28,15 +28,14 @@ class BrokerService
         $repo=$this->repository;
         $columns=!empty($queryParser->getWhereInParam("columns"))?$queryParser->getWhereInParam("columns")[1]:null;
         $orderBy=!empty($queryParser->getOrderBy())?$queryParser->getOrderBy()[0]:null;
-        $countryCondition= $queryParser->getWhereParam("country");
+        $zoneCondition= $queryParser->getWhereParam("zone");
         $languageCondition = $queryParser->getWhereParam("language");
-        if(empty($countryCondition) || empty($languageCondition)){
-            return response()->json(['error' => 'Country and language parameters are required'], 422);
+       
+        if(empty($zoneCondition) || empty($languageCondition)){
+            return response()->json(['error' => 'Zone and language parameters are required'], 422);
         }
-        $country=$countryCondition[2];
-      
-        $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
-        
+        $zone=$zoneCondition[2];
+ 
         return $repo->getDynamicColumns(
             $languageCondition,
             //change to zone code in production

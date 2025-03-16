@@ -9,11 +9,12 @@ class BrokerFilterQueryParser extends BaseQueryParser
 {
     protected $querySafeParams = [
        "language"=>['eq'],
-       "country"=>["eq"]
+       "zone"=>["eq"]
     ];
   
     protected $columnMap = [
        "language"=>"language_code",
+       "zone"=>"zone_code"
      
       
     ];

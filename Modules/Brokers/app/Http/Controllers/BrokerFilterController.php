@@ -25,17 +25,14 @@ class BrokerFilterController extends Controller
     public function index(BrokerFilterQueryParser $queryParser, Request $request)
     {
         $queryParser->parse($request);
-        $countryCondition=$queryParser->getWhereParam("country");
+        $zonecondition=$queryParser->getWhereParam("zone");
        
         $languageCondition = $queryParser->getWhereParam("language");
-        if(empty($languageCondition) || empty($countryCondition)){
+        if(empty($languageCondition) || empty($zonecondition)){
             //throw new \Exception("country or language not found");
-            return response()->json(['error' => 'Country and language parameters are required'], 422);
+            return response()->json(['error' => 'Zone and language parameters are required'], 422);
         }
-        $country=$countryCondition[2];
-        $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
-        //to be changed in production to $zone
-        $zonecondition=["zone_code","=","zone1"];
+       
         $companyRepo = new CompanyRepository();
         $regulatorRepo = new RegulatorRepository();
         $optionsValuesRepo = new OptionValueRepository();

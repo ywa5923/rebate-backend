@@ -9,7 +9,7 @@ class BrokersQueryParser extends BaseQueryParser
 {
     protected $querySafeParams = [
        "language"=>['eq'],
-       "country"=>['eq'],
+       "zone"=>['eq'],
        "order_by"=>['eq'],
        "order_direction"=>['eq'],
        "columns"=>['in'],
@@ -31,6 +31,7 @@ class BrokersQueryParser extends BaseQueryParser
   
     protected $columnMap = [
        "language"=>"language_code",
+       "zone"=>"zone_code",
        "filter_offices"=>"offices",
        "filter_headquarters"=>"headquarters",
        "filter_min_deposit"=>"min_deposit",

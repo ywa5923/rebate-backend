@@ -49,17 +49,9 @@ class BrokerController extends Controller
     public function index(BrokersQueryParser $queryParser,BrokerService $brokerService,Request $request)
     {
 
-      //dd($queryParser->parse($request)->getArrayResults());
+     
       //dd($queryParser->parse($request)->getWhereInParam("filter_offices"));
        return $brokerService->process($queryParser->parse($request));
-
-        //brokerService->process($queryParams,repository)
-
-        //get brokers registered with  default language = $language
-
-       // $defaultLanguageBrokers= Broker::with('dynamicOptionsValues')->where('default_language',  $language)->get();
-
-        //get brokers registered with other default language and was translated to $language by AI
 
         //tested with http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&columns[in]=trading_name,trading_fees,account_type,jurisdictions,promotion_title,fixed_spreads,support_options&order_by[eq]=+account_type
 

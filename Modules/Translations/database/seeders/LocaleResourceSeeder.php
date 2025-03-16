@@ -14,19 +14,15 @@ class LocaleResourceSeeder extends Seeder
     //se adauga mai intai fisierele in limba engleza 
 
     public $files=[
-        'database/seeders/home_page_en-eu.json',
-        'database/seeders/home_page_en-sua.json',
-        'database/seeders/home_page_en-invariant.json',
-        'database/seeders/home_page_ro-eu.json',
-        'database/seeders/home_page_ro-sua.json',
-        'database/seeders/home_page_ro-invariant.json',
+        'layout_en-invariant.json',
+        'layout_ro-invariant.json',
     ];
 
     public function run()
     {
         foreach($this->files as $file)
         {
-            $fileName = module_path('Translations', $file);
+            $fileName = module_path('Translations', 'database/seeders/'.$file);
             $this->insertJsonFile($fileName);
         }
      
