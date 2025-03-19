@@ -14,6 +14,8 @@ class LocaleResourceSeeder extends Seeder
     //se adauga mai intai fisierele in limba engleza 
 
     public $files=[
+        'home_page_en-invariant.json',
+        'home_page_ro-invariant.json',
         'layout_en-invariant.json',
         'layout_ro-invariant.json',
     ];
