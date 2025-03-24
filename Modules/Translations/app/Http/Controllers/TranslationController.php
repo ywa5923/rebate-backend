@@ -41,14 +41,7 @@ class TranslationController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //return view('translations::create');
-    }
-
+   
     /**
      * @OA\Post(
      *     path="/api/v1/translation",

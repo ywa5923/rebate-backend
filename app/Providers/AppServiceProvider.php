@@ -9,6 +9,9 @@ use Illuminate\Console\Application;
 use Illuminate\Hashing\HashManager;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
+use App\Services\OpenAiService;
+use OpenAI;
+use OpenAI\Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->make('hash')->extend('sha256', function() {
             return new ShaHasher;
+        });
+
+        $this->app->singleton(OpenAiService::class, function ($app) {
+            return new OpenAiService(OpenAI::client(config('services.openai.api_key')));
         });
 
 

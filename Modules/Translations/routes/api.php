@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Translations\Http\Controllers\LocaleController;
 use Modules\Translations\Http\Controllers\TranslationController;
 use Modules\Translations\Http\Controllers\LocaleResourceController;
 use Modules\Translations\Http\Controllers\ZoneController;
@@ -22,6 +23,8 @@ use Modules\Translations\Http\Controllers\ZoneController;
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('translations', TranslationController::class)->names('translations');
-    Route::apiResource("locale_resources",LocaleResourceController::class)->names("locale_resources");
-    Route::apiResource("zones",ZoneController::class)->names("zones");
+    Route::get("locale_resources",[LocaleResourceController::class,'index']);
+    Route::get("zones",[ZoneController::class,'index']);
+    
+    Route::apiResource("locales",LocaleController::class)->names('locales');
 });

@@ -5,29 +5,31 @@ namespace Modules\Translations\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Translations\Models\LocaleResource;
 use Modules\Translations\Models\Translation;
+use Illuminate\Support\Facades\File;
 
 class LocaleResourceSeeder extends Seeder
 {
     //sectiunile care sunt invariante se adauga zona ca invariant:
     //ex:   'database/seeders/home_page_en-invariant.json',
     //-------------------------------------------------------//
-    //se adauga mai intai fisierele in limba engleza 
+    //se adauga mai intai fisierele in limba engleza si apoi se adauga celelalte locale
 
-    public $files=[
-        'home_page_en-invariant.json',
-        'home_page_ro-invariant.json',
-        'layout_en-invariant.json',
-        'layout_ro-invariant.json',
-    ];
+   
 
     public function run()
     {
-        foreach($this->files as $file)
-        {
-            $fileName = module_path('Translations', 'database/seeders/'.$file);
-            $this->insertJsonFile($fileName);
+        $localesPath = module_path('Translations', 'database/seeders/locales');
+        
+        // Get all JSON files from all locale directories
+        $files = [];
+        foreach (File::directories($localesPath) as $localeDir) {
+            $files = array_merge($files, File::glob($localeDir . '/*.json'));
         }
-     
+
+        foreach($files as $file)
+        {
+            $this->insertJsonFile($file);
+        }
     }
 
     public function insertJsonFile($fileName)
