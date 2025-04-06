@@ -4,7 +4,7 @@ namespace Modules\Brokers\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Services\TranslateTrait;
+use App\Utilities\TranslateTrait;
 
 class BrokerOptionResource extends JsonResource
 {

@@ -35,4 +35,12 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'cloudflare' => [
+        'key' => env('CLOUDFLARE_KEY'),
+        'secret' => env('CLOUDFLARE_SECRET'),
+        'endpoint' => env('CLOUDFLARE_ENDPOINT'),
+        'bucket' => env('CLOUDFLARE_BUCKET'),
+        'token' => env('CLOUDFLARE_TOKEN'),
+        'public_url' => env('CLOUDFLARE_PUBLIC_URL'),
+    ],
 ];

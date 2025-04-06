@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Modules\Translations\Models\LocaleResource;
 use Modules\Translations\Models\Translation;
+use Modules\Translations\Utilities\JsonTranslationImporter;
+use Illuminate\Foundation\Application;
 
 class LoadLocales extends Command
 {
@@ -28,7 +30,11 @@ class LoadLocales extends Command
     public function handle()
     {
        Translation::where('translationable_type', LocaleResource::class)->delete();
-        LocaleResource::query()->delete();
-         $this->call('db:seed', ["class" => "\\Modules\\Translations\\Database\\Seeders\\LocaleResourceSeeder"]);
+       LocaleResource::query()->delete();
+
+        
+        $this->call('db:seed', [
+            "class" => "\\Modules\\Translations\\Database\\Seeders\\LocaleResourceSeeder"
+        ]);
     }
 }

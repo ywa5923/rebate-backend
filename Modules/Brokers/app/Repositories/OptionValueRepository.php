@@ -12,19 +12,23 @@ class OptionValueRepository
     public function getUniqueList($language,$slug,$zoneCondition)
     {
         $results=[];
-       
+        //dd($language,$slug,$zoneCondition);
          OptionValue::with(["translations"=>function (Builder $query) use ($language){
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
              $query->where(...$language);
+             
          }])->where("option_slug","=",$slug)->where(function (Builder $query) use ($zoneCondition) {
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+           
             $query->where(...$zoneCondition)->orWhere('is_invariant', true);
-        })->chunk(100,function ($options) use (&$results){
+        })
+         
+        ->chunk(100,function ($options) use (&$results){
             $collection=new DynamicOptionValueCollection($options);
              $list=[];
             foreach($collection->resolve() as $option)
             {
-
+                
                 //if the optionValue contain a link we will keep only the text
                 preg_match('/<a[^>]*>(.*?)<\/a>/', $option["value"], $match);
                 $optionValue=($match)?$match[1]:$option["value"];
@@ -39,7 +43,6 @@ class OptionValueRepository
             $results= array_merge($results,$list);
          });
 
-         //dd($results);
          return array_unique($results);
     }
 }

@@ -75,5 +75,19 @@
         "dark":"Dark",
         "light":"Light"
 
+    },
+    "urls":{
+        "brokers":"brokers",
+        "forex-brokers":"forex-brokers",
+        "forex-broker":"forex-broker",
+        "forex-brokers-rebates":"forex-brokers-rebates",
+        "crypto":"crypto",
+        "props":"props",
+        "tools":"tools",
+        "academy":"academy",
+        "trading-academy":"trading-academy",
+        "learn-forex-trading":"learn-forex-trading",
+        "learn-crypto-trading":"learn-crypto-trading",
+        "learn-prop-trading":"learn-prop-trading"
     }
 }

@@ -1,70 +1,41 @@
 <?php
-
-namespace Modules\Translations\Database\Seeders;
-
-use Illuminate\Database\Seeder;
+namespace Modules\Translations\Utilities;
+use Illuminate\Support\Facades\File;
 use Modules\Translations\Models\LocaleResource;
 use Modules\Translations\Models\Translation;
-use Illuminate\Support\Facades\File;
-use Modules\Translations\Utilities\JsonTranslationImporter;
-class LocaleResourceSeeder extends Seeder
+class JsonTranslationImporter
 {
-    public function __construct(protected JsonTranslationImporter $jsonImporter)
+    public function __construct(){}
+
+    public function importDirectory(string $directoryPath): void
     {
-        
-    }
-    //sectiunile care sunt invariante se adauga zona ca invariant:
-    //ex:   'database/seeders/home_page_en-invariant.json',
-    //-------------------------------------------------------//
-    //se adauga mai intai fisierele in limba engleza si apoi se adauga celelalte locale
-
-   
-
-    public function run()
-    {
-        $localesPath = module_path('Translations', 'database/seeders/locales');
-        
-        // Get all JSON files from all locale directories
-        $files = [];
-        foreach (File::directories($localesPath) as $localeDir) {
-            $files = array_merge($files, File::glob($localeDir . '/*.json'));
-        }
-
-        // Sort files to ensure English files are processed first
-        usort($files, function($a, $b) {
-            $isEnA = strpos($a, '_en-') !== false;
-            $isEnB = strpos($b, '_en-') !== false;
-            return $isEnB - $isEnA;
-        });
-
-        foreach($files as $file)
+        $jsonFiles = File::glob($directoryPath . '/*.json');
+        foreach($jsonFiles as $jsonFile)
         {
-           // $this->insertJsonFile($file);
-                $this->jsonImporter->importJson($file);
-            }
+            $this->importJson($jsonFile);
+        }
     }
 
-    public function insertJsonFile($fileName)
+    public function importJson(string $filePath): void
     {
-      
-        $latestDash = strrpos($fileName, '_');
-        $latestDot = strrpos($fileName, '.');
-        $latestSlash = strrpos($fileName, "/");
+        $latestDash = strrpos($filePath, '_');
+        $latestDot = strrpos($filePath, '.');
+        $latestSlash = strrpos($filePath, "/");
 
-        $key = substr($fileName, $latestSlash + 1, $latestDash - $latestSlash - 1);
-        $localeInfo = substr($fileName, $latestDash + 1, $latestDot - $latestDash - 1);
+        $key = substr($filePath, $latestSlash + 1, $latestDash - $latestSlash - 1);
+        $localeInfo = substr($filePath, $latestDash + 1, $latestDot - $latestDash - 1);
         [$locale, $zone] = explode("-", $localeInfo);
 
         if(empty($key) || empty($locale) || empty($zone))
         {
-            throw new \Exception("Invalid file name: " . $fileName);
+            throw new \Exception("Invalid file name: " . $filePath);
         }
 
         // Read and decode JSON file
-        $jsonContent = json_decode(file_get_contents($fileName), true);
+        $jsonContent = json_decode(file_get_contents($filePath), true);
 
         if (!$jsonContent) {
-            throw new \Exception("Invalid JSON content in: " . $fileName);
+            throw new \Exception("Invalid JSON content in: " . $filePath);
         }
 
         // Insert into LocaleResource or Translation
@@ -73,9 +44,7 @@ class LocaleResourceSeeder extends Seeder
         } else {
             $this->insertTranslatedLocale($jsonContent, $key, $zone, $locale);
         }
-
     }
-
     /**
      * Insert English locale resources.
      */
@@ -121,5 +90,4 @@ class LocaleResourceSeeder extends Seeder
         }
     }
 
-   
 }

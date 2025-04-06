@@ -2,7 +2,7 @@
 
 namespace Modules\Brokers\Services;
 
-use App\Services\BaseQueryParser;
+use App\Utilities\BaseQueryParser;
 use Illuminate\Http\Request;
 
 class BrokerFilterQueryParser extends BaseQueryParser

@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "abbasudo/laravel-purity": "^3.3",
+        "aws/aws-sdk-php": "^3.342",
         "calebporzio/sushi": "^2.4",
         "darkaonline/l5-swagger": "^8.6",
         "doctrine/dbal": "^4.0",

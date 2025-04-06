@@ -2,7 +2,7 @@
 
 namespace Modules\Translations\Services;
 
-use App\Services\BaseQueryParser;
+use App\Utilities\BaseQueryParser;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Translations\Repositories\TranslationRepository;
 use Modules\Translations\Models\Translation;

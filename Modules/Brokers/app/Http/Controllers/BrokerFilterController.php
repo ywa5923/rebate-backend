@@ -27,6 +27,8 @@ class BrokerFilterController extends Controller
         $queryParser->parse($request);
         $zonecondition=$queryParser->getWhereParam("zone");
        
+        //to be change to the real zone
+        $zonecondition[2]="zone1";
         $languageCondition = $queryParser->getWhereParam("language");
         if(empty($languageCondition) || empty($zonecondition)){
             //throw new \Exception("country or language not found");
@@ -43,7 +45,7 @@ class BrokerFilterController extends Controller
         $filterNames=$filterRepo->getSettingsParam("page_brokers",$languageCondition)["filters"];
 
         $currencies=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::ACCOUNT_CURRENCIES,  $zonecondition);
-
+        
         $mobilePlatforms=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::MOBILE_PLATFORM_LINK,  $zonecondition);
         $webPlatforms=$optionsValuesRepo->getUniqueList($languageCondition, BrokerOptionInterface::WEB_PLATFORM_LINK,  $zonecondition);
 

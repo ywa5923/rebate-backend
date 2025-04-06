@@ -11,7 +11,7 @@
         "trading_academy": "Académie de trading",
         "learn_forex_trading": "Apprendre le trading Forex",
         "learn_crypto_trading": "Apprendre le trading de crypto",
-        "learn_prop_trading": "Apprendre le trading de Prop",
+        "learn_prop_trading": "Apprendre le trading Prop",
         "what_are": "Qu'est-ce que",
         "forex_broker": "Courtier Forex",
         "crypto_exchange": "Échange de crypto",
@@ -41,7 +41,7 @@
         "contests": "Concours",
         "faqs": "FAQ",
         "payment_information": "Informations de paiement",
-        "rebate_program": "Programme de remise",
+        "rebate_program": "Programme de rabais",
         "affiliate_program": "Programme d'affiliation",
         "help_center": "Centre d'aide",
         "contact_us": "Contactez-nous",
@@ -71,8 +71,22 @@
         "brokers_promotions": "Promotions des courtiers",
         "brokers_contests": "Concours des courtiers",
         "login": "Connexion",
-        "join_now": "Rejoindre maintenant",
+        "join_now": "Rejoignez maintenant",
         "dark": "Sombre",
         "light": "Clair"
+    },
+    "urls": {
+        "brokers": "courtiers",
+        "forex-brokers": "courtiers-forex",
+        "forex-broker": "courtier-forex",
+        "forex-brokers-rebates": "remboursements-courtiers-forex",
+        "crypto": "crypto",
+        "props": "proprietaires-fonds",
+        "tools": "outils",
+        "academy": "academie",
+        "trading-academy": "academie-trading",
+        "learn-forex-trading": "apprendre-trading-forex",
+        "learn-crypto-trading": "apprendre-trading-crypto",
+        "learn-prop-trading": "apprendre-trading-proprietaire"
     }
 }

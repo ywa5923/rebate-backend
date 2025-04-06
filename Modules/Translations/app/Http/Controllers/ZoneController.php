@@ -7,7 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Translations\Models\Country;
-use Modules\Translations\Services\ZoneQueryParser;
+use Modules\Translations\Utilities\ZoneQueryParser;
 
 class ZoneController extends Controller
 {

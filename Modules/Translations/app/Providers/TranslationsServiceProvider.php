@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\Translations\Repositories\TranslationRepository;
 use Modules\Translations\Services\TranslationService;
+use Modules\Translations\Services\LocalesTranslator;
+use Modules\Translations\Utilities\JsonTranslationImporter;
+use Illuminate\Support\Facades\App;
+use App\Services\AiService;
 
 class TranslationsServiceProvider extends ServiceProvider
 {
@@ -36,6 +40,9 @@ class TranslationsServiceProvider extends ServiceProvider
         $this->app->bind(TranslationRepository::class);
         $this->app->bind(TranslationService::class, function ($app) {
             return new TranslationService($app->make(TranslationRepository::class));
+        });
+        $this->app->singleton(LocalesTranslator::class,function($app){
+            return new LocalesTranslator(App::make(AiService::class),new JsonTranslationImporter());
         });
     }
 

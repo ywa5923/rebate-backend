@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Translations\Services;
+namespace Modules\Translations\Utilities;
 
-use App\Services\BaseQueryParser;
+use App\Utilities\BaseQueryParser;
 use Illuminate\Http\Request;
 
 class TranslationQueryParser extends BaseQueryParser

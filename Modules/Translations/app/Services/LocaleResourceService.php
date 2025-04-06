@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\Translations\Services;
-use App\Services\BaseQueryParser;
+use App\Utilities\BaseQueryParser;
 use Modules\Translations\Transformers\LocaleResourceCollection;
 use Modules\Translations\Repositories\LocaleResourceRepository;
 

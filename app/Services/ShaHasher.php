@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Auth;
+namespace App\Services;
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Hashing\AbstractHasher;

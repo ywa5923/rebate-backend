@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Translations\Services\TranslationService;
-use Modules\Translations\Services\TranslationQueryParser;
+use Modules\Translations\Utilities\TranslationQueryParser;
 
 class TranslationController extends Controller
 {

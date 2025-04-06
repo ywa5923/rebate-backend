@@ -3,7 +3,7 @@
 namespace Modules\Brokers\Services;
 
 use App\Repositories\RepositoryInterface;
-use App\Services\BaseQueryParser;
+use App\Utilities\BaseQueryParser;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\Zone;
 use Modules\Brokers\Transformers\BrokerCollection;
