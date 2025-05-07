@@ -26,15 +26,15 @@ class MagicImport extends Command
      */
     public function handle()
     {
-        $this->call('app:export-brokers');
-        $this->call('app:export-regulators');
-        $this->call('app:export-companies');
-        $this->call('app:export-deal-types');
-        $this->call('app:export-urls');
-        $this->call('app:export-dynamic-options');
+        // $this->call('app:export-brokers');
+        // $this->call('app:export-regulators');
+        // $this->call('app:export-companies');
+        // $this->call('app:export-deal-types');
+        // $this->call('app:export-urls');
+        // $this->call('app:export-dynamic-options');
 
-        $this->info("====...switching to new database...====");
-        DB::statement("use fxrebate");
+        // $this->info("====...switching to new database...====");
+        // DB::statement("use fxrebate");
 
         $this->info("\\\\///...importing brokers to new database");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\StaticBrokersSeeder"]);
@@ -82,6 +82,9 @@ class MagicImport extends Command
 
         $this->info("\\\\///...importing settings table ");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\SettingsSeeder"]);
+
+        $this->info("\\\\///...importing zones table ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ZonesSeeder"]);
     
     }
 }
