@@ -23,7 +23,7 @@ services:
       - ./docker/mysql/db_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
     ports:
-      - 3306:3306
+      - 5306:3306
   nginx:
     image: nginx:latest
     ports:
