@@ -1,0 +1,97 @@
+id,name,slug,data_type,form_type,meta_data,for_crypto,for_brokers,for_props,required,position,default_language,option_category_id,created_at,updated_at
+1,"Position Home",position_home,int,number,NULL,1,1,1,0,1,en,1,NULL,NULL
+2,"Position List",position_list,int,number,NULL,1,1,1,0,1,en,1,NULL,NULL
+3,"Position Grid ",position_grid,int,number,NULL,1,1,1,0,1,en,1,NULL,NULL
+4,"Position Table",position_table,int,number,NULL,1,1,1,0,1,en,1,NULL,NULL
+5,Popularity,popularity,numeric,number,NULL,1,1,1,0,1,en,2,NULL,NULL
+6,Regulation,regulation,numeric,number,NULL,1,1,1,0,1,en,2,NULL,NULL
+7,"Trading Fees",trading_fees,numeric,number,NULL,1,1,1,0,1,en,2,NULL,NULL
+8,"Customer Support",customer_support,text,textarea,NULL,1,1,1,0,1,en,2,NULL,NULL
+9,Features,features,text,textarea,NULL,1,1,1,0,1,en,2,NULL,NULL
+10,"Trustpilot Ranking",trustpilot_ranking,numeric,number,NULL,1,1,1,0,1,en,3,NULL,NULL
+11,"ForexPeaceArmy Ranking",forex_peace_army_ranking,numeric,number,NULL,1,1,1,0,1,en,3,NULL,NULL
+12,"WikiFX Ranking",wikifx_ranking,numeric,number,NULL,1,1,1,0,1,en,3,NULL,NULL
+13,Highlights,"highlights ",text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+14,Notes,notes,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+15,"Promotion Title",promotion_title,string,text,NULL,1,1,1,0,1,en,5,NULL,NULL
+16,"Promotion Details",promotion_details,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+17,"Promotion Banner",promotion_banner,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+18,"Contest Title",contest_title,string,text,NULL,1,1,1,0,1,en,5,NULL,NULL
+19,"Contest Details",contest_details,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+20,"Contest Banner",contest_banner,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+21,"Short Payment Options",short_payment_options,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+22,Jurisdictions,jurisdictions,text,multi_select,NULL,1,1,1,0,1,en,5,NULL,NULL
+23,"Max. Cashback",max_cashback,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+24,Badge,badge,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+25,"New Account Notes",new_account_notes,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+26,"Old Account Notes",old_account_notes,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+27,"Partner Notes",partner_notes,text,textarea,NULL,1,1,1,0,1,en,5,NULL,NULL
+28,"Account type",account_type,text,textarea,NULL,1,1,0,1,1,en,6,NULL,NULL
+29,"Challenge type",challenge_type,text,textarea,NULL,0,0,1,1,1,en,6,NULL,NULL
+30,"Trading Instruments",trading_nstruments,text,multi_select,NULL,1,1,1,1,1,en,6,NULL,NULL
+31,"Spreads Value",spreads_value,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+32,"Spreads URL",spreads_url,string,text,NULL,1,1,1,0,1,en,6,NULL,NULL
+33,"Commission Value",commission_value,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+34,"Commission URL",commission_url,string,text,NULL,1,1,1,0,1,en,6,NULL,NULL
+35,"Rollover (Swaps) Value",rollover_value,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+36,"Rollover (Swaps) URL","rollover _url",string,text,NULL,1,1,1,0,1,en,6,NULL,NULL
+37,"Fixed Spreads",fixed_spreads,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+38,"Variable Spreads",variable_spreads,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+39,"Min. Deposit",min_deposit,numeric,money,NULL,1,1,1,0,1,en,6,NULL,NULL
+40,"Max. Leverage",max_leverage,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+41,"Min. Trade Size",min_trade_size,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+42,"Max. Trade Size",max_trade_size,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+43,"Stop Out Level",stop_out_level,numeric,number,NULL,1,1,1,0,1,en,6,NULL,NULL
+44,"Execution Model",execution_model,text,multi_select,NULL,1,1,1,0,1,en,6,NULL,NULL
+45,"1-Click Trading",1_click_trading,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+46,"Trailing Stops",trailing_stops,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+47,"Allow Scalping",allow_scalping,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+48,"Allow Hedging",allow_hedging,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+49,"Allow News Trading",allow_news_trading,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+50,"Allow Expert Advisors (EAs)",allow_expert_advisors,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+51,"Islamic Accounts",islamic_accounts,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+52,"Social Trading",social_trading,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+53,"Copy Trading",copy_trading,text,textarea,NULL,1,1,1,0,1,en,6,NULL,NULL
+54,"Trading Bonuses",trading_bonuses,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+55,"Trading Contests",trading_contests,boolean,checkbox,NULL,1,1,1,0,1,en,6,NULL,NULL
+56,"Min. Fee Challenge",min_fee_challenge,numeric,money,NULL,0,0,1,0,1,en,6,NULL,NULL
+57,"Trading API",trading_api,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+58,"Cent Accounts",cent_accounts,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+59,"MAM/ PAMM Platforms",mam_pamm_platforms,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+60,"MAM/ PAMM Leaderboards",mam_pamm_leaderboards,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+61,"Managed Accounts",managed_accounts,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+62,"Free VPS",free_vps,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+63,"Non-expiring Demo Accounts",non-expiring_demo_accounts,boolean,checkbox,NULL,1,1,1,0,1,en,7,NULL,NULL
+64,"Deposit Methods",deposit_methods,string,multiple_select,NULL,1,1,0,0,1,en,8,NULL,NULL
+65,"Withdrawal Methods",withdrawal_methods,string,multiple_select,NULL,1,1,0,0,1,en,8,NULL,NULL
+66,"Client Funds Bank",client_funds_bank,string,string,NULL,1,1,1,0,1,en,8,NULL,NULL
+67,"Challenge Payment Methods",challenge_payment_methods,string,multiple_select,NULL,0,0,1,0,1,en,8,NULL,NULL
+68,"Profit Withdrawal Methods",profit_withdrawal_methods,string,multiple_select,NULL,1,1,1,0,1,en,8,NULL,NULL
+69,"Interest on Free Margin",interest_on_free_margin,boolean,checkbox,NULL,1,1,1,0,1,en,8,NULL,NULL
+70,"Broker to Broker Transfer",broker_to_broker_transfer,boolean,checkbox,NULL,1,1,0,0,1,en,8,NULL,NULL
+71,"Prop  to Prop Transfer",prop_to_prop_transfer,boolean,checkbox,NULL,0,0,1,0,1,en,8,NULL,NULL
+72,"Regulatory Deposit Insurance",regulatory_deposit_insurance,boolean,checkbox,NULL,1,1,1,0,1,en,8,NULL,NULL
+73,"Negative Balance Protection",negative_balance_protection,boolean,checkbox,NULL,1,1,1,0,1,en,8,NULL,NULL
+74,"Segregated Accounts",segregated_accounts,boolean,checkbox,NULL,1,1,1,0,1,en,8,NULL,NULL
+75,"Crypto Rebates",crypto_rebates,boolean,checkbox,NULL,1,1,1,0,1,en,8,NULL,NULL
+76,Public,public,boolean,checkbox,NULL,1,1,1,0,1,en,10,NULL,NULL
+77,"Visible in User`s Portal",visible_in_user_portal,boolean,checkbox,NULL,1,1,1,0,1,en,10,NULL,NULL
+78,"New Broker",new_broker,boolean,checkbox,NULL,1,1,1,0,1,en,10,NULL,NULL
+79,"Public Live URL",public_live_url,boolean,checkbox,NULL,1,1,1,0,1,en,10,NULL,NULL
+80,Path,path,string,string,NULL,1,1,1,0,1,en,11,NULL,NULL
+81,"Language for Marketing",language_for_marketing,string,string,NULL,1,1,1,0,1,en,11,NULL,NULL
+82,URI,uri,string,string,NULL,1,1,1,0,1,en,11,NULL,NULL
+83,Title,title,string,string,NULL,1,1,1,0,1,en,11,NULL,NULL
+84,Description,description,text,textarea,NULL,1,1,1,0,1,en,11,NULL,NULL
+85,Keywords,keywords,text,string,NULL,1,1,1,0,1,en,11,NULL,NULL
+86,"Support Languages","support_languages ",string,string,NULL,1,1,1,1,1,en,4,NULL,NULL
+87,"24h Support",24h_support,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+88,"Contact page URL",contact_page_url,string,string,NULL,1,1,1,0,1,en,4,NULL,NULL
+89,"Accept American clients",accept_american_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+90,"Accept Japanese Clients",accept_japanese_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+91,"Accept European Clients",accept_european_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+92,"Accept Canadian Clients",accept_canadian_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+93,"Accept Asian Clients",accept_asian_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+94,"Accept British Clients",accept_british_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+95,"Accept Russian Clients",accept_russian_clients,boolean,checkbox,NULL,1,1,1,0,1,en,4,NULL,NULL
+96,"Demo Trading Account URL",demo_trading_account_URL,string,string,NULL,1,1,1,0,1,en,1,NULL,NULL
