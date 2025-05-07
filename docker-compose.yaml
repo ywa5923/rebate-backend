@@ -1,7 +1,16 @@
-version: "3"
+
 
 services:
- 
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:9000"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mysql
   mysql:
     image: mysql:5.7
     restart: always
@@ -15,7 +24,15 @@ services:
       - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
     ports:
       - 3306:3306
-
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+    depends_on:
+      - laravel
 volumes:
   ###> doctrine/doctrine-bundle ###
   database_data:

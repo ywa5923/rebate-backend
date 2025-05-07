@@ -1,0 +1,16 @@
+{
+    "server": {
+        "tabs": {
+            "general-information": "Γενικές Πληροφορίες",
+            "users-reviews": "Κριτικές Χρηστών",
+            "rebates": "Επιστροφές",
+            "trading": "Συναλλαγές"
+        },
+        "tabs-keys": {
+            "general-information": "general-information",
+            "users-reviews": "users-reviews",
+            "rebates": "rebates",
+            "trading": "trading"
+        }
+    }
+}

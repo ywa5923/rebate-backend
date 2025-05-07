@@ -13,6 +13,13 @@ use Modules\Translations\Services\LocalesTranslator;
 use App\Services\StorageService;
 use Modules\Translations\Models\Locales;
 use Modules\Translations\Transformers\LocalesCollection;
+use Modules\Brokers\Models\Matrix;
+use Modules\Brokers\Models\MatrixDimension;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Transformers\MatrixDimensionCollection;
+use Modules\Brokers\Transformers\MatrixHeaderResource;
+use Modules\Brokers\Repositories\MatrixRepository;
 class LocaleController extends Controller
 {
     /**
@@ -20,6 +27,7 @@ class LocaleController extends Controller
      */
     public function index(): JsonResponse
     {
+
         try {
             $locales = Locales::all();
             $transformedLocales = new LocalesCollection($locales);
@@ -106,6 +114,10 @@ class LocaleController extends Controller
      */
     public function show(int $id): JsonResponse
     {
+
+     
+
+
         $locale = Locales::findOrFail($id);
 
         return new JsonResponse([

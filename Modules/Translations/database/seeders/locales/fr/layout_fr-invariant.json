@@ -75,18 +75,12 @@
         "dark": "Sombre",
         "light": "Clair"
     },
-    "urls": {
-        "brokers": "courtiers",
-        "forex-brokers": "courtiers-forex",
-        "forex-broker": "courtier-forex",
-        "forex-brokers-rebates": "remboursements-courtiers-forex",
-        "crypto": "crypto",
-        "props": "proprietaires-fonds",
-        "tools": "outils",
-        "academy": "academie",
-        "trading-academy": "academie-trading",
-        "learn-forex-trading": "apprendre-trading-forex",
-        "learn-crypto-trading": "apprendre-trading-crypto",
-        "learn-prop-trading": "apprendre-trading-proprietaire"
+    "route-maps": {
+        "/brokers": "/courtiers",
+        "/brokers/:brokerId/:brokerName": "/courtiers/:brokerId/:brokerName",
+        "/brokers/:brokerId/:brokerName/general-information": "/courtiers/:brokerId/:brokerName/informations-generales",
+        "/brokers/:brokerId/:brokerName/users-reviews": "/courtiers/:brokerId/:brokerName/avis-utilisateurs",
+        "/brokers/:brokerId/:brokerName/rebates": "/courtiers/:brokerId/:brokerName/ristournes",
+        "/brokers/:brokerId/:brokerName/trading": "/courtiers/:brokerId/:brokerName/trading"
     }
 }

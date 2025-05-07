@@ -1,0 +1,18 @@
+{
+    "server":{
+       "tabs":{
+        "general-information": "Informations générales",
+         "users-reviews": "Avis des utilisateurs",
+         "rebates": "Ristournes",
+         "trading": "Trading"
+       },
+       "tabs-keys": {
+          "general-information": "informations-generales",
+          "users-reviews": "avis-utilisateurs",
+          "rebates": "ristournes",
+          "trading": "trading"
+       }
+     }
+ }
+
+ 
