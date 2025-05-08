@@ -39,7 +39,7 @@ class BrokerService
         return $repo->getDynamicColumns(
             $languageCondition,
             //change to zone code in production
-            ["zone_code","=","zone1"],
+          $zoneCondition,
             $columns,
             $orderBy,
             $queryParser->getOrderDirection(),
