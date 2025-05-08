@@ -120,10 +120,10 @@ class SettingsSeeder extends Seeder
                 "mobile_platform_link"=>"Mobile Platforms",
                 "web_platform_link"=>"Web Platforms",
                 "client_popularity"=>"Client Popularity",
-                "regulator_rating"=> "Regulator Rating
+                "regulator_rating"=> "Regulator Rating"
                
             ]
             ];
     }
 }
-  //{"options":["notes","min_deposit","min_trade_size"],"relations":"regulators"}
+//   //{"options":["notes","min_deposit","min_trade_size"],"relations":"regulators"}
