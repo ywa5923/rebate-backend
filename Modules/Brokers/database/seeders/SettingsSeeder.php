@@ -72,7 +72,9 @@ class SettingsSeeder extends Seeder
                 "managed_accounts"=>"Conturi Administrate",
                 'fixed_spreads'=>"Spread-uri Fixe",
                 "mobile_platform_link"=>"Platforme de Mobil",
-                "web_platform_link"=>"Platforme Web"
+                "web_platform_link"=>"Platforme Web",
+                "client_popularity"=>"Popularitate Client",
+                "regulator_rating"=> "Rating Regulator",
 
             ]
             ];
@@ -116,8 +118,9 @@ class SettingsSeeder extends Seeder
                 "managed_accounts"=>"Managed Accounts",
                 'fixed_spreads'=>"Fixed Spreads",
                 "mobile_platform_link"=>"Mobile Platforms",
-                "web_platform_link"=>"Web Platforms"
-
+                "web_platform_link"=>"Web Platforms",
+                "client_popularity"=>"Client Popularity",
+                "regulator_rating"=> "Regulator Rating
                
             ]
             ];
