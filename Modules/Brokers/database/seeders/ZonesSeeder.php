@@ -4,9 +4,10 @@ namespace Modules\Brokers\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-use Modules\Brokers\Models\Setting;
-use Modules\Brokers\Models\Zone;
-use Modules\Translations\Models\Translation;
+
+use Modules\Translations\Models\Country;
+use Modules\Translations\Models\Zone;
+
 
 class ZonesSeeder extends Seeder
 {
@@ -18,15 +19,31 @@ class ZonesSeeder extends Seeder
                 "id"=>1,
                 "name" => "Europe",
                 "zone_code" => "eu",
-                "countries" => "ro,pl,bg,hu,sk,cs,lv,lt,ee,de,fr,es,it,pt,ru,ua,se"
+               
             ],
             [
                 "id"=>2,
                 "name" => "Asia",
                 "zone_code" => "as",
-                "countries" => "ch"
+               
             ]
             
             ]);
+
+            Country::insert([
+                [
+                    "id"=>1,
+                    "name" => "Romania",
+                    "country_code" => "ro",
+                    "zone_id" => 1
+                ],
+                [
+                    "id"=>2,
+                    "name" => "Japan",
+                    "country_code" => "jp",
+                    "zone_id" => 2
+                ]
+                
+                ]);
     }
 }

@@ -36,30 +36,30 @@ class MagicImport extends Command
         // $this->info("====...switching to new database...====");
         // DB::statement("use fxrebate");
 
-        // $this->info("\\\\///...importing brokers to new database");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\StaticBrokersSeeder"]);
+        $this->info("\\\\///...importing brokers to new database");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\StaticBrokersSeeder"]);
 
-        // $this->info("\\\\///...importing companies to new database");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\CompaniesSeeder"]);
+        $this->info("\\\\///...importing companies to new database");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\CompaniesSeeder"]);
 
-        // $this->info("\\\\///...importing regulators ");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\RegulatorsSeeder"]);
+        $this->info("\\\\///...importing regulators ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\RegulatorsSeeder"]);
 
 
-        // $this->info("\\\\///...importing dealtypes ");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\DealTypesSeeder"]);
+        $this->info("\\\\///...importing dealtypes ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\DealTypesSeeder"]);
 
-        // $this->info("\\\\///...importing Option Categories");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
+        $this->info("\\\\///...importing Option Categories");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
 
-        // $this->info("\\\\///...importing URLs ");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
+        $this->info("\\\\///...importing URLs ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
 
-        // $this->info("\\\\///...importing broker_options ");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+        $this->info("\\\\///...importing broker_options ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
 
-        // $this->info("\\\\///...importing broker options value ");
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsValuesSeeder"]);
+        $this->info("\\\\///...importing broker options value ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsValuesSeeder"]);
 
 
         $this->info("\\\\///...translating brokers table ");
