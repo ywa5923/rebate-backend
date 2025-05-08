@@ -28,7 +28,7 @@ class BrokerFilterController extends Controller
         $zonecondition=$queryParser->getWhereParam("zone");
        
         //to be change to the real zone
-        $zonecondition[2]="zone1";
+        //$zonecondition[2]="zone1";
         $languageCondition = $queryParser->getWhereParam("language");
         if(empty($languageCondition) || empty($zonecondition)){
             //throw new \Exception("country or language not found");
