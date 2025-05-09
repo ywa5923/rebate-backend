@@ -88,6 +88,7 @@ class FilterRepository
         $query->where(...$languageCondition);
       }])->where("key", $key)->get();
 
+     
       if (!$setting) {
         return null; // Returnează null dacă setarea nu există
       }

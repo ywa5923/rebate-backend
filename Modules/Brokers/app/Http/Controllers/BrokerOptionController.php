@@ -32,8 +32,11 @@ class BrokerOptionController extends Controller
 
             try{
                 $optionsCollection = new BrokerOptionCollection($rep->translate($languageParams));
+               
                 $filterRepo = new FilterRepository();
+              
                 $brokerExtColumns = $filterRepo->getSettingsParam("page_brokers", $languageParams)["broker_ext_columns"];
+             
             }catch(\Exception $e){
                 return response()->json(['error' => 'Error getting broker options'], 422);
             }catch(\JsonException $e){

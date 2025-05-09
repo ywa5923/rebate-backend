@@ -87,7 +87,7 @@ class BrokerRepository implements RepositoryInterface
     public function makeQuery($languageCondition, $zoneCondition, $dynamicColumns, $extRelations, $orderBy, $orderDirection, $filters): LengthAwarePaginator
     {
 
-        // dd($zoneCondition);
+       
         DB::enableQueryLog();
         $qb = Broker::select(["id"])->with([
             // 'translations' => function (Builder $query) use ($languageCondition,$zoneCondition,) {

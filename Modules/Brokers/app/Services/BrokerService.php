@@ -34,8 +34,8 @@ class BrokerService
         if(empty($zoneCondition) || empty($languageCondition)){
             return response()->json(['error' => 'Zone and language parameters are required'], 422);
         }
-        $zone=$zoneCondition[2];
- 
+       
+       
         return $repo->getDynamicColumns(
             $languageCondition,
             //change to zone code in production
