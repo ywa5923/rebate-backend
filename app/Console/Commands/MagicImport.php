@@ -85,6 +85,15 @@ class MagicImport extends Command
 
         $this->info("\\\\///...importing zones table ");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ZonesSeeder"]);
-    
+
+        $this->info("\\\\///...importing dropdowns ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DropdownSeeder"]);
+
+        $this->info("\\\\///...importing form types ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\FormTypesSeeder"]);
+
+       
+
+
     }
 }

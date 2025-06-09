@@ -20,5 +20,10 @@ class MatrixHeader extends Model
    {
        return $this->morphMany(Translation::class,'translationable');
    }
+
+   public function formType():BelongsTo
+   {
+    return $this->belongsTo(FormType::class);
+   }
    
 }

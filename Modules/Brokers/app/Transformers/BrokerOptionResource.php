@@ -15,8 +15,10 @@ class BrokerOptionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-          
+           
             $this->slug=>$this->translateBrokerOption($this->slug),
+            "slug"=>$this->slug,
+            "name"=>$this->translateBrokerOption($this->slug),
             "default_loading"=>$this->default_loading,
             "default_loading_position"=>$this->default_loading_position,
             "dropdown_position"=>$this->dropdown_position,

@@ -21,7 +21,8 @@ class OptionsCategoriesSeeder extends Seeder
         $importer->setTableInfo(tableName:"option_categories",rowMapping:[
             "id"=>1,
             "name"=>2,
-            "default_language"=>3
+            "default_language"=>3,
+            "position"=>4
         ]);
       
         $importer->import();

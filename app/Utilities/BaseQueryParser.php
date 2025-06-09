@@ -3,13 +3,17 @@
 namespace App\Utilities;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 class BaseQueryParser
 {
     protected $querySafeParams = [
        
       ];
     
+      protected $validatorMap = [
+       
+      ];
+
       protected $columnMap = [
       
       ];
@@ -39,10 +43,15 @@ class BaseQueryParser
         //['column','operator','value']]
         
         //['column',['valuesArray']]
-       
-        
+      
         foreach ($this->querySafeParams as $param => $operators) {
+
           $query = $request->query($param);
+          //$param=language
+          //$query=["eq"=>"en"]
+          
+         
+        
         
           if (!isset($query))
             continue;
@@ -53,6 +62,17 @@ class BaseQueryParser
             if (!isset($query[$operator]))
               continue;
     
+            //make validation
+            if(isset($this->validatorMap[$param]))
+            {
+              $paramValue=$operator==="in" ? explode(',',$query[$operator]) : $query[$operator];
+              $validator = Validator::make(['value' => $paramValue],
+              ['value' => $this->validatorMap[$param]]);
+              if ($validator->fails()) {
+                throw new \Exception($validator->errors()->first());
+              }
+            }
+
             if ($param === "order_by") {
               $orderByString = $query[$operator];
               if ($orderByString[0] === '-') {

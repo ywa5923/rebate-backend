@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->enum('type',['column','row']);
             $table->string('title');
+            $table->string('slug');
             $table->text('description');
             $table->boolean('is_invariant')->default(true);
+            $table->foreignId('form_type_id')->nullable()->constrained('form_types')->nullOnDelete();
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->constrained('matrices');
+            $table->foreignId('broker_id')->nullable()->constrained('brokers')->nullOnDelete();
             $table->timestamps();
         });
     }

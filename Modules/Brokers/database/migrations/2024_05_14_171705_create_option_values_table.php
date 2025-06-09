@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("option_slug");
             $table->text("value");
+            $table->text("public_value")->nullable();
             $table->boolean("status")->default(1);//de bagat si in broker options;
             $table->string("status_message")->nullable();
             $table->boolean("default_loading")->default(1);

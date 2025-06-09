@@ -88,7 +88,7 @@ class BrokerRepository implements RepositoryInterface
     {
 
        
-        DB::enableQueryLog();
+        //DB::enableQueryLog();
         $qb = Broker::select(["id"])->with([
             // 'translations' => function (Builder $query) use ($languageCondition,$zoneCondition,) {
             //     /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */

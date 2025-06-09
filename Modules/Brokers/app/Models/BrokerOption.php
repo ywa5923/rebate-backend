@@ -52,9 +52,19 @@ class BrokerOption extends Model
         return $this->belongsTo(OptionCategory::class,"option_category_id");
     }
 
-    public function values():HasMany
+    public function values($brokerId=null):HasMany
     {
-        return $this->hasMany(OptionValue::class);
+        $query= $this->hasMany(OptionValue::class);
+        if($brokerId)
+        {
+            $query->where("broker_id",$brokerId);
+        }
+        return $query;
+    }
+
+    public function dropdownCategory():BelongsTo
+    {
+        return $this->belongsTo(DropdownCategory::class,"dropdown_category_id");
     }
 
     public function translations():MorphMany

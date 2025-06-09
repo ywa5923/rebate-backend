@@ -11,7 +11,8 @@ use Modules\Brokers\Repositories\BrokerOptionRepository;
 use Modules\Brokers\Services\BrokerOptionQueryParser;
 use Modules\Brokers\Transformers\BrokerOptionCollection;
 use Modules\Brokers\Repositories\FilterRepository;
-
+use Modules\Brokers\Transformers\FormBrokerOptionResource;
+use Modules\Brokers\Transformers\OptionCategoryResource;
 class BrokerOptionController extends Controller
 {
     /**
@@ -24,14 +25,22 @@ class BrokerOptionController extends Controller
         if (empty($queryParser->getWhereParams())) {
             return new Response("not found", 404);
         }
-        
-
       
             //ex: ['language_code','=','ro']
             $languageParams = $queryParser->getWhereParam("language");
 
             try{
-                $optionsCollection = new BrokerOptionCollection($rep->translate($languageParams));
+                $allColumns=$queryParser->getWhereParam("all_columns");
+                $brokerType=$queryParser->getWhereParam("broker_type")[2]??null;
+             
+                if($allColumns)
+                {
+                   //return all options categories with all options
+                   return OptionCategoryResource::collection($rep->getBrokerOptions($languageParams,1,$brokerType));
+                    // return FormBrokerOptionResource::collection($rep->getBrokerOptions($languageParams));
+                }
+
+                $optionsCollection = new BrokerOptionCollection($rep->getDropdownOptions($languageParams));
                
                 $filterRepo = new FilterRepository();
               
@@ -73,8 +82,6 @@ class BrokerOptionController extends Controller
             }
 
           
-
-
             usort($dropdownOptions, fn($a, $b) => $a['dropdown_position'] <=> $b['dropdown_position']);
             usort($defaultLoadedOptions, fn($a, $b) => $a['default_loading_position'] <=> $b['default_loading_position']);
 

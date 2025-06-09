@@ -16,6 +16,9 @@ use App\Utilities\OpenAiClient;
 use App\Services\StorageService;
 use App\Utilities\CloudFlareClient;
 use Aws\S3\S3Client;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -61,7 +64,13 @@ class AppServiceProvider extends ServiceProvider
             return new ShaHasher;
         });
 
-      
+        DB::listen(function($query) {
+            Log::info(
+                $query->sql,
+                $query->bindings,
+                $query->time
+            );
+        });
 
 
         // $this->app->extend(HashManager::class, function (HashManager $hashManager,Application $app) {

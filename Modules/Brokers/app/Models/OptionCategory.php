@@ -4,6 +4,10 @@ namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Translations\Models\Translation;
+
+
 
 /**
  * @OA\Schema(
@@ -35,5 +39,10 @@ class OptionCategory extends Model
     public function options():HasMany
     {
         return $this->hasMany(BrokerOption::class);
+    }
+
+    public function translations():MorphMany
+    {
+        return $this->morphMany(Translation::class,'translationable');
     }
 }
