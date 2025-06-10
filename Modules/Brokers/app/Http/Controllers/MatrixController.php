@@ -56,7 +56,11 @@ class MatrixController extends Controller
         //     ->get();
 
       
-        return MatrixHeaderResource::collection($columnHeaders);
+        return [
+            'columnHeaders' => MatrixHeaderResource::collection($columnHeaders),
+            'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
+        ];
+        //return MatrixHeaderResource::collection($columnHeaders);
 
 
         // return $headers->map(function($header) {

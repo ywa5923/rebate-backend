@@ -51,9 +51,11 @@ class MatrixHeaderRepository
                 }
             })
             ->where('type', 'row')
+            ->whereNull('parent_id')
             ->whereHas('matrix', function($query) use ($matrixNameCondition) {
                 $query->where(...$matrixNameCondition);
             })
+            ->with('children')
             ->get();
     }
 }

@@ -15,10 +15,20 @@ class MatrixHeaderResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = [
-            //'id' => $this->id,
+           
+            'slug' => $this->slug,
             'name' => $this->translateProp('title'),
             //'description' => $this->description,
         ];
+
+        if($this->type == 'row'){
+            $data['options'] = $this->children->map(function($child){
+                return [
+                    'value' => $child->slug,
+                    'label' => $child->title,
+                ];
+            });
+        }
 
         if ($this->formType) {
             $data['form_type'] = new FormTypeResource($this->formType);
