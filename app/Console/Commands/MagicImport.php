@@ -92,8 +92,10 @@ class MagicImport extends Command
         $this->info("\\\\///...importing form types ");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\FormTypesSeeder"]);
 
-       
+        $this->info("\\\\///...importing matrix headers");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\MatrixSeeder"]);
 
+    
 
     }
 }

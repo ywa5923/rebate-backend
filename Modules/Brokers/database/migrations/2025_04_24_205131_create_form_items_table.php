@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('form_items', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
+            $table->string('name')->unique()->nullable();
             $table->string('type');
             $table->string('placeholder')->nullable();
             $table->string('description')->nullable();

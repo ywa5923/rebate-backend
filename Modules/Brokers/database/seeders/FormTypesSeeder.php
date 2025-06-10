@@ -23,9 +23,13 @@ class FormTypesSeeder extends Seeder
             "name" => "Number",
         ]);
 
-        $numberWithSelectType = FormType::create([
-            "name" => "NumberWithSelect"
+        $numberWithCurrencyType = FormType::create([
+            "name" => "NumberWithCurrency"
         ]);
+        $numberWithUnitType = FormType::create([
+            "name" => "NumberWithUnit"
+        ]);
+       
 
         // Create FormItems
         $textItem = FormItem::create([
@@ -41,19 +45,19 @@ class FormTypesSeeder extends Seeder
         $currencyItem = FormItem::create([
             "name" => "Currency",
             "placeholder" => "Select Currency",
-            "type" => "select",
+            "type" => "single-select",
             "dropdown_id" => 2,
         ]);
 
         $unitItem = FormItem::create([
             "name" => "Unit",
-            "type" => "select",
+            "type" => "single-select",
             "placeholder" => "Select Unit",
             "dropdown_id" => 1,
         ]);
 
         // Attach items using relationship
-        $numberWithSelectType->items()->attach([
+        $numberWithCurrencyType->items()->attach([
             $numberItem->id,
             $currencyItem->id
         ]);
@@ -64,6 +68,11 @@ class FormTypesSeeder extends Seeder
 
         $numberType->items()->attach([
             $numberItem->id,
+        ]);
+
+        $numberWithUnitType->items()->attach([
+            $numberItem->id,
+            $unitItem->id
         ]);
 
         
