@@ -22,15 +22,21 @@ class MatrixController extends Controller
             return new Response("not found", 404);
         }
        
-
       
-        $headers = $rep->getColumnHeaders(
-            $queryParser->getWhereParam("type"), 
+      
+        $columnHeaders = $rep->getColumnHeaders(
             $queryParser->getWhereParam("matrix_id"),
             $queryParser->getWhereParam("broker_id")??null,
             $queryParser->getWhereParam("broker_id_strict")[2]??false
         );
 
+        //return $columnHeaders;
+
+        $rowHeaders = $rep->getRowHeaders(
+            $queryParser->getWhereParam("matrix_id"),
+            $queryParser->getWhereParam("broker_id")??null,
+            $queryParser->getWhereParam("broker_id_strict")[2]??false
+        );
        
 
         // $headers = MatrixHeader::with(['formType.items' => function($query) {
@@ -50,7 +56,7 @@ class MatrixController extends Controller
         //     ->get();
 
       
-        return MatrixHeaderResource::collection($headers);
+        return MatrixHeaderResource::collection($columnHeaders);
 
 
         // return $headers->map(function($header) {

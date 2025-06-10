@@ -59,10 +59,8 @@ trait TranslateTrait
     }
 
     public function translateProp($prop){
-
-      
-       
-        if($this->translations->isEmpty()){
+        
+        if(!$this->relationLoaded('translations')){
             return $this->{$prop};
          }
       
