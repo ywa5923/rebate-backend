@@ -25,4 +25,5 @@ Route::group(["prefix"=>'v1'], function () {
     Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
+    Route::post('/matrix/store', [MatrixController::class, 'store']);
 });

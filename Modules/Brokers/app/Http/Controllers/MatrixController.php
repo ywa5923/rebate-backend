@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 use Modules\Brokers\Transformers\MatrixHeaderResource;
 use Modules\Brokers\Services\MatrixHeadearsQueryParser;
 use Modules\Brokers\Repositories\MatrixHeaderRepository;
+use Modules\Brokers\Models\Matrix;
+use Modules\Brokers\Models\MatrixDimension;
+use Modules\Brokers\Models\MatrixValue;
 
 class MatrixController extends Controller
 {
@@ -23,7 +26,7 @@ class MatrixController extends Controller
         }
        
       
-      
+     
         $columnHeaders = $rep->getColumnHeaders(
             $queryParser->getWhereParam("matrix_id"),
             $queryParser->getWhereParam("broker_id")??null,
@@ -92,6 +95,175 @@ class MatrixController extends Controller
         //     ];
         // });
     }
+
+    public function store(Request $request, MatrixHeaderRepository $rep)
+    {
+        //to be done
+        //1. check if the matrix exists
+        //2. check if the broker exists
+        //3. delete matrix headears by bvroker id
+        //4. delete matrix dimensions by broker id
+        //5. delete matrix values by broker id
+       
+        
+  
+        
+        $startTime = microtime(true);
+        
+        $data = $request->validate([
+            'matrix' => 'required|array',
+            'broker_id' => 'required|integer',
+            'matrix_id' => 'required|string',
+        ]);
+
+        $matrixName = $data['matrix_id'];
+        $brokerId = $data['broker_id'];
+        $allHeaders = $rep->getAllHeaders(["name","=",$matrixName],["broker_id","=",$brokerId]);
+        $matrix = Matrix::where("name","=",$matrixName)->first();
+
+        // Prepare bulk insert data
+        $rowDimensions = [];
+        $columnDimensions = [];
+        $matrixValues = [];
+
+        foreach ($data['matrix'] as $rowIndex => $row) {
+            $selectedRowHeaderSubOptions = $row[0]['selectedRowHeaderSubOptions'] ?? null;
+
+            dd($selectedRowHeaderSubOptions);
+           // "selectedRowHeaderSubOptions":[{"value":"row-subheader-1","label":"Row subheader 1"},{"value":"row-subheader-2","label":"Row subheader 2"}]
+            $rowHeaderSlug = $row[0]['rowHeader'];
+            $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $allHeaders);
+            if($rowHeaderId==null){
+                $rowHeaderId=MatrixHeader::insertGetId([
+                    'title'=>ucwords(str_replace('-', ' ', $rowHeaderSlug) ),
+                    'slug'=>$rowHeaderSlug,
+                    'broker_id'=>$brokerId,
+                    'type'=>'row',
+                    'matrix_id'=>$matrix->id
+                ]);
+            //   $rowHeaderSubOptions=MatrixHeader::insertGetId([
+            //     'title'=>$selectedRowHeaderSubOptions[0]['label'],
+            //     'slug'=>$selectedRowHeaderSubOptions[0]['value'],
+            //     'broker_id'=>$brokerId,
+            //     'type'=>'row',
+            //     'matrix_id'=>$matrix->id
+            //   ]);
+            $rowHeaderSubOptions=[];
+            foreach($selectedRowHeaderSubOptions as $subOption){
+                $rowHeaderSubOptions[]=[
+                    'parent_id'=>$rowHeaderId,
+                    'slug'=>$subOption['value'],
+                    'title'=>$subOption['label'],
+                    'broker_id'=>$brokerId,
+                    'type'=>'row',
+                    'matrix_id'=>$matrix->id
+                ];
+            }
+            $rowHeaderSubOptionsIds=MatrixHeader::insertGetId($rowHeaderSubOptions);
+        }else{
+            $rowHeaderSubOptionsIds=[];
+            foreach($selectedRowHeaderSubOptions as $subOption){
+                $id=$this->getHeaderId($subOption['value'],$allHeaders);
+                if($id!=null){
+                    $rowHeaderSubOptionsIds[]=$id;
+                }else{
+                    $rowHeaderSubOptionsIds[]=MatrixHeader::insertGetId([
+                        'parent_id'=>$rowHeaderId,
+                        'slug'=>$subOption['value'],
+                        'title'=>$subOption['label'],
+                        'broker_id'=>$brokerId,
+                        'type'=>'row',
+                        'matrix_id'=>$matrix->id
+                    ]);
+                }
+            }
+        }
+            
+
+
+            // Add row dimension
+            $rowDimensions[] = [
+                'matrix_id' => $matrix->id,
+                'broker_id' => $brokerId,
+                'order' => $rowIndex,
+                'matrix_header_id' => $rowHeaderId,
+                'type' => 'row'
+            ];
+
+            foreach ($row as $cellIndex => $cell) {
+                $colHeaderSlug = $cell['colHeader'];
+                $colHeaderId = $this->getHeaderId($colHeaderSlug, $allHeaders);
+
+                // Add column dimension if not already added
+                if (!isset($columnDimensions[$cellIndex])) {
+                    $columnDimensions[$cellIndex] = [
+                        'matrix_id' => $matrix->id,
+                        'broker_id' => $brokerId,
+                        'order' => $cellIndex,
+                        'matrix_header_id' => $colHeaderId,
+                        'type' => 'column'
+                    ];
+                }
+
+                // Store value data for later bulk insert
+                $matrixValues[] = [
+                    'matrix_id' => $matrix->id,
+                    'broker_id' => $brokerId,
+                    'row_index' => $rowIndex,
+                    'col_index' => $cellIndex,
+                    'value' => json_encode($cell['value'])
+                ];
+            }
+        }
+
+        // Bulk insert dimensions and get their IDs
+        MatrixDimension::insert($rowDimensions);
+        MatrixDimension::insert(array_values($columnDimensions));
+
+        // Get the inserted IDs
+        $rowDimIds = MatrixDimension::where('matrix_id', $matrix->id)
+            ->where('type', 'row')
+            ->where('broker_id', $brokerId)
+            ->orderBy('order')
+            ->pluck('id')
+            ->toArray();
+
+        $colDimIds = MatrixDimension::where('matrix_id', $matrix->id)
+            ->where('type', 'column')
+            ->where('broker_id', $brokerId)
+            ->orderBy('order')
+            ->pluck('id')
+            ->toArray();
+
+        // Update matrix values with correct dimension IDs
+        foreach ($matrixValues as &$value) {
+            $value['matrix_row_id'] = $rowDimIds[$value['row_index']];
+            $value['matrix_column_id'] = $colDimIds[$value['col_index']];
+            unset($value['row_index'], $value['col_index']);
+        }
+
+        // Bulk insert values
+        MatrixValue::insert($matrixValues);
+
+        $endTime = microtime(true);
+        $executionTime = ($endTime - $startTime) * 1000; // Convert to milliseconds
+
+        return response()->json([
+            'message' => 'Matrix data saved successfully',
+            'performance' => [
+                'execution_time_ms' => $executionTime,
+                'rows_count' => count($rowDimensions),
+                'columns_count' => count($columnDimensions),
+                'values_count' => count($matrixValues)
+            ]
+        ]);
+    }
+
+    public function getHeaderId($headerSlug, $headers)
+    {
+        $header = $headers->firstWhere('slug', $headerSlug);
+        return $header ? $header->id : null;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -108,13 +280,7 @@ class MatrixController extends Controller
         return view('brokers::create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
+   
 
     /**
      * Show the specified resource.
@@ -148,3 +314,40 @@ class MatrixController extends Controller
         //
     }
 }
+// [
+//     [
+//         {
+//             "value": [],
+//             "rowHeader": "row-header-2",
+//             "colHeader": "trade-mt4",
+//             "type": "Text",
+//             "selectedRowHeaderSubOptions": [
+//                 {
+//                     "value": "row-subheader-1",
+//                     "label": "Row subheader 1"
+//                 },
+//                 {
+//                     "value": "row-subheader-2",
+//                     "label": "Row subheader 2"
+//                 }
+//             ]
+//         },
+//         {
+//             "value": {
+//                 "Number": "jyykyk"
+//             },
+//             "rowHeader": "row-header-1",
+//             "colHeader": "zero-mt4",
+//             "type": "Number"
+//         },
+//         {
+//             "value": {
+//                 "Number": "34",
+//                 "Currency": "lots"
+//             },
+//             "rowHeader": "row-header-1",
+//             "colHeader": "trade-mt5",
+//             "type": "NumberWithCurrency"
+//         }
+//     ]
+// ]
