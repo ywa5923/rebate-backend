@@ -44,4 +44,22 @@ class MatrixHeaderOption extends Model
     {
         return $this->belongsTo(MatrixHeader::class);
     }
+
+    public function OptionHeader(): BelongsTo
+    {
+        return $this->belongsTo(MatrixHeader::class,'sub_option_id');
+    }
+
+   
+
+    public function optionHeaderSlug(): string
+    {
+        return $this->OptionHeader->slug;
+    }
+
+    public function optionHeaderTitle(): string
+    {
+        return $this->OptionHeader->title;
+    }
+    
 } 

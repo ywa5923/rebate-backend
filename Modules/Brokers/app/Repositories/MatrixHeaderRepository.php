@@ -7,7 +7,7 @@ use Modules\Brokers\Models\MatrixHeader;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
-
+use Modules\Brokers\Models\MatrixHeaderOption;
 class MatrixHeaderRepository
 {
     /**
@@ -92,9 +92,11 @@ class MatrixHeaderRepository
     }
     public function flushMatrix(int $matrixId,int $brokerId)
     {
+        MatrixHeaderOption::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixDimension::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'type'=>'row'])->delete();
         MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+       
 
     }
 }
