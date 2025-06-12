@@ -3,6 +3,7 @@
 namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\MatrixDimension;
+
 use Modules\Brokers\Transformers\MatrixDimensionCollection;
 
 class MatrixRepository
@@ -101,6 +102,8 @@ class MatrixRepository
         })->orderBy('order','asc')->get();
         return $rows;
     }
+
+   
 }
         // $matrixRepository=new MatrixRepository();
         // $columnTitles=$matrixRepository->getMatrixColumnNames(1,1,1,'ro');

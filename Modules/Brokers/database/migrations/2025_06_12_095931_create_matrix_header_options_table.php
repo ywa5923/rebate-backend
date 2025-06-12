@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('matrix_values', function (Blueprint $table) {
+        Schema::create('matrix_header_options', function (Blueprint $table) {
             $table->id();
-            $table->json('value');
-            $table->json('public_value');
-            $table->boolean('is_invariant')->default(true);
-            $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->constrained('matrices')->onDelete('cascade');
-            $table->foreignId('matrix_row_id')->constrained('matrix_dimensions')->onDelete('cascade');
-            $table->foreignId('matrix_column_id')->constrained('matrix_dimensions')->onDelete('cascade');
             $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
+            $table->foreignId('matrix_header_id')->constrained('matrix_headers')->onDelete('cascade');
+           $table->foreignId('sub_option_id')->constrained('matrix_headers')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('matrix_values');
+        Schema::dropIfExists('matrix_header_options');
     }
 };

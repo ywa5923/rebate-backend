@@ -5,6 +5,8 @@ namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\MatrixHeader;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Brokers\Models\MatrixDimension;
+use Modules\Brokers\Models\MatrixValue;
 
 class MatrixHeaderRepository
 {
@@ -82,10 +84,17 @@ class MatrixHeaderRepository
                     $query->orWhere(...$brokerIdCondition);
             }
         })
-            ->whereNull('parent_id')
+            //->whereNull('parent_id')
             ->whereHas('matrix', function ($query) use ($matrixNameCondition) {
                 $query->where(...$matrixNameCondition);
             })
             ->get();
+    }
+    public function flushMatrix(int $matrixId,int $brokerId)
+    {
+        MatrixDimension::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+        MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'type'=>'row'])->delete();
+        MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+
     }
 }
