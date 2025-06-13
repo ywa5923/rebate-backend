@@ -16,6 +16,7 @@ use Modules\Brokers\Models\Matrix;
 use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
 use Modules\Brokers\Models\MatrixHeaderOption;
+
 class MatrixController extends Controller
 {
     public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
@@ -39,11 +40,11 @@ class MatrixController extends Controller
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
         );
 
+      
         return [
             'columnHeaders' => MatrixHeaderResource::collection($columnHeaders),
             'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
         ];
-     
     }
 
     public function store(Request $request, MatrixHeaderRepository $rep)
@@ -59,100 +60,99 @@ class MatrixController extends Controller
         $matrixName = $data['matrix_id'];
         $brokerId = $data['broker_id'];
         $matrix = Matrix::where("name", "=", $matrixName)->first();
-        //["broker_id", "=", $brokerId]
-        
 
         try {
-            // First transaction for headers
+            // First transaction - Flush data
             DB::beginTransaction();
-
-            //flush matrix data first
             $rep->flushMatrix($matrix->id, $brokerId);
             DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Matrix store error: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to delete matrix related data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
 
-        if(empty($data['matrix'])) {
-              
-            return response()->json([
-                'message' => 'Matrix data was deleted successfully',
-            ]);
-        }
+            if (empty($data['matrix'])) {
+                return response()->json([
+                    'message' => 'Matrix data was deleted successfully',
+                ]);
+            }
 
-        $allHeaders = $rep->getAllHeaders(["name", "=", $matrixName],null,false);
-       
-        try {
-         
-            DB::beginTransaction();
+            // Second transaction - Create headers
+            // DB::beginTransaction();
+            $allHeaders = $rep->getAllHeaders(["name", "=", $matrixName], null, false);
+
+            $newHeaders = [];
+            $newHeadersSubOptions = [];
+            $headearsSelectedSubOptions = [];
+
             // Create all headers first
-            $rowHeaderSubOptionsIds = [];
             foreach ($data['matrix'] as $rowIndex => $row) {
                 $selectedRowHeaderSubOptions = $row[0]['selectedRowHeaderSubOptions'] ?? null;
                 $rowHeaderSlug = $row[0]['rowHeader'];
                 $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $allHeaders);
-               
-                if ($rowHeaderId == null) {
-                    //if row header not found, create it
-                    $rowHeaderId = MatrixHeader::insertGetId([
+                //////new version=====================
+                $headearExists = in_array($rowHeaderSlug, array_column($newHeaders, 'slug'));
+                if ($rowHeaderId == null && !$headearExists){
+                    $newHeaders[] = [
                         'title' => ucwords(str_replace('-', ' ', $rowHeaderSlug)),
                         'slug' => $rowHeaderSlug,
                         'broker_id' => $brokerId,
                         'type' => 'row',
                         'matrix_id' => $matrix->id
-                    ]);
-
-                    $rowHeaderSubOptions = [];
-                    foreach ($selectedRowHeaderSubOptions as $subOption) {
-                        $rowHeaderSubOptions[] = [
-                            'parent_id' => $rowHeaderId,
-                            'slug' => $subOption['value'],
-                            'title' => $subOption['label'],
-                            'broker_id' => $brokerId,
-                            'type' => 'row',
-                            'matrix_id' => $matrix->id
-                        ];
-                    }
-                    MatrixHeader::insert($rowHeaderSubOptions);
-                    $rowHeaderSubOptionsIds[$rowHeaderId] = MatrixHeader::where([
-                        'parent_id' => $rowHeaderId,
-                        'broker_id' => $brokerId,
-                        'matrix_id' => $matrix->id,
-                        'type' => 'row'
-                    ])->pluck('id')->toArray();
-                } else {
-                    foreach ($selectedRowHeaderSubOptions as $subOption) {
-                        $id = $this->getHeaderId($subOption['value'], $allHeaders);
-                        if ($id != null) {
-                            $rowHeaderSubOptionsIds[$rowHeaderId][] = $id;
-                        } else {
-
-                            //to be optimized
-                            $subOptionId = MatrixHeader::insertGetId([
+                    ];
+                }
+                    
+               
+                foreach ($selectedRowHeaderSubOptions as $subOption) {
+                    $subOptionId = $this->getHeaderId($subOption['value'], $allHeaders);
+                    $subOptionExists = in_array($subOption['value'], array_column(array_merge(...array_values($newHeadersSubOptions)), 'slug'));
+                    if ($subOptionId == null && !$subOptionExists) {
+                        $newHeadersSubOptions[$rowHeaderSlug][]=
+                            [
                                 'parent_id' => $rowHeaderId,
                                 'slug' => $subOption['value'],
                                 'title' => $subOption['label'],
                                 'broker_id' => $brokerId,
                                 'type' => 'row',
                                 'matrix_id' => $matrix->id
-                            ]);
-                            $rowHeaderSubOptionsIds[$rowHeaderId][] = $subOptionId;
-                        }
+                            ];
                     }
+                    //$headearSelectedSubOptions[$rowHeaderSlug][] = $subOption['value'];
+                    $headearsSelectedSubOptions[$rowIndex][] = $subOption['value'];
                 }
+                   
+            } //end of matrix foreach
+           !empty($newHeaders) && MatrixHeader::insert($newHeaders);
+            //dd($newHeaders);
+            //$allHeaders = $rep->getAllHeaders(["name", "=", $matrixName], null, false);
+            $brokerHeadears = $rep->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
+           
+            foreach ($newHeadersSubOptions as $rowHeaderSlug => &$subOptionArray) {
+                $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $brokerHeadears);
+                foreach ($subOptionArray as &$subOption) {
+                   
+                    $subOption['parent_id'] = $rowHeaderId;
+                }
+                unset($subOption);
             }
+           
+            unset($subOptionArray); 
+            
+            MatrixHeader::insert(array_merge(...array_values($newHeadersSubOptions)));
 
-            // Commit first transaction to ensure all headers exist
-            DB::commit();
 
-            // Start second transaction for dimensions and values
-            DB::beginTransaction();
+            //grab again all headears
+            $allHeaders = $rep->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
+           
+            //$rep->insertSelectedSubOptions($headearSelectedSubOptions, $allHeaders, $matrix->id, $brokerId);
 
+        } catch (\Exception $e) {
+            // Log::error('Matrix store error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to save matrix data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        // Third transaction - Create dimensions, values and options
+        DB::beginTransaction();
+        try {
             // Prepare bulk insert data
             $rowDimensions = [];
             $columnDimensions = [];
@@ -175,7 +175,7 @@ class MatrixController extends Controller
                     $colHeaderSlug = $cell['colHeader'];
                     $colHeaderId = $this->getHeaderId($colHeaderSlug, $allHeaders);
 
-                    if(!isset($columnDimensions[$cellIndex])) {
+                    if (!isset($columnDimensions[$cellIndex])) {
                         $columnDimensions[$cellIndex] = [
                             'matrix_id' => $matrix->id,
                             'broker_id' => $brokerId,
@@ -185,7 +185,7 @@ class MatrixController extends Controller
                         ];
                     }
 
-                    if($colHeaderId == null) {
+                    if ($colHeaderId == null) {
                         throw new \Exception("Column header not found");
                     }
 
@@ -225,22 +225,27 @@ class MatrixController extends Controller
                 unset($value['row_index'], $value['col_index']);
             }
 
+            //dd($rowDimIds, $colDimIds);
             // Bulk insert values
             MatrixValue::insert($matrixValues);
+             
+            // Bulk insert dimension options
+            $rep->insertDimensionOptions($headearsSelectedSubOptions, $rowDimIds, $matrix->id, $brokerId,  $allHeaders);
+ 
 
-            // Create header options (now safe because headers exist)
-            foreach ($rowHeaderSubOptionsIds as $rowHeaderId => $subOptionIds) {
-                $data = [];
-                foreach ($subOptionIds as $subOptionId) {
-                    $data[] = [
-                        'matrix_id' => $matrix->id,
-                        'broker_id' => $brokerId,
-                        'matrix_header_id' => $rowHeaderId,
-                        'sub_option_id' => $subOptionId,
-                    ];
-                }
-                MatrixHeaderOption::insert($data);
-            }
+            // // Create header options (now safe because headers exist)
+            // foreach ($rowHeaderSubOptionsIds as $rowHeaderId => $subOptionIds) {
+            //     $data = [];
+            //     foreach ($subOptionIds as $subOptionId) {
+            //         $data[] = [
+            //             'matrix_id' => $matrix->id,
+            //             'broker_id' => $brokerId,
+            //             'matrix_header_id' => $rowHeaderId,
+            //             'sub_option_id' => $subOptionId,
+            //         ];
+            //     }
+            //     MatrixHeaderOption::insert($data);
+            // }
 
             DB::commit();
 
@@ -259,11 +264,21 @@ class MatrixController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Matrix store error: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to save matrix data',
-                'error' => $e->getMessage()
-            ], 500);
+           
+                // If headers were created and third transaction failed,
+                // we need to delete the headers we just created
+                DB::beginTransaction();
+                try {
+                    MatrixHeader::where('matrix_id', $matrix->id)
+                        ->where('broker_id', $brokerId)
+                        ->delete();
+                    DB::commit();
+                } catch (\Exception $deleteError) {
+                    DB::rollBack();
+                    Log::error('Failed to rollback headers: ' . $deleteError->getMessage());
+                }
+            
+            throw $e;
         }
     }
 
@@ -295,20 +310,20 @@ class MatrixController extends Controller
         // Get all dimensions for this matrix and broker
         $dimensions = MatrixDimension::where('matrix_id', $matrix->id)
             ->where('broker_id', $brokerId)
-            ->with(['matrixHeader'])
+            ->with(['matrixHeader', 'matrixDimensionOptions', 'matrixDimensionOptions.option'])
             ->get();
 
-            
+
         // Separate row and column dimensions
         $rowDimensions = $dimensions->where('type', 'row')->sortBy('order')->values();
         $columnDimensions = $dimensions->where('type', 'column')->sortBy('order')->values();
 
-        
+
         // Get all values for this matrix and broker
         $values = MatrixValue::where('matrix_id', $matrix->id)
             ->where('broker_id', $brokerId)
             ->get();
-       
+
         // Create the matrix structure
         $matrixData = [];
         foreach ($rowDimensions as $rowIndex => $rowDim) {
@@ -319,18 +334,19 @@ class MatrixController extends Controller
                 });
 
 
-                $subOptions=MatrixHeaderOption::where([
-                    "matrix_id"=>$matrix->id,
-                    "broker_id"=>$brokerId,
-                    "matrix_header_id"=>$rowDim->matrix_header_id
-                ])->get()
-                ->map(function($option){
-                    return [
-                        "value"=>$option->optionHeaderSlug(),
-                        "label"=>$option->optionHeaderTitle()
-                    ];
-                });
-           
+               
+                // $subOptions = MatrixDimensionOption::where([
+                //     "matrix_id" => $matrix->id,
+                //     "broker_id" => $brokerId,
+                //     "matrix_header_id" => $rowDim->matrix_header_id
+                // ])->get()
+                //     ->map(function ($option) {
+                //         return [
+                //             "value" => $option->optionHeaderSlug(),
+                //             "label" => $option->optionHeaderTitle()
+                //         ];
+                //     });
+
 
                 $cell = [
                     'value' => $value ? json_decode($value->value, true) : null,
@@ -340,8 +356,17 @@ class MatrixController extends Controller
                     //'selectedRowHeaderSubOptions' => $subOptions->toArray()
                 ];
 
-                $colIndex==0 && $cell['selectedRowHeaderSubOptions']=$subOptions->toArray();
-
+          //get the row headear options and add them to the cell in the first column
+                if($colIndex == 0){
+                    $options=$rowDim->matrixDimensionOptions;
+                    $subOptions = $options->map(function ($option) {
+                        return [
+                            "value" => $option->optionSlug(),
+                            "label" => $option->optionTitle()
+                        ];
+                    });
+                    $cell['selectedRowHeaderSubOptions'] = $subOptions->toArray();
+                }
                 $row[] = $cell;
             }
             $matrixData[] = $row;

@@ -7,7 +7,7 @@ use Modules\Brokers\Models\MatrixHeader;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
-use Modules\Brokers\Models\MatrixHeaderOption;
+use Modules\Brokers\Models\MatrixDimensionOption;
 class MatrixHeaderRepository
 {
     /**
@@ -92,11 +92,57 @@ class MatrixHeaderRepository
     }
     public function flushMatrix(int $matrixId,int $brokerId)
     {
-        MatrixHeaderOption::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+        MatrixDimensionOption::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixDimension::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'type'=>'row'])->delete();
         MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
        
 
     }
+    public function insertSelectedSubOptions(array $headearSelectedSubOptions, Collection $allHeaders,int $matrixId,int $brokerId)
+    {
+        $headerOptions = [];
+        foreach ($headearSelectedSubOptions as $rowHeaderSlug => $subOptionSlugs) {
+            $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $allHeaders);
+            foreach ($subOptionSlugs as $subOptionSlug) {
+                $subOptionId = $this->getHeaderId($subOptionSlug, $allHeaders);
+                if ($subOptionId != null) {
+                    // $rowHeaderSubOptionsIds[$rowHeaderId][] = $subOptionId;
+                    $headerOptions[] = [
+                        'matrix_id' => $matrixId,
+                        'broker_id' => $brokerId,
+                        'matrix_header_id' => $rowHeaderId,
+                        'sub_option_id' => $subOptionId,
+                    ];
+                }
+            }
+        }
+        MatrixDimensionOption::insert($headerOptions);
+    }
+
+    public function insertDimensionOptions(array $headearsSelectedOptions, array $rowDimIds, int $matrixId, int $brokerId, Collection $allHeaders)
+    {
+        $dimensionOptions = [];
+        foreach ($headearsSelectedOptions as $rowIndex => $optionsSlugs) {
+            //$rowIndex is the index of the row in the matrix
+            //$rowDimIds[$rowIndex] is the id of the row dimension
+            foreach ($optionsSlugs as $optionSlug) {
+                $optionId = $this->getHeaderId($optionSlug, $allHeaders);
+                $dimensionOptions[] = [
+                    'matrix_id' => $matrixId,
+                    'broker_id' => $brokerId,
+                    'matrix_dimension_id' => $rowDimIds[$rowIndex],
+                    'option_id' => $optionId,
+                ];
+            }
+        }
+        MatrixDimensionOption::insert($dimensionOptions);
+    }
+
+    public function getHeaderId($headerSlug, $headers)
+    {
+        $header = $headers->firstWhere('slug', $headerSlug);
+        return $header ? $header->id : null;
+    }
+
 }

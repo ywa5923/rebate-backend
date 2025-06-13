@@ -58,5 +58,10 @@ class MatrixDimension extends Model
     }
    }
 
+   public function matrixDimensionOptions():HasMany
+   {
+    return $this->hasMany(MatrixDimensionOption::class,'matrix_dimension_id');
+   }
+
   
 }

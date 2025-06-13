@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('matrix_header_options', function (Blueprint $table) {
+        Schema::create('matrix_dimension_options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('matrix_id')->constrained('matrices')->onDelete('cascade');
             $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
-            $table->foreignId('matrix_header_id')->constrained('matrix_headers')->onDelete('cascade');
-           $table->foreignId('sub_option_id')->constrained('matrix_headers')->onDelete('cascade');
+            //$table->foreignId('matrix_header_id')->constrained('matrix_headers')->onDelete('cascade');
+            $table->foreignId('matrix_dimension_id')->constrained('matrix_dimensions')->onDelete('cascade');
+            $table->foreignId('option_id')->constrained('matrix_headers')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('matrix_header_options');
+        Schema::dropIfExists('matrix_dimension_options');
     }
 };

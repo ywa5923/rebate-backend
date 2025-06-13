@@ -8,7 +8,7 @@ use Modules\Brokers\Models\Matrix;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\MatrixHeader;
 
-class MatrixHeaderOption extends Model
+class MatrixDimensionOption extends Model
 {
     protected $fillable = [
         'matrix_id',
@@ -36,30 +36,27 @@ class MatrixHeaderOption extends Model
     {
         return $this->belongsTo(Broker::class);
     }
-
-    /**
-     * Get the matrix header that owns the header option.
-     */
-    public function matrixHeader(): BelongsTo
+  
+    public function matrixDimension(): BelongsTo
     {
-        return $this->belongsTo(MatrixHeader::class);
+        return $this->belongsTo(MatrixDimension::class);
     }
 
-    public function OptionHeader(): BelongsTo
+    public function option(): BelongsTo
     {
-        return $this->belongsTo(MatrixHeader::class,'sub_option_id');
+        return $this->belongsTo(MatrixHeader::class,'option_id');
     }
 
    
 
-    public function optionHeaderSlug(): string
+    public function optionSlug(): string
     {
-        return $this->OptionHeader->slug;
+        return $this->option->slug;
     }
 
-    public function optionHeaderTitle(): string
+    public function optionTitle(): string
     {
-        return $this->OptionHeader->title;
+        return $this->option->title;
     }
     
 } 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('matrix_values', function (Blueprint $table) {
             $table->id();
             $table->json('value');
-            $table->json('public_value');
+            $table->json('public_value')->nullable();
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->constrained('matrices')->onDelete('cascade');
