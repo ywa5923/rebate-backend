@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('matrix_headers', function (Blueprint $table) {
             $table->id();
             $table->enum('type',['column','row']);
-            $table->string('title')->unique();
-            $table->string('slug')->unique();
+            $table->string('title');
+            $table->string('slug');
             $table->text('description')->nullable();
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('parent_id')->nullable()->constrained('matrix_headers')->nullOnDelete();
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->constrained('matrices');
             $table->foreignId('broker_id')->nullable()->constrained('brokers')->nullOnDelete();
+            $table->unique(['slug', 'broker_id', 'matrix_id'], 'unique_slug_broker_matrix');
             $table->timestamps();
         });
     }
