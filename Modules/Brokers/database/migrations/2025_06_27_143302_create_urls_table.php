@@ -13,14 +13,19 @@ return new class extends Migration
     {
         Schema::create('urls', function (Blueprint $table) {
             $table->id();
+            $table->nullableMorphs('urlable');
             $table->string("url_type");
             $table->string("url",500);
+            $table->string("url_p",500)->nullable();
             $table->string("name",500);
+            $table->string("name_p",500)->nullable();
             $table->string("slug",500);
+            $table->boolean("is_invariant")->default(true);
             $table->integer("category_position")->nullable();
             $table->string("description",500)->nullable(); 
-            $table->foreignId("option_category_id")->constrained("option_categories");
+            $table->foreignId("option_category_id")->nullable()->constrained("option_categories");
             $table->foreignId("broker_id")->constrained();
+            $table->foreignId("zone_id")->nullable()->constrained();
             $table->timestamps();
         });
     }

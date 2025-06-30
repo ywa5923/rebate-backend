@@ -56,7 +56,10 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
-        ]
+        ],
+        "test:brokers": "php artisan test Modules/Brokers/tests",
+        "test:brokers-unit": "php artisan test Modules/Brokers/tests/Unit",
+        "test:brokers-feature": "php artisan test Modules/Brokers/tests/Feature"
     },
     "extra": {
         "laravel": {

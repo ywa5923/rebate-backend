@@ -5,6 +5,7 @@ use Modules\Brokers\Http\Controllers\BrokerController;
 use Modules\Brokers\Http\Controllers\BrokerFilterController;
 use Modules\Brokers\Http\Controllers\BrokerOptionController;
 use Modules\Brokers\Http\Controllers\MatrixController;
+use Modules\Brokers\Http\Controllers\AcountTypeController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -27,4 +28,9 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
     Route::get('/matrix', [MatrixController::class, 'index']);
     Route::post('/matrix/store', [MatrixController::class, 'store']);
+    Route::post('account-types', [AcountTypeController::class, 'store']);
+    Route::get('account-types', [AcountTypeController::class, 'index']);
+    Route::get('account-types/{id}', [AcountTypeController::class, 'show']);
+    Route::put('account-types/{id}', [AcountTypeController::class, 'update']);
+    Route::delete('account-types/{id}', [AcountTypeController::class, 'destroy']);
 });

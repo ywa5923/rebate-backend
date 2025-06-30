@@ -241,7 +241,8 @@ class MatrixController extends Controller
                         'broker_id' => $brokerId,
                         'row_index' => $rowIndex,
                         'col_index' => $cellIndex,
-                        'value' => json_encode($cell['value'])
+                        'value' => json_encode($cell['value']),
+                        'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null
                     ];
                 }
             }
@@ -352,10 +353,10 @@ class MatrixController extends Controller
     {
         $matrixId = $request->query('matrix_id');
         $brokerId = $request->query('broker_id');
-
+        $is_admin = $request->query('is_admin');
         $matrixId = "Matrix-1";
         $brokerId = 1;
-
+        $is_admin = true;
         if (!$matrixId || !$brokerId) {
             return response()->json(['error' => 'matrix_id and broker_id are required'], 400);
         }
@@ -408,11 +409,13 @@ class MatrixController extends Controller
 
                 $cell = [
                     'value' => $value ? json_decode($value->value, true) : null,
+                    'public_value' => $value ? json_decode($value->public_value, true) : null,
                     'rowHeader' => $rowDim->matrixHeader->slug,
                     'colHeader' => $colDim->matrixHeader->slug,
                     'type' => $colDim->matrixHeader->formType->name ?? 'undefined'
                     //'selectedRowHeaderSubOptions' => $subOptions->toArray()
                 ];
+
 
           //get the row headear options and add them to the cell in the first column
                 if($colIndex == 0){
