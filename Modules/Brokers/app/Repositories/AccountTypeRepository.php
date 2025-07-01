@@ -22,12 +22,12 @@ class AccountTypeRepository
      */
     public function getAccountTypes(Request $request): LengthAwarePaginator|Collection
     {
-        if($request->has('locale')){
-            $locale = $request->locale;
+        if($request->has('language_code')){
+            $locale = $request->language_code;
         }else{
             $locale = 'en';
         }
-        $query = $this->model->with(['broker', 'zone', 'urls', 'translations' => function($query) use ($locale) {
+        $query = $this->model->with(['broker', 'zone', 'urls.translations', 'translations' => function($query) use ($locale) {
             $query->where('language_code', $locale);
         }]);
 

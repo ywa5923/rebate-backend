@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\AccountTypeService;
+use Modules\Brokers\Transformers\AccountTypeResource;
 
 class AcountTypeController extends Controller
 {
@@ -21,15 +22,16 @@ class AcountTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         try {
-            //get ac types by query params: broker_id, zone_id, broker_type, sort_by, sort_direction, per_page
+            //get ac types by query params: broker_id, zone_id, broker_type, sort_by, sort_direction, per_page,language_code
             //
             $result = $this->accountTypeService->getAccountTypes($request);
-            
-            return response()->json($result);
-
+          
+            // Transform the data collection
+            $result['data'] = AccountTypeResource::collection($result['data']);
+            return $result;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -78,7 +80,8 @@ class AcountTypeController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Account type created successfully',
-                'data' => $accountType
+                'data' => $accountType,
+                //'data' => new AccountTypeResource($accountType)
             ], 201);
 
         } catch (\Exception $e) {
