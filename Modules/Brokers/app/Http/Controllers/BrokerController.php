@@ -18,7 +18,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Services\BrokersQueryParser;
 use Modules\Brokers\Services\BrokerService;
 use Modules\Brokers\Services\BrokerQueryParser;
-use Modules\Brokers\Models\Zone;
+use Modules\Translations\Models\Zone;
 use Modules\Brokers\Models\Setting;
 
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
@@ -73,9 +73,9 @@ class BrokerController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="logo", type="string"),
-     *             @OA\Property(property="favicon", type="string"),
-     *             @OA\Property(property="trading_name", type="string"),
+     *             @OA\Property(property="registration_language", type="string", example="en"),
+     *             @OA\Property(property="registration_zone", type="string", example="US"),
+     *             @OA\Property(property="broker_type_id", type="integer", example=1),
      *         )
      *     ),
      *     @OA\Response(
@@ -91,6 +91,7 @@ class BrokerController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        //return new Response("not found", 404);
     }
 
     /**
@@ -98,6 +99,13 @@ class BrokerController extends Controller
      *     path="/api/v1/broker/{id}",
      *     tags={"Broker"},
      *     summary="Show a broker",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Broker ID",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation"
@@ -140,7 +148,7 @@ class BrokerController extends Controller
         // If 'relations' is absent, set to null, otherwise use the value
         $relations = $tabData['relations'] ?? null;
          
-        dd($options,$relations);
+        //dd($options,$relations);
 
     } else {
         return response()->json([
@@ -176,12 +184,19 @@ class BrokerController extends Controller
      *     path="/api/v1/broker/{id}",
      *     tags={"Broker"},
      *     summary="Update broker",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Broker ID",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *              @OA\Property(property="logo", type="string"),
-     *             @OA\Property(property="favicon", type="string"),
-     *             @OA\Property(property="trading_name", type="string"),
+     *              @OA\Property(property="registration_language", type="string", example="en"),
+     *             @OA\Property(property="registration_zone", type="string", example="US"),
+     *             @OA\Property(property="broker_type_id", type="integer", example=1),
      *         )
      *     ),
      *     @OA\Response(
@@ -197,7 +212,7 @@ class BrokerController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        //
+        //return new Response("not found", 404);
     }
 
     /**
@@ -205,6 +220,13 @@ class BrokerController extends Controller
      *     path="/api/v1/broker/{id}",
      *     tags={"Broker"},
      *     summary="Delete broker",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Broker ID",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=204,
      *         description="Successful operation"

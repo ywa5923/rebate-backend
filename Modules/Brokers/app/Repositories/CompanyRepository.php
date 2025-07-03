@@ -6,9 +6,19 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Models\Company;
 use Modules\Brokers\Transformers\CompanyCollection;
 use Modules\Brokers\Repositories\CompanyUniqueListInterface;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class CompanyRepository
 {
+    protected Company $model;
+
+    public function __construct(Company $model)
+    {
+        $this->model = $model;
+    }
    
     public function getUniqueList(array $langaugeCondition ,string $fieldName):array
     {
@@ -37,5 +47,193 @@ class CompanyRepository
             /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
              $query->where(...$langaugeCondition);
          }]);
+    }
+
+    // ===== NEW ADDED METHODS FOR CRUD OPERATIONS =====
+
+    /**
+     * Get paginated companies with filters
+     */
+    public function getCompanies(Request $request): LengthAwarePaginator|Collection
+    {
+        if($request->has('language_code')){
+            $locale = $request->language_code;
+        }else{
+            $locale = 'en';
+        }
+        $query = $this->model->with(['brokers', 'translations' => function($query) use ($locale) {
+            $query->where('language_code', $locale);
+        }]);
+
+        // Apply filters
+        $this->applyFilters($query, $request);
+
+        // Apply sorting
+        $this->applySorting($query, $request);
+
+        if($request->has('per_page') || $request->has('page')){
+             // Paginate with specific page
+             $perPage = $request->get('per_page', 15);
+             $page = $request->get('page', 1);
+            return $query->paginate($perPage, ['*'], 'page', $page);
+        }else{
+            return $query->get();
+        }
+    }
+
+    /**
+     * Get company by ID with relations
+     */
+    public function findById(int $id): ?Company
+    {
+        return $this->model->with(['brokers', 'translations'])->find($id);
+    }
+
+    /**
+     * Get company by ID without relations
+     */
+    public function findByIdWithoutRelations(int $id): ?Company
+    {
+        return $this->model->find($id);
+    }
+
+    /**
+     * Create new company
+     */
+    public function create(array $data): Company
+    {
+        return $this->model->create($data);
+    }
+
+    /**
+     * Update company
+     */
+    public function update(Company $company, array $data): bool
+    {
+        return $company->update($data);
+    }
+
+    /**
+     * Delete company
+     */
+    public function delete(Company $company): bool
+    {
+        return $company->delete();
+    }
+
+    /**
+     * Attach brokers to company
+     */
+    public function attachBrokers(Company $company, array $brokerIds, ?string $zoneCode = null): void
+    {
+        $pivotData = [];
+        foreach ($brokerIds as $brokerId) {
+            $pivotData[$brokerId] = [
+                'zone_code' => $zoneCode,
+                'is_invariant' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        
+        $company->brokers()->attach($pivotData);
+    }
+
+    /**
+     * Sync brokers with company
+     */
+    public function syncBrokers(Company $company, array $brokerIds, ?string $zoneCode = null): void
+    {
+        $pivotData = [];
+        foreach ($brokerIds as $brokerId) {
+            $pivotData[$brokerId] = [
+                'zone_code' => $zoneCode,
+                'is_invariant' => true,
+                'updated_at' => now(),
+            ];
+        }
+        
+        $company->brokers()->sync($pivotData);
+    }
+
+    /**
+     * Get brokers for form dropdown
+     */
+    public function getBrokersForForm(): Collection
+    {
+        return DB::table('brokers')->select('id', 'registration_language as name')->get();
+    }
+
+    /**
+     * Get zones for form dropdown
+     */
+    public function getZonesForForm(): Collection
+    {
+        return DB::table('zones')->select('id', 'name')->get();
+    }
+
+    /**
+     * Get companies by broker ID
+     */
+    public function getByBrokerId(int $brokerId): Collection
+    {
+        return $this->model->whereHas('brokers', function($query) use ($brokerId) {
+            $query->where('brokers.id', $brokerId);
+        })->get();
+    }
+
+    /**
+     * Get companies by status
+     */
+    public function getByStatus(string $status): Collection
+    {
+        return $this->model->where('status', $status)->get();
+    }
+
+    /**
+     * Search companies by name
+     */
+    public function searchByName(string $search): Collection
+    {
+        return $this->model->where('name', 'like', "%{$search}%")->get();
+    }
+
+    /**
+     * Apply filters to query
+     */
+    private function applyFilters($query, Request $request): void
+    {
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('broker_id')) {
+            $query->whereHas('brokers', function($q) use ($request) {
+                $q->where('brokers.id', $request->broker_id);
+            });
+        }
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('licence_number', 'like', "%{$search}%");
+            });
+        }
+    }
+
+    /**
+     * Apply sorting to query
+     */
+    private function applySorting($query, Request $request): void
+    {
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        
+        $allowedSortFields = ['name', 'status', 'year_founded', 'created_at', 'updated_at'];
+        
+        if (in_array($sortBy, $allowedSortFields)) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
     }
 }

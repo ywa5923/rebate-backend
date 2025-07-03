@@ -99,13 +99,679 @@
                 }
             }
         },
+        "/api/v1/account-types": {
+            "get": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Get all account types",
+                "operationId": "7039ecd0f085039c51b188846aaa247c",
+                "parameters": [
+                    {
+                        "name": "broker_id",
+                        "in": "query",
+                        "description": "Filter by broker ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "zone_id",
+                        "in": "query",
+                        "description": "Filter by zone ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "broker_type",
+                        "in": "query",
+                        "description": "Filter by broker type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "broker",
+                                "crypto",
+                                "prop_firm"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "language_code",
+                        "in": "query",
+                        "description": "Language code for translations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AcountType"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Create a new account type",
+                "operationId": "c1fbee95ad60a053dac7b8f0e04882f0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "broker_type",
+                                    "broker_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Standard Account"
+                                    },
+                                    "broker_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "broker",
+                                            "crypto",
+                                            "prop_firm"
+                                        ],
+                                        "example": "broker"
+                                    },
+                                    "commission_value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1.5
+                                    },
+                                    "commission_unit": {
+                                        "type": "string",
+                                        "example": "pips"
+                                    },
+                                    "execution_model": {
+                                        "type": "string",
+                                        "example": "STP"
+                                    },
+                                    "max_leverage": {
+                                        "type": "string",
+                                        "example": "1:500"
+                                    },
+                                    "spread_type": {
+                                        "type": "string",
+                                        "example": "Fixed"
+                                    },
+                                    "min_deposit_value": {
+                                        "type": "string",
+                                        "example": "100"
+                                    },
+                                    "min_deposit_unit": {
+                                        "type": "string",
+                                        "example": "USD"
+                                    },
+                                    "min_trade_size_value": {
+                                        "type": "string",
+                                        "example": "0.01"
+                                    },
+                                    "min_trade_size_unit": {
+                                        "type": "string",
+                                        "example": "lots"
+                                    },
+                                    "stopout_level_value": {
+                                        "type": "string",
+                                        "example": "20"
+                                    },
+                                    "stopout_level_unit": {
+                                        "type": "string",
+                                        "example": "%"
+                                    },
+                                    "trailing_stops": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_scalping": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_hedging": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_news_trading": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_cent_accounts": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "allow_islamic_accounts": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "is_invariant": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "urls": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com"
+                                                },
+                                                "url_type": {
+                                                    "type": "string",
+                                                    "example": "website"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Website"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "website"
+                                                },
+                                                "option_category_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Account type created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account type created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/AcountType"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/account-types/create": {
+            "get": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Get form data for creating account type",
+                "operationId": "20a66bba8979a337406542030a04b3ed",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create form endpoint"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "brokers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "zones": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "option_categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/account-types/{id}": {
+            "get": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Get account type by ID",
+                "operationId": "b10d28b0112785e913314c5f822458e6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/AcountType"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Update account type",
+                "operationId": "8aac86e4e8dfdddb17dd32fe8432fc0f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Standard Account"
+                                    },
+                                    "broker_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "broker",
+                                            "crypto",
+                                            "prop_firm"
+                                        ],
+                                        "example": "broker"
+                                    },
+                                    "commission_value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 2
+                                    },
+                                    "commission_unit": {
+                                        "type": "string",
+                                        "example": "pips"
+                                    },
+                                    "execution_model": {
+                                        "type": "string",
+                                        "example": "ECN"
+                                    },
+                                    "max_leverage": {
+                                        "type": "string",
+                                        "example": "1:1000"
+                                    },
+                                    "spread_type": {
+                                        "type": "string",
+                                        "example": "Variable"
+                                    },
+                                    "min_deposit_value": {
+                                        "type": "string",
+                                        "example": "200"
+                                    },
+                                    "min_deposit_unit": {
+                                        "type": "string",
+                                        "example": "USD"
+                                    },
+                                    "min_trade_size_value": {
+                                        "type": "string",
+                                        "example": "0.01"
+                                    },
+                                    "min_trade_size_unit": {
+                                        "type": "string",
+                                        "example": "lots"
+                                    },
+                                    "stopout_level_value": {
+                                        "type": "string",
+                                        "example": "25"
+                                    },
+                                    "stopout_level_unit": {
+                                        "type": "string",
+                                        "example": "%"
+                                    },
+                                    "trailing_stops": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_scalping": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_hedging": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_news_trading": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "allow_cent_accounts": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "allow_islamic_accounts": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "is_invariant": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "urls": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com"
+                                                },
+                                                "url_type": {
+                                                    "type": "string",
+                                                    "example": "website"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Website"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "website"
+                                                },
+                                                "option_category_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "urls_to_delete": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Account type updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account type updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/AcountType"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Delete account type",
+                "operationId": "78d79c18853210ceb91ece3771d270d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account type deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account type deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
         "/api/v1/brokers/": {
             "get": {
                 "tags": [
                     "Broker"
                 ],
                 "summary": "Get all brokers",
-                "operationId": "ec4cb31fd1f33834dcb884ba228ad72e",
+                "operationId": "b26d07fcdea5773e6cd7ddda550506de",
                 "responses": {
                     "200": {
                         "description": "Successful operation"
@@ -129,14 +795,17 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "logo": {
-                                        "type": "string"
+                                    "registration_language": {
+                                        "type": "string",
+                                        "example": "en"
                                     },
-                                    "favicon": {
-                                        "type": "string"
+                                    "registration_zone": {
+                                        "type": "string",
+                                        "example": "US"
                                     },
-                                    "trading_name": {
-                                        "type": "string"
+                                    "broker_type_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -161,6 +830,17 @@
                 ],
                 "summary": "Show a broker",
                 "operationId": "fb382c8caef7d7e1be19438f21cd0f2b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Broker ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation"
@@ -176,20 +856,34 @@
                 ],
                 "summary": "Update broker",
                 "operationId": "17715e762a5918b1fce4ab878b538f60",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Broker ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "logo": {
-                                        "type": "string"
+                                    "registration_language": {
+                                        "type": "string",
+                                        "example": "en"
                                     },
-                                    "favicon": {
-                                        "type": "string"
+                                    "registration_zone": {
+                                        "type": "string",
+                                        "example": "US"
                                     },
-                                    "trading_name": {
-                                        "type": "string"
+                                    "broker_type_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -212,12 +906,1253 @@
                 ],
                 "summary": "Delete broker",
                 "operationId": "084f3abaae194c1242baf66a2d03e26d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Broker ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": "Successful operation"
                     },
                     "401": {
                         "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "/api/v1/companies": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get all companies",
+                "operationId": "1acb37580ddcfbe9ab1f43f1dca2c2c6",
+                "parameters": [
+                    {
+                        "name": "broker_id",
+                        "in": "query",
+                        "description": "Filter by broker ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "published",
+                                "pending",
+                                "rejected"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search in name and licence_number",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "status",
+                                "year_founded",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "language_code",
+                        "in": "query",
+                        "description": "Language code for translations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Company"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Create a new company",
+                "operationId": "fa2ac605f23e6b4ac7f987f14739ba92",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "TechCorp Solutions"
+                                    },
+                                    "name_p": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "TechCorp Solutions P"
+                                    },
+                                    "licence_number": {
+                                        "type": "string",
+                                        "example": "TECH-2024-001"
+                                    },
+                                    "licence_number_p": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "TECH-2024-001-P"
+                                    },
+                                    "banner": {
+                                        "type": "string",
+                                        "example": "https://example.com/banners/techcorp-banner.jpg"
+                                    },
+                                    "banner_p": {
+                                        "type": "string",
+                                        "example": "https://example.com/banners/techcorp-banner-p.jpg"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Leading technology solutions provider"
+                                    },
+                                    "description_p": {
+                                        "type": "string",
+                                        "example": "Leading technology solutions provider"
+                                    },
+                                    "year_founded": {
+                                        "type": "string",
+                                        "example": "2018"
+                                    },
+                                    "year_founded_p": {
+                                        "type": "string",
+                                        "example": "2018"
+                                    },
+                                    "employees": {
+                                        "type": "string",
+                                        "example": "250-500"
+                                    },
+                                    "employees_p": {
+                                        "type": "string",
+                                        "example": "250-500"
+                                    },
+                                    "headquarters": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "San Francisco, California, USA"
+                                    },
+                                    "headquarters_p": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "San Francisco, California, USA"
+                                    },
+                                    "offices": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "New York, London, Singapore, Tokyo"
+                                    },
+                                    "offices_p": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "New York, London, Singapore, Tokyo"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "pending",
+                                            "rejected"
+                                        ],
+                                        "example": "published"
+                                    },
+                                    "status_reason": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": ""
+                                    },
+                                    "broker_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    },
+                                    "zone_code": {
+                                        "type": "string",
+                                        "maxLength": 200,
+                                        "example": "US"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Company created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Company"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/companies/create": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get form data for creating company",
+                "operationId": "db75542fbf1e58735d2a645b79221378",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create form endpoint"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "brokers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "zones": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "status_options": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/companies/{id}": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get company by ID",
+                "operationId": "f8b8d241e9ef04cd3977b4349d284111",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Company ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Company"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Update company",
+                "operationId": "258815f881ea9aa8be637506821f9e3a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Company ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "Updated TechCorp Solutions"
+                                    },
+                                    "name_p": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "Updated TechCorp Solutions P"
+                                    },
+                                    "licence_number": {
+                                        "type": "string",
+                                        "example": "TECH-2024-001-REV"
+                                    },
+                                    "licence_number_p": {
+                                        "type": "string",
+                                        "maxLength": 250,
+                                        "example": "TECH-2024-001-REV-P"
+                                    },
+                                    "banner": {
+                                        "type": "string",
+                                        "example": "https://example.com/banners/techcorp-banner-new.jpg"
+                                    },
+                                    "banner_p": {
+                                        "type": "string",
+                                        "example": "https://example.com/banners/techcorp-banner-new-p.jpg"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated: Leading technology solutions provider"
+                                    },
+                                    "description_p": {
+                                        "type": "string",
+                                        "example": "Updated: Leading technology solutions provider"
+                                    },
+                                    "year_founded": {
+                                        "type": "string",
+                                        "example": "2018"
+                                    },
+                                    "year_founded_p": {
+                                        "type": "string",
+                                        "example": "2018"
+                                    },
+                                    "employees": {
+                                        "type": "string",
+                                        "example": "500-750"
+                                    },
+                                    "employees_p": {
+                                        "type": "string",
+                                        "example": "500-750"
+                                    },
+                                    "headquarters": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "San Francisco, California, USA"
+                                    },
+                                    "headquarters_p": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "San Francisco, California, USA"
+                                    },
+                                    "offices": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "New York, London, Singapore, Tokyo, Berlin, Toronto"
+                                    },
+                                    "offices_p": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "New York, London, Singapore, Tokyo, Berlin, Toronto"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "pending",
+                                            "rejected"
+                                        ],
+                                        "example": "published"
+                                    },
+                                    "status_reason": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": ""
+                                    },
+                                    "broker_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ]
+                                    },
+                                    "zone_code": {
+                                        "type": "string",
+                                        "maxLength": 200,
+                                        "example": "US"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Company updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Company"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Delete company",
+                "operationId": "bc7d58d0575cba105a2bfd7146e25bd4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Company ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/regulators": {
+            "get": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Get all regulators",
+                "operationId": "fae92c69db46fc09ecb42cde424c8c5d",
+                "parameters": [
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "Filter by country",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "published",
+                                "pending",
+                                "rejected"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "enforced",
+                        "in": "query",
+                        "description": "Filter by enforced status",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name, abbreviation, or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "language_code",
+                        "in": "query",
+                        "description": "Language code for translations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Regulator"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Create a new regulator",
+                "operationId": "f14d0a32116db30b4e05d80b88da83f3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Financial Conduct Authority"
+                                    },
+                                    "abreviation": {
+                                        "type": "string",
+                                        "example": "FCA"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "United Kingdom"
+                                    },
+                                    "country_p": {
+                                        "type": "string",
+                                        "example": "UK"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Financial regulator in the UK"
+                                    },
+                                    "description_p": {
+                                        "type": "string",
+                                        "example": "UK financial regulator"
+                                    },
+                                    "rating": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4.5
+                                    },
+                                    "rating_p": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4.5
+                                    },
+                                    "capitalization": {
+                                        "type": "string",
+                                        "example": "High capitalization requirements"
+                                    },
+                                    "capitalization_p": {
+                                        "type": "string",
+                                        "example": "High cap requirements"
+                                    },
+                                    "segregated_clients_money": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "segregated_clients_money_p": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "deposit_compensation_scheme": {
+                                        "type": "string",
+                                        "example": "FSCS protection"
+                                    },
+                                    "deposit_compensation_scheme_p": {
+                                        "type": "string",
+                                        "example": "FSCS"
+                                    },
+                                    "negative_balance_protection": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "negative_balance_protection_p": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "rebates": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "rebates_p": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enforced": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enforced_p": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "max_leverage": {
+                                        "type": "string",
+                                        "example": "1:30"
+                                    },
+                                    "max_leverage_p": {
+                                        "type": "string",
+                                        "example": "1:30"
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "example": "https://www.fca.org.uk"
+                                    },
+                                    "website_p": {
+                                        "type": "string",
+                                        "example": "https://www.fca.org.uk"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "pending",
+                                            "rejected"
+                                        ],
+                                        "example": "published"
+                                    },
+                                    "status_reason": {
+                                        "type": "string",
+                                        "example": "Approved regulator"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Regulator created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Regulator created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Regulator"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/regulators/create": {
+            "get": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Get form data for creating regulator",
+                "operationId": "6b6ca2713fb0aeb4fa56fd565439cb24",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create form endpoint"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "statuses": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "countries": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/regulators/{id}": {
+            "get": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Get regulator by ID",
+                "operationId": "46f3113fa5b1bb45d0a7e42fea307a51",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Regulator ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Regulator"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Regulator not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Update regulator",
+                "operationId": "ec0fae47ba6fb46d8f71bed0e4ece9ea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Regulator ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Financial Conduct Authority"
+                                    },
+                                    "abreviation": {
+                                        "type": "string",
+                                        "example": "FCA"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "United Kingdom"
+                                    },
+                                    "country_p": {
+                                        "type": "string",
+                                        "example": "UK"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated financial regulator in the UK"
+                                    },
+                                    "description_p": {
+                                        "type": "string",
+                                        "example": "Updated UK financial regulator"
+                                    },
+                                    "rating": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4.8
+                                    },
+                                    "rating_p": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4.8
+                                    },
+                                    "capitalization": {
+                                        "type": "string",
+                                        "example": "Updated high capitalization requirements"
+                                    },
+                                    "capitalization_p": {
+                                        "type": "string",
+                                        "example": "Updated high cap requirements"
+                                    },
+                                    "segregated_clients_money": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "segregated_clients_money_p": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "deposit_compensation_scheme": {
+                                        "type": "string",
+                                        "example": "FSCS protection"
+                                    },
+                                    "deposit_compensation_scheme_p": {
+                                        "type": "string",
+                                        "example": "FSCS"
+                                    },
+                                    "negative_balance_protection": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "negative_balance_protection_p": {
+                                        "type": "string",
+                                        "example": "Yes"
+                                    },
+                                    "rebates": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "rebates_p": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enforced": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "enforced_p": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "max_leverage": {
+                                        "type": "string",
+                                        "example": "1:30"
+                                    },
+                                    "max_leverage_p": {
+                                        "type": "string",
+                                        "example": "1:30"
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "example": "https://www.fca.org.uk"
+                                    },
+                                    "website_p": {
+                                        "type": "string",
+                                        "example": "https://www.fca.org.uk"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "published",
+                                            "pending",
+                                            "rejected"
+                                        ],
+                                        "example": "published"
+                                    },
+                                    "status_reason": {
+                                        "type": "string",
+                                        "example": "Updated approved regulator"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Regulator updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Regulator updated successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Regulator"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Regulator not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Regulator"
+                ],
+                "summary": "Delete regulator",
+                "operationId": "5194167faf9f83653fc807b08e493788",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Regulator ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Regulator deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Regulator deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Regulator not found"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 }
             }
@@ -356,68 +2291,268 @@
     },
     "components": {
         "schemas": {
-            "Broker": {
+            "AcountType": {
                 "required": [
-                    "trading_name"
+                    "name",
+                    "broker_type",
+                    "broker_id"
                 ],
                 "properties": {
                     "id": {
                         "type": "integer",
                         "format": "int64"
                     },
-                    "logo": {
+                    "name": {
                         "type": "string",
+                        "example": "Standard Account"
+                    },
+                    "broker_type": {
+                        "type": "string",
+                        "enum": [
+                            "broker",
+                            "crypto",
+                            "prop_firm"
+                        ],
+                        "example": "broker"
+                    },
+                    "commission_value": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.5
+                    },
+                    "commission_value_p": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.5
+                    },
+                    "commission_unit": {
+                        "type": "string",
+                        "example": "pips"
+                    },
+                    "commission_unit_p": {
+                        "type": "string",
+                        "example": "pips"
+                    },
+                    "execution_model": {
+                        "type": "string",
+                        "example": "STP"
+                    },
+                    "execution_model_p": {
+                        "type": "string",
+                        "example": "STP"
+                    },
+                    "max_leverage": {
+                        "type": "string",
+                        "example": "1:500"
+                    },
+                    "max_leverage_p": {
+                        "type": "string",
+                        "example": "1:500"
+                    },
+                    "spread_type": {
+                        "type": "string",
+                        "example": "Fixed"
+                    },
+                    "spread_type_p": {
+                        "type": "string",
+                        "example": "Fixed"
+                    },
+                    "min_deposit_value": {
+                        "type": "string",
+                        "example": "100"
+                    },
+                    "min_deposit_unit": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "min_deposit_value_p": {
+                        "type": "string",
+                        "example": "100"
+                    },
+                    "min_deposit_unit_p": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "min_trade_size_value": {
+                        "type": "string",
+                        "example": "0.01"
+                    },
+                    "min_trade_size_unit": {
+                        "type": "string",
+                        "example": "lots"
+                    },
+                    "min_trade_size_value_p": {
+                        "type": "string",
+                        "example": "0.01"
+                    },
+                    "min_trade_size_unit_p": {
+                        "type": "string",
+                        "example": "lots"
+                    },
+                    "stopout_level_value": {
+                        "type": "string",
+                        "example": "20"
+                    },
+                    "stopout_level_unit": {
+                        "type": "string",
+                        "example": "%"
+                    },
+                    "stopout_level_value_p": {
+                        "type": "string",
+                        "example": "20"
+                    },
+                    "stopout_level_unit_p": {
+                        "type": "string",
+                        "example": "%"
+                    },
+                    "trailing_stops": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "trailing_stops_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_scalping": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_scalping_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_hedging": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_hedging_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_news_trading": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_news_trading_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "allow_cent_accounts": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "allow_cent_accounts_p": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "allow_islamic_accounts": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "allow_islamic_accounts_p": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "mobile_url_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "mobile_url_id_p": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "webplaform_url_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "webplaform_url_id_p": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "swap_url_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "swap_url_id_p": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "comission_url_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "comission_url_id_p": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "broker_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "broker": {
+                        "type": "object"
+                    },
+                    "zone": {
+                        "type": "object"
+                    },
+                    "urls": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "translations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Broker": {
+                "required": [
+                    "broker_type_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "registration_language": {
+                        "type": "string",
+                        "example": "en",
                         "nullable": true
                     },
-                    "favicon": {
+                    "registration_zone": {
                         "type": "string",
+                        "example": "US",
                         "nullable": true
                     },
-                    "trading_name": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "home_url": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "overall_rating": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "user_rating": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "support_options": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "account_type": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "trading_instruments": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "account_currencies": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "default_language": {
-                        "type": "string",
+                    "broker_type_id": {
+                        "type": "integer",
+                        "example": 1,
                         "nullable": false
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time",
-                        "nullable": false
+                        "format": "date-time"
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "date-time",
-                        "nullable": false
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -502,6 +2637,123 @@
                 },
                 "type": "object"
             },
+            "Company": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 250,
+                        "example": "TechCorp Solutions"
+                    },
+                    "name_p": {
+                        "type": "string",
+                        "maxLength": 250,
+                        "example": "TechCorp Solutions P"
+                    },
+                    "licence_number": {
+                        "type": "string",
+                        "example": "TECH-2024-001"
+                    },
+                    "licence_number_p": {
+                        "type": "string",
+                        "maxLength": 250,
+                        "example": "TECH-2024-001-P"
+                    },
+                    "banner": {
+                        "type": "string",
+                        "example": "https://example.com/banners/techcorp-banner.jpg"
+                    },
+                    "banner_p": {
+                        "type": "string",
+                        "example": "https://example.com/banners/techcorp-banner-p.jpg"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Leading technology solutions provider"
+                    },
+                    "description_p": {
+                        "type": "string",
+                        "example": "Leading technology solutions provider"
+                    },
+                    "year_founded": {
+                        "type": "string",
+                        "example": "2018"
+                    },
+                    "year_founded_p": {
+                        "type": "string",
+                        "example": "2018"
+                    },
+                    "employees": {
+                        "type": "string",
+                        "example": "250-500"
+                    },
+                    "employees_p": {
+                        "type": "string",
+                        "example": "250-500"
+                    },
+                    "headquarters": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": "San Francisco, California, USA"
+                    },
+                    "headquarters_p": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": "San Francisco, California, USA"
+                    },
+                    "offices": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": "New York, London, Singapore, Tokyo"
+                    },
+                    "offices_p": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": "New York, London, Singapore, Tokyo"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "published",
+                            "pending",
+                            "rejected"
+                        ],
+                        "example": "published"
+                    },
+                    "status_reason": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "example": ""
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "brokers": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "translations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "OptionCategory": {
                 "required": [
                     "name",
@@ -533,6 +2785,217 @@
                         "type": "string",
                         "format": "date-time",
                         "nullable": false
+                    }
+                },
+                "type": "object"
+            },
+            "Regulator": {
+                "title": "Regulator",
+                "description": "Regulator model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Financial Conduct Authority"
+                    },
+                    "abreviation": {
+                        "type": "string",
+                        "example": "FCA"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "United Kingdom"
+                    },
+                    "country_p": {
+                        "type": "string",
+                        "example": "UK"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Financial regulator in the UK"
+                    },
+                    "description_p": {
+                        "type": "string",
+                        "example": "UK financial regulator"
+                    },
+                    "rating": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.5
+                    },
+                    "rating_p": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.5
+                    },
+                    "capitalization": {
+                        "type": "string",
+                        "example": "High capitalization requirements"
+                    },
+                    "capitalization_p": {
+                        "type": "string",
+                        "example": "High cap requirements"
+                    },
+                    "segregated_clients_money": {
+                        "type": "string",
+                        "example": "Yes"
+                    },
+                    "segregated_clients_money_p": {
+                        "type": "string",
+                        "example": "Yes"
+                    },
+                    "deposit_compensation_scheme": {
+                        "type": "string",
+                        "example": "FSCS protection"
+                    },
+                    "deposit_compensation_scheme_p": {
+                        "type": "string",
+                        "example": "FSCS"
+                    },
+                    "negative_balance_protection": {
+                        "type": "string",
+                        "example": "Yes"
+                    },
+                    "negative_balance_protection_p": {
+                        "type": "string",
+                        "example": "Yes"
+                    },
+                    "rebates": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "rebates_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "enforced": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "enforced_p": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "max_leverage": {
+                        "type": "string",
+                        "example": "1:30"
+                    },
+                    "max_leverage_p": {
+                        "type": "string",
+                        "example": "1:30"
+                    },
+                    "website": {
+                        "type": "string",
+                        "example": "https://www.fca.org.uk"
+                    },
+                    "website_p": {
+                        "type": "string",
+                        "example": "https://www.fca.org.uk"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "published",
+                            "pending",
+                            "rejected"
+                        ],
+                        "example": "published"
+                    },
+                    "status_reason": {
+                        "type": "string",
+                        "example": "Approved regulator"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Url": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "urlable_type": {
+                        "type": "string",
+                        "example": "Modules\\\\Brokers\\\\Models\\\\AcountType"
+                    },
+                    "urlable_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "url_type": {
+                        "type": "string",
+                        "example": "website"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com"
+                    },
+                    "url_p": {
+                        "type": "string",
+                        "example": "https://example.com"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Website"
+                    },
+                    "name_p": {
+                        "type": "string",
+                        "example": "Website"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "website"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Company website"
+                    },
+                    "category_position": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "option_category_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "broker_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "zone": {
+                        "type": "object"
+                    },
+                    "broker": {
+                        "type": "object"
+                    },
+                    "translations": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
@@ -590,7 +3053,62 @@
                     }
                 },
                 "type": "object"
+            },
+            "Zone": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "United States"
+                    },
+                    "zone_code": {
+                        "type": "string",
+                        "example": "US"
+                    },
+                    "countries": {
+                        "type": "string",
+                        "example": "US,CA"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "AccountType",
+            "description": "AccountType"
+        },
+        {
+            "name": "Broker",
+            "description": "Broker"
+        },
+        {
+            "name": "Company",
+            "description": "Company"
+        },
+        {
+            "name": "Regulator",
+            "description": "Regulator"
+        },
+        {
+            "name": "Translation",
+            "description": "Translation"
+        }
+    ]
 }

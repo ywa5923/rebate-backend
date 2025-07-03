@@ -157,7 +157,7 @@ class BrokerOptionController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        //
+        //return new Response("not found", 404);
     }
 
     /**

@@ -9,7 +9,7 @@
         "abbasudo/laravel-purity": "^3.3",
         "aws/aws-sdk-php": "^3.342",
         "calebporzio/sushi": "^2.4",
-        "darkaonline/l5-swagger": "^8.6",
+        "darkaonline/l5-swagger": "^9.0",
         "doctrine/dbal": "^4.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",

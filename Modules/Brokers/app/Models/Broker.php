@@ -15,7 +15,13 @@ use Modules\Translations\Models\Translation;
  * @OA\Schema(
  *   schema="Broker",
  *   type="object",
- *   required={"trading_name"},
+ *   required={"broker_type_id"},
+ *   @OA\Property(property="id",type="integer", format="int64"),
+ *   @OA\Property(property="registration_language",type="string",nullable=true,example="en"),
+ *   @OA\Property(property="registration_zone",type="string",nullable=true,example="US"),
+ *   @OA\Property(property="broker_type_id",type="integer",nullable=false,example=1),
+ *   @OA\Property(property="created_at",type="string",format="date-time"),
+ *   @OA\Property(property="updated_at",type="string",format="date-time")
  * )
  * Class Broker
  * @package Modules\Brokers\Models
@@ -37,24 +43,6 @@ class Broker extends Model
      */
     protected $fillable = ["logo", "favicon", "trading_name"];
 
-
-    /**
-     * @OA\Property(property="id",type="integer", format="int64")
-     * @OA\Property(property="logo",type="string",nullable=true)
-     * @OA\Property(property="favicon",type="string",nullable=true)
-     * @OA\Property(property="trading_name",type="string",nullable=false)
-     * @OA\Property(property="home_url",type="string",nullable=false)
-     * @OA\Property(property="overall_rating",type="string",nullable=false)
-     * @OA\Property(property="user_rating",type="string",nullable=false)
-     * @OA\Property(property="support_options",type="string",nullable=false)
-     * @OA\Property(property="account_type",type="string",nullable=false)
-     * @OA\Property(property="trading_instruments",type="string",nullable=false)
-     * @OA\Property(property="account_currencies",type="string",nullable=false)
-     * @OA\Property(property="default_language",type="string",nullable=false)
-     * @OA\Property(property="created_at",type="datetime",nullable=false)
-     * @OA\Property(property="updated_at",type="datetime",nullable=false)
-     * 
-     */
 
     public function translations(): MorphMany
     {

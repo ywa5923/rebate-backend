@@ -17,16 +17,29 @@ class CompanyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            //"id"=>$this->id,
-           // "name" =>$this->name,
-           // "licence_number"=>$this->licence_number,
-          //  "banner"=>$this->banner,
-         //  "description"=>$this->translateProp("description"),
-           // "year_founded"=>$this->year_founded,
-          //  "employees"=>$this->employees,
-            "headquarters"=>$this->translateProp("headquarters"),
-            "offices"=>$this->translateProp("offices"),
-            //"translations"=>TranslationResource::collection($this->whenLoaded('translations'))
-          ];
+            "id" => $this->id,
+            "name" => $this->name,
+            "name_p" => $this->name_p,
+            "licence_number" => $this->licence_number,
+            "licence_number_p" => $this->licence_number_p,
+            "banner" => $this->banner,
+            "banner_p" => $this->banner_p,
+            "description" => $this->translateProp("description"),
+            "description_p" => $this->description_p,
+            "year_founded" => $this->year_founded,
+            "year_founded_p" => $this->year_founded_p,
+            "employees" => $this->employees,
+            "employees_p" => $this->employees_p,
+            "headquarters" => $this->headquarters,
+            "headquarters_p" => $this->translateProp('headquarters_p'),
+            "offices" => $this->offices,
+            "offices_p" => $this->translateProp('offices_p'),
+            "status" => $this->status,
+            "status_reason" => $this->status_reason,
+            "brokers" => $this->whenLoaded('brokers'),
+            "translations" => TranslationResource::collection($this->whenLoaded('translations')),
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
+        ];
     }
 }

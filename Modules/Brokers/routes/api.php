@@ -6,6 +6,7 @@ use Modules\Brokers\Http\Controllers\BrokerFilterController;
 use Modules\Brokers\Http\Controllers\BrokerOptionController;
 use Modules\Brokers\Http\Controllers\MatrixController;
 use Modules\Brokers\Http\Controllers\AcountTypeController;
+use Modules\Brokers\Http\Controllers\CompanyController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -33,4 +34,7 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('account-types/{id}', [AcountTypeController::class, 'show']);
     Route::put('account-types/{id}', [AcountTypeController::class, 'update']);
     Route::delete('account-types/{id}', [AcountTypeController::class, 'destroy']);
+    
+    // Company routes
+    Route::apiResource('companies', CompanyController::class)->names('companies');
 });
