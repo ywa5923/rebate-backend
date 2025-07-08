@@ -19,10 +19,10 @@ class DynamicOptionsValuesSeeder extends Seeder
         $csvFile = module_path('Brokers', 'database/seeders/csv/dynamic_options_values.csv');
         $handle = fopen($csvFile, "r");
         $this->loadFile($handle,null);
-        rewind($handle);
-       $this->loadFile($handle,"zone2");
-        rewind($handle);
-       $this->loadFile($handle,"zone3");
+    //     rewind($handle);
+    //    $this->loadFile($handle,"zone2");
+    //     rewind($handle);
+    //    $this->loadFile($handle,"zone3");
        
        
     }
@@ -36,15 +36,22 @@ class DynamicOptionsValuesSeeder extends Seeder
                 $rowIndex++;
                 $optionsInfo = $this->getOptionsInfo($row);
 
+              //  dd($optionsInfo);
                 $slugs = $row;
                 continue;
             }
-           
+            //dd($optionsInfo);
             foreach ($row as $k => $v) {
                 if ($k == 0 || empty($v)) {
                     continue;
                 }
-                [$brokerOptionId,$optionFormType]=$optionsInfo[$k];
+                $slugName=$slugs[$k];
+                if(isset($optionsInfo[$slugName])){
+                    [$brokerOptionId,$optionFormType]=$optionsInfo[$slugName];
+                }else{
+                    continue;
+                }
+               
               
 
                 if($optionFormType=="Link")
@@ -71,7 +78,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                             "broker_option_id" => $brokerOptionId,
                             "option_slug" => $slugs[$k],
                             "value" => (is_numeric($value))?$value:$zone.$value,
-                            "zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
+                            //"zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
                            // "default_loading"=>$default_loading??0,
                             //"default_loading_position"=>($default_loading_position)?($default_loading_position):1,
                             //"default_loading_position"=>$default_loading_position??1,
@@ -114,7 +121,7 @@ class DynamicOptionsValuesSeeder extends Seeder
                     "option_slug" => $zone.$slug,
                     "value" => $zone.$data,
                     "status" => 1,
-                    "zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
+                    //"zone_code"=>(!empty($zone)||!is_null($zone))?$zone:"zone1",
                 ]
             );
         }
@@ -127,9 +134,10 @@ class DynamicOptionsValuesSeeder extends Seeder
                 
                 $option = BrokerOption::where('slug', $v)->first();
                 if ($option != null) {
-                    $optionsInfo[$k] = [$option->id,$option->form_type];
+                    //$optionsInfo[$k] = [$option->id,$option->form_type];
+                    $optionsInfo[$option->slug] = [$option->id,$option->form_type];
                 } else {
-                    throw new \Exception("Option with slug {$v} not found");
+                    //throw new \Exception("Option with slug {$v} not found");
                 }
             }
         }

@@ -69,11 +69,11 @@ use Modules\Translations\Models\Zone;
  *   @OA\Property(property="urls", type="array", @OA\Items(type="object")),
  *   @OA\Property(property="translations", type="array", @OA\Items(type="object"))
  * )
- * Class AcountType
+ * Class AccountType
  * @package Modules\Brokers\Models
  */
 
-class AcountType extends Model
+class AccountType extends Model
 {
     /**
      * The attributes that are mass assignable.

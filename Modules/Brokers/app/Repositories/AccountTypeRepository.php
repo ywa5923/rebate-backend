@@ -2,7 +2,7 @@
 
 namespace Modules\Brokers\Repositories;
 
-use Modules\Brokers\Models\AcountType;
+use Modules\Brokers\Models\AccountType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AccountTypeRepository
 {
-    protected AcountType $model;
+    protected AccountType $model;
 
-    public function __construct(AcountType $model)
+    public function __construct(AccountType $model)
     {
         $this->model = $model;
     }
@@ -51,7 +51,7 @@ class AccountTypeRepository
     /**
      * Get account type by ID with relations
      */
-    public function findById(int $id): ?AcountType
+    public function findById(int $id): ?AccountType
     {
         return $this->model->with(['broker', 'zone', 'translations', 'urls'])->find($id);
     }
@@ -59,7 +59,7 @@ class AccountTypeRepository
     /**
      * Get account type by ID without relations
      */
-    public function findByIdWithoutRelations(int $id): ?AcountType
+    public function findByIdWithoutRelations(int $id): ?AccountType
     {
         return $this->model->find($id);
     }
@@ -67,7 +67,7 @@ class AccountTypeRepository
     /**
      * Create new account type
      */
-    public function create(array $data): AcountType
+    public function create(array $data): AccountType
     {
         return $this->model->create($data);
     }
@@ -75,7 +75,7 @@ class AccountTypeRepository
     /**
      * Update account type
      */
-    public function update(AcountType $accountType, array $data): bool
+    public function update(AccountType $accountType, array $data): bool
     {
         return $accountType->update($data);
     }
@@ -83,7 +83,7 @@ class AccountTypeRepository
     /**
      * Delete account type
      */
-    public function delete(AcountType $accountType): bool
+    public function delete(AccountType $accountType): bool
     {
         return $accountType->delete();
     }
@@ -91,7 +91,7 @@ class AccountTypeRepository
     /**
      * Create URLs for account type
      */
-    public function createUrls(AcountType $accountType, array $urls): void
+    public function createUrls(AccountType $accountType, array $urls): void
     {
         $urlModels = [];
         foreach ($urls as $index => $urlData) {
@@ -104,7 +104,7 @@ class AccountTypeRepository
             }
 
             $urlModels[] = [
-                'urlable_type' => AcountType::class,
+                'urlable_type' => AccountType::class,
                 'urlable_id' => $accountType->id,
                 'url_type' => $urlData['url_type'],
                 'url' => $urlData['url'],
@@ -130,7 +130,7 @@ class AccountTypeRepository
     /**
      * Handle URL updates and deletions
      */
-    public function handleUrlUpdates(AcountType $accountType, array $urls, array $urlsToDelete): void
+    public function handleUrlUpdates(AccountType $accountType, array $urls, array $urlsToDelete): void
     {
         // Delete URLs if specified
         if (!empty($urlsToDelete)) {
@@ -160,7 +160,7 @@ class AccountTypeRepository
                     DB::table('urls')->where('id', $urlData['id'])->update($urlModelData);
                 } else {
                     // Create new URL
-                    $urlModelData['urlable_type'] = AcountType::class;
+                    $urlModelData['urlable_type'] = AccountType::class;
                     $urlModelData['urlable_id'] = $accountType->id;
                     $urlModelData['created_at'] = now();
                     DB::table('urls')->insert($urlModelData);
@@ -212,8 +212,10 @@ class AccountTypeRepository
             $query->where('broker_id', $request->broker_id);
         }
 
-        if ($request->has('zone_id')) {
-            $query->where('zone_id', $request->zone_id);
+        if ($request->has('zone_code')) {
+            $query->where('zone_code', function($q) use ($request){
+                $q->where('zone_code', $request->zone_code);
+            });
         }
 
         if ($request->has('broker_type')) {

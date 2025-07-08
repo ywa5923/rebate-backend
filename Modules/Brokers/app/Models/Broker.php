@@ -41,7 +41,7 @@ class Broker extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ["logo", "favicon", "trading_name"];
+    protected $fillable = [];
 
 
     public function translations(): MorphMany
@@ -54,9 +54,9 @@ class Broker extends Model
         return $this->hasMany(OptionValue::class);
     }
 
-    public function companies(): BelongsToMany
+    public function companies(): HasMany
     {
-        return $this->belongsToMany(Company::class,"broker_company");
+        return $this->hasMany(Company::class);
     }
 
     public function regulators():BelongsToMany

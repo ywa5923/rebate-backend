@@ -34,14 +34,15 @@ return new class extends Migration
             $table->string("negative_balance_protection_p")->nullable();
             $table->boolean("rebates")->nullable();
             $table->boolean("rebates_p")->nullable();
-            $table->boolean("enforced")->nullable();
-            $table->boolean("enforced_p")->nullable();
+            
             $table->text("max_leverage_p")->nullable();
             $table->text("max_leverage")->nullable();
             $table->string("website",500)->nullable();
             $table->string("website_p",500)->nullable();
             $table->enum("status",["published","pending","rejected"])->default("published");
             $table->text("status_reason",1000)->nullable();
+            $table->boolean('is_invariant')->default(true);
+            $table->foreignId('zone_id')->nullable()->constrained('zones');
             $table->timestamps();
         });
     }

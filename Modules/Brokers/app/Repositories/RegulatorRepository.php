@@ -59,7 +59,7 @@ class RegulatorRepository
             $locale = 'en';
         }
         
-        $query = $this->model->with(['brokers', 'translations' => function($query) use ($locale) {
+        $query = $this->model->with(['brokers','translations' => function($query) use ($locale) {
             $query->where('language_code', $locale);
         }]);
 
@@ -158,18 +158,7 @@ class RegulatorRepository
      */
     private function applyFilters($query, Request $request): void
     {
-        if ($request->filled('country')) {
-            $query->where('country', $request->country);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('enforced')) {
-            $query->where('enforced', $request->boolean('enforced'));
-        }
-
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {

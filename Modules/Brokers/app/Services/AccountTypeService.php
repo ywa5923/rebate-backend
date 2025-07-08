@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Brokers\Models\AcountType;
+use Modules\Brokers\Models\AccountType;
 
 class AccountTypeService
 {
@@ -51,7 +51,7 @@ class AccountTypeService
     /**
      * Get account type by ID
      */
-    public function getAccountTypeById(int $id): ?AcountType
+    public function getAccountTypeById(int $id): ?AccountType
     {
         return $this->repository->findById($id);
     }
@@ -59,7 +59,7 @@ class AccountTypeService
     /**
      * Create new account type with URLs
      */
-    public function createAccountType(array $data): AcountType
+    public function createAccountType(array $data): AccountType
     {
         return DB::transaction(function () use ($data) {
             try {
@@ -87,7 +87,7 @@ class AccountTypeService
     /**
      * Update account type with URLs
      */
-    public function updateAccountType(int $id, array $data): AcountType
+    public function updateAccountType(int $id, array $data): AccountType
     {
       
         return DB::transaction(function () use ($id, $data) {

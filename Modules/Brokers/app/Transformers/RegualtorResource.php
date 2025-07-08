@@ -5,6 +5,7 @@ namespace Modules\Brokers\Transformers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Utilities\TranslateTrait;
+use Modules\Translations\Transformers\TranslationResource;
 
 class RegualtorResource extends JsonResource
 {
@@ -51,26 +52,27 @@ class RegualtorResource extends JsonResource
             'website_p' => $this->website_p,
             'status' => $this->status,
             'status_reason' => $this->status_reason,
-            'brokers' => $this->whenLoaded('brokers', function () {
-                return $this->brokers->map(function ($broker) {
-                    return [
-                        'id' => $broker->id,
-                        'name' => $broker->name,
-                        'trading_name' => $broker->trading_name,
-                    ];
-                });
-            }),
-            'translations' => $this->whenLoaded('translations', function () {
-                return $this->translations->map(function ($translation) {
-                    return [
-                        'id' => $translation->id,
-                        'language_code' => $translation->language_code,
-                        'metadata' => $translation->metadata,
-                    ];
-                });
-            }),
+            // 'brokers' => $this->whenLoaded('brokers', function () {
+            //     return $this->brokers->map(function ($broker) {
+            //         return [
+            //             'id' => $broker->id,
+            //             'name' => $broker->name,
+            //             'trading_name' => $broker->trading_name,
+            //         ];
+            //     });
+            // }),
+            // 'translations' => $this->whenLoaded('translations', function () {
+            //     return $this->translations->map(function ($translation) {
+            //         return [
+            //             'id' => $translation->id,
+            //             'language_code' => $translation->language_code,
+            //             'metadata' => $translation->metadata,
+            //         ];
+            //     });
+            // }),
+            "translations"=>TranslationResource::collection($this->whenLoaded('translations')),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'updated_at' => $this->updated_at,  
         ];
     }
     

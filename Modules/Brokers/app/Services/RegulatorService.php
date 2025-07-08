@@ -141,8 +141,6 @@ class RegulatorService
             'negative_balance_protection_p' => 'nullable|string|max:255',
             'rebates' => 'nullable|boolean',
             'rebates_p' => 'nullable|boolean',
-            'enforced' => 'nullable|boolean',
-            'enforced_p' => 'nullable|boolean',
             'max_leverage' => 'nullable|string',
             'max_leverage_p' => 'nullable|string',
             'website' => 'nullable|url|max:500',

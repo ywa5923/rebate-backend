@@ -23,6 +23,8 @@ return new class extends Migration
             $table->boolean("is_invariant")->default(true);
             $table->integer("category_position")->nullable();
             $table->string("description",500)->nullable(); 
+            $table->enum("status",["published","pending","rejected"])->default("published");
+            $table->text("status_reason",1000)->nullable();
             $table->foreignId("option_category_id")->nullable()->constrained("option_categories");
             $table->foreignId("broker_id")->constrained();
             $table->foreignId("zone_id")->nullable()->constrained();

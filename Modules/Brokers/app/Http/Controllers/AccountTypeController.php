@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\AccountTypeService;
 use Modules\Brokers\Transformers\AccountTypeResource;
 
-class AcountTypeController extends Controller
+class AccountTypeController extends Controller
 {
     protected AccountTypeService $accountTypeService;
 

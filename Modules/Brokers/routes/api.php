@@ -7,6 +7,7 @@ use Modules\Brokers\Http\Controllers\BrokerOptionController;
 use Modules\Brokers\Http\Controllers\MatrixController;
 use Modules\Brokers\Http\Controllers\AcountTypeController;
 use Modules\Brokers\Http\Controllers\CompanyController;
+use Modules\Brokers\Http\Controllers\RegulatorController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -29,12 +30,13 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
     Route::get('/matrix', [MatrixController::class, 'index']);
     Route::post('/matrix/store', [MatrixController::class, 'store']);
-    Route::post('account-types', [AcountTypeController::class, 'store']);
-    Route::get('account-types', [AcountTypeController::class, 'index']);
-    Route::get('account-types/{id}', [AcountTypeController::class, 'show']);
-    Route::put('account-types/{id}', [AcountTypeController::class, 'update']);
-    Route::delete('account-types/{id}', [AcountTypeController::class, 'destroy']);
+    Route::post('account-types', [AccountTypeController::class, 'store']);
+    Route::get('account-types', [AccountTypeController::class, 'index']);
+    Route::get('account-types/{id}', [AccountTypeController::class, 'show']);
+    Route::put('account-types/{id}', [AccountTypeController::class, 'update']);
+    Route::delete('account-types/{id}', [AccountTypeController::class, 'destroy']);
     
     // Company routes
     Route::apiResource('companies', CompanyController::class)->names('companies');
+    Route::apiResource('regulators', RegulatorController::class)->names('regulators');
 });

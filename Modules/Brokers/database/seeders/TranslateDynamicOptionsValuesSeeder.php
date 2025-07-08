@@ -44,8 +44,14 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
                     continue;
                 }
                 $brokerId=$row[0];
+
                 $optionSlug=$optionSlugs[$k];
-                $optionFormType=$optionsInfo[$k];
+
+                if(isset($optionsInfo[$optionSlug])){
+                $optionFormType=$optionsInfo[$optionSlug];
+                }else{
+                    continue;
+                }
 
                 if($optionFormType=="Link")
                
@@ -208,9 +214,10 @@ class TranslateDynamicOptionsValuesSeeder extends Seeder
                 
                 $option = BrokerOption::where('slug', $v)->first();
                 if ($option != null) {
-                    $optionsInfo[$k] = $option->form_type;
+                    //$optionsInfo[$k] = $option->form_type;
+                    $optionsInfo[$option->slug] = [$option->id,$option->form_type];
                 } else {
-                    throw new \Exception("Option with slug {$v} not found");
+                   // throw new \Exception("Option with slug {$v} not found");
                 }
             
         }

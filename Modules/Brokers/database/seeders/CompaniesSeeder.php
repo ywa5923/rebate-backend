@@ -19,6 +19,7 @@ class CompaniesSeeder extends Seeder
         $importer=new BatchImporter(filePath:$csvFile);
         $importer->setTableInfo(tableName:"companies",rowMapping:[
             "id"=>1,
+            "broker_id"=>2,
             "name"=>3,
             "licence_number"=>4,
             "year_founded"=>5,
@@ -32,10 +33,10 @@ class CompaniesSeeder extends Seeder
         //company_id,broker_id,name,licence_number,year_founded,employees,headquartes,description,offices
         $importer->import(1);
 
-        $importer->setTableInfo(tableName:"broker_company",rowMapping:[
-            "company_id"=>1,
-            "broker_id"=>2
-        ]);
-        $importer->import(1);
+        // $importer->setTableInfo(tableName:"broker_company",rowMapping:[
+        //     "company_id"=>1,
+        //     "broker_id"=>2
+        // ]);
+        // $importer->import(1);
     }
 }

@@ -22,13 +22,14 @@ class DynamicOptionsSeeder extends Seeder
             "data_type"=>4,
             "form_type"=>5,
             //"meta_data"=>6,
-            "for_brokers"=>7,
-            "for_crypto"=>8,
-            "for_props"=>9,
-            "required"=>10,
-            "position"=>11,
-            "default_language"=>12,
-            "option_category_id"=>13
+            "for_brokers"=>9,
+            "for_crypto"=>10,
+            "for_props"=>11,
+            "required"=>12,
+            "position"=>13,
+            "default_language"=>14,
+            "option_category_id"=>15,
+            //'dropdown_category_id'=>16
         
         ]);
        //id,name,slug,data_type,form_type,required,position,option_category_id,for_brokers,for_crypto,for_props,default_language
@@ -40,8 +41,8 @@ class DynamicOptionsSeeder extends Seeder
 
     public function update()
     {
-        $default_loaded=["trading_name","logo","home_url","overall_rating","user_rating","account_currencies","trading_instruments"];
-        
+       // $default_loaded=["trading_name","logo","home_url","overall_rating","user_rating","account_currencies","trading_instruments"];
+       $default_loaded=["trading_name","logo","home_url","account_currencies"];
         foreach($default_loaded as $k=>$v){
             BrokerOption::where("slug",$v)->update([
                 "default_loading"=>1,

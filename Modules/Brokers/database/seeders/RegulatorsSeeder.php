@@ -27,7 +27,7 @@ class RegulatorsSeeder extends Seeder
             "abreviation"=>2,
             "rating"=>3,
             "capitalization"=>4,
-            "enforced"=>5,
+           // "enforced"=>5,
             "website"=>6,
             "name"=>7,
             "country"=>8,

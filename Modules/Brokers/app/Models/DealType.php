@@ -15,8 +15,5 @@ class DealType extends Model
      */
     protected $fillable = [];
 
-    protected static function newFactory(): DealTypeFactory
-    {
-        //return DealTypeFactory::new();
-    }
+    
 }
