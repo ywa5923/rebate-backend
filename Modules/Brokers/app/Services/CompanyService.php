@@ -57,25 +57,16 @@ class CompanyService
     }
 
     /**
-     * Create new company with broker relationships
+     * Create new company
      */
     public function createCompany(array $data): Company
     {
         return DB::transaction(function () use ($data) {
             try {
-                // Extract broker relationships from data
-                $brokerIds = $data['broker_ids'] ?? [];
-                unset($data['broker_ids']);
-
                 // Create company
                 $company = $this->repository->create($data);
 
-                // Attach brokers if provided
-                if (!empty($brokerIds)) {
-                    $this->repository->attachBrokers($company, $brokerIds, $data['zone_code'] ?? null);
-                }
-
-                return $company->load(['brokers', 'translations']);
+                return $company->load(['broker', 'translations']);
 
             } catch (\Exception $e) {
                 Log::error('CompanyService createCompany error: ' . $e->getMessage());
@@ -85,7 +76,7 @@ class CompanyService
     }
 
     /**
-     * Update company with broker relationships
+     * Update company
      */
     public function updateCompany(int $id, array $data): Company
     {
@@ -97,18 +88,10 @@ class CompanyService
                     throw new \Exception('Company not found');
                 }
 
-                // Extract broker relationships from data
-                $brokerIds = $data['broker_ids'] ?? [];
-                $zoneCode = $data['zone_code'] ?? null;
-                unset($data['broker_ids'], $data['zone_code']);
-
                 // Update company
                 $this->repository->update($company, $data);
 
-                // Handle broker relationships
-                $this->repository->syncBrokers($company, $brokerIds, $zoneCode);
-
-                return $company->load(['brokers', 'translations']);
+                return $company->load(['broker', 'translations']);
 
             } catch (\Exception $e) {
                 Log::error('CompanyService updateCompany error: ' . $e->getMessage());
@@ -161,9 +144,8 @@ class CompanyService
             'offices_p' => 'nullable|string|max:1000',
             'status' => 'nullable|in:published,pending,rejected',
             'status_reason' => 'nullable|string|max:1000',
-            'broker_ids' => 'nullable|array',
-            'broker_ids.*' => 'exists:brokers,id',
-            'zone_code' => 'nullable|string|max:200',
+            'broker_id' => $isUpdate ? 'sometimes|required|exists:brokers,id' : 'required|exists:brokers,id',
+            'zone_id' => 'nullable|exists:zones,id',
         ];
 
         $validator = Validator::make($data, $rules);

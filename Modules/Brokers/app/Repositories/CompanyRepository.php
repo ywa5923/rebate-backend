@@ -61,7 +61,7 @@ class CompanyRepository
         }else{
             $locale = 'en';
         }
-        $query = $this->model->with(['brokers', 'translations' => function($query) use ($locale) {
+        $query = $this->model->with(['broker', 'translations' => function($query) use ($locale) {
             $query->where('language_code', $locale);
         }]);
 
@@ -86,7 +86,7 @@ class CompanyRepository
      */
     public function findById(int $id): ?Company
     {
-        return $this->model->with(['brokers', 'translations'])->find($id);
+        return $this->model->with(['broker', 'translations'])->find($id);
     }
 
     /**
@@ -122,41 +122,6 @@ class CompanyRepository
     }
 
     /**
-     * Attach brokers to company
-     */
-    public function attachBrokers(Company $company, array $brokerIds, ?string $zoneCode = null): void
-    {
-        $pivotData = [];
-        foreach ($brokerIds as $brokerId) {
-            $pivotData[$brokerId] = [
-                'zone_code' => $zoneCode,
-                'is_invariant' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-        
-        $company->brokers()->attach($pivotData);
-    }
-
-    /**
-     * Sync brokers with company
-     */
-    public function syncBrokers(Company $company, array $brokerIds, ?string $zoneCode = null): void
-    {
-        $pivotData = [];
-        foreach ($brokerIds as $brokerId) {
-            $pivotData[$brokerId] = [
-                'zone_code' => $zoneCode,
-                'is_invariant' => true,
-                'updated_at' => now(),
-            ];
-        }
-        
-        $company->brokers()->sync($pivotData);
-    }
-
-    /**
      * Get brokers for form dropdown
      */
     public function getBrokersForForm(): Collection
@@ -177,9 +142,7 @@ class CompanyRepository
      */
     public function getByBrokerId(int $brokerId): Collection
     {
-        return $this->model->whereHas('brokers', function($query) use ($brokerId) {
-            $query->where('brokers.id', $brokerId);
-        })->get();
+        return $this->model->where('broker_id', $brokerId)->get();
     }
 
     /**
@@ -208,9 +171,7 @@ class CompanyRepository
         }
 
         if ($request->has('broker_id')) {
-            $query->whereHas('brokers', function($q) use ($request) {
-                $q->where('brokers.id', $request->broker_id);
-            });
+            $query->where('broker_id', $request->broker_id);
         }
 
         if ($request->has('search')) {

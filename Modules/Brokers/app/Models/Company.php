@@ -35,7 +35,9 @@ use Modules\Translations\Models\Translation;
  *   @OA\Property(property="status_reason", type="string", example="", maxLength=1000),
  *   @OA\Property(property="created_at", type="string", format="date-time"),
  *   @OA\Property(property="updated_at", type="string", format="date-time"),
- *   @OA\Property(property="brokers", type="array", @OA\Items(type="object")),
+ *   @OA\Property(property="broker_id", type="integer", example=1),
+ *   @OA\Property(property="zone_id", type="integer", example=1),
+ *   @OA\Property(property="broker", type="object"),
  *   @OA\Property(property="translations", type="array", @OA\Items(type="object"))
  * )
  * Class Company
@@ -59,10 +61,32 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
-       
+        'name',
+        'name_p',
+        'licence_number',
+        'licence_number_p',
+        'crypto_categories',
+        'crypto_categories_p',
+        'banner',
+        'banner_p',
+        'description',
+        'description_p',
+        'year_founded',
+        'year_founded_p',
+        'employees',
+        'employees_p',
+        'headquarters',
+        'headquarters_p',
+        'offices',
+        'offices_p',
+        'status',
+        'status_reason',
+        'is_invariant',
+        'broker_id',
+        'zone_id'
     ];
 
-    public function brokers():BelongsTo
+    public function broker(): BelongsTo
     {
         return $this->belongsTo(Broker::class);
     }

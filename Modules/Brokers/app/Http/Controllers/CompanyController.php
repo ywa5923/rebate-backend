@@ -161,7 +161,7 @@ class CompanyController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name"},
+     *             required={"name", "broker_id"},
      *             @OA\Property(property="name", type="string", example="TechCorp Solutions", maxLength=250),
      *             @OA\Property(property="name_p", type="string", example="TechCorp Solutions P", maxLength=250),
      *             @OA\Property(property="licence_number", type="string", example="TECH-2024-001"),
@@ -180,8 +180,8 @@ class CompanyController extends Controller
      *             @OA\Property(property="offices_p", type="string", example="New York, London, Singapore, Tokyo", maxLength=1000),
      *             @OA\Property(property="status", type="string", enum={"published", "pending", "rejected"}, example="published"),
      *             @OA\Property(property="status_reason", type="string", example="", maxLength=1000),
-     *             @OA\Property(property="broker_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3}),
-     *             @OA\Property(property="zone_code", type="string", example="US", maxLength=200)
+     *             @OA\Property(property="broker_id", type="integer", example=1),
+     *             @OA\Property(property="zone_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -318,8 +318,8 @@ class CompanyController extends Controller
      *             @OA\Property(property="offices_p", type="string", example="New York, London, Singapore, Tokyo, Berlin, Toronto", maxLength=1000),
      *             @OA\Property(property="status", type="string", enum={"published", "pending", "rejected"}, example="published"),
      *             @OA\Property(property="status_reason", type="string", example="", maxLength=1000),
-     *             @OA\Property(property="broker_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3, 4, 5}),
-     *             @OA\Property(property="zone_code", type="string", example="US", maxLength=200)
+     *             @OA\Property(property="broker_id", type="integer", example=1),
+     *             @OA\Property(property="zone_id", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
