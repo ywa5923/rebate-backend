@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Brokers\Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Translations\Models\Translation;
+use Modules\Translations\Models\Zone;
 
 /**
  * @OA\Schema(
@@ -38,6 +39,7 @@ use Modules\Translations\Models\Translation;
  *   @OA\Property(property="broker_id", type="integer", example=1),
  *   @OA\Property(property="zone_id", type="integer", example=1),
  *   @OA\Property(property="broker", type="object"),
+ *   @OA\Property(property="zone", type="object"),
  *   @OA\Property(property="translations", type="array", @OA\Items(type="object"))
  * )
  * Class Company
@@ -89,6 +91,11 @@ class Company extends Model
     public function broker(): BelongsTo
     {
         return $this->belongsTo(Broker::class);
+    }
+
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
     }
 
     public function translations(): MorphMany

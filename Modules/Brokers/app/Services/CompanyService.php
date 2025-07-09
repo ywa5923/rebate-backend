@@ -66,7 +66,7 @@ class CompanyService
                 // Create company
                 $company = $this->repository->create($data);
 
-                return $company->load(['broker', 'translations']);
+                return $company->load(['broker', 'zone', 'translations']);
 
             } catch (\Exception $e) {
                 Log::error('CompanyService createCompany error: ' . $e->getMessage());
@@ -91,7 +91,7 @@ class CompanyService
                 // Update company
                 $this->repository->update($company, $data);
 
-                return $company->load(['broker', 'translations']);
+                return $company->load(['broker', 'zone', 'translations']);
 
             } catch (\Exception $e) {
                 Log::error('CompanyService updateCompany error: ' . $e->getMessage());

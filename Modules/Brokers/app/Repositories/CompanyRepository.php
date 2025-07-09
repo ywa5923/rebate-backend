@@ -61,7 +61,7 @@ class CompanyRepository
         }else{
             $locale = 'en';
         }
-        $query = $this->model->with(['broker', 'translations' => function($query) use ($locale) {
+        $query = $this->model->with(['broker', 'zone', 'translations' => function($query) use ($locale) {
             $query->where('language_code', $locale);
         }]);
 
@@ -86,7 +86,7 @@ class CompanyRepository
      */
     public function findById(int $id): ?Company
     {
-        return $this->model->with(['broker', 'translations'])->find($id);
+        return $this->model->with(['broker', 'zone', 'translations'])->find($id);
     }
 
     /**
@@ -172,6 +172,15 @@ class CompanyRepository
 
         if ($request->has('broker_id')) {
             $query->where('broker_id', $request->broker_id);
+        }
+
+        if ($request->has('zone_code')) {
+            $query->where(function($q) use ($request) {
+                $q->where('is_invariant', true)
+                  ->orWhereHas('zone', function($subQ) use ($request) {
+                      $subQ->where('zone_code', $request->zone_code);
+                  });
+            });
         }
 
         if ($request->has('search')) {

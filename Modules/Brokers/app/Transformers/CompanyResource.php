@@ -39,6 +39,7 @@ class CompanyResource extends JsonResource
             "broker_id" => $this->broker_id,
             "zone_id" => $this->zone_id,
             "broker" => $this->whenLoaded('broker'),
+            "zone" => $this->whenLoaded('zone'),
             "translations" => TranslationResource::collection($this->whenLoaded('translations')),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
