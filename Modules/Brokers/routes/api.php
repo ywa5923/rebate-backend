@@ -8,6 +8,7 @@ use Modules\Brokers\Http\Controllers\MatrixController;
 use Modules\Brokers\Http\Controllers\AccountTypeController;
 use Modules\Brokers\Http\Controllers\CompanyController;
 use Modules\Brokers\Http\Controllers\RegulatorController;
+use Modules\Brokers\Http\Controllers\OptionValueController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -39,4 +40,11 @@ Route::group(["prefix"=>'v1'], function () {
     // Company routes
     Route::apiResource('companies', CompanyController::class)->names('companies');
     Route::apiResource('regulators', RegulatorController::class)->names('regulators');
+    
+    // OptionValue routes
+    Route::apiResource('option-values', OptionValueController::class)->names('option-values');
+    
+    // Multiple option values routes for brokers
+    Route::post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
+    Route::put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
 });

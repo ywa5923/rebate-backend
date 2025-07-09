@@ -65,6 +65,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'production' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => 'error', // Only errors and above
+            'replace_placeholders' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
@@ -121,6 +128,12 @@ return [
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
+        ],
+
+        'production_null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+            'level' => 'emergency', // Only emergency logs
         ],
 
         'emergency' => [
