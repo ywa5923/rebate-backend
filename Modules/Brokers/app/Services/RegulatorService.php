@@ -127,8 +127,8 @@ class RegulatorService
             'abreviation' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:255',
             'country_p' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'description_p' => 'nullable|string',
+            'description' => 'nullable|string|max:10000',
+            'description_p' => 'nullable|string|max:10000',
             'rating' => 'nullable|numeric|min:0|max:5',
             'rating_p' => 'nullable|numeric|min:0|max:5',
             'capitalization' => 'nullable|string|max:1000',
@@ -141,12 +141,12 @@ class RegulatorService
             'negative_balance_protection_p' => 'nullable|string|max:255',
             'rebates' => 'nullable|boolean',
             'rebates_p' => 'nullable|boolean',
-            'max_leverage' => 'nullable|string',
-            'max_leverage_p' => 'nullable|string',
+            'max_leverage' => 'nullable|string|max:10000',
+            'max_leverage_p' => 'nullable|string|max:10000',
             'website' => 'nullable|url|max:500',
             'website_p' => 'nullable|url|max:500',
             'status' => 'nullable|in:published,pending,rejected',
-            'status_reason' => 'nullable|string|max:1000',
+            'status_reason' => 'nullable|string|max:10000',
         ];
 
         $validator = Validator::make($data, $rules);
