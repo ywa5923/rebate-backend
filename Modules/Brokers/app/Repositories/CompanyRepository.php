@@ -173,6 +173,11 @@ class CompanyRepository
         if ($request->has('broker_id')) {
             $query->where('broker_id', $request->broker_id);
         }
+        if ($request->has('broker_type')) {
+            $query->whereHas('broker.brokerType', function($q) use ($request) {
+                $q->where('name', $request->broker_type);
+            });
+        }
 
         if ($request->has('zone_code')) {
             $query->where(function($q) use ($request) {

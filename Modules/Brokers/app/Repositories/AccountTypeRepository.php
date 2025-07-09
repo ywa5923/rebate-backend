@@ -27,7 +27,9 @@ class AccountTypeRepository
         }else{
             $locale = 'en';
         }
-        $query = $this->model->with(['broker', 'zone', 'urls.translations', 'translations' => function($query) use ($locale) {
+        $query = $this->model->with(['broker', 'zone', 'translations' => function($query) use ($locale) {
+            $query->where('language_code', $locale);
+        }, 'urls.translations'=>function($query) use ($locale){
             $query->where('language_code', $locale);
         }]);
 
@@ -213,14 +215,24 @@ class AccountTypeRepository
         }
 
         if ($request->has('zone_code')) {
-            $query->where('zone_code', function($q) use ($request){
-                $q->where('zone_code', $request->zone_code);
+
+            $query->where(function($q) use ($request){  
+                $q->where('is_invariant', true)
+                  ->orWhereHas('zone', function($subQ) use ($request) {
+                      $subQ->where('zone_code', $request->zone_code);
+                  });
             });
         }
 
         if ($request->has('broker_type')) {
-            $query->where('broker_type', $request->broker_type);
+            $query->whereHas('broker.brokerType', function($q) use ($request) {
+                $q->where('name', $request->broker_type);
+            });
         }
+
+        // if ($request->has('broker_type')) {
+        //     $query->where('broker_type', $request->broker_type);
+        // }
 
         if ($request->has('is_active')) {
             $query->where('is_active', $request->boolean('is_active'));

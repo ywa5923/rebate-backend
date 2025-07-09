@@ -5,7 +5,7 @@ use Modules\Brokers\Http\Controllers\BrokerController;
 use Modules\Brokers\Http\Controllers\BrokerFilterController;
 use Modules\Brokers\Http\Controllers\BrokerOptionController;
 use Modules\Brokers\Http\Controllers\MatrixController;
-use Modules\Brokers\Http\Controllers\AcountTypeController;
+use Modules\Brokers\Http\Controllers\AccountTypeController;
 use Modules\Brokers\Http\Controllers\CompanyController;
 use Modules\Brokers\Http\Controllers\RegulatorController;
 /*
