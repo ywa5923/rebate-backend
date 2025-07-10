@@ -16,6 +16,9 @@ use Modules\Brokers\Services\BrokerFilterQueryParser;
 use Modules\Brokers\Transformers\SettingCollection;
 use PHPUnit\Util\Filter;
 use Modules\Brokers\Models\Zone;
+use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Models\Regulator;
+use Modules\Brokers\Models\Company;
 
 class BrokerFilterController extends Controller
 {
@@ -35,9 +38,9 @@ class BrokerFilterController extends Controller
             return response()->json(['error' => 'Zone and language parameters are required'], 422);
         }
        
-        $companyRepo = new CompanyRepository();
-        $regulatorRepo = new RegulatorRepository();
-        $optionsValuesRepo = new OptionValueRepository();
+        $companyRepo = new CompanyRepository(new Company());
+        $regulatorRepo = new RegulatorRepository(new Regulator());
+        $optionsValuesRepo = new OptionValueRepository(new OptionValue());
         $filterRepo = new FilterRepository();
         //$currencies = $filterRepo->getBrokerCurrencyList();
        

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean("default_loading")->default(1);
             $table->string("type",100)->nullable();
             $table->json('metadata')->nullable();
-          //  $table->string('zone_code',200)->nullable();
+            $table->string('zone_code',200)->nullable();
             $table->boolean('is_invariant')->default(1);
             $table->boolean('delete_by_system')->default(0);
             $table->foreignId("broker_id")->constrained();
