@@ -99,7 +99,7 @@ class OptionValueController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/OptionValueResource")),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
      *             @OA\Property(property="pagination", type="object", @OA\Property(property="current_page", type="integer"), @OA\Property(property="last_page", type="integer"), @OA\Property(property="per_page", type="integer"), @OA\Property(property="total", type="integer"))
      *         )
      *     ),
@@ -195,7 +195,7 @@ class OptionValueController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Option value created successfully"),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionValueResource")
+     *             @OA\Property(property="data", type="object")
      *         )
      *     ),
      *     @OA\Response(
@@ -264,7 +264,7 @@ class OptionValueController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Option values created successfully"),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/OptionValueResource"))
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
      *         )
      *     ),
      *     @OA\Response(
@@ -319,7 +319,7 @@ class OptionValueController extends Controller
      *         description="Successful operation",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionValueResource")
+     *             @OA\Property(property="data", type="object")
      *         )
      *     ),
      *     @OA\Response(
@@ -376,7 +376,7 @@ class OptionValueController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Edit form endpoint"),
-     *             @OA\Property(property="data", type="object", @OA\Property(property="option_value", ref="#/components/schemas/OptionValueResource"), @OA\Property(property="form_data", type="object"))
+     *             @OA\Property(property="data", type="object", @OA\Property(property="option_value", type="object"), @OA\Property(property="form_data", type="object"))
      *         )
      *     ),
      *     @OA\Response(
@@ -457,7 +457,7 @@ class OptionValueController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Option value updated successfully"),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionValueResource")
+     *             @OA\Property(property="data", type="object")
      *         )
      *     ),
      *     @OA\Response(
@@ -529,7 +529,7 @@ class OptionValueController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Option values updated successfully"),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/OptionValueResource"))
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
      *         )
      *     ),
      *     @OA\Response(

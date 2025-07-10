@@ -105,7 +105,7 @@
                     "AccountType"
                 ],
                 "summary": "Get all account types",
-                "operationId": "7039ecd0f085039c51b188846aaa247c",
+                "operationId": "f9f64e4c4798cc251b26c069d60c7ab1",
                 "parameters": [
                     {
                         "name": "broker_id",
@@ -230,7 +230,7 @@
                     "AccountType"
                 ],
                 "summary": "Create a new account type",
-                "operationId": "c1fbee95ad60a053dac7b8f0e04882f0",
+                "operationId": "c8484f7765255ecd597ac503181445bf",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -417,7 +417,7 @@
                     "AccountType"
                 ],
                 "summary": "Get form data for creating account type",
-                "operationId": "20a66bba8979a337406542030a04b3ed",
+                "operationId": "563f5749716d50799e90a0b402bb0480",
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -474,7 +474,7 @@
                     "AccountType"
                 ],
                 "summary": "Get account type by ID",
-                "operationId": "b10d28b0112785e913314c5f822458e6",
+                "operationId": "6a44ff23c7ded6ce131aca59e9479365",
                 "parameters": [
                     {
                         "name": "id",
@@ -519,7 +519,7 @@
                     "AccountType"
                 ],
                 "summary": "Update account type",
-                "operationId": "8aac86e4e8dfdddb17dd32fe8432fc0f",
+                "operationId": "072126222939e4a6a61acda3513c8b32",
                 "parameters": [
                     {
                         "name": "id",
@@ -723,7 +723,7 @@
                     "AccountType"
                 ],
                 "summary": "Delete account type",
-                "operationId": "78d79c18853210ceb91ece3771d270d5",
+                "operationId": "ce41945dcbb977c42ccc77d389655d62",
                 "parameters": [
                     {
                         "name": "id",
@@ -1081,7 +1081,8 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name"
+                                    "name",
+                                    "broker_id"
                                 ],
                                 "properties": {
                                     "name": {
@@ -1169,21 +1170,13 @@
                                         "maxLength": 1000,
                                         "example": ""
                                     },
-                                    "broker_ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        },
-                                        "example": [
-                                            1,
-                                            2,
-                                            3
-                                        ]
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
-                                    "zone_code": {
-                                        "type": "string",
-                                        "maxLength": 200,
-                                        "example": "US"
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -1432,23 +1425,13 @@
                                         "maxLength": 1000,
                                         "example": ""
                                     },
-                                    "broker_ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        },
-                                        "example": [
-                                            1,
-                                            2,
-                                            3,
-                                            4,
-                                            5
-                                        ]
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
-                                    "zone_code": {
-                                        "type": "string",
-                                        "maxLength": 200,
-                                        "example": "US"
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -1531,6 +1514,797 @@
                     },
                     "404": {
                         "description": "Company not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-values": {
+            "get": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Get all option values",
+                "operationId": "14253d030b7efd74f375be5ae08254f2",
+                "parameters": [
+                    {
+                        "name": "broker_id",
+                        "in": "query",
+                        "description": "Filter by broker ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "broker_option_id",
+                        "in": "query",
+                        "description": "Filter by broker option ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "option_slug",
+                        "in": "query",
+                        "description": "Filter by option slug",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search in value, public_value, and option_slug",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "option_slug",
+                                "value",
+                                "status",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "language_code",
+                        "in": "query",
+                        "description": "Language code for translations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Create a new option value",
+                "operationId": "964407414fce814aac573983d36f3810",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option_slug": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "minimum_deposit"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "100"
+                                    },
+                                    "public_value": {
+                                        "type": "string",
+                                        "example": "$100"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "status_message": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Active option"
+                                    },
+                                    "default_loading": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "number"
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "example": {
+                                            "unit": "USD",
+                                            "currency": "USD"
+                                        }
+                                    },
+                                    "is_invariant": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "delete_by_system": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "broker_option_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Option value created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option value created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-values/create": {
+            "get": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Get form data for creating option value",
+                "operationId": "8a00bd438e9ae1ee4426c2739d4a4c74",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create form endpoint"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "brokers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "broker_options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "zones": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "status_options": {
+                                                    "type": "object"
+                                                },
+                                                "type_options": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/brokers/{broker_id}/option-values": {
+            "put": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Update multiple option values for a broker",
+                "operationId": "2f6158fb5c4fe54e984f2587956d0a49",
+                "parameters": [
+                    {
+                        "name": "broker_id",
+                        "in": "path",
+                        "description": "Broker ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option_values": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "option_slug": {
+                                                    "type": "string",
+                                                    "example": "minimum_deposit"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "example": "200"
+                                                },
+                                                "public_value": {
+                                                    "type": "string",
+                                                    "example": "$200"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "broker_option_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Option values updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option values updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Create multiple option values for a broker",
+                "operationId": "84bb17ba818d3fb5e4f73307a8a6991f",
+                "parameters": [
+                    {
+                        "name": "broker_id",
+                        "in": "path",
+                        "description": "Broker ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option_values": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "option_slug": {
+                                                    "type": "string",
+                                                    "example": "minimum_deposit"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "example": "100"
+                                                },
+                                                "public_value": {
+                                                    "type": "string",
+                                                    "example": "$100"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "broker_option_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Option values created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option values created successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-values/{id}": {
+            "get": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Get option value by ID",
+                "operationId": "da0df6dd80b3ad03fbaad260ebc731d6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option value ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option value not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Update option value",
+                "operationId": "b8feef268a22c76ad75259521e9efe8d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option value ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "option_slug": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "minimum_deposit"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "200"
+                                    },
+                                    "public_value": {
+                                        "type": "string",
+                                        "example": "$200"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "status_message": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Updated option"
+                                    },
+                                    "default_loading": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "number"
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "example": {
+                                            "unit": "USD",
+                                            "currency": "USD"
+                                        }
+                                    },
+                                    "is_invariant": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "delete_by_system": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "broker_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "broker_option_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "zone_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Option value updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option value updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option value not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Delete option value",
+                "operationId": "bec45aa61c31bd4335d9d9b6d1add4a2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option value ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Option value deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option value deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option value not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-values/{id}/edit": {
+            "get": {
+                "tags": [
+                    "OptionValue"
+                ],
+                "summary": "Get form data for editing option value",
+                "operationId": "ccee7b5f8f0f21cc537fa3d70dadc1cc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option value ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Edit form endpoint"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "option_value": {
+                                                    "type": "object"
+                                                },
+                                                "form_data": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option value not found"
                     },
                     "500": {
                         "description": "Server error"
@@ -2739,11 +3513,19 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "brokers": {
-                        "type": "array",
-                        "items": {
-                            "type": "object"
-                        }
+                    "broker_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "broker": {
+                        "type": "object"
+                    },
+                    "zone": {
+                        "type": "object"
                     },
                     "translations": {
                         "type": "array",
@@ -2785,6 +3567,89 @@
                         "type": "string",
                         "format": "date-time",
                         "nullable": false
+                    }
+                },
+                "type": "object"
+            },
+            "OptionValue": {
+                "required": [
+                    "option_slug",
+                    "value",
+                    "broker_id",
+                    "broker_option_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "option_slug": {
+                        "type": "string",
+                        "example": "minimum_deposit"
+                    },
+                    "value": {
+                        "type": "string",
+                        "example": "100"
+                    },
+                    "public_value": {
+                        "type": "string",
+                        "example": "$100",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    },
+                    "status_message": {
+                        "type": "string",
+                        "example": "Active option",
+                        "nullable": true
+                    },
+                    "default_loading": {
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "number",
+                        "nullable": true
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "is_invariant": {
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    },
+                    "delete_by_system": {
+                        "type": "boolean",
+                        "default": false,
+                        "example": false
+                    },
+                    "broker_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "broker_option_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -3101,6 +3966,10 @@
         {
             "name": "Company",
             "description": "Company"
+        },
+        {
+            "name": "OptionValue",
+            "description": "OptionValue"
         },
         {
             "name": "Regulator",

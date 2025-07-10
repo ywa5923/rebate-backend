@@ -23,10 +23,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *   @OA\Property(property="broker_id", type="integer", example=1),
  *   @OA\Property(property="broker_option_id", type="integer", example=1),
  *   @OA\Property(property="zone_id", type="integer", example=1, nullable=true),
- *   @OA\Property(property="broker", type="object", ref="#/components/schemas/Broker"),
- *   @OA\Property(property="option", type="object", ref="#/components/schemas/BrokerOption"),
- *   @OA\Property(property="zone", type="object", ref="#/components/schemas/Zone"),
- *   @OA\Property(property="translations", type="array", @OA\Items(ref="#/components/schemas/Translation")),
+ *   @OA\Property(property="broker", type="object", nullable=true),
+ *   @OA\Property(property="option", type="object", nullable=true),
+ *   @OA\Property(property="zone", type="object", nullable=true),
+ *   @OA\Property(property="translations", type="array", @OA\Items(type="object"), nullable=true),
  *   @OA\Property(property="created_at", type="string", format="date-time"),
  *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
