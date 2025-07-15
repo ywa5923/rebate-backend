@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Models\OptionValue;
 
 class OptionValueService
@@ -90,15 +91,18 @@ class OptionValueService
                 // Prepare data for bulk insert
                 $bulkData = [];
                 $now = now();
-                
+                $options=BrokerOption::all()->pluck('id','slug');
+
+               
                 foreach ($optionValuesData as $index => $optionValueData) {
                     if (!is_array($optionValueData)) {
                         throw new \InvalidArgumentException("Option value data at index {$index} must be an array");
                     }
-                    
+                    $slug=$optionValueData['option_slug'];
                     $optionValueData['broker_id'] = $brokerId;
                     $optionValueData['created_at'] = $now;
                     $optionValueData['updated_at'] = $now;
+                    $optionValueData['broker_option_id']=$options[$slug];
                     
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
@@ -107,6 +111,7 @@ class OptionValueService
                     
                     $bulkData[] = $optionValueData;
                 }
+               
 
                 // Bulk insert all option values in one query
                 $this->repository->bulkCreate($bulkData);
@@ -248,7 +253,7 @@ class OptionValueService
             'is_invariant' => 'nullable|boolean',
             'delete_by_system' => 'nullable|boolean',
            // 'broker_id' => $isUpdate ? 'sometimes|required|exists:brokers,id' : 'required|exists:brokers,id',
-            'broker_option_id' => $isUpdate ? 'sometimes|required|exists:broker_options,id' : 'required|exists:broker_options,id',
+           // 'broker_option_id' => $isUpdate ? 'sometimes|required|exists:broker_options,id' : 'required|exists:broker_options,id',
             'zone_id' => 'nullable|exists:zones,id',
         ];
 

@@ -356,6 +356,13 @@ class OptionValueRepository
             $query->where('option_slug', $request->option_slug);
         }
 
+        if($request->has('category_id')){
+
+            $query->whereHas('option', function ($q) use ($request) {
+                $q->where('option_category_id', $request->category_id);
+            });
+        }
+
         if ($request->has('zone_code')) {
             $query->where(function ($q) use ($request) {
                 $q->where('is_invariant', true)
@@ -373,6 +380,20 @@ class OptionValueRepository
                     ->orWhere('option_slug', 'like', "%{$search}%");
             });
         }
+
+        $query->with('translations',function($q) use ($request){
+
+            $languageCode = $request->has('language_code') ? $request->language_code : 'en';
+            $q->where('language_code', $languageCode);
+        });
+
+
+        // if($request->has('language_code') ){
+
+        //     $query->with('translations',function($q) use ($request){
+        //         $q->where('language_code', $request->language_code);
+        //     });
+        // }
     }
 
     /**

@@ -146,7 +146,7 @@ class RegulatorService
             'website' => 'nullable|url|max:500',
             'website_p' => 'nullable|url|max:500',
             'status' => 'nullable|in:published,pending,rejected',
-            'status_reason' => 'nullable|string|max:10000',
+            'status_reason' => 'nullable|string|max:1000',
         ];
 
         $validator = Validator::make($data, $rules);

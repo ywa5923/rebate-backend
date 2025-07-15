@@ -7,6 +7,8 @@ trait TranslateTrait
     public function translate($field,$isOptionValueSlug=false)
     {
 
+        //only options public value is translated
+        
         //refactor this
         if($this->$field===null && $isOptionValueSlug===false)
         return null;
@@ -18,9 +20,10 @@ trait TranslateTrait
            return $translation->value;
         }
 
+        //
         //when the translation is not found return the default value of the field
         //for  option_values the default value of the slug is $this->value
-        return ($isOptionValueSlug)?$this->value:$this->$field;
+        return ($isOptionValueSlug)?$this->public_value:$this->$field;
     }
 
 

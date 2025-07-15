@@ -17,6 +17,7 @@ class OptionCategoryResource extends JsonResource
             "id"=>$this->id,
             "name"=>$this->translate("name"),
             "description"=>$this->translate("description"),
+            "slug"=>$this->slug,
             "default_language"=>$this->default_language,
             "position"=>$this->position,
             "options"=>FormBrokerOptionResource::collection($this->options),

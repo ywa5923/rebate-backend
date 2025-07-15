@@ -4,6 +4,7 @@ namespace Modules\Brokers\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Utilities\TranslateTrait;
 
 /**
  * @OA\Schema(
@@ -33,6 +34,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class OptionValueResource extends JsonResource
 {
+    use TranslateTrait;
     /**
      * Transform the resource into an array.
      *
@@ -43,22 +45,22 @@ class OptionValueResource extends JsonResource
         return [
             'id' => $this->id,
             'option_slug' => $this->option_slug,
-            'value' => $this->value,
-            'public_value' => $this->public_value,
+            "value" => $this->value,
+            'public_value' => $this->translate($this->option_slug,true),
             'status' => $this->status,
             'status_message' => $this->status_message,
             'default_loading' => $this->default_loading,
             'type' => $this->type,
-            'metadata' => $this->metadata,
+            'metadata' => $this->whenNotNull($this->translateOptionMeta($this->option_slug)),
             'is_invariant' => $this->is_invariant,
             'delete_by_system' => $this->delete_by_system,
             'broker_id' => $this->broker_id,
             'broker_option_id' => $this->broker_option_id,
             'zone_id' => $this->zone_id,
-            'broker' => $this->whenLoaded('broker'),
-            'option' => $this->whenLoaded('option'),
-            'zone' => $this->whenLoaded('zone'),
-            'translations' => $this->whenLoaded('translations'),
+            //'broker' => $this->whenLoaded('broker'),
+            //'option' => $this->whenLoaded('option'),
+           // 'zone' => $this->whenLoaded('zone'),
+            //'translations' => $this->whenLoaded('translations'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
