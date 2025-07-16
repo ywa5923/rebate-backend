@@ -167,43 +167,66 @@ class OptionValueService
     {
         return DB::transaction(function () use ($brokerId, $optionValuesData) {
             try {
-                $updatedOptionValues = [];
                 $now = now();
-                
-                // Group updates by ID for efficient processing
                 $updatesByCondition = [];
-              
+                $inserts = [];
+                $options=BrokerOption::all()->pluck('id','slug');
+
                 foreach ($optionValuesData as $optionValueData) {
-                    if (!isset($optionValueData['id'])) {
-                        throw new \Exception('Option value ID is required for updates');
-                    }
-                    
-                    $id = $optionValueData['id'];
-                    unset($optionValueData['id']); // Remove ID from update data
-                    
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
                         $optionValueData['metadata'] = json_encode($optionValueData['metadata']);
                     }
-                    
                     $optionValueData['updated_at'] = $now;
-                    $updatesByCondition[$id] = $optionValueData;
+
+                    if (empty($optionValueData['id'])) {
+                        // Remove id if present and null/empty
+                        unset($optionValueData['id']);
+                        $optionValueData['broker_id'] = $brokerId; // Ensure broker_id is set
+                        $optionValueData['created_at'] = $now;
+                        $optionValueData['broker_option_id']=$options[$optionValueData['option_slug']];
+                        $inserts[] = $optionValueData;
+                    } else {
+                        $id = $optionValueData['id'];
+                        unset($optionValueData['id']);
+                        $updatesByCondition[$id] = $optionValueData;
+                    }
                 }
 
-                // Log the processed data for debugging (only in debug mode)
                 if (config('app.debug')) {
                     Log::debug('Bulk Update Data:', ['updatesByCondition' => $updatesByCondition]);
+                    Log::debug('Bulk Insert Data:', ['inserts' => $inserts]);
                 }
 
-                // Bulk update all option values in one query
-                $this->repository->bulkUpdate($updatesByCondition, $brokerId);
-                
-                // Get the updated option values with relationships
-                $updatedOptionValues = $this->repository->getByBrokerIdAndIds($brokerId, array_keys($updatesByCondition))
-                    ->load(['broker', 'option', 'zone', 'translations']);
+                // Bulk update
+                if (!empty($updatesByCondition)) {
+                    $this->repository->bulkUpdate($updatesByCondition, $brokerId);
+                }
 
-                // Ensure we return an array of arrays, not objects
-                return $updatedOptionValues->map(function ($optionValue) {
+                // Bulk insert
+                if (!empty($inserts)) {
+                    $this->repository->bulkCreate($inserts);
+                }
+
+                // Get all affected option values (updated + inserted)
+                $updatedIds = array_keys($updatesByCondition);
+                $inserted = collect();
+                if (!empty($inserts)) {
+                    // Optionally, fetch the newly inserted records if you need to return them
+                    // This assumes you have enough info in $inserts to re-query them
+                    // For example, by unique fields or by created_at timestamp
+                    $inserted = OptionValue::where('broker_id', $brokerId)
+                        ->where('created_at', $now)
+                        ->get();
+                       
+                }
+                $updated = !empty($updatedIds)
+                    ? $this->repository->getByBrokerIdAndIds($brokerId, $updatedIds)
+                    : collect();
+
+                $all = $updated->merge($inserted)->load(['broker', 'option', 'zone', 'translations']);
+
+                return $all->map(function ($optionValue) {
                     return $optionValue->toArray();
                 })->toArray();
 
