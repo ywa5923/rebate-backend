@@ -283,9 +283,11 @@ class OptionValueController extends Controller
             // Validate data
           
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []));
-           
+            $entityId = $request->input('entity_id', null);
+            $entityType = $request->input('entity_type', null);
+          
             // Create multiple option values
-            $optionValues = $this->optionValueService->createMultipleOptionValues($brokerId, $validatedData);
+            $optionValues = $this->optionValueService->createMultipleOptionValues($brokerId, $validatedData,$entityType);
 
             return response()->json([
                 'success' => true,

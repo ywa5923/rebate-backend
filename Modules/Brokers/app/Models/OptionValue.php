@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Modules\Brokers\Database\Factories\OptionValueFactory;
 use Modules\Translations\Models\Translation;
@@ -30,7 +31,9 @@ use Modules\Translations\Models\Translation;
  *   @OA\Property(property="broker_option_id", type="integer", example=1),
  *   @OA\Property(property="zone_id", type="integer", example=1, nullable=true),
  *   @OA\Property(property="created_at", type="string", format="date-time"),
- *   @OA\Property(property="updated_at", type="string", format="date-time")
+ *   @OA\Property(property="updated_at", type="string", format="date-time"),
+ *   @OA\Property(property="optionable_id", type="integer", example=1, nullable=true),
+ *   @OA\Property(property="optionable_type", type="string", example="App\Models\Broker", nullable=true)
  * )
  */
 class OptionValue extends Model
@@ -41,6 +44,8 @@ class OptionValue extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'optionable_id',
+        'optionable_type',
         'option_slug',
         'value',
         'public_value',
@@ -85,5 +90,10 @@ class OptionValue extends Model
     public function translations():MorphMany
     {
         return $this->morphMany(Translation::class,'translationable');
+    }
+
+    public function optionable():MorphTo
+    {
+        return $this->morphTo();
     }
 }

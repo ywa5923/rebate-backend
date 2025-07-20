@@ -7,12 +7,19 @@ trait TranslateTrait
     public function translate($field,$isOptionValueSlug=false)
     {
 
-        //only options public value is translated
         
         //refactor this
         if($this->$field===null && $isOptionValueSlug===false)
         return null;
+
+        if(!$this->relationLoaded('translations'))
+        {
+            return $this->$field;
+        }
+
         $translations=$this->translations;
+
+        
 
         foreach($translations as $translation)
         {
@@ -22,7 +29,7 @@ trait TranslateTrait
 
         //
         //when the translation is not found return the default value of the field
-        //for  option_values the default value of the slug is $this->value
+        //for  option_values the default value of the slug is $this->pubic_value
         return ($isOptionValueSlug)?$this->public_value:$this->$field;
     }
 
@@ -50,8 +57,20 @@ trait TranslateTrait
         return $this->metadata;
     }
 
+    public function translateOptionPublicValue($propSlug)
+    {
+        ///for default language, translations relationship is not loaded, so just return the name
+        if(!$this->relationLoaded('translations'))
+        {
+            return $this->public_value;
+        }
+     return ($this->getTranslatedProperty($propSlug))??$this->public_value;
+    }
+
     public function translateBrokerOption($prop)
     {
+        //this function is used to translate only options not option values
+     
         //for default language, translations relationship is not loaded, so just return the name
         if(!$this->relationLoaded('translations'))
         {

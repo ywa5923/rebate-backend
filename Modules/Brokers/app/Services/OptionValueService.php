@@ -79,9 +79,9 @@ class OptionValueService
     /**
      * Create multiple option values for a broker
      */
-    public function createMultipleOptionValues(int $brokerId, array $optionValuesData): array
+    public function createMultipleOptionValues(int $brokerId, array $optionValuesData, string $entityType): array
     {
-        return DB::transaction(function () use ($brokerId, $optionValuesData) {
+        return DB::transaction(function () use ($brokerId, $optionValuesData, $entityType) {
             try {
                 // Validate input
                 if (empty($optionValuesData)) {
@@ -92,7 +92,22 @@ class OptionValueService
                 $bulkData = [];
                 $now = now();
                 $options=BrokerOption::all()->pluck('id','slug');
-
+              
+                if($entityType){
+                $className = ucfirst($entityType); // Convert 'company' to 'Company'
+                $modelClass = "Modules\\Brokers\\Models\\{$className}";
+               
+                if (!class_exists($modelClass)) {
+                    throw new \InvalidArgumentException("Model class {$modelClass} not found");
+                }
+                
+                $instance = $modelClass::create([
+                    'broker_id' => $brokerId,
+                    'name' => 'New Company',
+                ]);
+                $entityId = $instance->id;
+              
+                }
                
                 foreach ($optionValuesData as $index => $optionValueData) {
                     if (!is_array($optionValueData)) {
@@ -103,7 +118,9 @@ class OptionValueService
                     $optionValueData['created_at'] = $now;
                     $optionValueData['updated_at'] = $now;
                     $optionValueData['broker_option_id']=$options[$slug];
-                    
+                    $optionValueData['optionable_id']=$entityId??null;
+                    $optionValueData['optionable_type']=$modelClass??null;
+
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
                         $optionValueData['metadata'] = json_encode($optionValueData['metadata']);

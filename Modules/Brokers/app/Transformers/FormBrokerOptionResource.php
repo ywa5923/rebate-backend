@@ -42,6 +42,7 @@ class FormBrokerOptionResource extends JsonResource
             "min_constraint"=>$this->min_constraint,
             "max_constraint"=>$this->max_constraint,
             "meta_data"=>$meta_data,
+            'applicable_for'=>$this->applicable_for,
             // "values"=>$this->values->map(function($value){
             //     return [
             //         "id"=>$value->id,

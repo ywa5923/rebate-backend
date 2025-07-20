@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('option_values', function (Blueprint $table) {
             $table->id();
+            $table->nullableMorphs('optionable');
             $table->string("option_slug");
             $table->text("value");
             $table->text("public_value")->nullable();
-            $table->boolean("status")->default(1);//de bagat si in broker options;
-            $table->string("status_message")->nullable();
+
+            $table->enum("status",["published","pending","rejected"])->default("pending");
+            $table->text("status_reason",1000)->nullable();
+            //$table->boolean("status")->default(1);//de bagat si in broker options;
+           // $table->string("status_message")->nullable();
             $table->boolean("default_loading")->default(1);
             $table->string("type",100)->nullable();
             $table->json('metadata')->nullable();

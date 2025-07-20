@@ -2,7 +2,7 @@
 
 namespace Modules\Brokers\Services;
 
-use Modules\Brokers\Repositories\CompanyRepository;
+use Modules\Brokers\Repositories\Company2Repository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -11,9 +11,9 @@ use Modules\Brokers\Models\Company;
 
 class CompanyService
 {
-    protected CompanyRepository $repository;
+    protected Company2Repository $repository;
 
-    public function __construct(CompanyRepository $repository)
+    public function __construct(Company2Repository $repository)
     {
         $this->repository = $repository;
     }

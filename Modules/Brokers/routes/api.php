@@ -9,6 +9,7 @@ use Modules\Brokers\Http\Controllers\AccountTypeController;
 use Modules\Brokers\Http\Controllers\CompanyController;
 use Modules\Brokers\Http\Controllers\RegulatorController;
 use Modules\Brokers\Http\Controllers\OptionValueController;
+use Modules\Brokers\Http\Controllers\OptionCategoryController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -28,6 +29,8 @@ Route::group(["prefix"=>'v1'], function () {
     Route::apiResource('brokers', BrokerController::class)->names('brokers');
     Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
+
+    Route::apiResource('option-categories', OptionCategoryController::class)->names('option-categories');
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
     Route::get('/matrix', [MatrixController::class, 'index']);
     Route::post('/matrix/store', [MatrixController::class, 'store']);

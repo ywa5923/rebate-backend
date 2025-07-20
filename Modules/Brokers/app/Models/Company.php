@@ -103,5 +103,10 @@ class Company extends Model
         return $this->morphMany(Translation::class, 'translationable');
     }
 
+    public function optionValues(): MorphMany
+    {
+        return $this->morphMany(OptionValue::class, 'optionable');
+    }
+
    
 }

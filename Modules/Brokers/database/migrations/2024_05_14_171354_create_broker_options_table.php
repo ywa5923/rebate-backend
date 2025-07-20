@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name',100);
             $table->string('slug',100);
+            $table->string('applicable_for',255)->nullable();
             $table->string('data_type',100);
             $table->string('form_type',200);
             $table->json('meta_data')->nullable();
