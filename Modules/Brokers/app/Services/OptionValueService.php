@@ -182,6 +182,7 @@ class OptionValueService
      */
     public function updateMultipleOptionValues(int $brokerId, array $optionValuesData): array
     {
+        //dd($optionValuesData);
         return DB::transaction(function () use ($brokerId, $optionValuesData) {
             try {
                 $now = now();

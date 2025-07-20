@@ -172,16 +172,23 @@ class OptionValueRepository
 
         foreach ($allColumns as $column) {
             $caseStatements[$column] = "CASE id ";
+            $hasValues = false;
             
             foreach ($updatesByCondition as $id => $data) {
                 if (isset($data[$column])) {
                     $caseStatements[$column] .= "WHEN ? THEN ? ";
                     $bindings[] = $id;
                     $bindings[] = $data[$column];
+                    $hasValues = true;
                 }
             }
             
             $caseStatements[$column] .= "END";
+            
+            // Skip columns with no values to avoid empty CASE statements
+            if (!$hasValues) {
+                unset($caseStatements[$column]);
+            }
         }
 
         // Build the SQL query
