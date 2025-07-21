@@ -39,6 +39,9 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('account-types/{id}', [AccountTypeController::class, 'show']);
     Route::put('account-types/{id}', [AccountTypeController::class, 'update']);
     Route::delete('account-types/{id}', [AccountTypeController::class, 'destroy']);
+    Route::post('account-types/{id}/urls', [AccountTypeController::class, 'createUrls']);
+    Route::put('account-types/{id}/urls', [AccountTypeController::class, 'updateUrls']);
+    Route::delete('account-types/{accountTypeId}/urls/{urlId}', [\Modules\Brokers\Http\Controllers\AccountTypeController::class, 'deleteUrl']);
     
     // Company routes
     Route::apiResource('companies', CompanyController::class)->names('companies');

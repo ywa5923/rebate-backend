@@ -22,30 +22,20 @@ class AccountTypeRepository
      */
     public function getAccountTypes(Request $request): LengthAwarePaginator|Collection
     {
-        if($request->has('language_code')){
-            $locale = $request->language_code;
-        }else{
-            $locale = 'en';
-        }
-        $query = $this->model->with(['broker', 'zone', 'translations' => function($query) use ($locale) {
-            $query->where('language_code', $locale);
-        }, 'urls.translations'=>function($query) use ($locale){
-            $query->where('language_code', $locale);
-        }]);
-
+        $query = $this->model->newQuery();
+        
         // Apply filters
         $this->applyFilters($query, $request);
 
         // Apply sorting
-       // $this->applySorting($query, $request);
+        $this->applySorting($query, $request);
 
-       
-        if($request->has('per_page') || $request->has('page')){
-             // Paginate with specific page
-             $perPage = $request->get('per_page', 15);
-             $page = $request->get('page', 1);
+        if ($request->has('per_page') || $request->has('page')) {
+            // Paginate with specific page
+            $perPage = $request->get('per_page', 15);
+            $page = $request->get('page', 1);
             return $query->paginate($perPage, ['*'], 'page', $page);
-        }else{
+        } else {
             return $query->get();
         }
     }
@@ -204,24 +194,61 @@ class AccountTypeRepository
     }
 
     /**
+     * Get brokers for form dropdown
+     */
+    public function getBrokersForForm(): Collection
+    {
+        return DB::table('brokers')->select('id', 'registration_language as name')->get();
+    }
+
+    /**
+     * Get zones for form dropdown
+     */
+    public function getZonesForForm(): Collection
+    {
+        return DB::table('zones')->select('id', 'name')->get();
+    }
+
+    /**
      * Apply filters to query
      */
     private function applyFilters($query, Request $request): void
     {
-       
-        
         if ($request->has('broker_id')) {
             $query->where('broker_id', $request->broker_id);
         }
 
-        if ($request->has('zone_code')) {
+        if ($request->has('account_type_id')) {
+            $query->where('id', $request->account_type_id);
+        }
 
-            $query->where(function($q) use ($request){  
-                $q->where('is_invariant', true)
-                  ->orWhereHas('zone', function($subQ) use ($request) {
-                      $subQ->where('zone_code', $request->zone_code);
-                  });
-            });
+        $withArray = [];
+
+        if ($request->has('zone_code')) {
+            $withArray['optionValues'] = function ($q) use ($request) {
+                $q->where(function ($subQ) use ($request) {
+                    $subQ->where('is_invariant', 1)
+                        ->orWhere('zone_code', $request->zone_code);
+                });
+            };
+        }
+
+        if ($request->has('language_code')) {
+            if (isset($withArray['optionValues'])) {
+                $withArray['optionValues.translations'] = function ($q) use ($request) {
+                    $q->where('language_code', $request->language_code);
+                };
+            } else {
+                $withArray['optionValues.translations'] = function ($q) use ($request) {
+                    $q->where('language_code', $request->language_code);
+                };
+            }
+        }
+
+        if (!empty($withArray)) {
+            $query->with($withArray);
+        } else {
+            $query->with(['broker', 'urls','optionValues']);
         }
 
         if ($request->has('broker_type')) {
@@ -229,10 +256,6 @@ class AccountTypeRepository
                 $q->where('name', $request->broker_type);
             });
         }
-
-        // if ($request->has('broker_type')) {
-        //     $query->where('broker_type', $request->broker_type);
-        // }
 
         if ($request->has('is_active')) {
             $query->where('is_active', $request->boolean('is_active'));
@@ -248,9 +271,12 @@ class AccountTypeRepository
      */
     private function applySorting($query, Request $request): void
     {
-        if ($request->has('sort_by')) {
-            $sortBy = $request->get('sort_by', 'order');
-            $sortDirection = $request->get('sort_direction', 'asc');
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'asc');
+
+        $allowedSortFields = ['name', 'broker_type', 'is_active', 'order', 'created_at', 'updated_at'];
+
+        if (in_array($sortBy, $allowedSortFields)) {
             $query->orderBy($sortBy, $sortDirection);
         }
     }

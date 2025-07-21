@@ -46,7 +46,7 @@ class Url extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['id','urlable_type','urlable_id','url_type','url','url_p','name','name_p','slug','description','category_position','option_category_id','broker_id','zone_id'];
 
     public function zone(): BelongsTo
     {

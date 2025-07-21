@@ -765,6 +765,181 @@
                 }
             }
         },
+        "/api/v1/account-types/{id}/urls": {
+            "get": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Get all URLs for an account type, grouped by url_type",
+                "operationId": "b11c78e116a3f10660504aecb56a1d4c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Update one or many URLs for an account type",
+                "operationId": "99f46ce43d51b5adebe7c5dbc01aadd3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "example": {
+                                            "mobile": [
+                                                {
+                                                    "id": 1,
+                                                    "url": "https://m.example.com",
+                                                    "name": "Mobile",
+                                                    "slug": "mobile"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "object",
+                                        "example": {
+                                            "id": 1,
+                                            "url_type": "mobile",
+                                            "url": "https://m.example.com",
+                                            "name": "Mobile",
+                                            "slug": "mobile"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "URLs updated"
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "AccountType"
+                ],
+                "summary": "Create one or many URLs for an account type",
+                "operationId": "8610baf88c262dc8ced2a96006519427",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "example": {
+                                            "mobile": [
+                                                {
+                                                    "url": "https://m.example.com",
+                                                    "name": "Mobile",
+                                                    "slug": "mobile"
+                                                }
+                                            ],
+                                            "webplatform": [
+                                                {
+                                                    "url": "https://web.example.com",
+                                                    "name": "Web",
+                                                    "slug": "web"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "object",
+                                        "example": {
+                                            "url_type": "mobile",
+                                            "url": "https://m.example.com",
+                                            "name": "Mobile",
+                                            "slug": "mobile"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "URLs created"
+                    },
+                    "404": {
+                        "description": "Account type not found"
+                    }
+                }
+            }
+        },
         "/api/v1/brokers/": {
             "get": {
                 "tags": [
@@ -1514,6 +1689,410 @@
                     },
                     "404": {
                         "description": "Company not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-categories": {
+            "get": {
+                "tags": [
+                    "Option Categories"
+                ],
+                "summary": "Get all option categories",
+                "description": "Display a listing of option categories.",
+                "operationId": "90896318768ec2d83891d5ffca2a0fe6",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term for name or description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "language_code",
+                        "in": "query",
+                        "description": "Language code for translations",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "position",
+                                "default_language",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OptionCategory"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Option Categories"
+                ],
+                "summary": "Create a new option category",
+                "description": "Store a newly created option category.",
+                "operationId": "1b62abd8b8e354f884dc43deae308b58",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Trading Features"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Trading platform features and capabilities"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "example": "fas fa-chart-line"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "#007bff"
+                                    },
+                                    "background_color": {
+                                        "type": "string",
+                                        "example": "#f8f9fa"
+                                    },
+                                    "border_color": {
+                                        "type": "string",
+                                        "example": "#dee2e6"
+                                    },
+                                    "text_color": {
+                                        "type": "string",
+                                        "example": "#212529"
+                                    },
+                                    "font_weight": {
+                                        "type": "string",
+                                        "example": "bold"
+                                    },
+                                    "position": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "default_language": {
+                                        "type": "string",
+                                        "example": "en"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Option category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/OptionCategory"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option category created successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/option-categories/{id}": {
+            "get": {
+                "tags": [
+                    "Option Categories"
+                ],
+                "summary": "Get a specific option category",
+                "description": "Display the specified option category.",
+                "operationId": "87433e36dffc1ab6acf152a843d59776",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/OptionCategory"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option category not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Option Categories"
+                ],
+                "summary": "Update an option category",
+                "description": "Update the specified option category.",
+                "operationId": "6dbb574650f2f2d368e11631fef7e010",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Trading Features"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated trading platform features"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "example": "fas fa-chart-line"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "#007bff"
+                                    },
+                                    "background_color": {
+                                        "type": "string",
+                                        "example": "#f8f9fa"
+                                    },
+                                    "border_color": {
+                                        "type": "string",
+                                        "example": "#dee2e6"
+                                    },
+                                    "text_color": {
+                                        "type": "string",
+                                        "example": "#212529"
+                                    },
+                                    "font_weight": {
+                                        "type": "string",
+                                        "example": "bold"
+                                    },
+                                    "position": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "default_language": {
+                                        "type": "string",
+                                        "example": "en"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Option category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/OptionCategory"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option category updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option category not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Option Categories"
+                ],
+                "summary": "Delete an option category",
+                "description": "Remove the specified option category.",
+                "operationId": "70161a6745369596979e90e193e0e7cf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Option category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Option category deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Option category deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Option category not found"
                     },
                     "500": {
                         "description": "Server error"
@@ -3650,6 +4229,16 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "optionable_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "optionable_type": {
+                        "type": "string",
+                        "example": "App\\Models\\Broker",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3951,6 +4540,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Option Categories",
+            "description": "API Endpoints for managing option categories"
+        },
         {
             "name": "Auth",
             "description": "Auth"
