@@ -80,23 +80,23 @@ class AccountType extends Model
      *
      * @var array
      */
-    protected $fillable = ['broker_id','name'];
-        
+    protected $fillable = ['broker_id', 'name'];
+
 
     public function broker(): BelongsTo
     {
         return $this->belongsTo(Broker::class);
     }
 
-   
+
 
     public function urls(): MorphMany
     {
         return $this->morphMany(Url::class, 'urlable');
     }
 
-   
-    public function mobileUrls():MorphMany
+
+    public function mobileUrls(): MorphMany
     {
         return $this->urls()->where('url_type', 'mobile');
     }
@@ -105,22 +105,36 @@ class AccountType extends Model
 
     public function webplatformUrls(): MorphMany
     {
-        return $this->urls()->where('url_type','webplatform');
+        return $this->urls()->where('url_type', 'webplatform');
     }
 
     public function swapUrls(): MorphMany
     {
-        return $this->urls()->where('url_type','swap');
+        return $this->urls()->where('url_type', 'swap');
     }
 
 
     public function commissionUrls(): MorphMany
     {
-        return $this->urls()->where('url_type','commission');
+        return $this->urls()->where('url_type', 'commission');
     }
     public function optionValues(): MorphMany
     {
         return $this->morphMany(OptionValue::class, 'optionable');
+    }
+
+    public function getAllAccountTypeUrls()
+    {
+        $class = self::class;
+        return Url::where(function ($query) use ($class) {
+            $query->where(function ($q) {
+                $q->where('urlable_type', self::class)
+                  ->where('urlable_id', $this->id);
+            })->orWhere(function ($q) use ($class) {
+                $q->where('urlable_type', $class)
+                  ->whereNull('urlable_id');
+            });
+        });
     }
 
     protected static function booted()
@@ -132,5 +146,4 @@ class AccountType extends Model
             $accountType->optionValues()->delete();
         });
     }
-   
 }

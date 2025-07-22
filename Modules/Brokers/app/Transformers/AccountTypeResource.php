@@ -75,7 +75,7 @@ class AccountTypeResource extends JsonResource
            /// "zone_id" => $this->zone_id,
            "option_values" => OptionValueResource::collection($this->whenLoaded('optionValues')),
             
-            // URLs (if loaded)
+          
            // "urls" => URLResource::collection($this->whenLoaded('urls')),
             
             // Translations (if loaded)

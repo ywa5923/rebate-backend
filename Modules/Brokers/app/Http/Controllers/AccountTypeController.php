@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\AccountTypeService;
 use Modules\Brokers\Transformers\AccountTypeResource;
 use Modules\Brokers\Models\AccountType;
+use Modules\Brokers\Models\Url;
 use Modules\Brokers\Transformers\URLResource;
 use Modules\Brokers\Services\UrlService;
 
@@ -319,6 +320,7 @@ class AccountTypeController extends Controller
      */
     public function getUrlsGroupedByType($id)
     {
+       
         $accountType = AccountType::find($id);
         if (!$accountType) {
             return response()->json([
@@ -343,6 +345,8 @@ class AccountTypeController extends Controller
             'data' => $grouped
         ]);
     }
+
+    
 
     /**
      * @OA\Post(

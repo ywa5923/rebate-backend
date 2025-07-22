@@ -10,6 +10,7 @@ use Modules\Brokers\Http\Controllers\CompanyController;
 use Modules\Brokers\Http\Controllers\RegulatorController;
 use Modules\Brokers\Http\Controllers\OptionValueController;
 use Modules\Brokers\Http\Controllers\OptionCategoryController;
+use Modules\Brokers\Http\Controllers\UrlController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -39,10 +40,11 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('account-types/{id}', [AccountTypeController::class, 'show']);
     Route::put('account-types/{id}', [AccountTypeController::class, 'update']);
     Route::delete('account-types/{id}', [AccountTypeController::class, 'destroy']);
+    Route::get('account-types/{id}/urls', [AccountTypeController::class, 'getUrlsGroupedByType']);
     Route::post('account-types/{id}/urls', [AccountTypeController::class, 'createUrls']);
     Route::put('account-types/{id}/urls', [AccountTypeController::class, 'updateUrls']);
-    Route::delete('account-types/{accountTypeId}/urls/{urlId}', [\Modules\Brokers\Http\Controllers\AccountTypeController::class, 'deleteUrl']);
-    
+    Route::delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteUrl']);
+    Route::get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
     // Company routes
     Route::apiResource('companies', CompanyController::class)->names('companies');
     Route::apiResource('regulators', RegulatorController::class)->names('regulators');

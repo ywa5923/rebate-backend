@@ -41,7 +41,7 @@ class URLResource extends JsonResource
             "zone_id" => $this->zone_id,
             
             // Translations (if loaded)
-            "translations" => TranslationResource::collection($this->whenLoaded('translations')),
+            //"translations" => TranslationResource::collection($this->whenLoaded('translations')),
             // Timestamps
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
