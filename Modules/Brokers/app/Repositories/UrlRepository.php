@@ -42,6 +42,7 @@ class UrlRepository
             ->where('broker_id', $broker_id)
             ->where('urlable_type', $entity_type);
 
+            
         if (is_numeric($entity_id)) {
             $builder->where('urlable_id', $entity_id);
         }
@@ -62,6 +63,6 @@ class UrlRepository
             }]);
         }
 
-        return $builder->get();
+        return $builder->orderBy('id','desc')->get();
     }
 } 

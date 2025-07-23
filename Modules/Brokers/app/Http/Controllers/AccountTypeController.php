@@ -13,7 +13,7 @@ use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Url;
 use Modules\Brokers\Transformers\URLResource;
 use Modules\Brokers\Services\UrlService;
-
+use App\Utilities\ModelHelper;
 
 class AccountTypeController extends Controller
 {
@@ -425,22 +425,49 @@ class AccountTypeController extends Controller
     //   }
     public function createUrls(Request $request, $id)
     {
-        $accountType =AccountType::find($id);
-        if (!$accountType) {
-            return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+      // TO DO verify that the logged in broker id is the same as the broker_id in the request
+      //or is admin
+        $broker_id=$request->broker_id;
+       
+        if($broker_id==null){
+            throw new \Exception('Broker ID is required');
+         }
+        
+
+         //if account type id is  null, it means that is a master url that has urlable_id null 
+         //it is avaialble for all broker account types
+        if($id!=0 && $id!=null || $id!="0"){
+            //if account type id is not null, it means that is a broker account type
+            $accountType =AccountType::find($id);
+          
+            if (!$accountType) {
+                return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+            }
+        }else{
+            $accountType=null;
         }
+       
 
         $data = $request->all();
+        
         $urls = $this->flattenUrlInput($data);
-
-        $created = app(UrlService::class)->createMany($accountType, $urls);
+     
+       
+        $created = app(UrlService::class)->createMany($accountType,'account_type', $urls);
+      
 
         // Optionally, fetch the created URLs for response
-        $fetched = $accountType->urls()->with('translations')->latest('id')->take(count($urls))->get();
+        if($accountType){
+            $fetched = $accountType->urls()->latest('id')->take(count($urls))->get();
+        }else{
+            $fetched = Url::where('urlable_type', AccountType::class)->where('broker_id', $broker_id)->latest('id')->take(count($urls))->get();
+        }
+
 
         return response()->json([
             'success' => true,
-            'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
+           // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
+           'data' => $fetched
         ], 201);
     }
 
@@ -505,15 +532,29 @@ class AccountTypeController extends Controller
     //   }
     public function updateUrls(Request $request, $id)
     {
-        $accountType = \Modules\Brokers\Models\AccountType::find($id);
-        if (!$accountType) {
-            return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+       
+        // TO DO verify that the logged in broker id is the same as the broker_id in the request
+        //or is admin
+        $broker_id=$request->broker_id;
+        if($broker_id==null){
+           throw new \Exception('Broker ID is required as a search parameter');
+        }
+
+        if($id!=0 && $id!=null || $id!="0"){
+            //if account type id is not null, it means that is a broker account type
+            $accountType =AccountType::find($id);
+          
+            if (!$accountType) {
+                return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+            }
+        }else{
+            $accountType=null;
         }
 
         $data = $request->all();
         $urls = $this->flattenUrlInput($data);
-
-        $updated = app(UrlService::class)->updateMany($accountType, $urls);
+    
+        $updated = app(UrlService::class)->updateMany('account_type', $urls,$broker_id);
 
         return response()->json([
             'success' => true,
@@ -569,6 +610,8 @@ class AccountTypeController extends Controller
                 }
             }
         }
+
+        
         return $urls;
     }
 
@@ -700,10 +743,18 @@ class AccountTypeController extends Controller
      *     )
      * )
      */
-    public function destroy($id): JsonResponse
+    public function destroy(Request $request, $id): JsonResponse
     {
+        // TO DO
+        //check if account type broker id is the same as the logged in broker id
+        //or is admin
+        $broker_id=$request->broker_id;
+        if($broker_id==null){
+            throw new \Exception('Broker ID is required as a search parameter');
+         }
+      
         try {
-            $this->accountTypeService->deleteAccountType($id);
+            $this->accountTypeService->deleteAccountType($id,$broker_id);
 
             return response()->json([
                 'success' => true,
@@ -749,17 +800,26 @@ class AccountTypeController extends Controller
      *     @OA\Response(response=404, description="URL or Account type not found")
      * )
      */
-    public function deleteUrl($accountTypeId, $urlId)
+    public function deleteAccountTypeUrl($accountTypeId, $urlId)
     {
+
+         // TO DO
+        //check if account type broker id is the same as the logged in broker id
+        //or is admin
+
         $accountType = AccountType::find($accountTypeId);
         if (!$accountType) {
             return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
         }
-        $url = $accountType->urls()->find($urlId);
+
+        $allUrls = $accountType->getAllAccountTypeUrls();
+        $url = $allUrls->firstWhere('id', $urlId);
         if (!$url) {
             return response()->json(['success' => false, 'message' => 'URL not found'], 404);
         }
+
         $url->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'URL deleted successfully'

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-
+use Modules\Brokers\Models\Url;
 class AccountTypeRepository
 {
     protected AccountType $model;
@@ -80,6 +80,16 @@ class AccountTypeRepository
         return $accountType->delete();
     }
 
+    /**
+     * Delete URLs for account type
+     */
+    public function deleteAccountTypeUrls(AccountType $accountType,$broker_id): bool
+    {
+        return Url::where('urlable_type', AccountType::class)
+        
+        ->where('broker_id', $broker_id)
+        ->delete();
+    }
     /**
      * Create URLs for account type
      */

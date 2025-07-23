@@ -121,16 +121,26 @@ class AccountTypeService
     /**
      * Delete account type
      */
-    public function deleteAccountType(int $id): bool
+    public function deleteAccountType(int $id,$broker_id): bool
     {
+        
         try {
             $accountType = $this->repository->findByIdWithoutRelations($id);
+
+            if($accountType->broker_id!=$broker_id){
+                throw new \Exception('You are not authorized to delete this account type');
+            }
             
             if (!$accountType) {
                 throw new \Exception('Account type not found');
             }
 
-            return $this->repository->delete($accountType);
+            DB::beginTransaction();
+            $this->repository->delete($accountType);
+            $this->repository->deleteAccountTypeUrls($accountType,$broker_id);
+            DB::commit();
+            return true;
+            
 
         } catch (\Exception $e) {
             Log::error('AccountTypeService deleteAccountType error: ' . $e->getMessage());
