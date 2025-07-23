@@ -241,6 +241,14 @@ class AccountTypeRepository
                         ->orWhere('zone_code', $request->zone_code);
                 });
             };
+        }else{
+            //if zone_code is not provided, we need to get the option values 
+            //for the account type that have no zone_code and zone_id, i.e original data submitted by broker
+            $withArray['optionValues'] = function ($q) use ($request) {
+                $q->where(function ($subQ) use ($request) {
+                    $subQ->where('zone_code', null)->where('zone_id',null);
+                });
+            };
         }
 
         if ($request->has('language_code')) {

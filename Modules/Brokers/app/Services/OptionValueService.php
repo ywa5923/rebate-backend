@@ -80,7 +80,7 @@ class OptionValueService
     /**
      * Create multiple option values for a broker
      */
-    public function createMultipleOptionValues(int $brokerId, array $optionValuesData, string $entityType): array
+    public function createMultipleOptionValues(int $brokerId, array $optionValuesData, string|null $entityType): array
     {
         return DB::transaction(function () use ($brokerId, $optionValuesData, $entityType) {
             try {
@@ -108,6 +108,12 @@ class OptionValueService
                 ]);
                 $entityId = $instance->id;
               
+                }else{
+                    //if entity type is null, it means that is a broker option value
+                    //so we need to create a new broker option value
+                    //and we need to set the entity id to the broker id
+                    $entityId=$brokerId;
+                    $modelClass=ModelHelper::getModelClassFromSlug('Broker');
                 }
                
                 foreach ($optionValuesData as $index => $optionValueData) {
