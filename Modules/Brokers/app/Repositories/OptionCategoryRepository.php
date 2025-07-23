@@ -121,10 +121,12 @@ class OptionCategoryRepository
                 $q->where('language_code', $request->language_code);
             };
         }
+
+        
         
         $query->with($withArray);
         
-
+     
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {

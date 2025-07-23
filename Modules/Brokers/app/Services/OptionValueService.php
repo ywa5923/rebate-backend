@@ -2,6 +2,7 @@
 
 namespace Modules\Brokers\Services;
 
+use App\Utilities\ModelHelper;
 use Modules\Brokers\Repositories\OptionValueRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -94,8 +95,8 @@ class OptionValueService
                 $options=BrokerOption::all()->pluck('id','slug');
               
                 if($entityType){
-                $className = ucfirst($entityType); // Convert 'company' to 'Company'
-                $modelClass = "Modules\\Brokers\\Models\\{$className}";
+               // $className = ucfirst($entityType); // Convert 'company' to 'Company'
+                $modelClass = ModelHelper::getModelClassFromSlug($entityType);
                
                 if (!class_exists($modelClass)) {
                     throw new \InvalidArgumentException("Model class {$modelClass} not found");
@@ -103,7 +104,7 @@ class OptionValueService
                 
                 $instance = $modelClass::create([
                     'broker_id' => $brokerId,
-                    'name' => 'New Company',
+                    //'name' => 'New Company',
                 ]);
                 $entityId = $instance->id;
               

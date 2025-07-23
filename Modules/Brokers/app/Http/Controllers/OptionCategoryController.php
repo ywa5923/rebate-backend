@@ -92,7 +92,9 @@ class OptionCategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+         
             $result = $this->service->getOptionCategories($request);
+            
             
             $result['data'] = OptionCategoryResource::collection($result['data']);
 

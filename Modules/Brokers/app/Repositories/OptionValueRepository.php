@@ -377,6 +377,8 @@ class OptionValueRepository
                         $subQ->where('zone_code', $request->zone_code);
                     });
             });
+        }else{
+            $query->where('zone_id',null)->where('zone_code',null);
         }
 
         if ($request->has('search')) {
