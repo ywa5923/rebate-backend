@@ -80,7 +80,7 @@ class OptionValueService
     /**
      * Create multiple option values for a broker
      */
-    public function createMultipleOptionValues(int $brokerId, array $optionValuesData, string|null $entityType): array
+    public function createMultipleOptionValues(int $brokerId, string $entityType, array $optionValuesData, ): array
     {
         return DB::transaction(function () use ($brokerId, $optionValuesData, $entityType) {
             try {
@@ -94,7 +94,7 @@ class OptionValueService
                 $now = now();
                 $options=BrokerOption::all()->pluck('id','slug');
               
-                if($entityType){
+               if($entityType && strtolower($entityType)!='broker'){
                // $className = ucfirst($entityType); // Convert 'company' to 'Company'
                 $modelClass = ModelHelper::getModelClassFromSlug($entityType);
                
@@ -125,8 +125,8 @@ class OptionValueService
                     $optionValueData['created_at'] = $now;
                     $optionValueData['updated_at'] = $now;
                     $optionValueData['broker_option_id']=$options[$slug];
-                    $optionValueData['optionable_id']=$entityId??null;
-                    $optionValueData['optionable_type']=$modelClass??null;
+                    $optionValueData['optionable_id']=$entityId;
+                    $optionValueData['optionable_type']=$modelClass;
 
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
@@ -135,6 +135,7 @@ class OptionValueService
                     
                     $bulkData[] = $optionValueData;
                 }
+                
                
 
                 // Bulk insert all option values in one query
@@ -187,10 +188,16 @@ class OptionValueService
     /**
      * Update multiple option values for a broker
      */
-    public function updateMultipleOptionValues(int $brokerId, array $optionValuesData): array
+    public function updateMultipleOptionValues(int $brokerId,int $entity_id, string $entity_type, array $optionValuesData): array
     {
         //dd($optionValuesData);
-        return DB::transaction(function () use ($brokerId, $optionValuesData) {
+
+        $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
+        if (!class_exists($modelClass)) {
+            throw new \InvalidArgumentException("Model class {$modelClass} not found");
+        }
+       
+        return DB::transaction(function () use ($brokerId, $optionValuesData,$entity_id,$modelClass) {
             try {
                 $now = now();
                 $updatesByCondition = [];
@@ -208,6 +215,8 @@ class OptionValueService
                         // Remove id if present and null/empty
                         unset($optionValueData['id']);
                         $optionValueData['broker_id'] = $brokerId; // Ensure broker_id is set
+                        $optionValueData['optionable_id']=$entity_id;
+                        $optionValueData['optionable_type']=$modelClass;
                         $optionValueData['created_at'] = $now;
                         $optionValueData['broker_option_id']=$options[$optionValueData['option_slug']];
                         $inserts[] = $optionValueData;
@@ -218,10 +227,10 @@ class OptionValueService
                     }
                 }
 
-                if (config('app.debug')) {
-                    Log::debug('Bulk Update Data:', ['updatesByCondition' => $updatesByCondition]);
-                    Log::debug('Bulk Insert Data:', ['inserts' => $inserts]);
-                }
+                // if (config('app.debug')) {
+                //     Log::debug('Bulk Update Data:', ['updatesByCondition' => $updatesByCondition]);
+                //     Log::debug('Bulk Insert Data:', ['inserts' => $inserts]);
+                // }
 
                 // Bulk update
                 if (!empty($updatesByCondition)) {

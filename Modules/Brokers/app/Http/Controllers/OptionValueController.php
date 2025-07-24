@@ -279,16 +279,25 @@ class OptionValueController extends Controller
      */
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
+      
+        $entityType = $request->input('entity_type');
+        if (!$brokerId ||  !$entityType) {
+            return response()->json([
+                'success' => false,
+                'message' => 'broker_id, entity_id, and entity_type are all required.'
+            ], 422);
+        }
         try {
             // Validate data
             
-          
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []));
            // $entityId = $request->input('entity_id', null);
             $entityType = $request->input('entity_type', null);
              //entity id is not needed for store, it is created in service a new entry for model EntityType
+             //For example a company is created in service and the entity id is the company id
+             //The request for store multiple options values is made when  a new entity is created,ex: when a new company is created,entity_type is company.
             // Create multiple option values
-            $optionValues = $this->optionValueService->createMultipleOptionValues($brokerId, $validatedData,$entityType);
+            $optionValues = $this->optionValueService->createMultipleOptionValues($brokerId, $entityType,$validatedData);
 
             return response()->json([
                 'success' => true,
@@ -547,20 +556,22 @@ class OptionValueController extends Controller
      */
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
+        $entityId = $request->input('entity_id');
+        $entityType = $request->input('entity_type');
+        if (!$brokerId || !$entityId || !$entityType) {
+            return response()->json([
+                'success' => false,
+                'message' => 'broker_id, entity_id, and entity_type are all required.'
+            ], 422);
+        }
         try {
-            // Validate data
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []), true);
-            
-          
-            // Update multiple option values
-            $optionValues = $this->optionValueService->updateMultipleOptionValues($brokerId, $validatedData);
-
+            $optionValues = $this->optionValueService->updateMultipleOptionValues($brokerId, $entityId, $entityType, $validatedData);
             return response()->json([
                 'success' => true,
                 'message' => 'Option values updated successfully',
-                'data' => $optionValues // Return the array directly since it's already formatted
+                'data' => $optionValues
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
