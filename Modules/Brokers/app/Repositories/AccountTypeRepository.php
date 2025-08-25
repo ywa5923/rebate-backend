@@ -275,13 +275,13 @@ class AccountTypeRepository
             });
         }
 
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
-        }
+        // if ($request->has('is_active')) {
+        //     $query->where('is_active', $request->boolean('is_active'));
+        // }
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
+        // if ($request->has('search')) {
+        //     $query->where('name', 'like', '%' . $request->search . '%');
+        // }
     }
 
     /**

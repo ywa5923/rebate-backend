@@ -63,29 +63,7 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
-        'name_p',
-        'licence_number',
-        'licence_number_p',
-        'crypto_categories',
-        'crypto_categories_p',
-        'banner',
-        'banner_p',
-        'description',
-        'description_p',
-        'year_founded',
-        'year_founded_p',
-        'employees',
-        'employees_p',
-        'headquarters',
-        'headquarters_p',
-        'offices',
-        'offices_p',
-        'status',
-        'status_reason',
-        'is_invariant',
         'broker_id',
-        'zone_id'
     ];
 
     public function broker(): BelongsTo
@@ -93,15 +71,7 @@ class Company extends Model
         return $this->belongsTo(Broker::class);
     }
 
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
-    public function translations(): MorphMany
-    {
-        return $this->morphMany(Translation::class, 'translationable');
-    }
+  
 
     public function optionValues(): MorphMany
     {

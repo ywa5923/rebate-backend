@@ -16,7 +16,8 @@ class MatrixHeaderRepository
      * @param string $type The type of headers to retrieve
      * @param int $matrix_id The ID of the matrix
      * @param int|null $broker_id The ID of the broker (optional)
-     * @param bool $broker_id_strict Whether to strictly match the broker ID
+     * @param bool $broker_id_strict Whether to strictly match the broker ID.
+     * If false,get headears where broker_id is null or the broker_id is the same as the broker_id in the request
      * @return Collection
      */
     public function getColumnHeaders(array $matrixNameCondition, ?array $brokerIdCondition, $broker_id_strict = false): Collection

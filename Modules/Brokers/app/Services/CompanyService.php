@@ -12,10 +12,11 @@ use Modules\Brokers\Models\Company;
 class CompanyService
 {
     protected Company2Repository $repository;
-
-    public function __construct(Company2Repository $repository)
+    protected OptionValueService $optionValueService;
+    public function __construct(Company2Repository $repository, OptionValueService $optionValueService)
     {
         $this->repository = $repository;
+        $this->optionValueService = $optionValueService;
     }
 
     /**
@@ -106,13 +107,18 @@ class CompanyService
     public function deleteCompany(int $id): bool
     {
         try {
+            DB::beginTransaction();
             $company = $this->repository->findByIdWithoutRelations($id);
             
             if (!$company) {
                 throw new \Exception('Company not found');
             }
 
-            return $this->repository->delete($company);
+            $this->repository->delete($company);
+            //delete all option values for this company
+            $this->optionValueService->deleteOptionValuesByOptionableId($id,'company');
+            DB::commit();
+            return true;
 
         } catch (\Exception $e) {
             Log::error('CompanyService deleteCompany error: ' . $e->getMessage());

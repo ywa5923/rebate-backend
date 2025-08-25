@@ -169,3 +169,8 @@ php artisan migrate --path=/Modules/Translations/database/migrations/2025_03_01_
 https://laracasts.com/discuss/channels/laravel/progress-bars-on-other-class
 
 docker exec -it backend-laravel-1 bash -c "chown -R www-data:www-data /var/www/html && chmod -R g+w /var/www/html"
+
+
+//to load magic imports
+docker exec -it backend-laravel-1 php artisan migrate:fresh
+docker exec -it backend-laravel-1 php artisan app:magic-import

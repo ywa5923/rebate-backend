@@ -11,6 +11,8 @@ use Modules\Brokers\Http\Controllers\RegulatorController;
 use Modules\Brokers\Http\Controllers\OptionValueController;
 use Modules\Brokers\Http\Controllers\OptionCategoryController;
 use Modules\Brokers\Http\Controllers\UrlController;
+use Modules\Brokers\Http\Controllers\PromotionController;
+use Modules\Brokers\Http\Controllers\ContestController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -55,4 +57,12 @@ Route::group(["prefix"=>'v1'], function () {
     // Multiple option values routes for brokers
     Route::post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
     Route::put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
+    
+    // Promotion routes
+    Route::get('promotions', [PromotionController::class, 'index']);
+    Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);
+    
+    // Contest routes
+    Route::get('contests', [ContestController::class, 'index']);
+    Route::delete('contests/{id}', [ContestController::class, 'destroy']);
 });

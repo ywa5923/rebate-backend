@@ -2,6 +2,7 @@
 
 namespace Modules\Brokers\Repositories;
 
+use App\Utilities\ModelHelper;
 use Modules\Brokers\Models\OptionValue;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Transformers\DynamicOptionValueCollection;
@@ -332,6 +333,17 @@ class OptionValueRepository
     public function getByStatus(bool $status): Collection
     {
         return $this->model->where('status', $status)->get();
+    }
+
+    /**
+     * Get option values by optionable ID
+    /**
+     * Get option values by optionable ID
+     */
+    public function getByOptionableId(int $optionableId, string $optionableType): Collection
+    {
+        $optionableType = ModelHelper::getModelClassFromSlug($optionableType);
+        return $this->model->where('optionable_id', $optionableId)->where('optionable_type', $optionableType)->get();
     }
 
     /**

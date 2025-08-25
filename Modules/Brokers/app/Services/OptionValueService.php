@@ -272,6 +272,15 @@ class OptionValueService
         });
     }
 
+    public function deleteOptionValuesByOptionableId(int $optionableId, string $optionableType): bool
+    {
+        $optionValues = $this->repository->getByOptionableId($optionableId,$optionableType);
+        foreach ($optionValues as $optionValue) {
+            $this->repository->delete($optionValue);
+        }
+        return true;
+    }
+
     /**
      * Delete option value
      */

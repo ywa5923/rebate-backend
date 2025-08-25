@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_covered_market', function (Blueprint $table) {
+        Schema::create('contests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("company_id")->constrained("companies");
-            $table->foreignId("covered_market_id")->constrained();
+            $table->foreignId('broker_id')->constrained('brokers');
             $table->timestamps();
+            
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_covered_market');
+        Schema::dropIfExists('contests');
     }
 };
