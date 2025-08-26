@@ -66,6 +66,7 @@ class MatrixController extends Controller
         try {
             // First transaction - Flush data
             DB::beginTransaction();
+            //flush all data for the matrix and headers and headears options
             $rep->flushMatrix($matrix->id, $brokerId);
             DB::commit();
 

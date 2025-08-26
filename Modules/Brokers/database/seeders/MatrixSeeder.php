@@ -18,7 +18,7 @@ class MatrixSeeder extends Seeder
     {
        $matrixId= Matrix::insertGetId([
             
-            'name'=>'Matrix 1',
+            'name'=>'Matrix-1',
             'description'=>'Matrix 1 Description'
            
         ]);
