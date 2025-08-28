@@ -174,3 +174,5 @@ docker exec -it backend-laravel-1 bash -c "chown -R www-data:www-data /var/www/h
 //to load magic imports
 docker exec -it backend-laravel-1 php artisan migrate:fresh
 docker exec -it backend-laravel-1 php artisan app:magic-import
+
+ docker exec -it backend-laravel-1 php artisan db:seed --class=\\Modules\\Brokers\\Database\\Seeders\\DatabaseSeeder

@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('challenge_steps', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->string('image')->nullable();
+            $table->string('slug');  
+            $table->foreignId('challenge_category_id')->constrained('challenge_categories');
             $table->timestamps();
         });
     }

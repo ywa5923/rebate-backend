@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('challenges', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('matrix_name');
+            $table->boolean('is_placeholder')->default(false);
+            $table->foreignId('matrix_id')->constrained('matrices');
+            $table->foreignId('challenge_category_id')->constrained('challenge_categories');
+            $table->foreignId('challenge_step_id')->constrained('challenge_steps');
+            $table->foreignId('challenge_amount_id')->constrained('challenge_amounts');
             $table->timestamps();
         });
     }

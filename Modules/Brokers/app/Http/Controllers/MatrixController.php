@@ -23,21 +23,29 @@ class MatrixController extends Controller
     public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
     {
         $queryParser->parse($request);
+      
+
         if (empty($queryParser->getWhereParams())) {
             return new Response("not found", 404);
         }
 
-        $columnHeaders = $rep->getColumnHeaders(
-            $queryParser->getWhereParam("matrix_id"),
+        $columnHeaders = $rep->getColumnHeadearsByType(
+            'column',
+            $queryParser->getWhereParam("matrix_id") ?? null,
             $queryParser->getWhereParam("broker_id") ?? null,
+            $queryParser->getWhereParam("group") ?? null,
+            $queryParser->getWhereParam("language") ?? null,
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
         );
 
         //return $columnHeaders;
 
-        $rowHeaders = $rep->getRowHeaders(
-            $queryParser->getWhereParam("matrix_id"),
+        $rowHeaders = $rep->getColumnHeadearsByType(
+            'row',
+            $queryParser->getWhereParam("matrix_id") ?? null,
             $queryParser->getWhereParam("broker_id") ?? null,
+            $queryParser->getWhereParam("group") ?? null,
+            $queryParser->getWhereParam("language") ?? null,
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
         );
 
