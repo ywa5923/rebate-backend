@@ -13,7 +13,8 @@ class MatrixHeadearsQueryParser extends BaseQueryParser
         "broker_id"=>['eq'],
         "matrix_id"=>['eq'],
         "broker_id_strict"=>['eq'],
-        "group"=>['eq'],
+        "col_group"=>['eq'],
+        "row_group"=>['eq'],
         "language"=>['eq'],
      ];
 
@@ -24,14 +25,16 @@ class MatrixHeadearsQueryParser extends BaseQueryParser
         "broker_id"=>"string|min:1|max:45",
         "matrix_id"=>"string|min:1|max:45",
         "broker_id_strict"=>"boolean",
-        "group"=>"string|min:1|max:45",
+        "col_group"=>"string|min:1|max:45",
+        "row_group"=>"string|min:1|max:45",
         "language"=>"string|min:2|max:5",
      ];
 
      protected $columnMap = [
         "language"=>"language_code",
         "matrix_id"=>"name",
-        "group"=>"group_name",
+        "col_group"=>"group_name",
+        "row_group"=>"group_name",
         "language"=>"language_code",
      ];
 }

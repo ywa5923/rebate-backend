@@ -13,6 +13,7 @@ use Modules\Brokers\Http\Controllers\OptionCategoryController;
 use Modules\Brokers\Http\Controllers\UrlController;
 use Modules\Brokers\Http\Controllers\PromotionController;
 use Modules\Brokers\Http\Controllers\ContestController;
+use Modules\Brokers\Http\Controllers\ChallengeController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -65,4 +66,7 @@ Route::group(["prefix"=>'v1'], function () {
     // Contest routes
     Route::get('contests', [ContestController::class, 'index']);
     Route::delete('contests/{id}', [ContestController::class, 'destroy']);
+
+     // Challenges table routes
+     Route::get('challenges/categories', [ChallengeController::class, 'getChallengeCategories']);
 });

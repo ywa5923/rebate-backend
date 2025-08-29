@@ -3,20 +3,22 @@
 namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Brokers\Database\Factories\ChallengeStepFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ChallengeStep extends Model
 {
-    use HasFactory;
+    
 
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
 
-    protected static function newFactory(): ChallengeStepFactory
+    public function challengeCategory(): BelongsTo
     {
-        //return ChallengeStepFactory::new();
+        return $this->belongsTo(ChallengeCategory::class,'challenge_category_id');
     }
+
+   
 }
+    

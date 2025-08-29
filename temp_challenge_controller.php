@@ -85,8 +85,6 @@ class ChallengeController extends Controller
      */
     public function getChallengeCategories(Request $request)
     {
-         // $categories = ChallengeCategory::with('steps','amounts')->get();
-       // return response()->json($categories);
         try {
             $result = $this->challengeCategoryService->getChallengeCategories($request);
             

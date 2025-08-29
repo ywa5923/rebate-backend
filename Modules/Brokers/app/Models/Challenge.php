@@ -3,20 +3,35 @@
 namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Brokers\Database\Factories\ChallengeFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Challenge extends Model
 {
-    use HasFactory;
+   
 
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
 
-    protected static function newFactory(): ChallengeFactory
+    public function challengeCategory(): BelongsTo
     {
-        //return ChallengeFactory::new();
+        return $this->belongsTo(ChallengeCategory::class,'challenge_category_id');
+    } 
+
+    public function challengeStep(): BelongsTo
+    {
+        return $this->belongsTo(ChallengeStep::class,'challenge_step_id');
     }
+
+    public function challengeAmount(): BelongsTo
+    {
+        return $this->belongsTo(ChallengeAmount::class,'challenge_amount_id');
+    }
+
+    public function matrix(): BelongsTo
+    {
+        return $this->belongsTo(Matrix::class,'matrix_id');
+    }
+    
 }

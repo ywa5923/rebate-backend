@@ -3,20 +3,28 @@
 namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Brokers\Database\Factories\ChallengeCategoryFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+
 
 class ChallengeCategory extends Model
 {
-    use HasFactory;
+    
 
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
 
-    protected static function newFactory(): ChallengeCategoryFactory
+    public function steps(): HasMany
     {
-        //return ChallengeCategoryFactory::new();
+        return $this->hasMany(ChallengeStep::class,'challenge_category_id');
     }
+
+    public function amounts(): HasMany
+    {
+        return $this->hasMany(ChallengeAmount::class,'challenge_category_id');
+    }
+
+   
 }
