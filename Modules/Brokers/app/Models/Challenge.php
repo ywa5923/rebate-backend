@@ -4,7 +4,7 @@ namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Challenge extends Model
 {
    
@@ -12,7 +12,7 @@ class Challenge extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = ['is_placeholder','challenge_category_id','challenge_step_id','challenge_amount_id','broker_id'];
 
     public function challengeCategory(): BelongsTo
     {
@@ -29,9 +29,14 @@ class Challenge extends Model
         return $this->belongsTo(ChallengeAmount::class,'challenge_amount_id');
     }
 
-    public function matrix(): BelongsTo
+    public function challengeMatrixValues(): HasMany
     {
-        return $this->belongsTo(Matrix::class,'matrix_id');
+        return $this->hasMany(ChallengeMatrixValue::class,'challenge_id');
+    }
+
+    public function broker(): BelongsTo
+    {
+        return $this->belongsTo(Broker::class,'broker_id');
     }
     
 }

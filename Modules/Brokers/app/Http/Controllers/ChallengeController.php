@@ -10,22 +10,117 @@ use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Models\ChallengeCategory;
 use Modules\Brokers\Services\ChallengeCategoryService;
 use Modules\Brokers\Transformers\ChallengeCategoryResource;
-
+use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Models\Challenge;
+use Modules\Brokers\Models\Matrix;
+use Modules\Brokers\Models\MatrixValue;
+use Modules\Brokers\Models\MatrixDimension;
+use Modules\Brokers\Models\MatrixHeader;
+use Modules\Brokers\Models\ChallengeMatrixValue;
+use Modules\Brokers\Services\ChallengeService;
 class ChallengeController extends Controller
 {
     protected ChallengeCategoryService $challengeCategoryService;
+    protected ChallengeService $challengeService;
 
-    public function __construct(ChallengeCategoryService $challengeCategoryService)
+    public function __construct(ChallengeCategoryService $challengeCategoryService, ChallengeService $challengeService)
     {
         $this->challengeCategoryService = $challengeCategoryService;
+        $this->challengeService = $challengeService;
     }
+
+    
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        return view('brokers::index');
+        try {
+            // Validate the request parameters
+            $validatedData = $request->validate([
+                'category_id' => 'required|integer|exists:challenge_categories,id',
+                'step_id' => 'required|integer|exists:challenge_steps,id', 
+                'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
+                'is_placeholder' => 'nullable|boolean'
+            ]);
+
+            $brokerId = 1; // Default broker ID
+
+            $isPalceholder=$validatedData['is_placeholder'];
+            if($validatedData['is_placeholder']==false || $validatedData['is_placeholder']==null){
+            //First find the challenge that is not placeholder 
+            $challenge = $this->challengeService->findChallengeByParams(
+                false,
+                $validatedData['category_id'],
+                $validatedData['step_id'],
+                $validatedData['amount_id'] ?? null,
+                $brokerId
+            );
+
+            //if not found then find the challenge that is placeholder 
+            if (!$challenge) {
+
+                //find the challenge that is placeholder
+                $challenge = $this->challengeService->challengeExist(
+                   true,
+                    $validatedData['category_id'],
+                    $validatedData['step_id'],
+                    $validatedData['amount_id'] ?? null,
+                    $brokerId,
+                );
+                if (!$challenge) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Challenge not found'
+                    ], 404);
+                }else{
+                    $isPalceholder=true;
+                }
+            }
+
+            }else if($validatedData['is_placeholder']==true){
+                //the client  get only the matrix data for placeholder challenge
+                $challenge = $this->challengeService->findChallengeByParams(
+                    true,
+                    $validatedData['category_id'],
+                    $validatedData['step_id'],
+                    $validatedData['amount_id'] ?? null,
+                    $brokerId
+                );
+
+            }
+            
+
+            // Get matrix data in the required format
+            //TODO:add translation and zone params
+            $matrix = $this->challengeService->getChallengeMatrixData($challenge->id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'challenge_id' => $challenge->id,
+                    'challenge_category_id' => $challenge->challenge_category_id,
+                    'challenge_step_id' => $challenge->challenge_step_id,
+                    'challenge_amount_id' => $challenge->challenge_amount_id,
+                    'is_placeholder' => $challenge->is_placeholder,
+                    'matrix' => $matrix
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve challenge matrix data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
     
     /**
@@ -113,13 +208,49 @@ class ChallengeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse
     {
-        // Implementation for storing challenge category
-        return redirect()->back();
-    }
+        $brokerId = 1;
+        
+        try {
+            // Validate the request
+            $validatedData = $request->validate([
+                'category_id' => 'required|integer|exists:challenge_categories,id',
+                'step_id' => 'required|integer|exists:challenge_steps,id', 
+                'step_slug' => 'nullable|string',
+                'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
+                'is_placeholder' => 'nullable|boolean',
+                'matrix' => 'required|array'
+            ]);
 
-    /**
+            // Use service to store challenge
+            $result = $this->challengeService->storeChallenge($validatedData, $brokerId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Challenge matrix created successfully',
+                'data' => [
+                    'challenge_id' => $result['challenge_id']
+                ]
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create challenge matrix',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+     /**
+     * Save matrix data to matrix_values table
+  
      * Show the specified resource.
      */
     public function show($id)
