@@ -42,31 +42,35 @@ class ChallengeController extends Controller
                 'category_id' => 'required|integer|exists:challenge_categories,id',
                 'step_id' => 'required|integer|exists:challenge_steps,id', 
                 'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-                'is_placeholder' => 'nullable|boolean'
+                'is_placeholder' => 'nullable|boolean',
+                'broker_id' => 'nullable|integer|exists:brokers,id'
             ]);
 
-            $brokerId = 1; // Default broker ID
-
+            $brokerId = $validatedData['broker_id']; // Default broker ID
+           // $brokerId=1;
             $isPalceholder=$validatedData['is_placeholder'];
-            if($validatedData['is_placeholder']==false || $validatedData['is_placeholder']==null){
+            if($validatedData['is_placeholder'] == false || $validatedData['is_placeholder'] == null || $validatedData['is_placeholder'] == "0" || $validatedData['is_placeholder'] == 0){
             //First find the challenge that is not placeholder 
             $challenge = $this->challengeService->findChallengeByParams(
                 false,
                 $validatedData['category_id'],
                 $validatedData['step_id'],
-                $validatedData['amount_id'] ?? null,
+                $validatedData['amount_id'],
                 $brokerId
             );
+
+           // dd($challenge);
 
             //if not found then find the challenge that is placeholder 
             if (!$challenge) {
 
                 //find the challenge that is placeholder
+                //placeholder challenges entries have amount_id null,they differ only by step_id and category_id
                 $challenge = $this->challengeService->challengeExist(
                    true,
                     $validatedData['category_id'],
                     $validatedData['step_id'],
-                    $validatedData['amount_id'] ?? null,
+                    null,
                     $brokerId,
                 );
                 if (!$challenge) {
@@ -79,7 +83,7 @@ class ChallengeController extends Controller
                 }
             }
 
-            }else if($validatedData['is_placeholder']==true){
+            }else if($validatedData['is_placeholder'] == true || $validatedData['is_placeholder'] == "1" || $validatedData['is_placeholder'] == 1){
                 //the client  get only the matrix data for placeholder challenge
                 $challenge = $this->challengeService->findChallengeByParams(
                     true,
@@ -210,7 +214,7 @@ class ChallengeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $brokerId = 1;
+        
         
         try {
             // Validate the request
@@ -220,9 +224,11 @@ class ChallengeController extends Controller
                 'step_slug' => 'nullable|string',
                 'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
                 'is_placeholder' => 'nullable|boolean',
-                'matrix' => 'required|array'
+                'matrix' => 'required|array',
+                'broker_id' => 'nullable|integer|exists:brokers,id'
             ]);
 
+            $brokerId = $validatedData['broker_id'];
             // Use service to store challenge
             $result = $this->challengeService->storeChallenge($validatedData, $brokerId);
 
