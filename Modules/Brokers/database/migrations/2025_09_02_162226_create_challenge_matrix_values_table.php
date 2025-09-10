@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('challenge_matrix_values', function (Blueprint $table) {
             $table->id();
+            $table->json('previous_value')->nullable();
             $table->json('value');
+            $table->json('previous_public_value')->nullable();
             $table->json('public_value')->nullable();
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();

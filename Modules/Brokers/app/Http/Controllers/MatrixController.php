@@ -125,7 +125,9 @@ class MatrixController extends Controller
                //2.Scan matrix for new sub headears (instruments) which doesn't exist in matrix_headears,
                //and save them in newHeadersSubOptions for later save in matrix_headears using batch insert
                
-                foreach ($selectedRowHeaderSubOptions as $subOption) {
+               //added new check for selectedRowHeaderSubOptions
+                if ($selectedRowHeaderSubOptions) {
+                    foreach ($selectedRowHeaderSubOptions as $subOption) {
                     //get the id of the sub headear (instrument),which has parent_id=rowHeaderId
                     //if the sub option doesn't exist in the allHeaders array, it will return null
                     $subOptionId = $this->getHeaderId($subOption['value'], $allHeaders,false);
@@ -151,6 +153,7 @@ class MatrixController extends Controller
                     //$headearSelectedSubOptions[$rowHeaderSlug][] = $subOption['value'];
                    // $headearsSelectedSubOptions[$rowIndex][] = $subOption['value'];
                     $headearsSelectedSubOptions[$rowIndex][] = $slug;
+                    }
                 }
               
                    
@@ -360,11 +363,20 @@ class MatrixController extends Controller
      */
     public function index(Request $request)
     {
+
+        // $matrixId = "Matrix-1";
+        // $brokerId = 181;
+        // $oldMAtrix=  MatrixValue::where('matrix_id', $matrixId)
+        // ->where('broker_id', $brokerId)
+        // ->get();
+
+        // dd($oldMAtrix);
+
         $matrixId = $request->query('matrix_id');
         $brokerId = $request->query('broker_id');
         $is_admin = $request->query('is_admin');
         $matrixId = "Matrix-1";
-        $brokerId = 1;
+        $brokerId = 181;
         $is_admin = true;
         if (!$matrixId || !$brokerId) {
             return response()->json(['error' => 'matrix_id and broker_id are required'], 400);
