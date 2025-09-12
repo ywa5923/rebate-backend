@@ -103,6 +103,13 @@ class MatrixRepository
         return $rows;
     }
 
+    public function insertHeadears(array $matrixData,int $brokerId,string $matrixName)
+    {
+        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], null, false);
+
+        //MatrixHeader::insert($headears);
+    }
+
    
 }
         // $matrixRepository=new MatrixRepository();

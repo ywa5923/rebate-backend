@@ -242,4 +242,132 @@ class MatrixHeaderRepository
         return $header ? $header->id : null;
     }
 
+
+    public function insertHeadears(array $matrixData,int $brokerId,string $matrixName,int $matrixId)
+    {
+        //GET original row HEADERS FOR THE MATRIX where broker_id is null
+        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], null, false);
+        $newHeaders = [];
+        $newHeadersSubOptions = [];
+        $headearsSelectedSubOptions = [];
+        $usedSlugs = [];
+        // Create all headers first
+        foreach ($matrixData as $rowIndex => $row) {
+            $selectedRowHeaderSubOptions = $row[0]['selectedRowHeaderSubOptions'] ?? null;
+            $rowHeaderSlug = $row[0]['rowHeader'];
+            $usedSlugs[] = $rowHeaderSlug;
+            //Get the id of the main headear (class instrument),which has parent_id=null
+            //Sub headears (instruments) are stored in matrix_headears with parent_id=rowHeaderId
+
+            //1.first scan matrix for new main headears (parent_id=null) which doesn't exist in matrix_headears,
+            //and save them in newHeaders for later save in matrix_headears with broker_id using batch insert
+            $rowHeaderId = $this->getHeaderIdByParent($rowHeaderSlug, $allHeaders,true);
+            $title=ucwords(str_replace('-', ' ', $rowHeaderSlug));
+            $headearExists = in_array($title, array_column($newHeaders, 'title'));
+            $slug=$rowHeaderSlug;
+            // $slug=$headearExists ? $this->getUniqueSlug($rowHeaderSlug, $usedSlugs) : $rowHeaderSlug;
+            if ($rowHeaderId == null && !$headearExists){
+               
+                //$slug=$headearExists ? $this->getUniqueSlug($rowHeaderSlug, $usedSlugs) : $rowHeaderSlug;
+               
+               
+                $newHeaders[] = [
+                    'title' => $title,
+                    'slug' =>   $slug,
+                    'broker_id' => $brokerId,
+                    'type' => 'row',
+                    'matrix_id' => $matrixId
+                ];
+            }
+            $updatedRowSlugs[]=$slug;
+                
+           //2.Scan matrix for new sub headears (instruments) which doesn't exist in matrix_headears,
+           //and save them in newHeadersSubOptions for later save in matrix_headears using batch insert
+           
+           //added new check for selectedRowHeaderSubOptions
+            if ($selectedRowHeaderSubOptions) {
+                foreach ($selectedRowHeaderSubOptions as $subOption) {
+                //get the id of the sub headear (instrument),which has parent_id=rowHeaderId
+                //if the sub option doesn't exist in the allHeaders array, it will return null
+                $subOptionId = $this->getHeaderId($subOption['value'], $allHeaders,false);
+                $usedSlugs[] = $subOption['value'];
+                $slug=$subOption['value'];
+                if ($subOptionId == null ) {
+                    //$usedSlugs[] = $subOption['value'];
+                    $slug = $this->getUniqueSlug($subOption['value'], $usedSlugs);
+                 
+                    $subOptionTitle = ucwords(str_replace('-', ' ',    $subOption['label']));
+                     //check if the sub option already exists in the newHeadersSubOptions array
+                  // $subOptionExists = in_array($subOptionTitle, array_column(array_merge(...array_values($newHeadersSubOptions)), 'title'));
+
+                    $newHeadersSubOptions[$rowHeaderSlug][]=
+                        [
+                            'parent_id' => $rowHeaderId,//$rowHeaderId is null for new row headears, it will be set later after save new row headears
+                            'slug' =>  $slug,
+                            'title' => $subOptionTitle,
+                            'broker_id' => $brokerId,
+                            'type' => 'row',
+                            'matrix_id' => $matrixId
+                        ];
+                }
+              
+                //$headearSelectedSubOptions[$rowHeaderSlug][] = $subOption['value'];
+               // $headearsSelectedSubOptions[$rowIndex][] = $subOption['value'];
+                $headearsSelectedSubOptions[$rowIndex][] = $slug;
+                }
+            }
+          
+               
+        } //end of matrix foreach
+       
+      
+        //save new main headears
+        //this allow to get their ids for later save sub_headears in matrix_headears with parent_id=main_headear_id
+       !empty($newHeaders) && MatrixHeader::insert($newHeaders);
+       // dd( $headearsSelectedSubOptions);
+       $brokerHeadears = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
+    
+        foreach ($newHeadersSubOptions as $rowHeaderSlug => &$subOptionArray) {
+            $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $brokerHeadears,true);
+            foreach ($subOptionArray as &$subOption) {
+               
+                $subOption['parent_id'] = $rowHeaderId;
+            }
+            unset($subOption);
+        }
+       
+        unset($subOptionArray); 
+        
+        //save new sub headears
+        MatrixHeader::insert(array_merge(...array_values($newHeadersSubOptions)));
+
+        //MatrixHeader::insert($headears);
+    }
+
+    public function getUniqueSlug($slug,$usedSlugs){
+      
+        if(in_array($slug, $usedSlugs)){
+            $slug = $slug. '-' . count($usedSlugs);
+           
+        }
+        return $slug;
+    }
+
+    public function findHeaderBySlugAndParent($headerSlug, $headers, $onlyParent = false): int|null
+    {
+        $header = null;
+        if($onlyParent){
+            $header = $headers->firstWhere(function($header) use ($headerSlug) {
+                return $header->slug === $headerSlug && $header->parent_id === null;
+            });
+        }else{
+            $header = $headers->firstWhere(function($header) use ($headerSlug) {
+                return $header->slug === $headerSlug && $header->parent_id !== null;
+            });
+        }
+
+        return $header ? $header->id : null;
+        
+    }
+
 }
