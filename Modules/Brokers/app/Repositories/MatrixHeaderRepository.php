@@ -243,13 +243,42 @@ class MatrixHeaderRepository
     }
 
 
+    //Example of a matrix row
+            //First cell in a row contains the selectedRowHeaderSubOptions        
+            // [
+            //     {
+            //         "value": {
+            //             "Number": "hyrt"
+            //         },
+            //         "public_value": null,
+            //         "rowHeader": "wwwwww",
+            //         "colHeader": "zero-mt4",
+            //         "type": "Number",
+            //         "selectedRowHeaderSubOptions": [
+            //             {
+            //                 "value": "qqqqqq-2-2",
+            //                 "label": "Qqqqqq"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         "value": {
+            //             "Number": "hrherth"
+            //         },
+            //         "public_value": null,
+            //         "rowHeader": "wwwwww",
+            //         "colHeader": "zero-mt4",
+            //         "type": "Number"
+            //     }
+            // ],
     public function insertHeadears(array $matrixData,int $brokerId,string $matrixName,int $matrixId)
     {
+        $headearsSelectedSubOptions = [];
         //GET original row HEADERS FOR THE MATRIX where broker_id is null
-        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], null, false);
+        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id','=', $brokerId], false);
         $newHeaders = [];
         $newHeadersSubOptions = [];
-        $headearsSelectedSubOptions = [];
+       // $headearsSelectedSubOptions = [];
         $usedSlugs = [];
         // Create all headers first
         foreach ($matrixData as $rowIndex => $row) {
@@ -261,45 +290,40 @@ class MatrixHeaderRepository
 
             //1.first scan matrix for new main headears (parent_id=null) which doesn't exist in matrix_headears,
             //and save them in newHeaders for later save in matrix_headears with broker_id using batch insert
-            $rowHeaderId = $this->getHeaderIdByParent($rowHeaderSlug, $allHeaders,true);
-            $title=ucwords(str_replace('-', ' ', $rowHeaderSlug));
-            $headearExists = in_array($title, array_column($newHeaders, 'title'));
-            $slug=$rowHeaderSlug;
-            // $slug=$headearExists ? $this->getUniqueSlug($rowHeaderSlug, $usedSlugs) : $rowHeaderSlug;
+
+            //get the id of the main headear (class instrument),which has parent_id=null
+            $rowHeaderId = $this->findHeaderIdBySlugAndParent($rowHeaderSlug, $allHeaders,true);
+            $headearExists = in_array($rowHeaderSlug, array_column($newHeaders, 'slug'));
+          
             if ($rowHeaderId == null && !$headearExists){
-               
-                //$slug=$headearExists ? $this->getUniqueSlug($rowHeaderSlug, $usedSlugs) : $rowHeaderSlug;
-               
-               
+                $title=ucwords(str_replace('-', ' ', $rowHeaderSlug));
+
                 $newHeaders[] = [
                     'title' => $title,
-                    'slug' =>   $slug,
+                    'slug' =>   $rowHeaderSlug,
                     'broker_id' => $brokerId,
                     'type' => 'row',
                     'matrix_id' => $matrixId
                 ];
             }
-            $updatedRowSlugs[]=$slug;
+            $updatedRowSlugs[]=$rowHeaderSlug;
                 
            //2.Scan matrix for new sub headears (instruments) which doesn't exist in matrix_headears,
            //and save them in newHeadersSubOptions for later save in matrix_headears using batch insert
-           
-           //added new check for selectedRowHeaderSubOptions
+         
             if ($selectedRowHeaderSubOptions) {
                 foreach ($selectedRowHeaderSubOptions as $subOption) {
                 //get the id of the sub headear (instrument),which has parent_id=rowHeaderId
                 //if the sub option doesn't exist in the allHeaders array, it will return null
-                $subOptionId = $this->getHeaderId($subOption['value'], $allHeaders,false);
-                $usedSlugs[] = $subOption['value'];
+                $subOptionId = $this->findHeaderIdBySlugAndParent($subOption['value'], $allHeaders,false);
+               
                 $slug=$subOption['value'];
-                if ($subOptionId == null ) {
-                    //$usedSlugs[] = $subOption['value'];
-                    $slug = $this->getUniqueSlug($subOption['value'], $usedSlugs);
-                 
-                    $subOptionTitle = ucwords(str_replace('-', ' ',    $subOption['label']));
-                     //check if the sub option already exists in the newHeadersSubOptions array
-                  // $subOptionExists = in_array($subOptionTitle, array_column(array_merge(...array_values($newHeadersSubOptions)), 'title'));
-
+                $subOptionTitle = ucwords(str_replace('-', ' ',    $subOption['label']));
+                $subOptionExists = in_array( $subOptionTitle, array_column($newHeadersSubOptions[$rowHeaderSlug] ?? [], 'title'));
+          
+                if ($subOptionId == null && !$subOptionExists) {
+                   
+                    $slug = $this->getUniqueSlug($slug, $usedSlugs);
                     $newHeadersSubOptions[$rowHeaderSlug][]=
                         [
                             'parent_id' => $rowHeaderId,//$rowHeaderId is null for new row headears, it will be set later after save new row headears
@@ -310,25 +334,24 @@ class MatrixHeaderRepository
                             'matrix_id' => $matrixId
                         ];
                 }
-              
-                //$headearSelectedSubOptions[$rowHeaderSlug][] = $subOption['value'];
-               // $headearsSelectedSubOptions[$rowIndex][] = $subOption['value'];
+                $usedSlugs[] = $slug;
                 $headearsSelectedSubOptions[$rowIndex][] = $slug;
                 }
             }
-          
-               
+        
+      
         } //end of matrix foreach
        
-      
         //save new main headears
         //this allow to get their ids for later save sub_headears in matrix_headears with parent_id=main_headear_id
-       !empty($newHeaders) && MatrixHeader::insert($newHeaders);
+       if (!empty($newHeaders)) {
+           MatrixHeader::insert($newHeaders);
+       }
        // dd( $headearsSelectedSubOptions);
        $brokerHeadears = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
     
         foreach ($newHeadersSubOptions as $rowHeaderSlug => &$subOptionArray) {
-            $rowHeaderId = $this->getHeaderId($rowHeaderSlug, $brokerHeadears,true);
+            $rowHeaderId = $this->findHeaderIdBySlugAndParent($rowHeaderSlug, $brokerHeadears, true);
             foreach ($subOptionArray as &$subOption) {
                
                 $subOption['parent_id'] = $rowHeaderId;
@@ -341,8 +364,98 @@ class MatrixHeaderRepository
         //save new sub headears
         MatrixHeader::insert(array_merge(...array_values($newHeadersSubOptions)));
 
-        //MatrixHeader::insert($headears);
+        return $headearsSelectedSubOptions;
     }
+
+    public function insertMatrixDimensions(array $matrixData,int $brokerId,string $matrixName,int $matrixId)
+    {
+        $rowDimensions = [];
+        $columnDimensions = [];
+        
+        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
+
+        foreach ($matrixData as $rowIndex => $row) {
+            $rowHeaderSlug = $row[0]['rowHeader'];
+           // $updatedRowSlug = $updatedRowSlugs[$rowIndex];
+            $rowHeaderId = $this->findHeaderIdBySlugAndParent( $rowHeaderSlug, $allHeaders,true);
+
+
+            // Add row dimension
+            $rowDimensions[] = [
+                'matrix_id' => $matrixId,
+                'broker_id' => $brokerId,
+                'order' => $rowIndex,
+                'matrix_header_id' => $rowHeaderId,
+                'type' => 'row'
+            ];
+
+            foreach ($row as $cellIndex => $cell) {
+                $colHeaderSlug = $cell['colHeader'];
+                $colHeaderId = $this->findHeaderIdBySlugAndParent($colHeaderSlug, $allHeaders,true);
+
+                if (!isset($columnDimensions[$cellIndex])) {
+                    $columnDimensions[$cellIndex] = [
+                        'matrix_id' => $matrixId,
+                        'broker_id' => $brokerId,
+                        'order' => $cellIndex,
+                        'matrix_header_id' => $colHeaderId,
+                        'type' => 'column'
+                    ];
+                }
+
+                if ($colHeaderId == null) {
+                    throw new \Exception("Column header not found");
+                }
+
+               
+            }
+        }
+
+        // Bulk insert dimensions
+        MatrixDimension::insert($rowDimensions);
+        MatrixDimension::insert(array_values($columnDimensions));
+          // Get the inserted IDs
+          $rowDimIds = MatrixDimension::where('matrix_id', $matrixId)
+          ->where('type', 'row')
+          ->where('broker_id', $brokerId)
+          ->orderBy('order')
+          ->pluck('id')
+          ->toArray();
+  
+      $colDimIds = MatrixDimension::where('matrix_id', $matrixId)
+          ->where('type', 'column')
+          ->where('broker_id', $brokerId)
+          ->orderBy('order')
+          ->pluck('id')
+          ->toArray();
+
+          return [$rowDimIds, $colDimIds];
+
+
+    }
+
+    public function insertMatrixValues(array $matrixData,int $brokerId,string $matrixName,int $matrixId,$rowDimIds,$colDimIds)
+    {
+      
+
+        $matrixValues = [];
+        foreach ($matrixData as $rowIndex => $row) {
+            foreach ($row as $cellIndex => $cell) {
+                $matrixValues[] = [
+                    'matrix_id' => $matrixId,
+                    'broker_id' => $brokerId,
+                    'matrix_row_id' => $rowDimIds[$rowIndex],
+                    'matrix_column_id' => $colDimIds[$cellIndex],
+                    'value' => json_encode($cell['value']),
+                    'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null,
+                    'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null
+                ];
+            }
+        }
+            // Bulk insert values
+            MatrixValue::insert($matrixValues);
+    }
+
 
     public function getUniqueSlug($slug,$usedSlugs){
       
@@ -353,7 +466,7 @@ class MatrixHeaderRepository
         return $slug;
     }
 
-    public function findHeaderBySlugAndParent($headerSlug, $headers, $onlyParent = false): int|null
+    public function findHeaderIdBySlugAndParent($headerSlug, $headers, $onlyParent = false): int|null
     {
         $header = null;
         if($onlyParent){
