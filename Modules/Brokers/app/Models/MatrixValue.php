@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Translations\Models\Translation;
 class MatrixValue extends Model
 {
-   protected $fillable=['value','matrix_id','matrix_row_id','matrix_column_id','broker_id'];
+   protected $fillable=['value','matrix_id','previous_value','public_value','matrix_row_id','matrix_column_id','broker_id'];
    protected $table='matrix_values';
 
    public function matrix():BelongsTo

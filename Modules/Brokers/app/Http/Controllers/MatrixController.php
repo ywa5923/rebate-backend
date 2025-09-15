@@ -55,32 +55,91 @@ class MatrixController extends Controller
             'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
         ];
     }
-    public function getPrevCellValue($previousMatrixData, $rowSlug, $colSlug){
-        foreach($previousMatrixData['matrix'] as $row){
+    public function compareSelectedRowHeaderSubOptions($previousSubOptions, $newSubOptions) {
+        // Handle null/empty cases
+        if (empty($previousSubOptions) && empty($newSubOptions)) {
+            return true;
+        }
+        
+        if (empty($previousSubOptions) || empty($newSubOptions)) {
+            return false;
+        }
+        
+        // Check if arrays have same length
+        if (count($previousSubOptions) !== count($newSubOptions)) {
+            return false;
+        }
+        
+        // Sort both arrays by value for consistent comparison
+        $sortedPrevious = $this->sortSubOptionsByValue($previousSubOptions);
+        $sortedNew = $this->sortSubOptionsByValue($newSubOptions);
+        
+        // Compare each item
+        for ($i = 0; $i < count($sortedPrevious); $i++) {
+            if ($sortedPrevious[$i]['value'] !== $sortedNew[$i]['value'] || 
+                $sortedPrevious[$i]['label'] !== $sortedNew[$i]['label']) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private function sortSubOptionsByValue($subOptions) {
+        // Create a copy to avoid modifying original array
+        $sorted = $subOptions;
+        
+        // Sort by 'value' field
+        usort($sorted, function($a, $b) {
+            return strcmp($a['value'], $b['value']);
+        });
+        
+        return $sorted;
+    }
+    public function getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions){
+
+       $index=0;
+        foreach($previousMatrixData as $row){
             foreach($row as $cell){
-                if($cell['rowHeader'] == $rowSlug && $cell['colHeader'] == $colSlug){
+              //  $index==1 && dd($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions);
+               //  $index==1 && dd($this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions));
+                if($cell['rowHeader'] == $rowSlug 
+                && $cell['colHeader'] == $colSlug 
+                && $this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions)){
                     return $cell['value'];
                 }
             }
+            $index++;
         }
+        return null;
     }
 
     public function compareMatrixData($previousMatrixData, &$newMatrixData){
-        foreach($newMatrixData as $index => $row){
-            foreach($row as $cell){
+        $index=0;
+        foreach($newMatrixData as $index => &$row){
+           
+            foreach($row as &$cell){
                 $cellValueArray=$cell['value'];
                 $rowSlug=$cell['rowHeader'];
                 $colSlug=$cell['colHeader'];
-
-                $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug);
-                if ($previousCellValueArray && empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
+                $rowSubOptions=$cell['selectedRowHeaderSubOptions'];
+             
+                $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
+               //$index==1 && dd($previousCellValueArray, $cellValueArray);
+               //  $index==1 && dd(empty(array_diff_assoc($previousCellValueArray, $cellValueArray)));
+                if ($previousCellValueArray && !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
                    $cell["previous_value"]=$previousCellValueArray;
-                   dd($cell);
+                //  dd($cell);
+                  //dd($previousCellValueArray, $cellValueArray);
+
                 }
-
-
+                
             }
+            $index++;
+           
+            
         }
+        unset($row);
         return null;
     }
 
@@ -105,11 +164,11 @@ class MatrixController extends Controller
         $brokerId = $data['broker_id'];
         $matrix = Matrix::where("name", "=", $matrixName)->first();
 
-       // dd($data['matrix']);
+       // dd($previousMatrixData['matrix']);
         if($previousMatrixData['matrix']){
-            $this->compareMatrixData($previousMatrixData, $data['matrix']);
+            $this->compareMatrixData($previousMatrixData['matrix'], $data['matrix']);
         }
-        dd($data['matrix']);
+      //  dd($data['matrix']);
             
         $updatedRowSlugs=[];
         try {
@@ -345,7 +404,8 @@ class MatrixController extends Controller
                         'row_index' => $rowIndex,
                         'col_index' => $cellIndex,
                         'value' => json_encode($cell['value']),
-                        'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null
+                        'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null,
+                        'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null
                     ];
                 }
             }
