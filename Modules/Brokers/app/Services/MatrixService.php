@@ -4,12 +4,18 @@ namespace Modules\Brokers\Services;
 
 use Modules\Brokers\Repositories\MatrixHeaderRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Brokers\Repositories\MatrixDimensionRepository;
+use Modules\Brokers\Repositories\MatrixRepository;
 
 class MatrixService
 {
     
 
-    public function __construct(protected MatrixHeaderRepository $matrixHeaderRepository)
+    public function __construct(
+        protected MatrixHeaderRepository $matrixHeaderRepository,
+        protected MatrixDimensionRepository $matrixDimensionRepository,
+        protected MatrixRepository $matrixRepository
+    )
     {
         
     }
@@ -124,5 +130,58 @@ class MatrixService
         return null;
     }
 
-    
+   public function getMatrixIdByName(string $matrixName): int
+   {
+    return $this->matrixRepository->getMatrixIdByName($matrixName);
+   }
+
+    public function getFormattedMatrix(string $matrixName, int $brokerId, ?int $zoneId): array
+    {
+        $matrixId=$this->getMatrixIdByName($matrixName);
+
+        $dimensions=$this->matrixDimensionRepository->getMatrixDimensions($matrixId, $brokerId);
+        $rowDimensions = $dimensions->where('type', 'row')->sortBy('order')->values();
+        $columnDimensions = $dimensions->where('type', 'column')->sortBy('order')->values();
+
+        $values = $this->matrixRepository->getMatrixValues($matrixId, $brokerId, $zoneId);
+
+        // Create the matrix structure
+        $matrixData = [];
+        foreach ($rowDimensions as $rowIndex => $rowDim) {
+            $row = [];
+            foreach ($columnDimensions as $colIndex => $colDim) {
+                $value = $values->first(function ($v) use ($rowDim, $colDim) {
+                    return $v->matrix_row_id === $rowDim->id && $v->matrix_column_id === $colDim->id;
+                });
+
+
+                $cell = [
+                    'previous_value' => $value ? json_decode($value->previous_value, true) : null,
+                    'value' => $value ? json_decode($value->value, true) : null,
+                    'public_value' => $value ? json_decode($value->public_value, true) : null,
+                    'rowHeader' => $rowDim->matrixHeader->slug,
+                    'colHeader' => $colDim->matrixHeader->slug,
+                    'type' => $colDim->matrixHeader->formType->name ?? 'undefined'
+                    //'selectedRowHeaderSubOptions' => $subOptions->toArray()
+                ];
+
+
+          //get the row headear options and add them to the cell in the first column
+                if($colIndex == 0){
+                    $options=$rowDim->matrixDimensionOptions;
+                    $subOptions = $options->map(function ($option) {
+                        return [
+                            "value" => $option->optionSlug(),
+                            "label" => $option->optionTitle()
+                        ];
+                    });
+                    $cell['selectedRowHeaderSubOptions'] = $subOptions->toArray();
+                }
+                $row[] = $cell;
+            }
+            $matrixData[] = $row;
+        }
+        return $matrixData;
+    }
+
 }

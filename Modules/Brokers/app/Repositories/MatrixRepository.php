@@ -5,9 +5,17 @@ namespace Modules\Brokers\Repositories;
 use Modules\Brokers\Models\MatrixDimension;
 
 use Modules\Brokers\Transformers\MatrixDimensionCollection;
-
+use Modules\Brokers\Models\MatrixValue;
+use Modules\Brokers\Models\Matrix;
+use Illuminate\Database\Eloquent\Collection;
 class MatrixRepository
 {
+
+    public function __construct(protected MatrixValue $modelValue,protected Matrix $model)
+    {
+
+    }
+
     public function getMatrixColumnNames(int $matrixId, int $brokerId, int $zoneId, string $languageCode): array
     {
         $columns = MatrixDimension::with([
@@ -87,6 +95,7 @@ class MatrixRepository
 
     public function getRowsData(int $matrixId,int $brokerId,int $zoneId,string $languageCode)
     {
+        //TODO move this in MatrixDimensionRepository
         $rows= MatrixDimension::with(['matrixHeader.translations'=>function($query) use ($languageCode){
             $query->where('language_code',$languageCode);
         },'matrixRowCells'=>function($query) use ($brokerId,$zoneId,$matrixId){
@@ -105,9 +114,45 @@ class MatrixRepository
 
     public function insertHeadears(array $matrixData,int $brokerId,string $matrixName)
     {
-        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], null, false);
+        //$allHeaders = $this->getAllHeaders(["name", "=", $matrixName], null, false);
 
         //MatrixHeader::insert($headears);
+    }
+
+    /**
+     * Get matrix values
+     * @param int $matrixId
+     * @param int $brokerId
+     * @param int|null $zoneId
+     * @return Collection|null
+     */
+    public function getMatrixValues(int $matrixId,int $brokerId,?int $zoneId=null):Collection|null
+    {
+       
+        return $this->modelValue->where('matrix_id', $matrixId)
+        ->where('broker_id', $brokerId)
+        ->where(function($query) use ($zoneId){
+            $query->where('zone_id', $zoneId)
+            ->orWhere('is_invariant', 1);
+        })
+
+        ->get() ?? null;
+
+    }
+
+    /**
+     * Get matrix ID by name
+     * @param string $matrixName
+     * @return int
+     */
+    public function getMatrixIdByName(string $matrixName):int
+    {
+       
+        $matrix = $this->model->where('name', $matrixName)->first();
+        if (!$matrix) {
+            throw new \Exception("Matrix with name '{$matrixName}' not found");
+        }
+        return $matrix->id;
     }
 
    
