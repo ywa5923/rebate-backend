@@ -17,6 +17,8 @@ use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
 use Modules\Brokers\Models\MatrixHeaderOption;
 use Illuminate\Support\Str;
+use Modules\Brokers\Services\MatrixService;
+use Illuminate\Support\Facades\Validator;
 
 class MatrixController extends Controller
 {
@@ -55,215 +57,61 @@ class MatrixController extends Controller
             'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
         ];
     }
-    public function compareSelectedRowHeaderSubOptions($previousSubOptions, $newSubOptions) {
-        // Handle null/empty cases
-        if (empty($previousSubOptions) && empty($newSubOptions)) {
-            return true;
-        }
-        
-        if (empty($previousSubOptions) || empty($newSubOptions)) {
-            return false;
-        }
-        
-        // Check if arrays have same length
-        if (count($previousSubOptions) !== count($newSubOptions)) {
-            return false;
-        }
-        
-        // Sort both arrays by value for consistent comparison
-        $sortedPrevious = $this->sortSubOptionsByValue($previousSubOptions);
-        $sortedNew = $this->sortSubOptionsByValue($newSubOptions);
-        
-        // Compare each item
-        for ($i = 0; $i < count($sortedPrevious); $i++) {
-            if ($sortedPrevious[$i]['value'] !== $sortedNew[$i]['value'] || 
-                $sortedPrevious[$i]['label'] !== $sortedNew[$i]['label']) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
+  
     
-    private function sortSubOptionsByValue($subOptions) {
-        // Create a copy to avoid modifying original array
-        $sorted = $subOptions;
-        
-        // Sort by 'value' field
-        usort($sorted, function($a, $b) {
-            return strcmp($a['value'], $b['value']);
-        });
-        
-        return $sorted;
-    }
-    public function getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions){
-
-       $index=0;
-        foreach($previousMatrixData as $row){
-            foreach($row as $cell){
-              //  $index==1 && dd($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions);
-               //  $index==1 && dd($this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions));
-                if($cell['rowHeader'] == $rowSlug 
-                && $cell['colHeader'] == $colSlug 
-                && $this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions)){
-                    return $cell['value'];
-                }
-            }
-            $index++;
-        }
-        return null;
-    }
-
-    public function compareMatrixData($previousMatrixData, &$newMatrixData){
-        $index=0;
-        foreach($newMatrixData as $index => &$row){
-           
-            foreach($row as &$cell){
-                $cellValueArray=$cell['value'];
-                $rowSlug=$cell['rowHeader'];
-                $colSlug=$cell['colHeader'];
-                $rowSubOptions=$cell['selectedRowHeaderSubOptions'];
-             
-                $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
-               //$index==1 && dd($previousCellValueArray, $cellValueArray);
-               //  $index==1 && dd(empty(array_diff_assoc($previousCellValueArray, $cellValueArray)));
-                if ($previousCellValueArray && !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
-                   $cell["previous_value"]=$previousCellValueArray;
-                //  dd($cell);
-                  //dd($previousCellValueArray, $cellValueArray);
-
-                }
-                
-            }
-            $index++;
-           
-            
-        }
-        unset($row);
-        return null;
-    }
-
-    public function store(Request $request, MatrixHeaderRepository $rep)
+    public function store(Request $request, MatrixService $matrixService)
     {
         $startTime = microtime(true);
-
-        $previousMatrixResponse = $this->index($request);
-        $previousMatrixData = json_decode($previousMatrixResponse->getContent(), true);
-        
-       
-        
-       
-
         $data = $request->validate([
             'matrix' => 'array',
             'broker_id' => 'required|integer',
             'matrix_id' => 'required|string',
         ]);
-
+        if (empty($data['matrix'])) {
+            return response()->json([
+                'message' => 'Matrix data is empty, nothing to save',
+            ]);
+        }
         $matrixName = $data['matrix_id'];
         $brokerId = $data['broker_id'];
-        $matrix = Matrix::where("name", "=", $matrixName)->first();
-
-       // dd($previousMatrixData['matrix']);
-        if($previousMatrixData['matrix']){
-            $this->compareMatrixData($previousMatrixData['matrix'], $data['matrix']);
-        }
-      //  dd($data['matrix']);
-            
-        $updatedRowSlugs=[];
-        $headearsSelectedSubOptions=[];
+      //  $matrix = Matrix::where("name", "=", $matrixName)->first();
+     
         try {
-            // First transaction - Flush data
-            DB::beginTransaction();
-            //flush all data for the matrix and headers and headears options
-            $rep->flushMatrix($matrix->id, $brokerId);
-            DB::commit();
-
-            if (empty($data['matrix'])) {
+            $matrix = Matrix::where("name", "=", $matrixName)->first();
+            if(!$matrix){
                 return response()->json([
-                    'message' => 'Matrix data was deleted successfully',
-                ]);
+                    'message' => 'Matrix name not found in the database',
+                ], 404);
             }
+            $previousMatrixResponse = $this->index($request);
+            $previousMatrixData = json_decode($previousMatrixResponse->getContent(), true);
 
-            // Second transaction - Create headers
-             DB::beginTransaction();
-            
-          
-            
-             $headearsSelectedSubOptions = $rep->insertHeadears($data['matrix'], $brokerId, $matrixName, $matrix->id);
-            DB::commit();
+            if($previousMatrixData['matrix']){
+                //$this->compareMatrixData($previousMatrixData['matrix'], $data['matrix']);
+                $matrixService->setPreviousValueInMatrixData($previousMatrixData['matrix'], $data['matrix']);
+            }
+            $result = DB::transaction(function () use ($matrixService, $data, $brokerId, $matrixName, $matrix, $startTime) {
+            $matrixService->saveMatrixData($data['matrix'], $brokerId, $matrixName, $matrix->id,null);
+            $endTime = microtime(true);
+            $executionTime = ($endTime - $startTime) * 1000;
 
-            //grab again all headears
-            $allHeaders = $rep->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
-           
-            //$rep->insertSelectedSubOptions($headearSelectedSubOptions, $allHeaders, $matrix->id, $brokerId);
-
+            return [
+                'message' => 'Matrix data saved successfully',
+                'performance' => [
+                    'execution_time_ms' => $executionTime,
+                    'rows_count' => count($data['matrix'])        
+                ]
+            ];
+        });
+        return response()->json($result);
+       
         } catch (\Exception $e) {
             // Log::error('Matrix store error: ' . $e->getMessage());
-           
-            DB::beginTransaction();
-            try {
-                MatrixHeader::where('matrix_id', $matrix->id)
-                    ->where('broker_id', $brokerId)
-                    ->delete();
-                DB::commit();
-            } catch (\Exception $deleteError) {
-                DB::rollBack();
-                Log::error('Failed to rollback headers: ' . $deleteError->getMessage());
-            }
-
             return response()->json([
                 'message' => 'Failed to save matrix data2',
                 'error' => $e->getMessage()
             ], 500);
         
-        }
-
-        // Third transaction - Create dimensions, values and options
-        DB::beginTransaction();
-        try {
-            [$rowDimIds, $colDimIds]=$rep->insertMatrixDimensions($data['matrix'], $brokerId, $matrixName, $matrix->id);
-            $rep->insertMatrixValues($data['matrix'], $brokerId, $matrixName, $matrix->id,$rowDimIds,$colDimIds);
-            
-           
-            // Bulk insert dimension options
-            $rep->insertDimensionOptions($headearsSelectedSubOptions, $rowDimIds, $matrix->id, $brokerId,   $allHeaders);
- 
-
-
-            DB::commit();
-
-            $endTime = microtime(true);
-            $executionTime = ($endTime - $startTime) * 1000;
-
-            return response()->json([
-                'message' => 'Matrix data saved successfully',
-                'performance' => [
-                    'execution_time_ms' => $executionTime,
-                    'rows_count' => count($rowDimIds),
-                    'columns_count' => count($colDimIds),
-                    'values_count' => count($data['matrix'])
-                            
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-           
-                // If headers were created and third transaction failed,
-                // we need to delete the headers we just created
-                DB::beginTransaction();
-                try {
-                    MatrixHeader::where('matrix_id', $matrix->id)
-                        ->where('broker_id', $brokerId)
-                        ->delete();
-                    DB::commit();
-                } catch (\Exception $deleteError) {
-                    DB::rollBack();
-                    Log::error('Failed to rollback headers: ' . $deleteError->getMessage());
-                }
-            
-            throw $e;
         }
     }
 
@@ -297,12 +145,39 @@ class MatrixController extends Controller
 
         // dd($oldMAtrix);
 
-        $matrixId = $request->query('matrix_id');
-        $brokerId = $request->query('broker_id');
-        $is_admin = $request->query('is_admin');
-        $matrixId = "Matrix-1";
-        $brokerId = 181;
-        $is_admin = true;
+
+       // dd($request->all());
+        // Normalize is_admin from string to boolean/null for query params like is_admin=false
+        if ($request->has('is_admin')) {
+            $request->merge([
+                'is_admin' => filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'zone_id' => 'sometimes|nullable|integer',
+            'broker_id' => 'required|integer',
+            'matrix_id' => 'required|string',
+            'is_admin' => 'sometimes|nullable|boolean',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+        $data = $validator->validated();
+        $data['zone_id'] = $data['zone_id'] ?? null;
+        $data['is_admin'] = $data['is_admin'] ?? null;
+
+        // $matrixId = $request->query('matrix_id');
+        // $brokerId = $request->query('broker_id');
+        // $is_admin = $request->query('is_admin');
+        //$matrixId = "Matrix-1";
+        //$brokerId = 181;
+
+        $matrixId = $data['matrix_id'];
+        $brokerId = $data['broker_id'];
+        $is_admin = $data['is_admin'];
+        $zoneId = $data['zone_id'];
+        
         if (!$matrixId || !$brokerId) {
             return response()->json(['error' => 'matrix_id and broker_id are required'], 400);
         }
@@ -327,7 +202,28 @@ class MatrixController extends Controller
         // Get all values for this matrix and broker
         $values = MatrixValue::where('matrix_id', $matrix->id)
             ->where('broker_id', $brokerId)
+            ->where(function($query) use ($zoneId){
+                $query->where('zone_id', $zoneId)
+                ->orWhere('is_invariant', 1);
+            })
+
             ->get();
+
+        // if($zoneId){
+        // $values = MatrixValue::where('matrix_id', $matrix->id)
+        //     ->where('broker_id', $brokerId)
+        //     ->where(function($query) use ($zoneId){
+        //         $query->where('zone_id', $zoneId)
+        //         ->orWhere('is_invariant', 1);
+        //     })
+
+        //     ->get();
+        // }else{
+        //     $values = MatrixValue::where('matrix_id', $matrix->id)
+        //     ->where('broker_id', $brokerId)
+        //     ->where('is_invariant', 1)
+        //     ->get();
+        // }
 
         // Create the matrix structure
         $matrixData = [];
@@ -354,6 +250,7 @@ class MatrixController extends Controller
 
 
                 $cell = [
+                    'previous_value' => $value ? json_decode($value->previous_value, true) : null,
                     'value' => $value ? json_decode($value->value, true) : null,
                     'public_value' => $value ? json_decode($value->public_value, true) : null,
                     'rowHeader' => $rowDim->matrixHeader->slug,
@@ -417,7 +314,7 @@ class MatrixController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        //
+       // return redirect()->back();
     }
 
     /**

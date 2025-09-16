@@ -187,14 +187,17 @@ class MatrixHeaderRepository
             })
             ->get();
     }
-    public function flushMatrix(int $matrixId,int $brokerId)
+    public function flushMatrix(int $matrixId,int $brokerId,?int $zoneId=null)
     {
         MatrixDimensionOption::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixDimension::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'type'=>'row'])->delete();
-        MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+        if($zoneId){
+            MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'zone_id'=>$zoneId])->delete();
+        }else{
+            MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+        }
        
-
     }
     public function insertSelectedSubOptions(array $headearSelectedSubOptions, Collection $allHeaders,int $matrixId,int $brokerId)
     {
@@ -217,8 +220,9 @@ class MatrixHeaderRepository
         MatrixDimensionOption::insert($headerOptions);
     }
 
-    public function insertDimensionOptions(array $headearsSelectedOptions, array $rowDimIds, int $matrixId, int $brokerId, Collection $allHeaders)
+    public function insertDimensionOptions(array $headearsSelectedOptions, array $rowDimIds, int $matrixId, string $matrixName, int $brokerId,Collection $allHeaders)
     {
+      //  $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
         $dimensionOptions = [];
         foreach ($headearsSelectedOptions as $rowIndex => $optionsSlugs) {
             //$rowIndex is the index of the row in the matrix
@@ -367,18 +371,15 @@ class MatrixHeaderRepository
         return $headearsSelectedSubOptions;
     }
 
-    public function insertMatrixDimensions(array $matrixData,int $brokerId,string $matrixName,int $matrixId)
+    public function insertMatrixDimensions(array $matrixData,int $brokerId,string $matrixName,int $matrixId,Collection $allHeaders)
     {
         $rowDimensions = [];
         $columnDimensions = [];
         
-        $allHeaders = $this->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
-
         foreach ($matrixData as $rowIndex => $row) {
             $rowHeaderSlug = $row[0]['rowHeader'];
            // $updatedRowSlug = $updatedRowSlugs[$rowIndex];
             $rowHeaderId = $this->findHeaderIdBySlugAndParent( $rowHeaderSlug, $allHeaders,true);
-
 
             // Add row dimension
             $rowDimensions[] = [
@@ -434,7 +435,7 @@ class MatrixHeaderRepository
 
     }
 
-    public function insertMatrixValues(array $matrixData,int $brokerId,string $matrixName,int $matrixId,$rowDimIds,$colDimIds)
+    public function insertMatrixValues(array $matrixData,int $brokerId,string $matrixName,int $matrixId,$rowDimIds,$colDimIds,?int $zoneId=null)
     {
       
 
@@ -448,7 +449,8 @@ class MatrixHeaderRepository
                     'matrix_column_id' => $colDimIds[$cellIndex],
                     'value' => json_encode($cell['value']),
                     'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null,
-                    'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null
+                    'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null,
+                    'zone_id' => $zoneId
                 ];
             }
         }
