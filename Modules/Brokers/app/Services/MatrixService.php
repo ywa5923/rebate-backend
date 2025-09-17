@@ -31,13 +31,13 @@ class MatrixService
     * @return void
     * @throws \Exception
     */
-    public function saveMatrixData(array $matrixData, int $brokerId, string $matrixName, int $matrixId, ?int $zoneId = null): void
+    public function saveMatrixData(array $matrixData, int $brokerId, string $matrixName, int $matrixId, ?int $zoneId = null, ?bool $isAdmin = null): void
     {
         $this->matrixHeaderRepository->flushMatrix($matrixId, $brokerId,$zoneId);
         $headersSlugsWithOptions=$this->matrixHeaderRepository->insertHeadears($matrixData, $brokerId, $matrixName, $matrixId);
         $allHeaders = $this->matrixHeaderRepository->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
         [$rowDimIds, $colDimIds]= $this->matrixHeaderRepository->insertMatrixDimensions($matrixData, $brokerId, $matrixName, $matrixId,$allHeaders);
-        $this->matrixHeaderRepository->insertMatrixValues($matrixData, $brokerId, $matrixName, $matrixId,$rowDimIds,$colDimIds,$zoneId);
+        $this->matrixHeaderRepository->insertMatrixValues($matrixData, $brokerId, $matrixName, $matrixId,$rowDimIds,$colDimIds,$zoneId,$isAdmin);
         $this->matrixHeaderRepository->insertDimensionOptions($headersSlugsWithOptions, $rowDimIds, $matrixId, $matrixName, $brokerId,$allHeaders);
 
     }
@@ -83,6 +83,17 @@ class MatrixService
         
         return $sorted;
     }
+
+    /**
+     * Get the previous cell value from the previous matrix data.
+     * To get the previous value, we need to compare the selected row header sub options,
+     *  because in the table can be multiple rows with the same row header slug, but different sub options.
+     * @param array $previousMatrixData
+     * @param string $rowSlug
+     * @param string $colSlug
+     * @param array $rowSubOptions
+     * @return array|null
+     */
     public function getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions){
 
        // $index=0;
@@ -101,6 +112,15 @@ class MatrixService
          return null;
     }
 
+    /**
+     * This is used to identify the updated entries and previous values in the matrix data.
+     * Set the previous value in the matrix data.
+     * If the cell value is different from the previous value found in the previous matrix data, set the previous value in the cell.
+     * Also set the is_updated_entry to true.
+     * @param array $previousMatrixData
+     * @param array $newMatrixData
+     * @return void
+     */
     public function setPreviousValueInMatrixData($previousMatrixData, &$newMatrixData){
        // $index=0;
         foreach($newMatrixData as $index => &$row){
@@ -116,6 +136,7 @@ class MatrixService
                //  $index==1 && dd(empty(array_diff_assoc($previousCellValueArray, $cellValueArray)));
                 if ($previousCellValueArray && !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
                    $cell["previous_value"]=$previousCellValueArray;
+                   $cell["is_updated_entry"]=true;
                 //  dd($cell);
                   //dd($previousCellValueArray, $cellValueArray);
 
@@ -134,6 +155,47 @@ class MatrixService
    {
     return $this->matrixRepository->getMatrixIdByName($matrixName);
    }
+
+    /**
+     * Get the formatted matrix data.
+     * @param string $matrixName
+     * @param int $brokerId
+     * @param int|null $zoneId
+     * @return array
+     *
+     * Example of a matrix with two rows and one column:
+     * [
+     *   [
+     *     {
+     *       "previous_value": null,
+     *       "value": { "Number": "23" },
+     *       "public_value": null,
+     *       "is_updated_entry": 0,
+     *       "rowHeader": "wwww",
+     *       "colHeader": "zero-mt4",
+     *       "type": "Number",
+     *       "selectedRowHeaderSubOptions": [
+     *         { "value": "q1-2", "label": "Q1" }
+     *       ]
+     *     }
+     *   ],
+     *   [
+     *     {
+     *       "previous_value": null,
+     *       "value": { "Number": "12" },
+     *       "public_value": null,
+     *       "is_updated_entry": 0,
+     *       "rowHeader": "wwww",
+     *       "colHeader": "zero-mt4",
+     *       "type": "Number",
+     *       "selectedRowHeaderSubOptions": [
+     *         { "value": "q1-2", "label": "Q1" },
+     *         { "value": "q2", "label": "Q2" }
+     *       ]
+     *     }
+     *   ]
+     * ]
+     */
 
     public function getFormattedMatrix(string $matrixName, int $brokerId, ?int $zoneId): array
     {
@@ -159,6 +221,7 @@ class MatrixService
                     'previous_value' => $value ? json_decode($value->previous_value, true) : null,
                     'value' => $value ? json_decode($value->value, true) : null,
                     'public_value' => $value ? json_decode($value->public_value, true) : null,
+                    'is_updated_entry' => $value ? $value->is_updated_entry : false,
                     'rowHeader' => $rowDim->matrixHeader->slug,
                     'colHeader' => $colDim->matrixHeader->slug,
                     'type' => $colDim->matrixHeader->formType->name ?? 'undefined'

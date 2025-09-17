@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('value');
             $table->json('previous_public_value')->nullable();
             $table->json('public_value')->nullable();
+            $table->boolean('is_updated_entry')->default(false);
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->constrained('matrices')->onDelete('cascade');

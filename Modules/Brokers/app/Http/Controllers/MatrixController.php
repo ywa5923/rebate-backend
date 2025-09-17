@@ -23,14 +23,12 @@ use Illuminate\Support\Facades\Validator;
 class MatrixController extends Controller
 {
 
-    public function __construct(protected MatrixService $matrixService)
-    {
-    }
+    public function __construct(protected MatrixService $matrixService) {}
 
     public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
     {
         $queryParser->parse($request);
-     // dd( $queryParser->getWhereParams());
+        // dd( $queryParser->getWhereParams());
 
         if (empty($queryParser->getWhereParams())) {
             return new Response("not found", 404);
@@ -56,23 +54,31 @@ class MatrixController extends Controller
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
         );
 
-      
+
         return [
             'columnHeaders' => MatrixHeaderResource::collection($columnHeaders),
             'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
         ];
     }
-  
-    
+
+
     public function store(Request $request)
     {
         $startTime = microtime(true);
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'matrix' => 'array',
             'broker_id' => 'required|integer',
             'matrix_name' => 'required|string',
             'zone_id' => 'sometimes|nullable|integer',
+            'is_admin' => 'sometimes|nullable|boolean',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+        $data = $validator->validated();
+
+
         if (empty($data['matrix'])) {
             return response()->json([
                 'message' => 'Matrix data is empty, nothing to save',
@@ -80,65 +86,78 @@ class MatrixController extends Controller
         }
         $matrixName = $data['matrix_name'];
         $brokerId = $data['broker_id'];
-        $zoneId = $data['zone_id']??null;
-     
+        $zoneId = $data['zone_id'] ?? null;
+        $isAdmin = $data['is_admin'] ?? null;
+
         try {
-           
-            $matrixId=$this->matrixService->getMatrixIdByName($matrixName);
-            if(!$matrixId){
+
+            $matrixId = $this->matrixService->getMatrixIdByName($matrixName);
+            if (!$matrixId) {
                 return response()->json([
                     'message' => 'Matrix name not found in the database',
                 ], 404);
             }
-         
-            $previousMatrixData=$this->matrixService->getFormattedMatrix($matrixName,$brokerId,$zoneId);
-            if(!empty( $previousMatrixData)){
-                $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
-                
-            }
-            $result = DB::transaction(function () use ($data, $brokerId, $matrixName, $matrixId, $startTime) {
-            $this->matrixService->saveMatrixData($data['matrix'], $brokerId, $matrixName, $matrixId,null);
-            $endTime = microtime(true);
-            $executionTime = ($endTime - $startTime) * 1000;
 
-            return [
-                'message' => 'Matrix data saved successfully',
-                'performance' => [
-                    'execution_time_ms' => $executionTime,
-                    'rows_count' => count($data['matrix'])        
-                ]
-            ];
-        });
-        return response()->json($result);
-       
+            $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
+            if (!empty($previousMatrixData)) {
+                $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
+            }
+            $result = DB::transaction(function () use ($data, $brokerId, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
+
+                //matrix cell's is_updated_entry is used to identify the updated entries and previous values in the matrix data.
+                //it is set to 1 in MAtrixService::setPreviousValueInMatrixData if the cell value is different from the previous value.
+                //when admin save the matrix, all matrix cells will have is_updated_entry=0. See MatrixHeaderRepository::insertMatrixValues
+
+                $this->matrixService->saveMatrixData(
+                    $data['matrix'],
+                    $brokerId,
+                    $matrixName,
+                    $matrixId,
+                    $zoneId,
+                    $isAdmin
+                );
+
+                $endTime = microtime(true);
+                $executionTime = ($endTime - $startTime) * 1000;
+
+                return [
+                    'message' => 'Matrix data saved successfully',
+                    'performance' => [
+                        'execution_time_ms' => $executionTime,
+                        'rows_count' => count($data['matrix'])
+                    ]
+                ];
+            });
+            return response()->json($result);
         } catch (\Exception $e) {
             // Log::error('Matrix store error: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to save matrix data2',
                 'error' => $e->getMessage()
             ], 500);
-        
         }
     }
 
-    public function getHeaderId($headerSlug, $headers,$onlyParent=false):int|null
+    public function getHeaderId($headerSlug, $headers, $onlyParent = false): int|null
     {
         $header = null;
-        if($onlyParent){
-            $header = $headers->firstWhere(function($header) use ($headerSlug) {
+        if ($onlyParent) {
+            $header = $headers->firstWhere(function ($header) use ($headerSlug) {
                 return $header->slug === $headerSlug && $header->parent_id === null;
             });
-        }else{
-            $header = $headers->firstWhere(function($header) use ($headerSlug) {
+        } else {
+            $header = $headers->firstWhere(function ($header) use ($headerSlug) {
                 return $header->slug === $headerSlug && $header->parent_id !== null;
             });
         }
 
         return $header ? $header->id : null;
-        
     }
+
     /**
-     * Display a listing of the resource.
+     * Get the matrix data
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
@@ -159,28 +178,28 @@ class MatrixController extends Controller
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
         $data = $validator->validated();
-        $data['zone_id'] = $data['zone_id'] ?? null;
-        $data['is_admin'] = $data['is_admin'] ?? null;
-
-   
-        $matrixName = $data['matrix_name'];
+        $zoneId = $data['zone_id'] ?? null;
+        $is_admin = $data['is_admin'] ?? null;
         $brokerId = $data['broker_id'];
-        $is_admin = $data['is_admin'];
-        $zoneId = $data['zone_id'];
-        
+        $matrixName = $data['matrix_name'];
+
+
         if (!$matrixName || !$brokerId) {
             return response()->json(['error' => 'matrix_id and broker_id are required'], 400);
         }
 
-        //dd($matrixName,$brokerId,$zoneId);
-        $matrixData=$this->matrixService->getFormattedMatrix($matrixName,$brokerId,$zoneId);
-        return response()->json([
-            'matrix' => $matrixData,
-            'broker_id' => $brokerId,
-            'matrix_name' => $matrixName
-        ]);
+        try {
 
-       
+            $matrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
+
+            return response()->json([
+                'matrix' => $matrixData,
+                'broker_id' => $brokerId,
+                'matrix_name' => $matrixName
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to get matrix data', 'error_message' => $e->getMessage()], 500);
+        }
     }
 
 
@@ -215,7 +234,7 @@ class MatrixController extends Controller
      */
     public function update(Request $request, $id): RedirectResponse
     {
-       // return redirect()->back();
+        // return redirect()->back();
     }
 
     /**
@@ -240,59 +259,21 @@ class MatrixController extends Controller
     {
         // Create a unique string combining all parameters
         $uniqueString = $title . '-' . $matrixId . '-' . $brokerId;
-        
+
         // Generate a hash and take first 8 characters
         $hash = substr(md5($uniqueString), 0, 8);
-        
+
         // Convert title to slug and combine with hash
         $baseSlug = Str::slug($title);
         return $baseSlug . '-' . $hash;
     }
 
-    public function getUniqueSlug($slug,$usedSlugs){
-      
-        if(in_array($slug, $usedSlugs)){
-            $slug = $slug. '-' . count($usedSlugs);
-           
+    public function getUniqueSlug($slug, $usedSlugs)
+    {
+
+        if (in_array($slug, $usedSlugs)) {
+            $slug = $slug . '-' . count($usedSlugs);
         }
         return $slug;
     }
-
 }
-// [
-//     [
-//         {
-//             "value": [],
-//             "rowHeader": "row-header-2",
-//             "colHeader": "trade-mt4",
-//             "type": "Text",
-//             "selectedRowHeaderSubOptions": [
-//                 {
-//                     "value": "row-subheader-1",
-//                     "label": "Row subheader 1"
-//                 },
-//                 {
-//                     "value": "row-subheader-2",
-//                     "label": "Row subheader 2"
-//                 }
-//             ]
-//         },
-//         {
-//             "value": {
-//                 "Number": "jyykyk"
-//             },
-//             "rowHeader": "row-header-1",
-//             "colHeader": "zero-mt4",
-//             "type": "Number"
-//         },
-//         {
-//             "value": {
-//                 "Number": "34",
-//                 "Currency": "lots"
-//             },
-//             "rowHeader": "row-header-1",
-//             "colHeader": "trade-mt5",
-//             "type": "NumberWithCurrency"
-//         }
-//     ]
-// ]
