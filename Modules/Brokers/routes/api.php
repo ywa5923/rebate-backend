@@ -38,7 +38,7 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
     Route::get('/matrix', [MatrixController::class, 'index']);
     Route::post('/matrix/store', [MatrixController::class, 'store']);
-    Route::post('account-types', [AccountTypeController::class, 'store']);
+    //Route::post('account-types', [AccountTypeController::class, 'store']);
     Route::get('account-types', [AccountTypeController::class, 'index']);
     Route::get('account-types/{id}', [AccountTypeController::class, 'show']);
     Route::put('account-types/{id}', [AccountTypeController::class, 'update']);

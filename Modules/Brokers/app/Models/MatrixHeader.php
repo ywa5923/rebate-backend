@@ -10,7 +10,7 @@ use Modules\Translations\Models\Translation;
 
 class MatrixHeader extends Model
 {
-    protected $fillable = ['title', 'description', 'matrix_id', 'type', 'parent_id'];
+    protected $fillable = ['title', 'slug', 'description', 'matrix_id', 'type', 'parent_id', 'broker_id', 'is_invariant', 'form_type_id'];
     protected $table = 'matrix_headers';
 
     public function matrix(): BelongsTo

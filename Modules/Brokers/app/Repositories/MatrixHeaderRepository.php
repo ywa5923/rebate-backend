@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
 use Modules\Brokers\Models\MatrixDimensionOption;
+
 class MatrixHeaderRepository
 {
     // /**
@@ -487,6 +488,21 @@ class MatrixHeaderRepository
 
         return $header ? $header->id : null;
         
+    }
+
+    public function getColumnMatrixHeaderByTitle(string $title,$broker_id): MatrixHeader|null
+    {
+        return MatrixHeader::where('title', $title)->where('type', 'column')->where('broker_id', $broker_id)->first();
+    }
+
+    public function create(array $data): MatrixHeader
+    {
+        return MatrixHeader::create($data);
+    }
+
+    public function deleteById(int $id): bool
+    {
+        return MatrixHeader::where('id', $id)->delete();
     }
 
 }

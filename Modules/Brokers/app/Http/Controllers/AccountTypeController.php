@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Services\AccountTypeService;
 use Modules\Brokers\Transformers\AccountTypeResource;
 use Modules\Brokers\Models\AccountType;
@@ -468,23 +469,30 @@ class AccountTypeController extends Controller
      */
     public function destroy(Request $request, $id): JsonResponse
     {
-        // TO DO
-        //check if account type broker id is the same as the logged in broker id
-        //or is admin
-        $broker_id=$request->broker_id;
-        if($broker_id==null){
-            throw new \Exception('Broker ID is required as a search parameter');
-         }
-      
+        
+        // TODO: Check if account type broker id is the same as the logged in broker id or is admin
+        $brokerId = $request->input('broker_id');
+        
+        if (!$brokerId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Broker ID is required as a search parameter'
+            ], 400);
+        }
+
         try {
-            $this->accountTypeService->deleteAccountType($id,$broker_id);
+
+            DB::transaction(function () use ($id, $brokerId) {  
+                $this->accountTypeService->deleteMatrixHeader($id, $brokerId);
+                $this->accountTypeService->deleteAccountType($id, $brokerId);
+            });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Account type deleted successfully'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete account type',

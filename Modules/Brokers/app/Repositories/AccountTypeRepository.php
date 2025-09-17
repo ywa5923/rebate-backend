@@ -298,4 +298,11 @@ class AccountTypeRepository
             $query->orderBy($sortBy, $sortDirection);
         }
     }
+
+    public function getAccountTypeName(int $accountTypeId): string
+    {
+        return $this->model->where('id', $accountTypeId)->with('optionValues',function($q){
+            $q->where('option_slug', 'account_type_name');
+        })->first()->optionValues->first()->value;
+    }
 } 

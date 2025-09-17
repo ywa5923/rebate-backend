@@ -9,6 +9,9 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\OptionValueService;
 use Modules\Brokers\Transformers\OptionValueResource;
+use Modules\Brokers\Models\MatrixHeader;
+use App\Utilities\ModelHelper;
+use Illuminate\Support\Facades\DB;
 
 class OptionValueController extends Controller
 {
@@ -279,33 +282,63 @@ class OptionValueController extends Controller
      */
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
+        //Example request
+        // {
+        //     "option_values": [
+        //       {
+        //         "option_slug": "account_name",
+        //         "value": "swsws",
+        //         "metadata": null
+        //       }
+        //     ],
+        //     "entity_id": 0,
+        //     "entity_type": "AccountType"
+        //   }
       
-        $entityType = $request->input('entity_type');
-        if (!$brokerId ||  !$entityType) {
+        $entityType = $request->input('entity_type', null);
+        if (!$brokerId) {
             return response()->json([
                 'success' => false,
                 'message' => 'broker_id, entity_id, and entity_type are all required.'
             ], 422);
         }
         try {
+            DB::transaction(function () use ($request, $brokerId,$entityType) {
             // Validate data
-            
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []));
-           // $entityId = $request->input('entity_id', null);
-            $entityType = $request->input('entity_type', null);
-             //entity id is not needed for store, it is created in service a new entry for model EntityType
-             //For example a company is created in service and the entity id is the company id
-             //The request for store multiple options values is made when  a new entity is created,ex: when a new company is created,entity_type is company.
-            // Create multiple option values
-            $optionValues = $this->optionValueService->createMultipleOptionValues($brokerId, $entityType,$validatedData);
+           
+            $modelClass=is_null($entityType) ? $this->optionValueService->getModelClassFromSlug('Broker') : $this->optionValueService->getModelClassFromSlug($entityType);
+            $entityId=is_null($entityType) ? $brokerId : $this->optionValueService->saveModelInstance($modelClass,$brokerId);
+            $this->optionValueService->createMultipleOptionValues($brokerId, $modelClass,$entityId,$validatedData);
+
+            if(str_contains($modelClass,'AccountType')){
+                $accountNameOption= array_filter(  $validatedData, function($optionValue){
+                    return $optionValue['option_slug']=='account_type_name';
+                });
+              
+                $accountName= $accountNameOption[0]['value'];
+
+                $this->optionValueService->createMatrixHeader([
+                    'title' => $accountName,
+                    'slug' => strtolower(str_replace(' ', '-', $accountName)),
+                    'broker_id' => $brokerId,
+                    'type' => 'column',
+                    'is_invariant' => true,
+                    'parent_id' => null,
+                    'form_type_id' => 4,
+                    'matrix_id' => 1,
+                ]);
+                }
+            });
+            
 
             return response()->json([
                 'success' => true,
                 'message' => 'Option values created successfully',
-                'data' => $optionValues, // Return the array directly since it's already formatted
+              //  'data' => $optionValues, // Return the array directly since it's already formatted
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create option values',

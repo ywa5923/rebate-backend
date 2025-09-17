@@ -8,14 +8,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\AccountType;
+use Modules\Brokers\Repositories\MatrixHeaderRepository;
 
 class AccountTypeService
 {
     protected AccountTypeRepository $repository;
-
-    public function __construct(AccountTypeRepository $repository)
+    protected MatrixHeaderRepository $matrixHeaderRepository;
+    public function __construct(AccountTypeRepository $repository,MatrixHeaderRepository $matrixHeaderRepository)
     {
         $this->repository = $repository;
+        $this->matrixHeaderRepository = $matrixHeaderRepository;
     }
 
     /**
@@ -118,6 +120,20 @@ class AccountTypeService
         });
     }
 
+
+    public function deleteMatrixHeader(int $accountTypeId,$broker_id): bool
+    {
+        $accountTypeName=$this->repository->getAccountTypeName($accountTypeId);
+        
+        if($accountTypeName){
+        $matrixHeader=$this->matrixHeaderRepository->getColumnMatrixHeaderByTitle($accountTypeName,$broker_id);
+      
+        if($matrixHeader && $matrixHeader->id){
+            return $this->matrixHeaderRepository->deleteById($matrixHeader->id);
+            }
+        }
+        return false;
+    }
     /**
      * Delete account type
      */

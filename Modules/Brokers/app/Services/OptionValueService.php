@@ -10,14 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Repositories\MatrixHeaderRepository;
+use Modules\Brokers\Models\MatrixHeader;
 
 class OptionValueService
 {
-    protected OptionValueRepository $repository;
+    
 
-    public function __construct(OptionValueRepository $repository)
+    public function __construct(protected OptionValueRepository $repository,protected MatrixHeaderRepository $matrixHeaderRepository)
     {
-        $this->repository = $repository;
+       
     }
 
     /**
@@ -77,12 +79,43 @@ class OptionValueService
         });
     }
 
+    public function getModelClassFromSlug(string $slug): string
+    {
+        return ModelHelper::getModelClassFromSlug($slug);
+    }
+
+
+    /**
+     * Save a model instance
+     * @param string $modelClass
+     * @param int $brokerId
+     * @return int|null
+     * @throws \InvalidArgumentException if class does not exist
+     */
+    public function saveModelInstance(string $modelClass,$brokerId): int|null
+    {
+        if (!class_exists($modelClass)) {
+            throw new \InvalidArgumentException("Model class {$modelClass} not found");
+        }
+        
+        $instance = $modelClass::create([
+            'broker_id' => $brokerId,
+            //'name' => 'New Company',
+        ]);
+        return $instance->id;  
+      
+    }
+
+    public function createMatrixHeader(array $data): MatrixHeader
+    {
+        return $this->matrixHeaderRepository->create($data);
+    }
+
     /**
      * Create multiple option values for a broker
      */
-    public function createMultipleOptionValues(int $brokerId, string $entityType, array $optionValuesData, ): array
+    public function createMultipleOptionValues(int $brokerId, string $modelClass, int $entityId, array $optionValuesData): void
     {
-        return DB::transaction(function () use ($brokerId, $optionValuesData, $entityType) {
             try {
                 // Validate input
                 if (empty($optionValuesData)) {
@@ -94,27 +127,27 @@ class OptionValueService
                 $now = now();
                 $options=BrokerOption::all()->pluck('id','slug');
               
-               if($entityType && strtolower($entityType)!='broker'){
-               // $className = ucfirst($entityType); // Convert 'company' to 'Company'
-                $modelClass = ModelHelper::getModelClassFromSlug($entityType);
+            //    if($entityType && strtolower($entityType)!='broker'){
+            //    // $className = ucfirst($entityType); // Convert 'company' to 'Company'
+            //     $modelClass = ModelHelper::getModelClassFromSlug($entityType);
                
-                if (!class_exists($modelClass)) {
-                    throw new \InvalidArgumentException("Model class {$modelClass} not found");
-                }
+            //     if (!class_exists($modelClass)) {
+            //         throw new \InvalidArgumentException("Model class {$modelClass} not found");
+            //     }
                 
-                $instance = $modelClass::create([
-                    'broker_id' => $brokerId,
-                    //'name' => 'New Company',
-                ]);
-                $entityId = $instance->id;
+            //     $instance = $modelClass::create([
+            //         'broker_id' => $brokerId,
+            //         //'name' => 'New Company',
+            //     ]);
+            //     $entityId = $instance->id;
               
-                }else{
-                    //if entity type is null, it means that is a broker option value
-                    //so we need to create a new broker option value
-                    //and we need to set the entity id to the broker id
-                    $entityId=$brokerId;
-                    $modelClass=ModelHelper::getModelClassFromSlug('Broker');
-                }
+            //     }else{
+            //         //if entity type is null, it means that is a broker option value
+            //         //so we need to create a new broker option value
+            //         //and we need to set the entity id to the broker id
+            //         $entityId=$brokerId;
+            //         $modelClass=ModelHelper::getModelClassFromSlug('Broker');
+            //     }
                
                 foreach ($optionValuesData as $index => $optionValueData) {
                     if (!is_array($optionValueData)) {
@@ -136,28 +169,27 @@ class OptionValueService
                     $bulkData[] = $optionValueData;
                 }
                 
-               
-
                 // Bulk insert all option values in one query
                 $this->repository->bulkCreate($bulkData);
                 
                 // Get the created option values with relationships
                 // Since bulk insert doesn't return IDs, we fetch by broker_id and option_slugs
-                $optionSlugs = collect($optionValuesData)->pluck('option_slug')->toArray();
-                $createdOptionValues = $this->repository->getByBrokerIdAndOptionSlugs($brokerId, $optionSlugs)
-                    ->load(['broker', 'option', 'zone', 'translations']);
 
-                // Ensure we return an array of arrays, not objects
-                return $createdOptionValues->map(function ($optionValue) {
-                    return $optionValue->toArray();
-                })->toArray();
+                // $optionSlugs = collect($optionValuesData)->pluck('option_slug')->toArray();
+                // $createdOptionValues = $this->repository->getByBrokerIdAndOptionSlugs($brokerId, $optionSlugs)
+                //     ->load(['broker', 'option', 'zone', 'translations']);
+
+                // // Ensure we return an array of arrays, not objects
+                // return $createdOptionValues->map(function ($optionValue) {
+                //     return $optionValue->toArray();
+                // })->toArray();
 
             } catch (\Exception $e) {
                 Log::error('OptionValueService createMultipleOptionValues error: ' . $e->getMessage());
                 Log::error('Stack trace: ' . $e->getTraceAsString());
                 throw $e;
             }
-        });
+        
     }
 
     /**
