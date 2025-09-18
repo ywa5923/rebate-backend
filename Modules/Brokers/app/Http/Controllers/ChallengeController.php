@@ -225,12 +225,30 @@ class ChallengeController extends Controller
                 'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
                 'is_placeholder' => 'nullable|boolean',
                 'matrix' => 'required|array',
-                'broker_id' => 'nullable|integer|exists:brokers,id'
+                'broker_id' => 'nullable|integer|exists:brokers,id',
+                'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+                'is_admin' => 'sometimes|nullable|boolean'
             ]);
 
             $brokerId = $validatedData['broker_id'];
+            $zoneId = $validatedData['zone_id'] ?? null;
+            $isAdmin = $validatedData['is_admin'] ?? null;
             // Use service to store challenge
-            $result = $this->challengeService->storeChallenge($validatedData, $brokerId);
+           // $challengeId = 
+        //    $challenge = $this->challengeService->findChallengeByParams(
+        //     false,
+        //     $validatedData['category_id'],
+        //     $validatedData['step_id'],
+        //     $validatedData['amount_id'],
+        //     $brokerId
+        // );
+        // if($challenge){
+           
+        //     $previousChalengeMatrix = $this->challengeService->getChallengeMatrixData($challenge->id, $zoneId);
+        //     $newMAtrix=$this->challengeService->setPreviousValueInMatrixData($previousChalengeMatrix, $validatedData['matrix']);
+
+        // }
+            $result = $this->challengeService->storeChallengeMatrix($validatedData, $brokerId, $zoneId, $isAdmin);
 
             return response()->json([
                 'success' => true,
@@ -246,7 +264,7 @@ class ChallengeController extends Controller
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create challenge matrix',

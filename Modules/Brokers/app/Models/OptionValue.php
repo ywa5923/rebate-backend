@@ -47,6 +47,8 @@ class OptionValue extends Model
         'optionable_id',
         'optionable_type',
         'option_slug',
+        'previous_value',
+        'is_updated_entry',
         'value',
         'public_value',
         'status',

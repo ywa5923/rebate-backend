@@ -15,7 +15,7 @@ class ChallengeMatrixValue extends Model
      * The attributes that are mass assignable.
      */
 
-    protected $fillable = ['value', 'public_value', 'is_invariant', 'zone_id', 'challenge_id', 'row_id', 'column_id', 'broker_id'];
+    protected $fillable = ['previous_value','value', 'public_value','is_updated_entry', 'is_invariant', 'zone_id', 'challenge_id', 'row_id', 'column_id', 'broker_id'];
    
     public function row():BelongsTo 
     {

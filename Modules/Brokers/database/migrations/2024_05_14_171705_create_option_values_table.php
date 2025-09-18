@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->nullableMorphs('optionable');
             $table->string("option_slug");
+            $table->text("previous_value")->nullable();
             $table->text("value");
             $table->text("public_value")->nullable();
-
+            $table->boolean("is_updated_entry")->default(0);
             $table->enum("status",["published","pending","rejected"])->default("pending");
             $table->text("status_reason",1000)->nullable();
             //$table->boolean("status")->default(1);//de bagat si in broker options;

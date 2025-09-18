@@ -591,6 +591,7 @@ class OptionValueController extends Controller
     {
         $entityId = $request->input('entity_id');
         $entityType = $request->input('entity_type');
+        $isAdmin=false;
         if (!$brokerId || !$entityId || !$entityType) {
             return response()->json([
                 'success' => false,
@@ -599,6 +600,9 @@ class OptionValueController extends Controller
         }
         try {
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []), true);
+         
+         
+         
             $optionValues = $this->optionValueService->updateMultipleOptionValues($brokerId, $entityId, $entityType, $validatedData);
             return response()->json([
                 'success' => true,

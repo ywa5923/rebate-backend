@@ -236,6 +236,19 @@ class OptionValueService
                 $inserts = [];
                 $options=BrokerOption::all()->pluck('id','slug');
 
+                // Extract IDs that are different from 0 for comparison
+                $idsToCompare = array_filter(array_column($optionValuesData, 'id'), function($id) {
+                    return !empty($id) && $id != 0;
+                });
+
+                // Get existing option values for comparison
+                $existingOptionValues = [];
+                if (!empty($idsToCompare)) {
+                    $existingOptionValues = OptionValue::whereIn('id', $idsToCompare)
+                        ->get()
+                        ->keyBy('id');
+                }
+
                 foreach ($optionValuesData as $optionValueData) {
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
@@ -253,6 +266,24 @@ class OptionValueService
                         $optionValueData['broker_option_id']=$options[$optionValueData['option_slug']];
                         $inserts[] = $optionValueData;
                     } else {
+                        // Check if this is an existing option value that needs comparison
+                        if (isset($existingOptionValues[$optionValueData['id']])) {
+                            $existingValue = $existingOptionValues[$optionValueData['id']];
+                            
+                            // Compare values to determine if they've changed
+                            $valueChanged = $this->hasValueChanged($existingValue, $optionValueData);
+                            
+                            if ($valueChanged) {
+                                // Set previous_value to old value and is_updated_entry to 1
+                                $optionValueData['previous_value'] = $existingValue->value;
+                                $optionValueData['is_updated_entry'] = 1;
+                            } else {
+                                // Keep existing previous_value and is_updated_entry
+                                $optionValueData['previous_value'] = $existingValue->previous_value;
+                                $optionValueData['is_updated_entry'] = $existingValue->is_updated_entry;
+                            }
+                        }
+                        
                         $id = $optionValueData['id'];
                         unset($optionValueData['id']);
                         $updatesByCondition[$id] = $optionValueData;
@@ -466,5 +497,37 @@ class OptionValueService
     public function searchByValue(string $search): \Illuminate\Database\Eloquent\Collection
     {
         return $this->repository->searchByValue($search);
+    }
+
+    /**
+     * Check if option value has changed by comparing key fields
+     * 
+     * @param OptionValue $existingValue
+     * @param array $newData
+     * @return bool
+     */
+    private function hasValueChanged(OptionValue $existingValue, array $newData): bool
+    {
+        // Compare the main value fields that indicate a change
+        $fieldsToCompare = ['value', 'public_value', 'status', 'status_message', 'default_loading', 'type'];
+        
+        foreach ($fieldsToCompare as $field) {
+            if (isset($newData[$field])) {
+                $existingFieldValue = $existingValue->$field;
+                $newFieldValue = $newData[$field];
+                
+                // Handle different data types
+                if (is_array($existingFieldValue) && is_array($newFieldValue)) {
+                    if (array_diff_assoc($existingFieldValue, $newFieldValue) !== [] || 
+                        array_diff_assoc($newFieldValue, $existingFieldValue) !== []) {
+                        return true;
+                    }
+                } elseif ($existingFieldValue != $newFieldValue) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 } 

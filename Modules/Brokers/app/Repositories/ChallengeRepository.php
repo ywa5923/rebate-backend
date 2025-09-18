@@ -75,9 +75,9 @@ class ChallengeRepository
      * @param int $challengeId
      * @return void
      */
-    public function deleteChallengeMatrixValues(int $challengeId): void
+    public function deleteChallengeMatrixValues(int $challengeId,?int $zoneId=null): void
     {
-        ChallengeMatrixValue::where('challenge_id', $challengeId)->delete();
+        ChallengeMatrixValue::where('challenge_id', $challengeId)->where('zone_id', $zoneId)->delete();
     }
 
     /**
@@ -85,9 +85,9 @@ class ChallengeRepository
      * @param int $challengeId
      * @return Collection
      */
-    public function getChallengeMatrixValues(int $challengeId): Collection
+    public function getChallengeMatrixValues(int $challengeId,?int $zoneId=null): Collection
     {
-        return ChallengeMatrixValue::where('challenge_id', $challengeId)
+        return ChallengeMatrixValue::where('challenge_id', $challengeId)->where('zone_id', $zoneId)
             ->with(['row', 'column'])
             ->get();
     }

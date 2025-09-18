@@ -100,7 +100,7 @@ class AccountTypeController extends Controller
             //get ac types by query params: broker_id, zone_id, broker_type, sort_by, sort_direction, per_page,language_code
             //
             $result = $this->accountTypeService->getAccountTypes($request);
-          
+
             // Transform the data collection
             $result['data'] = AccountTypeResource::collection($result['data']);
             return $result;
@@ -113,7 +113,7 @@ class AccountTypeController extends Controller
         }
     }
 
-   
+
 
     /**
      * @OA\Get(
@@ -140,7 +140,7 @@ class AccountTypeController extends Controller
      */
     public function getUrlsGroupedByType($id)
     {
-       
+
         $accountType = AccountType::find($id);
         if (!$accountType) {
             return response()->json([
@@ -166,7 +166,7 @@ class AccountTypeController extends Controller
         ]);
     }
 
-    
+
 
     /**
      * @OA\Post(
@@ -245,49 +245,49 @@ class AccountTypeController extends Controller
     //   }
     public function createUrls(Request $request, $id)
     {
-      // TO DO verify that the logged in broker id is the same as the broker_id in the request
-      //or is admin
-        $broker_id=$request->broker_id;
-       
-        if($broker_id==null){
-            throw new \Exception('Broker ID is required');
-         }
-        
+        // TO DO verify that the logged in broker id is the same as the broker_id in the request
+        //or is admin
+        $broker_id = $request->broker_id;
 
-         //if account type id is  null, it means that is a master url that has urlable_id null 
-         //it is avaialble for all broker account types
-        if($id!=0 && $id!=null || $id!="0"){
+        if ($broker_id == null) {
+            throw new \Exception('Broker ID is required');
+        }
+
+
+        //if account type id is  null, it means that is a master url that has urlable_id null 
+        //it is avaialble for all broker account types
+        if ($id != 0 && $id != null || $id != "0") {
             //if account type id is not null, it means that is a broker account type
-            $accountType =AccountType::find($id);
-          
+            $accountType = AccountType::find($id);
+
             if (!$accountType) {
                 return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
             }
-        }else{
-            $accountType=null;
+        } else {
+            $accountType = null;
         }
-       
+
 
         $data = $request->all();
-        
+
         $urls = $this->flattenUrlInput($data);
-     
-       
-        $created = app(UrlService::class)->createMany($accountType,'account_type', $urls);
-      
+
+
+        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls);
+
 
         // Optionally, fetch the created URLs for response
-        if($accountType){
+        if ($accountType) {
             $fetched = $accountType->urls()->latest('id')->take(count($urls))->get();
-        }else{
+        } else {
             $fetched = Url::where('urlable_type', AccountType::class)->where('broker_id', $broker_id)->latest('id')->take(count($urls))->get();
         }
 
 
         return response()->json([
             'success' => true,
-           // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
-           'data' => $fetched
+            // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
+            'data' => $fetched
         ], 201);
     }
 
@@ -352,29 +352,29 @@ class AccountTypeController extends Controller
     //   }
     public function updateUrls(Request $request, $id)
     {
-       
+
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
-        $broker_id=$request->broker_id;
-        if($broker_id==null){
-           throw new \Exception('Broker ID is required as a search parameter');
+        $broker_id = $request->broker_id;
+        if ($broker_id == null) {
+            throw new \Exception('Broker ID is required as a search parameter');
         }
 
-        if($id!=0 && $id!=null || $id!="0"){
+        if ($id != 0 && $id != null || $id != "0") {
             //if account type id is not null, it means that is a broker account type
-            $accountType =AccountType::find($id);
-          
+            $accountType = AccountType::find($id);
+
             if (!$accountType) {
                 return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
             }
-        }else{
-            $accountType=null;
+        } else {
+            $accountType = null;
         }
 
         $data = $request->all();
         $urls = $this->flattenUrlInput($data);
-    
-        $updated = app(UrlService::class)->updateMany('account_type', $urls,$broker_id);
+
+        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id);
 
         return response()->json([
             'success' => true,
@@ -431,11 +431,11 @@ class AccountTypeController extends Controller
             }
         }
 
-        
+
         return $urls;
     }
 
-    
+
 
     /**
      * @OA\Delete(
@@ -469,10 +469,10 @@ class AccountTypeController extends Controller
      */
     public function destroy(Request $request, $id): JsonResponse
     {
-        
+
         // TODO: Check if account type broker id is the same as the logged in broker id or is admin
         $brokerId = $request->input('broker_id');
-        
+
         if (!$brokerId) {
             return response()->json([
                 'success' => false,
@@ -482,7 +482,7 @@ class AccountTypeController extends Controller
 
         try {
 
-            DB::transaction(function () use ($id, $brokerId) {  
+            DB::transaction(function () use ($id, $brokerId) {
                 $this->accountTypeService->deleteMatrixHeader($id, $brokerId);
                 $this->accountTypeService->deleteAccountType($id, $brokerId);
             });
@@ -491,7 +491,6 @@ class AccountTypeController extends Controller
                 'success' => true,
                 'message' => 'Account type deleted successfully'
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -534,11 +533,22 @@ class AccountTypeController extends Controller
     public function deleteAccountTypeUrl($accountTypeId, $urlId)
     {
 
-         // TO DO
+        // TO DO
         //check if account type broker id is the same as the logged in broker id
         //or is admin
 
+        // $brokerId = $request->input('broker_id');
+        // if (!$brokerId) {
+        //     return response()->json(['success' => false, 'message' => 'Broker ID required'], 400);
+        // }
+
+        // // TODO: Verify broker owns this account type
+        // $accountType = AccountType::where('id', $accountTypeId)
+        //     ->where('broker_id', $brokerId)
+        //     ->first();
+
         $accountType = AccountType::find($accountTypeId);
+
         if (!$accountType) {
             return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
         }
@@ -549,11 +559,19 @@ class AccountTypeController extends Controller
             return response()->json(['success' => false, 'message' => 'URL not found'], 404);
         }
 
-        $url->delete();
+        try {
+            $url->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'URL deleted successfully'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'URL deleted successfully'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete URL',
+                'error' => $e->getMessage()  // Add this for debugging
+            ], 500);
+        }
     }
 }

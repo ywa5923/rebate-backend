@@ -19,7 +19,7 @@ class ChallengeService
     /**
      * Store challenge with matrix data
      */
-    public function storeChallenge(array $validatedData, int $brokerId): array
+    public function storeChallengeMatrix(array $validatedData, int $brokerId,?int $zoneId=null,?bool $isAdmin=null): array
     {
         DB::beginTransaction();
 
@@ -27,21 +27,31 @@ class ChallengeService
             //check if challenge already exists
             //if it exist delete it
             $challenge = $this->challengeRepository->exists($validatedData['is_placeholder'],$validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
-            if($challenge){
-                $challenge->delete();
-            }
-            // Create challenge
-            $challenge = $this->challengeRepository->create([
+            if(!$challenge){
+                //$challenge->delete();
+                $challenge = $this->challengeRepository->create([
             
-                'is_placeholder' => $validatedData['is_placeholder'],
-                'challenge_category_id' => $validatedData['category_id'],
-                'challenge_step_id' => $validatedData['step_id'],
-                'challenge_amount_id' => $validatedData['amount_id'] ?? null,
-                'broker_id' => $brokerId
-            ]);
+                    'is_placeholder' => $validatedData['is_placeholder'],
+                    'challenge_category_id' => $validatedData['category_id'],
+                    'challenge_step_id' => $validatedData['step_id'],
+                    'challenge_amount_id' => $validatedData['amount_id'] ?? null,
+                    'broker_id' => $brokerId
+                ]);
+                // Save matrix data
+              $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
+            }else{
+                $previousChalengeMatrix = $this->getChallengeMatrixData($challenge->id, $zoneId);
+                $newMAtrix=$this->setPreviousValueInMatrixData(
+                    $previousChalengeMatrix,
+                     $validatedData['matrix'],
+                );
+                //remove old chalenge's matrix values
+                $this->challengeRepository->deleteChallengeMatrixValues($challenge->id, $zoneId);// Save matrix data
+                $this->saveMatrixData($newMAtrix, $challenge->id, $brokerId, $zoneId, $isAdmin);            }
+            // Create challenge
+           
 
-            // Save matrix data
-            $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId);
+            
 
             DB::commit();
 
@@ -59,10 +69,15 @@ class ChallengeService
     /**
      * Save matrix data to challenge_matrix_values table
      */
-    private function saveMatrixData(array $matrixData, int $challengeId, int $brokerId): void
+    private function saveMatrixData(array $matrixData, int $challengeId, int $brokerId,?int $zoneId=null,?bool $isAdmin=null): void
     {
         $challengeMatrixValues = [];
         $groupNames = ['challenge', 'step-0', 'step-1', 'step-2'];
+
+        // Fetch all headers for the needed groups once and index by slug
+        $headersBySlug = $this->challengeRepository
+            ->getMatrixHeadersByGroups($groupNames)
+            ->keyBy('slug');
 
         foreach ($matrixData as $rowIndex => $rowData) {
             foreach ($rowData as $colIndex => $cellData) {
@@ -70,18 +85,20 @@ class ChallengeService
                 $colHeaderSlug = $cellData['colHeader'];
 
                 // Get matrix headers
-                $rowHeader = $this->challengeRepository->getMatrixHeaderBySlugAndGroups($rowHeaderSlug, $groupNames);
-                $colHeader = $this->challengeRepository->getMatrixHeaderBySlugAndGroups($colHeaderSlug, $groupNames);
+                $rowHeader = $headersBySlug->get($rowHeaderSlug);
+                $colHeader = $headersBySlug->get($colHeaderSlug);
 
                 if (!$rowHeader || !$colHeader) {
                     throw new \Exception('Row or column header not found for: ' . $rowHeaderSlug . ' or ' . $colHeaderSlug);
                 }
 
                 $challengeMatrixValues[] = [
-                    'value' => json_encode($cellData['value'] ?? []),
-                    'public_value' => json_encode($cellData['public_value'] ?? []),
-                    'is_invariant' => true,
-                    'zone_id' => null,
+                    'previous_value' => !empty($cellData['previous_value'])?json_encode($cellData['previous_value']):null,
+                    'value' => !empty($cellData['value'])?json_encode($cellData['value']):null,
+                    'public_value' => !empty($cellData['public_value'])?json_encode($cellData['public_value']):null,
+                    'is_updated_entry' => $isAdmin ? 0 :$cellData['is_updated_entry'] ?? false,
+                    'is_invariant' => isset($zoneId) ? false : true,
+                    'zone_id' => $zoneId,
                     'challenge_id' => $challengeId,
                     'row_id' => $rowHeader->id,
                     'column_id' => $colHeader->id,
@@ -120,9 +137,9 @@ class ChallengeService
     /**
      * Get challenge matrix data in the required format
      */
-    public function getChallengeMatrixData(int $challengeId): array
+    public function getChallengeMatrixData(int $challengeId,?int $zoneId=null): array
     {
-        $matrixValues = $this->challengeRepository->getChallengeMatrixValues($challengeId);
+        $matrixValues = $this->challengeRepository->getChallengeMatrixValues($challengeId, $zoneId);
         
         if ($matrixValues->isEmpty()) {
             return [];
@@ -139,8 +156,10 @@ class ChallengeService
             
             foreach ($rowValues as $value) {
                 $row[] = [
+                    'previous_value' => json_decode($value->previous_value, true) ?: [],
                     'value' => json_decode($value->value, true) ?: [],
                     'public_value' => json_decode($value->public_value, true) ?: [],
+                    'is_updated_entry' => $value->is_updated_entry,
                     'rowHeader' => $value->row->slug,
                     'colHeader' => $value->column->slug,
                     'type' => $value->column->formType->name ?? 'Text'
@@ -152,6 +171,45 @@ class ChallengeService
         }
         
         return $matrix;
+    }
+
+    /**
+     * Merge previous matrix values into the new matrix payload.
+     * Sets previous_value (and preserves is_updated_entry if present).
+     *
+     * @param array $previousMatrix Matrix returned from getChallengeMatrixData
+     * @param array $newMatrix Incoming matrix from client payload
+     * @return array Updated matrix with previous_value filled where applicable
+     */
+    public function setPreviousValueInMatrixData(array $previousMatrix, array $newMatrix): array
+    {
+        $previousByKey = [];
+        foreach ($previousMatrix as $row) {
+            foreach ($row as $cell) {
+                $key = ($cell['rowHeader'] ?? '') . '|' . ($cell['colHeader'] ?? '');
+                $previousByKey[$key] = [
+                    'previous_value' => $cell['value'] ?? null,
+                   /// 'is_updated_entry' => $cell['is_updated_entry'] ?? 0,
+                ];
+            }
+        }
+
+        foreach ($newMatrix as &$row) {
+            foreach ($row as &$cell) {
+                $key = ($cell['rowHeader'] ?? '') . '|' . ($cell['colHeader'] ?? '');
+                if (isset($previousByKey[$key])) {
+                    $previousValue = $previousByKey[$key]['previous_value'];
+                    $currentValue = $cell['value'];
+                    if($previousValue && $currentValue && !empty(array_diff_assoc($previousValue, $currentValue))){
+                        $cell['previous_value'] = $previousByKey[$key]['previous_value'];
+                        $cell['is_updated_entry']=true;
+                    }
+                } 
+            }
+        }
+        unset($row, $cell);
+
+        return $newMatrix;
     }
 
     /**

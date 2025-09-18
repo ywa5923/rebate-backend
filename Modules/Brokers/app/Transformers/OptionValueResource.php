@@ -45,6 +45,8 @@ class OptionValueResource extends JsonResource
         return [
             'id' => $this->id,
             'option_slug' => $this->option_slug,
+            'previous_value' => $this->previous_value,
+            'is_updated_entry' => $this->is_updated_entry,
             "value" => $this->value,
             'public_value' => $this->translateOptionPublicValue($this->option_slug),
             'status' => $this->status,
