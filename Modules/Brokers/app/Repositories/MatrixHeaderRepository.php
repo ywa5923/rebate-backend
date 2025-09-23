@@ -286,6 +286,8 @@ class MatrixHeaderRepository
        // $headearsSelectedSubOptions = [];
         $usedSlugs = [];
         // Create all headers first
+
+        
         foreach ($matrixData as $rowIndex => $row) {
             $selectedRowHeaderSubOptions = $row[0]['selectedRowHeaderSubOptions'] ?? null;
             $rowHeaderSlug = $row[0]['rowHeader'];

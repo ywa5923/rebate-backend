@@ -16,6 +16,9 @@ return new class extends Migration
             $table->nullableMorphs('urlable');
             $table->string("url_type");
             $table->string("url",500);
+            $table->string("public_url",500)->nullable();
+            $table->string("old_url",500)->nullable();
+            $table->boolean("is_updated_entry")->default(false);
             $table->string("url_p",500)->nullable();
             $table->string("name",500);
             $table->string("name_p",500)->nullable();

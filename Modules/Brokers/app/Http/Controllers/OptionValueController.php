@@ -308,7 +308,7 @@ class OptionValueController extends Controller
             $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []));
            
             $modelClass=is_null($entityType) ? $this->optionValueService->getModelClassFromSlug('Broker') : $this->optionValueService->getModelClassFromSlug($entityType);
-            $entityId=is_null($entityType) ? $brokerId : $this->optionValueService->saveModelInstance($modelClass,$brokerId);
+            $entityId=is_null($entityType) || $entityType=='Broker' ? $brokerId : $this->optionValueService->saveModelInstance($modelClass,$brokerId);
             $this->optionValueService->createMultipleOptionValues($brokerId, $modelClass,$entityId,$validatedData);
 
             if(str_contains($modelClass,'AccountType')){
@@ -591,7 +591,7 @@ class OptionValueController extends Controller
     {
         $entityId = $request->input('entity_id');
         $entityType = $request->input('entity_type');
-        $isAdmin=false;
+        $isAdmin=true;
         if (!$brokerId || !$entityId || !$entityType) {
             return response()->json([
                 'success' => false,
@@ -603,7 +603,7 @@ class OptionValueController extends Controller
          
          
          
-            $optionValues = $this->optionValueService->updateMultipleOptionValues($brokerId, $entityId, $entityType, $validatedData);
+            $optionValues = $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType, $validatedData);
             return response()->json([
                 'success' => true,
                 'message' => 'Option values updated successfully',

@@ -5,6 +5,9 @@ namespace Modules\Brokers\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Brokers\Models\Url;
+
 class Challenge extends Model
 {
    
@@ -12,7 +15,7 @@ class Challenge extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['is_placeholder','challenge_category_id','challenge_step_id','challenge_amount_id','broker_id'];
+    protected $fillable = ['evaluation_cost_discount','is_placeholder','challenge_category_id','challenge_step_id','challenge_amount_id','broker_id'];
 
     public function challengeCategory(): BelongsTo
     {
@@ -37,6 +40,11 @@ class Challenge extends Model
     public function broker(): BelongsTo
     {
         return $this->belongsTo(Broker::class,'broker_id');
+    }
+
+    public function urls(): MorphMany
+    {
+        return $this->morphMany(Url::class, 'urlable');
     }
     
 }

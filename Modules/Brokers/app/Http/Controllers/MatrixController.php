@@ -88,6 +88,7 @@ class MatrixController extends Controller
         $brokerId = $data['broker_id'];
         $zoneId = $data['zone_id'] ?? null;
         $isAdmin = $data['is_admin'] ?? null;
+        $isAdmin=false;
 
         try {
 
@@ -99,11 +100,12 @@ class MatrixController extends Controller
             }
 
             $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
-            if (!empty($previousMatrixData)) {
+            if (!empty($previousMatrixData) && !$isAdmin) {
                 $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
             }
             $result = DB::transaction(function () use ($data, $brokerId, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
 
+               // dd($data['matrix']);
                 //matrix cell's is_updated_entry is used to identify the updated entries and previous values in the matrix data.
                 //it is set to 1 in MAtrixService::setPreviousValueInMatrixData if the cell value is different from the previous value.
                 //when admin save the matrix, all matrix cells will have is_updated_entry=0. See MatrixHeaderRepository::insertMatrixValues

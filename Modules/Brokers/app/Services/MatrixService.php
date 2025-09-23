@@ -122,7 +122,7 @@ class MatrixService
      * @return void
      */
     public function setPreviousValueInMatrixData($previousMatrixData, &$newMatrixData){
-       // $index=0;
+        $index=0;
         foreach($newMatrixData as $index => &$row){
            
             foreach($row as &$cell){
@@ -132,9 +132,13 @@ class MatrixService
                 $rowSubOptions=$cell['selectedRowHeaderSubOptions'];
              
                 $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
-               //$index==1 && dd($previousCellValueArray, $cellValueArray);
+                $index==2 && dd($previousCellValueArray);
+                //$previousCellValueArray=json_decode($previousCellValue, true);
+               // $index=2 && dd($previousCellValueArray,$cellValueArray,(array_diff_assoc($previousCellValueArray, $cellValueArray)));
+                //$index==1 && dd($previousCellValueArray, $cellValueArray);
                //  $index==1 && dd(empty(array_diff_assoc($previousCellValueArray, $cellValueArray)));
-                if ($previousCellValueArray && !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
+                if ($previousCellValueArray && 
+                !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
                    $cell["previous_value"]=$previousCellValueArray;
                    $cell["is_updated_entry"]=true;
                 //  dd($cell);
@@ -143,7 +147,7 @@ class MatrixService
                 }
                 
             }
-           // $index++;
+            $index++;
            
             
         }

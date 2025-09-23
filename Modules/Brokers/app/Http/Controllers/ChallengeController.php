@@ -227,12 +227,18 @@ class ChallengeController extends Controller
                 'matrix' => 'required|array',
                 'broker_id' => 'nullable|integer|exists:brokers,id',
                 'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-                'is_admin' => 'sometimes|nullable|boolean'
+                'is_admin' => 'sometimes|nullable|boolean',
+                'evaluation_cost_discount' => 'sometimes|nullable|string',
+                'affiliate_link' => 'sometimes|nullable|string',
+                'affiliate_master_link' => 'sometimes|nullable|string',
             ]);
 
             $brokerId = $validatedData['broker_id'];
             $zoneId = $validatedData['zone_id'] ?? null;
             $isAdmin = $validatedData['is_admin'] ?? null;
+
+
+            $isAdmin=true;
             // Use service to store challenge
            // $challengeId = 
         //    $challenge = $this->challengeService->findChallengeByParams(
@@ -248,6 +254,7 @@ class ChallengeController extends Controller
         //     $newMAtrix=$this->challengeService->setPreviousValueInMatrixData($previousChalengeMatrix, $validatedData['matrix']);
 
         // }
+
             $result = $this->challengeService->storeChallengeMatrix($validatedData, $brokerId, $zoneId, $isAdmin);
 
             return response()->json([

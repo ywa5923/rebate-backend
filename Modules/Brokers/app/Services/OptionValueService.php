@@ -98,6 +98,12 @@ class OptionValueService
             throw new \InvalidArgumentException("Model class {$modelClass} not found");
         }
         
+        // For Broker model, return the brokerId directly since we're not creating a new broker
+        if ($modelClass === 'Modules\Brokers\Models\Broker') {
+            return $brokerId;
+        }
+        
+        // For other models (like Company, AccountType, etc.), create with broker_id
         $instance = $modelClass::create([
             'broker_id' => $brokerId,
             //'name' => 'New Company',
@@ -220,7 +226,7 @@ class OptionValueService
     /**
      * Update multiple option values for a broker
      */
-    public function updateMultipleOptionValues(int $brokerId,int $entity_id, string $entity_type, array $optionValuesData): array
+    public function updateMultipleOptionValues(bool $isAdmin,int $brokerId,int $entity_id, string $entity_type, array $optionValuesData): array
     {
         //dd($optionValuesData);
 
@@ -229,7 +235,7 @@ class OptionValueService
             throw new \InvalidArgumentException("Model class {$modelClass} not found");
         }
        
-        return DB::transaction(function () use ($brokerId, $optionValuesData,$entity_id,$modelClass) {
+        return DB::transaction(function () use ($brokerId, $optionValuesData,$entity_id,$modelClass,$isAdmin) {
             try {
                 $now = now();
                 $updatesByCondition = [];
@@ -267,7 +273,7 @@ class OptionValueService
                         $inserts[] = $optionValueData;
                     } else {
                         // Check if this is an existing option value that needs comparison
-                        if (isset($existingOptionValues[$optionValueData['id']])) {
+                        if (!$isAdmin && isset($existingOptionValues[$optionValueData['id']])) {
                             $existingValue = $existingOptionValues[$optionValueData['id']];
                             
                             // Compare values to determine if they've changed
@@ -282,6 +288,9 @@ class OptionValueService
                                 $optionValueData['previous_value'] = $existingValue->previous_value;
                                 $optionValueData['is_updated_entry'] = $existingValue->is_updated_entry;
                             }
+                        }else if($isAdmin){
+                            
+                            $optionValueData['is_updated_entry'] = 0;
                         }
                         
                         $id = $optionValueData['id'];
