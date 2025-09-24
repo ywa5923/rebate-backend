@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Repositories\CostDiscountRepository;
-
+use Modules\Brokers\Models\CostDiscount;
+use Modules\Brokers\Models\Url;
 class ChallengeService
 {
     protected ChallengeRepository $challengeRepository;
@@ -46,28 +47,6 @@ class ChallengeService
                 // Save matrix data
                 $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
                
-                // $this->urlRepository->bulkCreate([
-                //     [
-                //         'urlable_type' => Challenge::class,
-                //         'urlable_id' => $challenge->id,
-                //         'url_type' => 'challenge-matrix',
-                //         'url' => $validatedData['affiliate_link'],
-                //         'name' => 'Affiliate Link',
-                //         'slug' => 'affiliate-link',
-                //         'broker_id' => $brokerId,
-                //         'zone_id' => $zoneId,
-                //     ],
-                //     [
-                //         'urlable_type' => Challenge::class,
-                //         'urlable_id' => null,
-                //         'url_type' => 'challenge-matrix',
-                //         'url' => $validatedData['affiliate_master_link'],
-                //         'name' => 'Affiliate Master Link',
-                //         'slug' => 'affiliate-master-link',
-                //         'broker_id' => $brokerId,
-                //         'zone_id' => $zoneId,
-                //     ]
-                // ]);
             } else {
                 $previousChalengeMatrix = $this->getChallengeMatrixData($challenge->id, $zoneId);
                 $newMAtrix = $this->setPreviousValueInMatrixData(
@@ -89,12 +68,14 @@ class ChallengeService
             $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, null, $brokerId, $zoneId);
             //update the evaluation cost discount
           
+         
              //the broker updated the evaluation cost discount in broker_value 
              //so we need to update the old_value and broker_value and is_updated_entry
                 if ($oldCostDiscount) {
-                    $oldDiscountValue = $oldCostDiscount->broker_value;
-                    $oldCostDiscount->update([
-                        'old_value' => $oldDiscountValue,
+                   
+                    $oldDiscountValue = $isAdmin ? $oldCostDiscount->public_value : $oldCostDiscount->broker_value;
+                    ($oldDiscountValue != $validatedData['evaluation_cost_discount'])   && $oldCostDiscount->update([
+                        $isAdmin ? null : 'old_value' => $oldDiscountValue,
                         $isAdmin ? 'public_value' : 'broker_value' => $validatedData['evaluation_cost_discount'] ?? null,
                         'is_updated_entry' => $isAdmin ? false : true,
                     ]);
@@ -108,17 +89,19 @@ class ChallengeService
 
                 }
                 if ($oldAffiliateLink) {
-                    $oldAffiliateLink->update([
-                        'old_url' => $oldAffiliateLink->url,
+                    $oldAffiliateLinkValue = $isAdmin ? $oldAffiliateLink->public_url : $oldAffiliateLink->url;
+                    $oldAffiliateLinkValue != $validatedData['affiliate_link'] && $oldAffiliateLink->update([
+                        $isAdmin ? null : 'old_url' => $oldAffiliateLink->url,
                         $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_link'],
                         'is_updated_entry' => $isAdmin ? false : true,
                     ]);
                 }else{
+                    $field = $isAdmin ? 'public_url' : 'url';
                     $this->urlRepository->create([
                         'urlable_type' => Challenge::class,
                         'urlable_id' => $challenge->id,
                         'url_type' => 'challenge-matrix',
-                        $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_link'],
+                        $field => $validatedData['affiliate_link'],
                         'name' => 'Affiliate Link',
                         'slug' => 'affiliate-link',
                         'broker_id' => $brokerId,
@@ -126,12 +109,15 @@ class ChallengeService
                     ]);
                 }
                 if ($oldAffiliateMasterLink) {
-                    $oldAffiliateMasterLink->update([
+                    $oldAffiliateMasterLinkValue = $isAdmin ? $oldAffiliateMasterLink->public_url : $oldAffiliateMasterLink->url;
+                    $oldAffiliateMasterLinkValue != $validatedData['affiliate_master_link'] && $oldAffiliateMasterLink->update([
+                        $isAdmin ? null : 'old_url' => $oldAffiliateMasterLink->url,
                         'old_url' => $oldAffiliateMasterLink->url,
                         $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_master_link'],
                         'is_updated_entry' => $isAdmin ? false : true,
                     ]);
                 }else{
+                    
                     $this->urlRepository->create( [
                         'urlable_type' => Challenge::class,
                         'urlable_id' => null,
@@ -200,6 +186,24 @@ class ChallengeService
         }
 
         $this->challengeRepository->insertChallengeMatrixValues($challengeMatrixValues);
+    }
+
+    /**
+     * Find url by urlable type and id
+     * @param string $urlableType
+     * @param int|null $urlableId
+     * @param int $brokerId
+     * @param int|null $zoneId
+     * @return Url|null
+     */
+    public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, int $brokerId, ?int $zoneId = null): ?Url
+    {
+        return $this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $zoneId);
+    }
+
+    public function findDiscountByChallengeId(int $challengeId, int $brokerId, ?int $zoneId = null): ?CostDiscount
+    {
+        return $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
     }
 
     /**

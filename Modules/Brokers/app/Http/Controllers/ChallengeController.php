@@ -18,6 +18,9 @@ use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixHeader;
 use Modules\Brokers\Models\ChallengeMatrixValue;
 use Modules\Brokers\Services\ChallengeService;
+use Modules\Brokers\Transformers\AffiliateLinkResource;
+use Modules\Brokers\Transformers\CostDiscountResource;
+
 class ChallengeController extends Controller
 {
     protected ChallengeCategoryService $challengeCategoryService;
@@ -43,10 +46,12 @@ class ChallengeController extends Controller
                 'step_id' => 'required|integer|exists:challenge_steps,id', 
                 'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
                 'is_placeholder' => 'nullable|boolean',
-                'broker_id' => 'nullable|integer|exists:brokers,id'
+                'broker_id' => 'nullable|integer|exists:brokers,id',
+                'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
             ]);
 
             $brokerId = $validatedData['broker_id']; // Default broker ID
+            $zoneId = $validatedData['zone_id'] ?? null;
            // $brokerId=1;
             $isPalceholder=$validatedData['is_placeholder'];
             if($validatedData['is_placeholder'] == false || $validatedData['is_placeholder'] == null || $validatedData['is_placeholder'] == "0" || $validatedData['is_placeholder'] == 0){
@@ -95,10 +100,13 @@ class ChallengeController extends Controller
 
             }
             
-
+          
             // Get matrix data in the required format
             //TODO:add translation and zone params
             $matrix = $this->challengeService->getChallengeMatrixData($challenge->id);
+            $affiliateLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $zoneId);
+            $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $zoneId);
+            $discountValue = $this->challengeService->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
 
             return response()->json([
                 'success' => true,
@@ -108,7 +116,10 @@ class ChallengeController extends Controller
                     'challenge_step_id' => $challenge->challenge_step_id,
                     'challenge_amount_id' => $challenge->challenge_amount_id,
                     'is_placeholder' => $challenge->is_placeholder,
-                    'matrix' => $matrix
+                    'matrix' => $matrix,
+                    'affiliate_link' => AffiliateLinkResource::make($affiliateLink),
+                    'affiliate_master_link' => AffiliateLinkResource::make($affiliateMasterLink),
+                    'evaluation_cost_discount' => CostDiscountResource::make($discountValue),
                 ]
             ]);
 
@@ -237,6 +248,7 @@ class ChallengeController extends Controller
             $zoneId = $validatedData['zone_id'] ?? null;
             $isAdmin = $validatedData['is_admin'] ?? null;
 
+           
 
             $isAdmin=true;
             // Use service to store challenge
