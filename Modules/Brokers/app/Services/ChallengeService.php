@@ -33,7 +33,7 @@ class ChallengeService
         try {
             //check if challenge already exists
             //if it exist delete it
-            $challenge = $this->challengeRepository->exists($validatedData['is_placeholder'], $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
+            $challenge = $this->challengeRepository->exists((int)$validatedData['is_placeholder'], $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
             if (!$challenge) {
                
                 $challenge = $this->challengeRepository->create([
@@ -42,12 +42,13 @@ class ChallengeService
                     'challenge_step_id' => $validatedData['step_id'],
                     'challenge_amount_id' => $validatedData['amount_id'] ?? null,
                     'broker_id' => $brokerId,
-                    'evaluation_cost_discount' => $validatedData['evaluation_cost_discount'] ?? null,
+                   
                 ]);
                 // Save matrix data
                 $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
                
             } else {
+
                 $previousChalengeMatrix = $this->getChallengeMatrixData($challenge->id, $zoneId);
                 $newMAtrix = $this->setPreviousValueInMatrixData(
                     $previousChalengeMatrix,
@@ -62,6 +63,9 @@ class ChallengeService
 
                 
             }
+
+            //for matrix that is not placeholder we need to update the evaluation cost discount
+            if (!$validatedData['is_placeholder']) {
             //update the evaluation cost discount
             $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challenge->id, $brokerId, $zoneId);
             $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $zoneId);
@@ -89,6 +93,7 @@ class ChallengeService
 
                 }
                 if ($oldAffiliateLink) {
+                    
                     $oldAffiliateLinkValue = $isAdmin ? $oldAffiliateLink->public_url : $oldAffiliateLink->url;
                     $oldAffiliateLinkValue != $validatedData['affiliate_link'] && $oldAffiliateLink->update([
                         $isAdmin ? null : 'old_url' => $oldAffiliateLink->url,
@@ -108,15 +113,16 @@ class ChallengeService
                         'zone_id' => $zoneId,
                     ]);
                 }
-                if ($oldAffiliateMasterLink) {
+                if ($oldAffiliateMasterLink && isset($validatedData['affiliate_master_link'])) {
                     $oldAffiliateMasterLinkValue = $isAdmin ? $oldAffiliateMasterLink->public_url : $oldAffiliateMasterLink->url;
+                   
                     $oldAffiliateMasterLinkValue != $validatedData['affiliate_master_link'] && $oldAffiliateMasterLink->update([
                         $isAdmin ? null : 'old_url' => $oldAffiliateMasterLink->url,
-                        'old_url' => $oldAffiliateMasterLink->url,
+                        //'old_url' => $oldAffiliateMasterLink->url,
                         $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_master_link'],
                         'is_updated_entry' => $isAdmin ? false : true,
                     ]);
-                }else{
+                }else if(isset($validatedData['affiliate_master_link'])){
                     
                     $this->urlRepository->create( [
                         'urlable_type' => Challenge::class,
@@ -129,6 +135,7 @@ class ChallengeService
                         'zone_id' => $zoneId,
                     ]);
                 }
+            }
             
 
             // Create challenge
@@ -174,7 +181,7 @@ class ChallengeService
                     'previous_value' => !empty($cellData['previous_value']) ? json_encode($cellData['previous_value']) : null,
                     'value' => !empty($cellData['value']) ? json_encode($cellData['value']) : null,
                     'public_value' => !empty($cellData['public_value']) ? json_encode($cellData['public_value']) : null,
-                    'is_updated_entry' => $isAdmin ? 0 : $cellData['is_updated_entry'],
+                    'is_updated_entry' => $isAdmin ? 0 : (int)($cellData['is_updated_entry'] ?? 0),
                     'is_invariant' => isset($zoneId) ? false : true,
                     'zone_id' => $zoneId,
                     'challenge_id' => $challengeId,

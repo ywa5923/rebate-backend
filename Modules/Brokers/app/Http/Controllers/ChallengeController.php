@@ -104,23 +104,32 @@ class ChallengeController extends Controller
             // Get matrix data in the required format
             //TODO:add translation and zone params
             $matrix = $this->challengeService->getChallengeMatrixData($challenge->id);
-            $affiliateLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $zoneId);
-            $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $zoneId);
-            $discountValue = $this->challengeService->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
 
+            $resonseArray=[
+                'challenge_id' => $challenge->id,
+                'challenge_category_id' => $challenge->challenge_category_id,
+                'challenge_step_id' => $challenge->challenge_step_id,
+                'challenge_amount_id' => $challenge->challenge_amount_id,
+                'is_placeholder' => $challenge->is_placeholder,
+                'matrix' => $matrix];
+
+          
+            
+            //for challenge matrix that is not placeholder we need to add the affiliate link and evaluation cost discount
+            if(!$isPalceholder){
+                $affiliateLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $zoneId);
+                $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $zoneId);
+                $discountValue = $this->challengeService->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
+
+              
+                $affiliateLink && $resonseArray['affiliate_link'] = AffiliateLinkResource::make($affiliateLink);
+                $affiliateMasterLink && $resonseArray['affiliate_master_link'] = AffiliateLinkResource::make($affiliateMasterLink);
+                $discountValue && $resonseArray['evaluation_cost_discount'] = CostDiscountResource::make($discountValue);
+            }
+           
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'challenge_id' => $challenge->id,
-                    'challenge_category_id' => $challenge->challenge_category_id,
-                    'challenge_step_id' => $challenge->challenge_step_id,
-                    'challenge_amount_id' => $challenge->challenge_amount_id,
-                    'is_placeholder' => $challenge->is_placeholder,
-                    'matrix' => $matrix,
-                    'affiliate_link' => AffiliateLinkResource::make($affiliateLink),
-                    'affiliate_master_link' => AffiliateLinkResource::make($affiliateMasterLink),
-                    'evaluation_cost_discount' => CostDiscountResource::make($discountValue),
-                ]
+                'data' => $resonseArray
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {

@@ -104,7 +104,7 @@ class ChallengeRepository
      */
     public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, int $brokerId): ?Challenge
     {
-        return $this->model->where('is_placeholder', $isPlaceholder)
+        return $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
             ->where('challenge_category_id', $categoryId)
             ->where('challenge_step_id', $stepId)
             ->where('challenge_amount_id', $amountId)

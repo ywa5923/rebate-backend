@@ -131,10 +131,19 @@ class UrlRepository
      */
     public function findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $zoneId = null): ?Url
     {
-        return Url::where('urlable_type', $urlableType)
-            ->where('urlable_id', $urlableId)
-            ->where('broker_id', $brokerId)
-            ->where('zone_id', $zoneId)
-            ->first();
+       $qb= Url::where('urlable_type', $urlableType);
+       if(isset($urlableId)){
+        $qb->where('urlable_id', $urlableId);
+       }else{
+        $qb->whereNull('urlable_id');
+       }
+       if(isset($brokerId)){
+        $qb->where('broker_id', $brokerId);
+       }
+       if(isset($zoneId)){
+        $qb->where('zone_id', $zoneId);
+       }
+       return $qb->first();
+           
     }
 } 
