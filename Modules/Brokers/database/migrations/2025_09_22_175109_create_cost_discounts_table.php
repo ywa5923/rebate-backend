@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('cost_discounts', function (Blueprint $table) {
             $table->id();
-            $table->string('broker_value')->nullable();
+            $table->string('value')->nullable();
             $table->string('public_value')->nullable();
-            $table->string('old_value')->nullable();
+            $table->string('previous_value')->nullable();
             $table->boolean('is_updated_entry')->default(false);
             $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();

@@ -15,10 +15,12 @@ class CostDiscountResource extends JsonResource
         return [
             //'id' => $this->id,
             'public_value' => $this->public_value,
-            'broker_value' => $this->broker_value,
-            'old_value' => $this->old_value,
+            'value' => $this->value,
+            'previous_value' => $this->previous_value,
             'is_updated_entry' => $this->is_updated_entry,
             'zone_id' => $this->zone_id,
+            'is_placeholder' => $this->is_placeholder,
+            
         ];
     }
 }

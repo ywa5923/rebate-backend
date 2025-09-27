@@ -185,6 +185,7 @@ class UrlRepository
     {
         $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
 
+        //dd($isAdmin, $isPlaceholder);
 
         $this->create([
             'urlable_type' => Challenge::class,

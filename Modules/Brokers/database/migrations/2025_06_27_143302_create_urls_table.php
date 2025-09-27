@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("url_type");
             $table->string("url",500)->nullable();
             $table->string("public_url",500)->nullable();
-            $table->string("old_url",500)->nullable();
+            $table->string("previous_url",500)->nullable();
             $table->boolean("is_updated_entry")->default(false);
             $table->boolean("is_placeholder")->default(false);
             $table->string("name",500);

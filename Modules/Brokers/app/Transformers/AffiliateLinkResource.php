@@ -17,7 +17,7 @@ class AffiliateLinkResource extends JsonResource
         //'id' => $this->id,
         'url' => $this->url,
         'public_url' => $this->public_url,
-        'old_url' => $this->old_url,
+        'previous_url' => $this->previous_url,
         'is_updated_entry' => $this->is_updated_entry,
         'name' => $this->name,
         'slug' => $this->slug,

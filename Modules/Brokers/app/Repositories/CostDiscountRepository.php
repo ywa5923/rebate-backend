@@ -28,7 +28,7 @@ class CostDiscountRepository
      */
     public function create(array $data): CostDiscount
     {
-        return $this->model->create($data);
+        return $this->model->newQuery()->create($data);
     }
 
     /**
@@ -187,12 +187,13 @@ class CostDiscountRepository
 
     public function createCostDiscount(int $challengeId,string $costDiscount, int $brokerId, bool $isAdmin,bool $isPlaceholder,?int $zoneId = null): CostDiscount
     {
-        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'broker_value';   
+        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';   
        return $this->create([
             'challenge_id' => $challengeId,
             'broker_id' => $brokerId,
             'zone_id' => $zoneId,
             $field => $costDiscount,
+            'is_placeholder' => $isPlaceholder,
         ]);
     }
 }

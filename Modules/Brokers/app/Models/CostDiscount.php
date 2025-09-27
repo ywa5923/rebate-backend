@@ -17,10 +17,11 @@ class CostDiscount extends Model
         'broker_id',
         'zone_id',
         'challenge_id',
-        'broker_value',
+        'value',
         'public_value',
-        'old_value',
+        'previous_value',
         'is_updated_entry',
+        'is_placeholder'
     ];
 
     /**
