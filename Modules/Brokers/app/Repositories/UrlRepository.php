@@ -222,8 +222,6 @@ class UrlRepository
         ?int $zoneId = null,
     ): void
     {
-        $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
-
         // Check if record already exists
         $existingUrl = $this->findByUrlableTypeAndId(
             Challenge::class, 
@@ -233,32 +231,44 @@ class UrlRepository
             $zoneId
         );
 
-        $data = [
-            'urlable_type' => Challenge::class,
-            'urlable_id' => $challengeId ?? null,
-            'url_type' => 'challenge-matrix',
-            $field => $affiliateLink,
-            'name' => $affiliateLinkName,
-            'slug' => strtolower(str_replace(' ', '-', $affiliateLinkName)),
-            'broker_id' => $brokerId,
-            'is_placeholder' => $isPlaceholder,
-            'zone_id' => $zoneId,
-        ];
-
-        // Add previous_url conditionally
-        if (!$isPlaceholder && !$isAdmin && $existingUrl) {
-            $data['previous_url'] = $existingUrl->url;
-            $data['is_updated_entry'] = true;
-        }
-
-        if (empty($affiliateLink) && $existingUrl && $existingUrl->url != $affiliateLink) {
-            // Update existing record
-            $existingUrl->update($data);
-        } else if(empty($affiliateLink) && $existingUrl) {
-            $existingUrl->delete();
-        } else if(is_null($existingUrl) && !empty($affiliateLink)) {
-            // Create new record
-            $this->create($data);
+        if ($existingUrl) {
+            // Get the current value based on admin/placeholder status
+            $oldAffiliateLinkValue = $isAdmin ? $existingUrl->public_url : $existingUrl->url;
+            
+            // Compare values and update if different
+            if ($oldAffiliateLinkValue != $affiliateLink && !is_null($affiliateLink)) {
+                $updateData = [
+                    ($isAdmin || $isPlaceholder) ? null : 'previous_url' => $existingUrl->url,
+                    $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $affiliateLink,
+                    'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
+                ];
+                
+                // Remove null keys
+                $updateData = array_filter($updateData, function($key) {
+                    return $key !== null;
+                }, ARRAY_FILTER_USE_KEY);
+                
+                $existingUrl->update($updateData);
+            } elseif (is_null($affiliateLink)) {
+                $existingUrl->delete();
+            }
+        } else {
+            // Create new record if affiliate link is not empty
+            if (!empty($affiliateLink)) {
+                $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
+                
+                $this->create([
+                    'urlable_type' => Challenge::class,
+                    'urlable_id' => $challengeId ?? null,
+                    'url_type' => 'challenge-matrix',
+                    $field => $affiliateLink,
+                    'name' => $affiliateLinkName,
+                    'slug' => strtolower(str_replace(' ', '-', $affiliateLinkName)),
+                    'broker_id' => $brokerId,
+                    'is_placeholder' => $isPlaceholder,
+                    'zone_id' => $zoneId,
+                ]);
+            }
         }
     }
 } 

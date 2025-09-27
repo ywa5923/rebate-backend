@@ -33,22 +33,20 @@ class ChallengeController extends Controller
     }
 
 
-    public function show(Request $request): JsonResponse
+    /**
+     * =========== DEPRECATED FUNCTION =================
+     * Show the challenge data
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function showOld(Request $request): JsonResponse
     {
         try {
-            $validatedData = $request->validate([
-                'category_id' => 'required|integer|exists:challenge_categories,id',
-                'step_id' => 'required|integer|exists:challenge_steps,id',
-                'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-                'is_placeholder' => 'nullable|boolean',
-                'broker_id' => 'nullable|integer|exists:brokers,id',
-                'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-            ]);
-
+            $validatedData = $this->challengeService->validateGetRequestData($request);
+            
             $brokerId = $validatedData['broker_id'] ?? 1;
             $zoneId = $validatedData['zone_id'] ?? null;
             $isPlaceholder = $validatedData['is_placeholder'];
-
 
             $placeholderChallenge = $this->challengeService->findChallengeByParams(
                 true,
@@ -137,8 +135,8 @@ class ChallengeController extends Controller
 
 
                 // Check if matrix has empty cells - if so, get placeholder array for matrix cells
-                if ($this->hasEmptyMatrixCells($matrix) && $placeholderChallenge?->id) {
-                    $responseArray['matrix_placeholders_array'] = $this->getMatrixPlaceholderArray($placeholderChallenge->id, $challenge->id);
+                if ($this->challengeService->hasEmptyMatrixCells($matrix) && $placeholderChallenge?->id) {
+                    $responseArray['matrix_placeholders_array'] = $this->challengeService->getMatrixPlaceholderArray($placeholderChallenge->id, $challenge->id);
                 }
 
                 
@@ -170,7 +168,7 @@ class ChallengeController extends Controller
                     $responseArray = array_merge($responseArray, [
                         'challenge_id' => $placeholderChallenge->id,
                         'matrix' => null,
-                        'matrix_placeholders_array' => $this->getMatrixPlaceholderArray($placeholderChallenge->id, null),
+                        'matrix_placeholders_array' => $this->challengeService->getMatrixPlaceholderArray($placeholderChallenge->id, null),
                         'evaluation_cost_discount_placeholder' =>
                         $this->challengeService->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value,
 
@@ -198,161 +196,53 @@ class ChallengeController extends Controller
         }
     }
 
-    private function hasEmptyMatrixCells($matrix): bool
-    {
-        foreach ($matrix as $row) {
-            foreach ($row as $cell) {
-                if (empty($cell['value']['text']) || (is_array($cell['value']['text']) && empty(array_filter($cell['value']['text'])))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
     /**
-     * Check if matrix has empty cells
+     * Refactored show method using helper methods from ChallengeService
      */
-    private function getPlaceholdersCellsArray(array $placeholderMatrix, ?array $matrix = null): array
-    {
-        $placeholders = [];
-        if ($matrix) {
-            foreach ($matrix as $rowIndex => $row) {
-                foreach ($row as $colIndex => $cell) {
-                    if (empty($cell['value']['text']) || (is_array($cell['value']['text']) && empty(array_filter($cell['value']['text'])))) {
-                        // $placeholders[] = $cell;
-                        $placeholders[$cell['rowHeader'] . '-' . $cell['colHeader']] = $placeholderMatrix[$rowIndex][$colIndex]['value']['text'];
-                    }
-                }
-            }
-        } else {
-            foreach ($placeholderMatrix as $rowIndex => $row) {
-                foreach ($row as $colIndex => $cell) {
-                    $placeholders[$cell['rowHeader'] . '-' . $cell['colHeader']] = $cell['value']['text'];
-                }
-            }
-        }
-        return $placeholders;
-    }
-
-    /**
-     * Get placeholder data (lazy loading)
-     */
-    private function getMatrixPlaceholderArray($placeholderChallengeId, ?int $challengeId = null): array
-    {
-        $placeholderMatrix = $this->challengeService->getChallengeMatrixData($placeholderChallengeId);
-        $challengeMatrix = ($challengeId) ? $this->challengeService->getChallengeMatrixData($challengeId) : null;
-        return $this->getPlaceholdersCellsArray($placeholderMatrix, $challengeMatrix);
-    }
-   
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): JsonResponse
+    public function show(Request $request): JsonResponse
     {
         try {
-            // Validate the request parameters
-            $validatedData = $request->validate([
-                'category_id' => 'required|integer|exists:challenge_categories,id',
-                'step_id' => 'required|integer|exists:challenge_steps,id',
-                'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-                'is_placeholder' => 'nullable|boolean',
-                'broker_id' => 'nullable|integer|exists:brokers,id',
-                'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-            ]);
+            $validatedData = $this->challengeService->validateGetRequestData($request);
 
-            $brokerId = $validatedData['broker_id']; // Default broker ID
+            $brokerId = $validatedData['broker_id'] ?? 1;
             $zoneId = $validatedData['zone_id'] ?? null;
-            // $brokerId=1;
-            $isPalceholder = $validatedData['is_placeholder'];
-            if ($validatedData['is_placeholder'] == false || $validatedData['is_placeholder'] == null || $validatedData['is_placeholder'] == "0" || $validatedData['is_placeholder'] == 0) {
-                //First find the challenge that is not placeholder 
-                $challenge = $this->challengeService->findChallengeByParams(
-                    false,
-                    $validatedData['category_id'],
-                    $validatedData['step_id'],
-                    $validatedData['amount_id'],
-                    $brokerId
-                );
+            $isPlaceholder = $validatedData['is_placeholder'];
 
-                // dd($challenge);
-
-                //if not found then find the challenge that is placeholder 
-                if (!$challenge) {
-
-                    //find the challenge that is placeholder
-                    //placeholder challenges entries have amount_id null,they differ only by step_id and category_id
-                    $challenge = $this->challengeService->challengeExist(
-                        true,
-                        $validatedData['category_id'],
-                        $validatedData['step_id'],
-                        null,
-                        $brokerId,
-                    );
-                    if (!$challenge) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Challenge not found'
-                        ], 404);
-                    } else {
-                        $isPalceholder = true;
-                    }
-                }
-            } else if ($validatedData['is_placeholder'] == true || $validatedData['is_placeholder'] == "1" || $validatedData['is_placeholder'] == 1) {
-                //the client  get only the matrix data for placeholder challenge
-                $challenge = $this->challengeService->findChallengeByParams(
-                    true,
-                    $validatedData['category_id'],
-                    $validatedData['step_id'],
-                    $validatedData['amount_id'] ?? null,
-                    $brokerId
-                );
+            if ($isPlaceholder) {
+                //return the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+                return response()->json($this->challengeService->handlePlaceholderRequest($validatedData, $brokerId, $zoneId));
             }
 
+            //return the regular challenge data for challenge matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+            return response()->json($this->challengeService->handleRegularChallengeRequest($validatedData, $brokerId, $zoneId));
 
-            // Get matrix data in the required format
-            //TODO:add translation and zone params
-            $matrix = $this->challengeService->getChallengeMatrixData($challenge->id);
-
-            $resonseArray = [
-                'challenge_id' => $challenge->id,
-                'challenge_category_id' => $challenge->challenge_category_id,
-                'challenge_step_id' => $challenge->challenge_step_id,
-                'challenge_amount_id' => $challenge->challenge_amount_id,
-                'is_placeholder' => $challenge->is_placeholder,
-                'matrix' => $matrix
-            ];
-
-
-
-            //for challenge matrix that is not placeholder we need to add the affiliate link and evaluation cost discount
-            if (!$isPalceholder) {
-                $affiliateLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, false, $zoneId);
-                $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-                $discountValue = $this->challengeService->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
-
-
-                $affiliateLink && $resonseArray['affiliate_link'] = AffiliateLinkResource::make($affiliateLink);
-                $affiliateMasterLink && $resonseArray['affiliate_master_link'] = AffiliateLinkResource::make($affiliateMasterLink);
-                $discountValue && $resonseArray['evaluation_cost_discount'] = CostDiscountResource::make($discountValue);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $resonseArray
-            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve challenge matrix data',
+                'message' => 'Failed to retrieve challenge data',
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    
+    /**
+     * =========== DEPRECATED FUNCTION =================
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Deprecated function',
+            'error' => 'This function is deprecated'
+        ], 400);
     }
 
     /**
