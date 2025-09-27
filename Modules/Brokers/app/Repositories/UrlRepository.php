@@ -141,10 +141,9 @@ class UrlRepository
     {
        $qb= $this->model->newQuery()->where('urlable_type', $urlableType);
       
-       if(isset($urlableId)){
+       if(isset($urlableId) && $urlableId!=null){
         $qb->where('urlable_id', $urlableId);
        }else{
-       
         $qb->whereNull('urlable_id');
        }
        if(isset($brokerId)){
@@ -152,6 +151,8 @@ class UrlRepository
        }
        if(isset($zoneId)){
         $qb->where('zone_id', $zoneId);
+       }else{
+        $qb->whereNull('zone_id');
        }
        if(isset($isPlaceholder)){
         $qb->where('is_placeholder', $isPlaceholder);
@@ -198,5 +199,65 @@ class UrlRepository
             'is_placeholder' => $isPlaceholder,
             'zone_id' => $zoneId,
         ]);
+    }
+
+    /**
+     * Upsert affiliate link (update or insert)
+     * @param int|null $challengeId
+     * @param string $affiliateLink
+     * @param string $affiliateLinkName
+     * @param int $brokerId
+     * @param bool|null $isAdmin
+     * @param bool|null $isPlaceholder
+     * @param int|null $zoneId
+     * @return void
+     */
+    public function upsertAffiliateLink(
+        ?int $challengeId = null, 
+        string $affiliateLink, 
+        string $affiliateLinkName, 
+        int $brokerId, 
+        ?bool $isAdmin = null,
+        ?bool $isPlaceholder = false,
+        ?int $zoneId = null,
+    ): void
+    {
+        $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
+
+        // Check if record already exists
+        $existingUrl = $this->findByUrlableTypeAndId(
+            Challenge::class, 
+            $challengeId, 
+            $brokerId, 
+            $isPlaceholder, 
+            $zoneId
+        );
+
+        $data = [
+            'urlable_type' => Challenge::class,
+            'urlable_id' => $challengeId ?? null,
+            'url_type' => 'challenge-matrix',
+            $field => $affiliateLink,
+            'name' => $affiliateLinkName,
+            'slug' => strtolower(str_replace(' ', '-', $affiliateLinkName)),
+            'broker_id' => $brokerId,
+            'is_placeholder' => $isPlaceholder,
+            'zone_id' => $zoneId,
+        ];
+
+        // Add previous_url conditionally
+        if (!$isPlaceholder && !$isAdmin && $existingUrl) {
+            $data['previous_url'] = $existingUrl->url;
+        }
+
+        if (empty($affiliateLink) && $existingUrl && $existingUrl->url != $affiliateLink) {
+            // Update existing record
+            $existingUrl->update($data);
+        } else if($affiliateLink == null && $existingUrl) {
+            $existingUrl->delete();
+        } else if(is_null($existingUrl) && !empty($affiliateLink)) {
+            // Create new record
+            $this->create($data);
+        }
     }
 } 

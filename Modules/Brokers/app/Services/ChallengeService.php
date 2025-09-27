@@ -28,7 +28,7 @@ class ChallengeService
     }
 
 
-    public function validateRequestData(Request $request): array
+    public function validatePostRequestData(Request $request): array
     {
         return $request->validate([
             'category_id' => 'required|integer|exists:challenge_categories,id',
@@ -124,7 +124,7 @@ class ChallengeService
             throw $e;
         }
     }
-
+    
     /**
      * Update matrix and extra data:affiliate link, affiliate master link, evaluation cost discount
      * @param array $validatedData
@@ -141,8 +141,8 @@ class ChallengeService
         $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
        
         $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challengeId, $brokerId, $isPlaceholder, $zoneId);
-        $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId(
-            Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
+        $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId( Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
+           
         
    
         //update the evaluation cost discount
@@ -200,11 +200,11 @@ class ChallengeService
             }
         }
 
-        if ($oldAffiliateMasterLink) {
+        if ($oldAffiliateMasterLink!=null) {
             $oldAffiliateMasterLinkValue = $isAdmin ? $oldAffiliateMasterLink->public_url : $oldAffiliateMasterLink->url;
             $newAffiliateMasterLinkValue = $validatedData['affiliate_master_link']??null;
            
-            if ( $oldAffiliateMasterLinkValue != $newAffiliateMasterLinkValue && !is_null($newAffiliateMasterLinkValue)) {
+            if ( trim($oldAffiliateMasterLinkValue) != trim($newAffiliateMasterLinkValue) && !is_null($newAffiliateMasterLinkValue)) {
                 $oldAffiliateMasterLink->update([
                     ($isAdmin || $isPlaceholder) ? null : 'previous_url' => $oldAffiliateMasterLink->url,
                     $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $newAffiliateMasterLinkValue,
@@ -255,7 +255,7 @@ class ChallengeService
         }
 
         if (!empty($validatedData['affiliate_master_link'])) {
-            $this->urlRepository->saveAffiliateLink(
+            $this->urlRepository->upsertAffiliateLink(
                 null,
                 $validatedData['affiliate_master_link'],
                 'Affiliate Master Link',
