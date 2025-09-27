@@ -125,7 +125,14 @@ class ChallengeService
         }
     }
     
+    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
+    {
+        $this->costDiscountRepository->upsertCostDiscount($challengeId, $validatedData['evaluation_cost_discount']??null, $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+        $this->urlRepository->upsertAffiliateLink($challengeId, $validatedData['affiliate_link']??null, 'Affiliate Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+        $this->urlRepository->upsertAffiliateLink(null, $validatedData['affiliate_master_link']??null, 'Affiliate Master Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+    }
     /**
+     * =========== DEPRECATED FUNCTION =================
      * Update matrix and extra data:affiliate link, affiliate master link, evaluation cost discount
      * @param array $validatedData
      * @param int $challengeId
@@ -136,15 +143,14 @@ class ChallengeService
      * @return void
      * @throws \Exception
      */
-    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
+    public function updateMatrixAndExtraData2(array $validatedData, int $challengeId, int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
     {
         $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
        
         $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challengeId, $brokerId, $isPlaceholder, $zoneId);
         $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId( Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
            
-        
-   
+    
         //update the evaluation cost discount
         if ($oldCostDiscount) {
             //if old evaluation cost discount is found, update it

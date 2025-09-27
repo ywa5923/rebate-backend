@@ -214,7 +214,7 @@ class UrlRepository
      */
     public function upsertAffiliateLink(
         ?int $challengeId = null, 
-        string $affiliateLink, 
+        string|null $affiliateLink, 
         string $affiliateLinkName, 
         int $brokerId, 
         ?bool $isAdmin = null,
@@ -248,12 +248,13 @@ class UrlRepository
         // Add previous_url conditionally
         if (!$isPlaceholder && !$isAdmin && $existingUrl) {
             $data['previous_url'] = $existingUrl->url;
+            $data['is_updated_entry'] = true;
         }
 
         if (empty($affiliateLink) && $existingUrl && $existingUrl->url != $affiliateLink) {
             // Update existing record
             $existingUrl->update($data);
-        } else if($affiliateLink == null && $existingUrl) {
+        } else if(empty($affiliateLink) && $existingUrl) {
             $existingUrl->delete();
         } else if(is_null($existingUrl) && !empty($affiliateLink)) {
             // Create new record

@@ -196,6 +196,55 @@ class CostDiscountRepository
             'is_placeholder' => $isPlaceholder,
         ]);
     }
+
+    /**
+     * Upsert cost discount (update or insert)
+     * @param int $challengeId
+     * @param string $costDiscount
+     * @param int $brokerId
+     * @param bool $isAdmin
+     * @param bool $isPlaceholder
+     * @param int|null $zoneId
+     * @return void
+     */
+    public function upsertCostDiscount(
+        int $challengeId,
+        string|null $costDiscount,
+        int $brokerId,
+        bool $isAdmin,
+        bool $isPlaceholder,
+        ?int $zoneId = null,
+    ): void
+    {
+        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';
+
+        // Check if record already exists
+        $existingCostDiscount = $this->findByChallengeId($challengeId, $brokerId, $zoneId);
+
+        $data = [
+            'challenge_id' => $challengeId,
+            'broker_id' => $brokerId,
+            'zone_id' => $zoneId,
+            $field => $costDiscount,
+            'is_placeholder' => $isPlaceholder,
+        ];
+
+        // Add previous_value conditionally
+        if (!$isPlaceholder && !$isAdmin && $existingCostDiscount) {
+            $data['previous_value'] = $existingCostDiscount->value;
+            $data['is_updated_entry'] = true;
+        }
+
+        if (empty($costDiscount) && $existingCostDiscount && $existingCostDiscount->value != $costDiscount) {
+            // Update existing record
+            $existingCostDiscount->update($data);
+        } else if(empty($costDiscount) && $existingCostDiscount) {
+            $existingCostDiscount->delete();
+        } else if(is_null($existingCostDiscount) && !empty($costDiscount)) {
+            // Create new record
+            $this->create($data);
+        }
+    }
 }
 
 
