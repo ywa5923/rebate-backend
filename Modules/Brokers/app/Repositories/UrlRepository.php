@@ -4,8 +4,16 @@ namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\Url;
 use App\Utilities\ModelHelper;
+use Modules\Brokers\Models\Challenge;
+
 class UrlRepository
 {
+    protected Url $model;
+
+    public function __construct(Url $model)
+    {
+        $this->model = $model;
+    }
     /**
      * Create url
      * @param array $data
@@ -13,7 +21,7 @@ class UrlRepository
      */
     public function create(array $data)
     {
-        return Url::create($data);
+        return $this->model->create($data);
     }
 
     /**
@@ -35,7 +43,7 @@ class UrlRepository
      */
     public function find($id)
     {
-        return Url::find($id);
+        return $this->model->find($id);
     }
 
     /**
@@ -45,7 +53,7 @@ class UrlRepository
      */
     public function findByAccountType($accountTypeId)
     {
-        return Url::where('urlable_type', 'Modules\\Brokers\\Models\\AccountType')
+        return $this->model->where('urlable_type', 'Modules\\Brokers\\Models\\AccountType')
             ->where('urlable_id', $accountTypeId)
             ->with('translations')
             ->get();
@@ -58,7 +66,7 @@ class UrlRepository
      */
     public function bulkCreate(array $data)
     {
-        return Url::insert($data);
+        return $this->model->insert($data);
     }
 
     /**
@@ -73,7 +81,7 @@ class UrlRepository
     public function getUrlsByEntity($broker_id, $entity_type, $entity_id = null,$zone_code = null,$language_code = null)
     {
      //dd($broker_id,$entity_type,$entity_id,$zone_code,$language_code);
-        $builder = Url::query()
+        $builder = $this->model->newQuery()
             ->where('broker_id', $broker_id)
             ->where('urlable_type', $entity_type);
 
@@ -108,14 +116,14 @@ class UrlRepository
      */
     public function deleteByUrlType($urlType, $brokerId)
     {
-        return Url::where('url_type', $urlType)
+        return $this->model->newQuery()->where('url_type', $urlType)
             ->where('broker_id', $brokerId)
             ->delete();
     }
 
     public function deleteByUrlableType($urlableType, $brokerId)
     {
-        return Url::where('urlable_type', $urlableType)
+        return $this->model->newQuery()->where('urlable_type', $urlableType)
             ->where('broker_id', $brokerId)
             ->delete();
     }
@@ -129,12 +137,14 @@ class UrlRepository
      * @param int|null $zoneId
      * @return Url|null
      */
-    public function findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $zoneId = null): ?Url
+    public function findByUrlableTypeAndId($urlableType, $urlableId, $brokerId,$isPlaceholder, $zoneId = null): ?Url
     {
-       $qb= Url::where('urlable_type', $urlableType);
+       $qb= $this->model->newQuery()->where('urlable_type', $urlableType);
+      
        if(isset($urlableId)){
         $qb->where('urlable_id', $urlableId);
        }else{
+       
         $qb->whereNull('urlable_id');
        }
        if(isset($brokerId)){
@@ -143,7 +153,49 @@ class UrlRepository
        if(isset($zoneId)){
         $qb->where('zone_id', $zoneId);
        }
-       return $qb->first();
+       if(isset($isPlaceholder)){
+        $qb->where('is_placeholder', $isPlaceholder);
+       }
+
+       //dd($qb->getBindings(),$qb->toSql());
+       return $qb->orderBy('id','desc')->first();
            
+    }
+
+    /** 
+     * Save affiliate link
+     * @param int|null $challengeId
+     * @param string $affiliateLink
+     * @param string $affiliateLinkName
+     * @param int $brokerId
+     * @param bool|null $isAdmin
+     * @param bool|null $isPlaceholder
+     * @param int|null $zoneId
+     * @return void
+     */
+    public function saveAffiliateLink(
+        ?int $challengeId=null, 
+        string $affiliateLink, 
+        string $affiliateLinkName, 
+        int $brokerId, 
+        ?bool $isAdmin = null,
+        ?bool $isPlaceholder = false,
+        ?int $zoneId = null,
+       ): void
+    {
+        $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
+
+
+        $this->create([
+            'urlable_type' => Challenge::class,
+            'urlable_id' => $challengeId ?? null,
+            'url_type' => 'challenge-matrix',
+            $field => $affiliateLink,
+            'name' => $affiliateLinkName,
+            'slug' => strtolower(str_replace(' ', '-', $affiliateLinkName)),
+            'broker_id' => $brokerId,
+            'is_placeholder' => $isPlaceholder,
+            'zone_id' => $zoneId,
+        ]);
     }
 } 

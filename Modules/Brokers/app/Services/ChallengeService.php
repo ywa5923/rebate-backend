@@ -10,6 +10,10 @@ use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Repositories\CostDiscountRepository;
 use Modules\Brokers\Models\CostDiscount;
 use Modules\Brokers\Models\Url;
+use Modules\Brokers\Transformers\CostDiscountResource;
+use Modules\Brokers\Transformers\AffiliateLinkResource;
+
+
 class ChallengeService
 {
     protected ChallengeRepository $challengeRepository;
@@ -23,6 +27,7 @@ class ChallengeService
         $this->costDiscountRepository = $costDiscountRepository;
     }
 
+
     /**
      * Store challenge with matrix data
      */
@@ -34,109 +39,177 @@ class ChallengeService
             //check if challenge already exists
             //if it exist delete it
             $challenge = $this->challengeRepository->exists((int)$validatedData['is_placeholder'], $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
+            $isPlaceholder = $validatedData['is_placeholder'];
             if (!$challenge) {
-               
+
+                //create a new challenge if it does not exist even in placeholder mode
+                //if it exists then update it
                 $challenge = $this->challengeRepository->create([
-                    'is_placeholder' => $validatedData['is_placeholder'],
+                    'is_placeholder' => $isPlaceholder,
                     'challenge_category_id' => $validatedData['category_id'],
                     'challenge_step_id' => $validatedData['step_id'],
                     'challenge_amount_id' => $validatedData['amount_id'] ?? null,
                     'broker_id' => $brokerId,
-                   
+
                 ]);
                 // Save matrix data
                 $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
+
+                //save the affiliate link
+                // $field = $isAdmin ? 'public_url' : 'url';
+                // $validatedData['affiliate_link'] && $this->urlRepository->create([
+                //     'urlable_type' => Challenge::class,
+                //     'urlable_id' => $challenge->id,
+                //     'url_type' => 'challenge-matrix',
+                //     $field => $validatedData['affiliate_link'],
+                //     'name' => 'Affiliate Link',
+                //     'slug' => 'affiliate-link',
+                //     'broker_id' => $brokerId,
+                //     'is_placeholder' => $isPlaceholder,
+                //     'zone_id' => $zoneId,
+                // ]);
+
+                $validatedData['affiliate_link'] && $this->urlRepository->saveAffiliateLink(
+                    $challenge->id,
+                    $validatedData['affiliate_link'],
+                    'Affiliate Link',
+                    $brokerId,
+                    $isAdmin,
+                    $isPlaceholder,
+                    $zoneId,
+                );
+
+                $validatedData['affiliate_master_link'] && $this->urlRepository->saveAffiliateLink(
+                    null,
+                    $validatedData['affiliate_master_link'],
+                    'Affiliate Master Link',
+                    $brokerId,
+                    $isAdmin,
+                    $isPlaceholder,
+                    $zoneId,
+                );
+                 //save the evaluation cost discount
+                 if (!empty($validatedData['evaluation_cost_discount'])) {
+                     $this->costDiscountRepository->createCostDiscount(
+                        $challenge->id,
+                        $validatedData['evaluation_cost_discount'],
+                        $brokerId,
+                        $isAdmin,
+                        $zoneId,
+                    );
+                 }
                
+
             } else {
 
-                $previousChalengeMatrix = $this->getChallengeMatrixData($challenge->id, $zoneId);
-                $newMAtrix = $this->setPreviousValueInMatrixData(
-                    $previousChalengeMatrix,
+                //matrice saved by the admin or placeholder matrix will not have previous values
+                //how matrix save works in frontend
+                //1. if the admin is true and the matrix is changed, the cell's values will be injected in matrix's cell's public_values
+                //2. if the admin is false and the matrix is changed, the cell's values will be injected in matrix's cell's values
+                //3. In the placeholder mode ,is_placeholder is true, when the matrix is changed, the cell's values will be injected in matrix's cell's values
+
+
+                //here we skip the previous value injection for admin and placeholder mode
+                $newMatrix = ($isPlaceholder || $isAdmin) ? $validatedData['matrix'] : $this->setPreviousValueInMatrixData(
+                    $this->getChallengeMatrixData($challenge->id, $zoneId),
                     $validatedData['matrix'],
                 );
                 //remove old chalenge's matrix values
                 $this->challengeRepository->deleteChallengeMatrixValues($challenge->id, $zoneId); // Save matrix data
-              
-               
-                $this->saveMatrixData($newMAtrix, $challenge->id, $brokerId, $zoneId, $isAdmin);
-               // $this->urlRepository->deleteByUrlableType(Challenge::class, $brokerId);
+                $this->saveMatrixData($newMatrix, $challenge->id, $brokerId, $zoneId, $isAdmin);
+                // $this->urlRepository->deleteByUrlableType(Challenge::class, $brokerId);
 
+
+                //this is new 
+                $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challenge->id, $brokerId, $zoneId);
+                $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $isPlaceholder, $zoneId);
+                $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId(
+                    Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
                 
-            }
-
-            //for matrix that is not placeholder we need to update the evaluation cost discount
-            if (!$validatedData['is_placeholder']) {
-            //update the evaluation cost discount
-            $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challenge->id, $brokerId, $zoneId);
-            $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, $zoneId);
-            $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, null, $brokerId, $zoneId);
-            //update the evaluation cost discount
-          
-         
-             //the broker updated the evaluation cost discount in broker_value 
-             //so we need to update the old_value and broker_value and is_updated_entry
+           
+                //update the evaluation cost discount
                 if ($oldCostDiscount) {
-                   
+                    //if old evaluation cost discount is found, update it
                     $oldDiscountValue = $isAdmin ? $oldCostDiscount->public_value : $oldCostDiscount->broker_value;
-                    ($oldDiscountValue != $validatedData['evaluation_cost_discount'])   && $oldCostDiscount->update([
-                        $isAdmin ? null : 'old_value' => $oldDiscountValue,
-                        $isAdmin ? 'public_value' : 'broker_value' => $validatedData['evaluation_cost_discount'] ?? null,
-                        'is_updated_entry' => $isAdmin ? false : true,
-                    ]);
-                }else{
-                    $this->costDiscountRepository->create([
-                        'challenge_id' => $challenge->id,
-                        'broker_id' => $brokerId,
-                        'zone_id' => $zoneId,
-                        $isAdmin ? 'public_value' : 'broker_value' => $validatedData['evaluation_cost_discount'] ?? null,
-                    ]);
-
+                    
+                    $newDiscountValue = $validatedData['evaluation_cost_discount']??null;
+                    if ( $oldDiscountValue != $newDiscountValue && !is_null($newDiscountValue)) {
+                        $oldCostDiscount->update([
+                            ($isAdmin || $isPlaceholder) ? null : 'old_value' => $oldDiscountValue,
+                            $isAdmin && !$isPlaceholder ? 'public_value' : 'broker_value' => $newDiscountValue,
+                            'is_updated_entry' => $isAdmin ? false : true,
+                        ]);
+                    }elseif(is_null($newDiscountValue)){
+                        $oldCostDiscount->delete();
+                    }
+                } else {
+                    //if the old evaluation cost discount is not found, create a new one
+                    if (!empty($validatedData['evaluation_cost_discount'])) {
+                        $this->costDiscountRepository->createCostDiscount(
+                            $challenge->id,
+                            $validatedData['evaluation_cost_discount'],
+                            $brokerId,
+                            $isAdmin,
+                            $isPlaceholder,
+                            $zoneId,
+                        );
+                    }
                 }
                 if ($oldAffiliateLink) {
-                    
                     $oldAffiliateLinkValue = $isAdmin ? $oldAffiliateLink->public_url : $oldAffiliateLink->url;
-                    $oldAffiliateLinkValue != $validatedData['affiliate_link'] && $oldAffiliateLink->update([
-                        $isAdmin ? null : 'old_url' => $oldAffiliateLink->url,
-                        $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_link'],
-                        'is_updated_entry' => $isAdmin ? false : true,
-                    ]);
-                }else{
-                    $field = $isAdmin ? 'public_url' : 'url';
-                    $this->urlRepository->create([
-                        'urlable_type' => Challenge::class,
-                        'urlable_id' => $challenge->id,
-                        'url_type' => 'challenge-matrix',
-                        $field => $validatedData['affiliate_link'],
-                        'name' => 'Affiliate Link',
-                        'slug' => 'affiliate-link',
-                        'broker_id' => $brokerId,
-                        'zone_id' => $zoneId,
-                    ]);
+                    $newAffiliateLinkValue = $validatedData['affiliate_link']??null;
+                    if ($oldAffiliateLinkValue !=   $newAffiliateLinkValue && !is_null($newAffiliateLinkValue)) {
+                        $oldAffiliateLink->update([
+                            ($isAdmin || $isPlaceholder) ? null : 'old_url' => $oldAffiliateLink?->url,
+                            $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $newAffiliateLinkValue,
+                            'is_updated_entry' => $isAdmin || $isPlaceholder ? false : true,
+                        ]);
+                    }elseif(is_null($newAffiliateLinkValue)){
+                        $oldAffiliateLink->delete();
+                    }
+                } else {
+                    //if the old affiliate link is not found, create a new one
+                    if (!empty($validatedData['affiliate_link'])) {
+                        $this->urlRepository->saveAffiliateLink(
+                            $challenge->id,
+                            $validatedData['affiliate_link'],
+                            'Affiliate Link',
+                            $brokerId,
+                            $isAdmin,
+                            $isPlaceholder,
+                            $zoneId,
+                        );
+                    }
                 }
-                if ($oldAffiliateMasterLink && isset($validatedData['affiliate_master_link'])) {
+
+                if ($oldAffiliateMasterLink) {
                     $oldAffiliateMasterLinkValue = $isAdmin ? $oldAffiliateMasterLink->public_url : $oldAffiliateMasterLink->url;
+                    $newAffiliateMasterLinkValue = $validatedData['affiliate_master_link']??null;
                    
-                    $oldAffiliateMasterLinkValue != $validatedData['affiliate_master_link'] && $oldAffiliateMasterLink->update([
-                        $isAdmin ? null : 'old_url' => $oldAffiliateMasterLink->url,
-                        //'old_url' => $oldAffiliateMasterLink->url,
-                        $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_master_link'],
-                        'is_updated_entry' => $isAdmin ? false : true,
-                    ]);
-                }else if(isset($validatedData['affiliate_master_link'])){
-                    
-                    $this->urlRepository->create( [
-                        'urlable_type' => Challenge::class,
-                        'urlable_id' => null,
-                        'url_type' => 'challenge-matrix',
-                        $isAdmin ? 'public_url' : 'url' => $validatedData['affiliate_master_link'],
-                        'name' => 'Affiliate Master Link',
-                        'slug' => 'affiliate-master-link',
-                        'broker_id' => $brokerId,
-                        'zone_id' => $zoneId,
-                    ]);
+                    if ( $oldAffiliateMasterLinkValue != $newAffiliateMasterLinkValue && !is_null($newAffiliateMasterLinkValue)) {
+                        $oldAffiliateMasterLink->update([
+                            ($isAdmin || $isPlaceholder) ? null : 'old_url' => $oldAffiliateMasterLink->url,
+                            $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $newAffiliateMasterLinkValue,
+                            'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
+                        ]);
+                    }elseif(is_null($newAffiliateMasterLinkValue)){
+                        $oldAffiliateMasterLink->delete();
+                    }
+                } else {
+                    //if the old affiliate master link is not found, create a new one
+                    if (!empty($validatedData['affiliate_master_link'])) {
+                        $this->urlRepository->saveAffiliateLink(
+                            null,
+                            $validatedData['affiliate_master_link'],
+                            'Affiliate Master Link',
+                            $brokerId,
+                            $isAdmin,
+                            $isPlaceholder,
+                            $zoneId,
+                        );
+                    }
                 }
             }
-            
 
             // Create challenge
             DB::commit();
@@ -145,12 +218,38 @@ class ChallengeService
                 'success' => true,
                 'challenge_id' => $challenge->id
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
     }
 
+
+    // public function saveAffiliateLink(
+    //     ?int $challengeId=null, 
+    //     string $affiliateLink, 
+    //     string $affiliateLinkName, 
+    //     int $brokerId, 
+    //     ?bool $isAdmin = null,
+    //     ?bool $isPlaceholder = false,
+    //     ?int $zoneId = null,
+    //    ): void
+    // {
+    //     $field = $isAdmin ? 'public_url' : 'url';
+
+
+    //     $this->urlRepository->create([
+    //         'urlable_type' => Challenge::class,
+    //         'urlable_id' => $challengeId ?? null,
+    //         'url_type' => 'challenge-matrix',
+    //         $field => $affiliateLink,
+    //         'name' => $affiliateLinkName,
+    //         'slug' => strtolower(str_replace(' ', '-', $affiliateLinkName)),
+    //         'broker_id' => $brokerId,
+    //         'is_placeholder' => $isPlaceholder,
+    //         'zone_id' => $zoneId,
+    //     ]);
+    // }
     /**
      * Save matrix data to challenge_matrix_values table
      */
@@ -201,16 +300,27 @@ class ChallengeService
      * @param int|null $urlableId
      * @param int $brokerId
      * @param int|null $zoneId
-     * @return Url|null
+     * @param bool|null $isPlaceholder
+     * @return AffiliateLinkResource|null
      */
-    public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, int $brokerId, ?int $zoneId = null): ?Url
+    public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, int $brokerId, bool $isPlaceholder = false, ?int $zoneId = null): ?AffiliateLinkResource
     {
-        return $this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $zoneId);
+       $chalengeObject=$this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $isPlaceholder, $zoneId);
+       if($chalengeObject){
+        return AffiliateLinkResource::make($chalengeObject);
+       }
+       return null;
     }
 
-    public function findDiscountByChallengeId(int $challengeId, int $brokerId, ?int $zoneId = null): ?CostDiscount
+
+    public function findDiscountByChallengeId(int $challengeId, int $brokerId, ?int $zoneId = null): ?CostDiscountResource
     {
-        return $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
+        $discountObject=$this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
+        if($discountObject){
+            return CostDiscountResource::make($discountObject);
+        }
+        return null;
+       
     }
 
     /**

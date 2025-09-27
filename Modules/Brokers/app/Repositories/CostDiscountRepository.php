@@ -184,6 +184,17 @@ class CostDiscountRepository
 
         return $query->orderBy('id', 'desc')->first();
     }
+
+    public function createCostDiscount(int $challengeId,string $costDiscount, int $brokerId, bool $isAdmin,bool $isPlaceholder,?int $zoneId = null): CostDiscount
+    {
+        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'broker_value';   
+       return $this->create([
+            'challenge_id' => $challengeId,
+            'broker_id' => $brokerId,
+            'zone_id' => $zoneId,
+            $field => $costDiscount,
+        ]);
+    }
 }
 
 

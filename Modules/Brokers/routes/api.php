@@ -70,5 +70,7 @@ Route::group(["prefix"=>'v1'], function () {
      // Challenges table routes
      Route::get('challenges/categories', [ChallengeController::class, 'getChallengeCategories']);
      Route::post('challenges', [ChallengeController::class, 'store']);
-     Route::get('challenges', [ChallengeController::class, 'index']);
+    // Route::get('challenges', [ChallengeController::class, 'index']);
+    Route::get('challenges', [ChallengeController::class, 'show']);
+     Route::get('challenges/show', [ChallengeController::class, 'show']);
 });
