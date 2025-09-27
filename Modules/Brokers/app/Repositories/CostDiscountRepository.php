@@ -216,33 +216,43 @@ class CostDiscountRepository
         ?int $zoneId = null,
     ): void
     {
-        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';
-
         // Check if record already exists
         $existingCostDiscount = $this->findByChallengeId($challengeId, $brokerId, $zoneId);
 
-        $data = [
-            'challenge_id' => $challengeId,
-            'broker_id' => $brokerId,
-            'zone_id' => $zoneId,
-            $field => $costDiscount,
-            'is_placeholder' => $isPlaceholder,
-        ];
-
-        // Add previous_value conditionally
-        if (!$isPlaceholder && !$isAdmin && $existingCostDiscount) {
-            $data['previous_value'] = $existingCostDiscount->value;
-            $data['is_updated_entry'] = true;
-        }
-
-        if (empty($costDiscount) && $existingCostDiscount && $existingCostDiscount->value != $costDiscount) {
-            // Update existing record
-            $existingCostDiscount->update($data);
-        } else if(empty($costDiscount) && $existingCostDiscount) {
-            $existingCostDiscount->delete();
-        } else if(is_null($existingCostDiscount) && !empty($costDiscount)) {
-            // Create new record
-            $this->create($data);
+        if ($existingCostDiscount) {
+            // Get the current value based on admin/placeholder status
+            $oldDiscountValue = $isAdmin ? $existingCostDiscount->public_value : $existingCostDiscount->value;
+            
+            // Compare values and update if different
+            if ($oldDiscountValue != $costDiscount && !is_null($costDiscount)) {
+                $updateData = [
+                    ($isAdmin || $isPlaceholder) ? null : 'previous_value' => $oldDiscountValue,
+                    $isAdmin && !$isPlaceholder ? 'public_value' : 'value' => $costDiscount,
+                    'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
+                ];
+                
+                // Remove null keys
+                $updateData = array_filter($updateData, function($key) {
+                    return $key !== null;
+                }, ARRAY_FILTER_USE_KEY);
+                
+                $existingCostDiscount->update($updateData);
+            } elseif (is_null($costDiscount)) {
+                $existingCostDiscount->delete();
+            }
+        } else {
+            // Create new record if cost discount is not empty
+            if (!empty($costDiscount)) {
+                $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';
+                
+                $this->create([
+                    'challenge_id' => $challengeId,
+                    'broker_id' => $brokerId,
+                    'zone_id' => $zoneId,
+                    $field => $costDiscount,
+                    'is_placeholder' => $isPlaceholder,
+                ]);
+            }
         }
     }
 }
