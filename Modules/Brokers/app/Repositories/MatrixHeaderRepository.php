@@ -112,7 +112,13 @@ class MatrixHeaderRepository
         //     2 => "Group 1"-
         //   ]
         $languageCode = $languageCode ?? ['language_code','=','en'];
-        $withArray = ['formType.items.dropdown.dropdownOptions'];
+        //$withArray = ['formType.items.dropdown.dropdownOptions'];
+        $withArray = [
+            'formType.items' => function($query) {
+                $query->orderBy('form_type_form_item.id','asc');
+            },
+            'formType.items.dropdown.dropdownOptions'
+        ];
         if($languageCode[2]!='en'){
             $withArray['translations']= function($query) use ($languageCode) {
                 $query->where(...$languageCode); // or any specific language

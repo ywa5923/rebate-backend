@@ -86,7 +86,7 @@ class MatrixService
 
     /**
      * Get the previous cell value from the previous matrix data.
-     * To get the previous value, we need to compare the selected row header sub options,
+     * To get the previous value, we need to compare the row header slug, the column header slug and the selected row header sub options,
      *  because in the table can be multiple rows with the same row header slug, but different sub options.
      * @param array $previousMatrixData
      * @param string $rowSlug
@@ -98,12 +98,22 @@ class MatrixService
 
        // $index=0;
          foreach($previousMatrixData as $row){
+             // Skip if row is not an array or is empty
+             if (!is_array($row) || empty($row)) {
+                 continue;
+             }
+             
              foreach($row as $cell){
+                //get the previous row suboptions
+                
+              $previousRowSubOptions = $cell['selectedRowHeaderSubOptions'] ?? null;
+                //the row subobtions are in the first cell of the row
                //  $index==1 && dd($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions);
                 //  $index==1 && dd($this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions));
                  if($cell['rowHeader'] == $rowSlug 
                  && $cell['colHeader'] == $colSlug 
-                 && $this->compareSelectedRowHeaderSubOptions($row[0]['selectedRowHeaderSubOptions'],$rowSubOptions)){
+               
+                 && $this->compareSelectedRowHeaderSubOptions($previousRowSubOptions, $rowSubOptions)){
                      return $cell['value'];
                  }
              }
@@ -129,7 +139,7 @@ class MatrixService
                 $cellValueArray=$cell['value'];
                 $rowSlug=$cell['rowHeader'];
                 $colSlug=$cell['colHeader'];
-                $rowSubOptions=$cell['selectedRowHeaderSubOptions'];
+                $rowSubOptions = $cell['selectedRowHeaderSubOptions'] ?? null;
              
                 $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
                 $index==2 && dd($previousCellValueArray);

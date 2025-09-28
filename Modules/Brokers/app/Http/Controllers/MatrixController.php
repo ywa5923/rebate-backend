@@ -88,7 +88,7 @@ class MatrixController extends Controller
         $brokerId = $data['broker_id'];
         $zoneId = $data['zone_id'] ?? null;
         $isAdmin = $data['is_admin'] ?? null;
-        $isAdmin=false;
+        $isAdmin=true;
 
         try {
 
