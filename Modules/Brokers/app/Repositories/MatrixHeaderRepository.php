@@ -462,7 +462,8 @@ class MatrixHeaderRepository
                     //if isAdmin is true, set is_updated_entry to 0.
                     //we don't want to update the is_updated_entry field for admin.
                     //when admin save the matrix,all updated cells will be set to 0.
-                    'is_updated_entry' => $isAdmin ? 0 :$cell['is_updated_entry'] ?? false,
+                   // 'is_updated_entry' => $isAdmin ? 0 :$cell['is_updated_entry'] ?? false,
+                    'is_updated_entry' => $cell['is_updated_entry'] ?? false,
                     'zone_id' => $zoneId
                 ];
             }

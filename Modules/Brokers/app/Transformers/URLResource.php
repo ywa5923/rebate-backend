@@ -20,10 +20,17 @@ class URLResource extends JsonResource
             // Basic Information
             "id" => $this->id,
             "url_type" => $this->url_type,
-            "url" => $this->translateProp("url"),
-            "url_p" => $this->translateProp("url_p"),
+            "url" => $this->url,
+            "public_url" => $this->public_url,
+            "previous_url" => $this->previous_url,
+
+           // "url_p" => $this->translateProp("url_p"),
             "name" => $this->translateProp("name"),
-            "name_p" => $this->translateProp("name_p"),
+            "public_name" => $this->translateProp("public_name"),
+            "previous_name" => $this->translateProp("previous_name"),
+            "is_updated_entry" => $this->is_updated_entry,
+
+           // "name_p" => $this->translateProp("name_p"),
             "slug" => $this->slug,
             "description" => $this->translateProp("description")    ,
             
@@ -34,6 +41,7 @@ class URLResource extends JsonResource
             // Polymorphic Relationship
             "urlable_type" => $this->urlable_type,
             "urlable_id" => $this->urlable_id,
+
             
             // Foreign Keys
             "option_category_id" => $this->option_category_id,

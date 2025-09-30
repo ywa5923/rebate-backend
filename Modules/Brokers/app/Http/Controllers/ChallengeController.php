@@ -339,7 +339,7 @@ class ChallengeController extends Controller
             $isAdmin = $validatedData['is_admin'] ?? null;
             $isPlaceholder = $validatedData['is_placeholder'];
 
-            $isAdmin = false;
+            $isAdmin = true;
            
             //process the request and update the challenge matrix and extra data using transaction
             $result = $this->challengeService->processRequest($validatedData, $brokerId, $isPlaceholder, $isAdmin,$zoneId);

@@ -589,27 +589,27 @@ class OptionValueController extends Controller
      */
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
-        $entityId = $request->input('entity_id');
-        $entityType = $request->input('entity_type');
+        //TODO:CHECK IF IS ADMIN IS TRUE WITH THE AUTH MIDDLEWARE
         $isAdmin=true;
-        if (!$brokerId || !$entityId || !$entityType) {
-            return response()->json([
-                'success' => false,
-                'message' => 'broker_id, entity_id, and entity_type are all required.'
-            ], 422);
-        }
+   
         try {
-            $validatedData = $this->optionValueService->validateMultipleOptionValuesData($request->input('option_values', []), true);
+            $entityId = $request->input('entity_id');
+            $entityType = $request->input('entity_type');
+            $optionValuesData = $request->input('option_values', []);
+           
+
+            $this->optionValueService->validateEntityTypeAndId($entityType, $entityId, $brokerId, $isAdmin);
+
+            $this->optionValueService->validateMultipleOptionValuesData($optionValuesData, true);
          
-         
-         
-            $optionValues = $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType, $validatedData);
+            $optionValues = $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType,  $optionValuesData);
+          
             return response()->json([
                 'success' => true,
                 'message' => 'Option values updated successfully',
                 'data' => $optionValues
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update option values',

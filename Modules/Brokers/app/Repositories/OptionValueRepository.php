@@ -209,11 +209,11 @@ class OptionValueRepository
             
             // Only log in development or when explicitly enabled
             if (config('app.debug') || config('app.env') === 'local') {
-                Log::info('Bulk update completed', [
-                    'broker_id' => $brokerId,
-                    'records_updated' => $result,
-                    'total_records' => count($optionValueIds)
-                ]);
+                // Log::info('Bulk update completed', [
+                //     'broker_id' => $brokerId,
+                //     'records_updated' => $result,
+                //     'total_records' => count($optionValueIds)
+                // ]);
             }
             
             return $result > 0;

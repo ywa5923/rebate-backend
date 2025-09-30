@@ -234,6 +234,8 @@ class OptionValueService
         if (!class_exists($modelClass)) {
             throw new \InvalidArgumentException("Model class {$modelClass} not found");
         }
+        //$optionValuesData is an array of option values data with the following structure:[['option_slug' => 'option_value','metadata' => 'metadata'],['option_slug' => 'option_value','metadata' => 'metadata']]
+        
        
         return DB::transaction(function () use ($brokerId, $optionValuesData,$entity_id,$modelClass,$isAdmin) {
             try {
@@ -289,8 +291,12 @@ class OptionValueService
                                 $optionValueData['is_updated_entry'] = $existingValue->is_updated_entry;
                             }
                         }else if($isAdmin){
-                            
-                            $optionValueData['is_updated_entry'] = 0;
+                            // if(isset($optionValueData['is_updated_entry'])){
+                            //     $optionValueData['is_updated_entry'] = 1;
+                            // }else{
+                            //     $optionValueData['is_updated_entry'] = 0;
+                            // }
+
                         }
                         
                         $id = $optionValueData['id'];
@@ -373,6 +379,39 @@ class OptionValueService
         }
     }
 
+    public function validateEntityTypeAndId(string $entityType, int $entityId,int $brokerId,bool $isAdmin): bool
+    {
+        $allowedEntityTypes = ['broker', 'account-type','contest','promotion','company'];
+        $modelClass = ModelHelper::getModelClassFromSlug($entityType);
+       
+        $table = (new $modelClass)->getTable();
+        if(!class_exists($modelClass)){
+            throw new \InvalidArgumentException("Model class {$modelClass} not found");
+        }
+        
+        $rules=[
+            'entity_type' => 'required|in:'.implode(',', $allowedEntityTypes),
+            'entity_id' => 'required|exists:'.$table.',id',
+            'broker_id' => 'required|exists:brokers,id',
+        ];
+        
+        $validator = Validator::make(['entity_type' => $entityType, 'entity_id' => $entityId, 'broker_id' => $brokerId], $rules);
+        if($validator->fails()){
+            throw new \InvalidArgumentException($validator->errors()->first());
+        }
+
+        if(!$isAdmin && $entityType !== 'broker'){
+            $belongs = $modelClass::query()
+            ->whereKey($entityId)
+            ->where('broker_id', $brokerId)
+            ->exists();
+            if(!$belongs){
+                throw new \InvalidArgumentException("Entity {$entityType} with id {$entityId} does not belong to broker {$brokerId}");
+            }
+        }
+        
+        return true;
+    }
     /**
      * Validate option value data
      */
@@ -393,6 +432,7 @@ class OptionValueService
            // 'broker_id' => $isUpdate ? 'sometimes|required|exists:brokers,id' : 'required|exists:brokers,id',
            // 'broker_option_id' => $isUpdate ? 'sometimes|required|exists:broker_options,id' : 'required|exists:broker_options,id',
             'zone_id' => 'nullable|exists:zones,id',
+            'is_updated_entry' => 'sometimes|nullable|boolean',
         ];
 
         $validator = Validator::make($data, $rules);

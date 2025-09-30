@@ -21,6 +21,8 @@ return new class extends Migration
             $table->boolean("is_updated_entry")->default(false);
             $table->boolean("is_placeholder")->default(false);
             $table->string("name",500);
+            $table->string("public_name",500)->nullable();
+            $table->string("previous_name",500)->nullable();
             $table->string("slug",500);
             $table->boolean("is_invariant")->default(true);
             $table->integer("category_position")->nullable();

@@ -19,9 +19,18 @@ class UrlService
         $this->repository = $repository;
     }
 
-    public function createMany($urlableTypeObject, string $entityType, array $urls)
+    public function createMany($urlableTypeObject, string $entityType, array $urls,$isAdmin=false)
     {
+        
         foreach ($urls as &$urlData) {
+            
+            if($isAdmin){
+                $urlData['public_url'] = $urlData['url'];
+                $urlData['public_name'] = $urlData['name'];
+            }else{
+                //TO BE DONE
+                //$urlData['is_updated_entry'] = 1;
+            }
             $modelClass = ModelHelper::getModelClassFromSlug($entityType);
             $urlData['urlable_type'] = $modelClass;
             $urlData['urlable_id'] = $urlableTypeObject ? $urlableTypeObject->id : null;
@@ -35,18 +44,33 @@ class UrlService
         return true;
     }
 
-    public function updateMany(string $entityType, array $urls, $broker_id)
+    public function updateMany(string $entityType, array $urls, $broker_id,$isAdmin=false)
     {
         $updated = [];
         $modelClass = ModelHelper::getModelClassFromSlug($entityType);
+       
         foreach ($urls as $urlData) {
 
-            if (isset($urlData['id'])) {
-                $url = $this->repository->find($urlData['id']);
+            if (isset($urlData['id']) && is_numeric($urlData['id'])) {
+                $existingUrl = $this->repository->find($urlData['id']);
+               // dd($existingUrl);
                 $urlData['urlable_type'] = $modelClass;
-
-                if ($url && $url->urlable_type == $modelClass && $url->broker_id == $broker_id) {
-                    $updated[] = $this->repository->update($url, $urlData);
+                if($isAdmin){
+                    $urlData['public_url'] = $urlData['url'];
+                    $urlData['public_name'] = $urlData['name'];
+                    $urlData['is_updated_entry'] = 0;
+                    unset($urlData['url']);
+                    unset($urlData['name']);
+                }else{
+                   
+                    $urlData['is_updated_entry'] = 1;
+                    trim($urlData['url'])!==trim($existingUrl->url) && $urlData['previous_url'] =  $existingUrl->url;
+                    trim($urlData['name'])!==trim($existingUrl->name) &&  $urlData['previous_name'] = $existingUrl->name;
+                }
+               
+               //dd($urlData);
+                if ($existingUrl && $existingUrl->urlable_type == $modelClass && $existingUrl->broker_id == $broker_id) {
+                    $updated[] = $this->repository->update($existingUrl, $urlData);
                 }
             }
         }

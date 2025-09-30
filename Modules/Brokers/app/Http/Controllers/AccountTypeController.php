@@ -16,6 +16,7 @@ use Modules\Brokers\Transformers\URLResource;
 use Modules\Brokers\Services\UrlService;
 use App\Utilities\ModelHelper;
 
+
 class AccountTypeController extends Controller
 {
     protected AccountTypeService $accountTypeService;
@@ -243,20 +244,21 @@ class AccountTypeController extends Controller
     //     "slug": "mobile",
     //     "broker_id":1
     //   }
-    public function createUrls(Request $request, $id)
+    public function createUrls(Request $request, $id=null)
     {
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
-
+        $isAdmin=false;
+        $id = ($id === 'null' || $id === '') ? null : $id;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required');
         }
 
 
-        //if account type id is  null, it means that is a master url that has urlable_id null 
+        //if urlable_id is  null which is the id for AccountType, it means that is a master url that has urlable_id null 
         //it is avaialble for all broker account types
-        if ($id != 0 && $id != null || $id != "0") {
+        if ($id) {
             //if account type id is not null, it means that is a broker account type
             $accountType = AccountType::find($id);
 
@@ -273,7 +275,7 @@ class AccountTypeController extends Controller
         $urls = $this->flattenUrlInput($data);
 
 
-        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls);
+        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls,$isAdmin);
 
 
         // Optionally, fetch the created URLs for response
@@ -350,17 +352,22 @@ class AccountTypeController extends Controller
     //       }
     //     ]
     //   }
-    public function updateUrls(Request $request, $id)
+    public function updateUrls(Request $request, $id=null)
     {
+        // Convert string "null" to actual null
+        $id = ($id === 'null' || $id === '') ? null : $id;
 
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
+        
+        $isAdmin=false;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }
 
-        if ($id != 0 && $id != null || $id != "0") {
+       // dd($id);
+        if ($id) {
             //if account type id is not null, it means that is a broker account type
             $accountType = AccountType::find($id);
 
@@ -374,11 +381,13 @@ class AccountTypeController extends Controller
         $data = $request->all();
         $urls = $this->flattenUrlInput($data);
 
-        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id);
+        
+
+        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id,$isAdmin);
 
         return response()->json([
             'success' => true,
-            'data' => \Modules\Brokers\Transformers\URLResource::collection(collect($updated))
+            'data' => URLResource::collection(collect($updated))
         ]);
     }
 

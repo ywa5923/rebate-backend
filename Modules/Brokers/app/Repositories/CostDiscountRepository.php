@@ -251,6 +251,7 @@ class CostDiscountRepository
                     'zone_id' => $zoneId,
                     $field => $costDiscount,
                     'is_placeholder' => $isPlaceholder,
+                    'is_updated_entry' => $isAdmin ? 0 : 1
                 ]);
             }
         }

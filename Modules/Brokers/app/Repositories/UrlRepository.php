@@ -254,6 +254,7 @@ class UrlRepository
             }
         } else {
             // Create new record if affiliate link is not empty
+            //and if old value is not found in database
             if (!empty($affiliateLink)) {
                 $field = ($isAdmin && !$isPlaceholder) ? 'public_url' : 'url';
                 
@@ -267,6 +268,7 @@ class UrlRepository
                     'broker_id' => $brokerId,
                     'is_placeholder' => $isPlaceholder,
                     'zone_id' => $zoneId,
+                    'is_updated_entry' => $isAdmin ? 0 : 1
                 ]);
             }
         }
