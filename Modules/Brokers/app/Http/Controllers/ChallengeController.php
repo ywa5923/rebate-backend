@@ -26,10 +26,12 @@ class ChallengeController extends Controller
     protected ChallengeCategoryService $challengeCategoryService;
     protected ChallengeService $challengeService;
 
+    protected bool $isAdmin;
     public function __construct(ChallengeCategoryService $challengeCategoryService, ChallengeService $challengeService)
     {
         $this->challengeCategoryService = $challengeCategoryService;
         $this->challengeService = $challengeService;
+        $this->isAdmin = app('isAdmin');
     }
 
 
@@ -201,6 +203,7 @@ class ChallengeController extends Controller
      */
     public function show(Request $request): JsonResponse
     {
+        
         try {
             $validatedData = $this->challengeService->validateGetRequestData($request);
 
@@ -339,7 +342,7 @@ class ChallengeController extends Controller
             $isAdmin = $validatedData['is_admin'] ?? null;
             $isPlaceholder = $validatedData['is_placeholder'];
 
-            $isAdmin = true;
+            $isAdmin = $this->isAdmin;
            
             //process the request and update the challenge matrix and extra data using transaction
             $result = $this->challengeService->processRequest($validatedData, $brokerId, $isPlaceholder, $isAdmin,$zoneId);

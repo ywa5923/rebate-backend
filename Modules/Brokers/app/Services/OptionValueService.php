@@ -417,11 +417,12 @@ class OptionValueService
      */
     public function validateOptionValueData(array $data, bool $isUpdate = false): array
     {
+       
         $rules = [
             'id' => 'nullable|exists:option_values,id',
             'option_slug' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'value' => $isUpdate ? 'sometimes|required|string' : 'required|string',
-            'public_value' => 'nullable|string',
+            'value' => $isUpdate ? 'sometimes|nullable' : 'required',
+            'public_value' => 'sometimes|nullable',
             'status' => 'nullable|boolean',
             'status_message' => 'nullable|string|max:1000',
             'default_loading' => 'nullable|boolean',
@@ -443,6 +444,27 @@ class OptionValueService
 
         $validatedData = $validator->validated();
         
+        // Validate and convert value field
+        if (array_key_exists('value', $validatedData)) {
+            if (!is_null($validatedData['value']) && !is_string($validatedData['value']) && !is_numeric($validatedData['value'])) {
+                throw new \InvalidArgumentException('The value field must be null, a string, or numeric.');
+            }
+            // Convert to string if not null
+            if (!is_null($validatedData['value'])) {
+                $validatedData['value'] = (string) $validatedData['value'];
+            }
+        }
+        
+        // Validate and convert public_value field
+        if (array_key_exists('public_value', $validatedData)) {
+            if (!is_null($validatedData['public_value']) && !is_string($validatedData['public_value']) && !is_numeric($validatedData['public_value'])) {
+                throw new \InvalidArgumentException('The public value field must be null, a string, or numeric.');
+            }
+            // Convert to string if not null
+            if (!is_null($validatedData['public_value'])) {
+                $validatedData['public_value'] = (string) $validatedData['public_value'];
+            }
+        }
         // Ensure boolean fields are properly cast
         if (isset($validatedData['status'])) {
             $validatedData['status'] = (bool) $validatedData['status'];
@@ -466,12 +488,12 @@ class OptionValueService
     public function validateMultipleOptionValuesData(array $optionValuesData, bool $isUpdate = false): array
     {
         $validatedData = [];
-        
+       // dd($optionValuesData);
         foreach ($optionValuesData as $index => $optionValueData) {
             try {
                 $validatedData[] = $this->validateOptionValueData($optionValueData, $isUpdate);
             } catch (\Exception $e) {
-                throw new \InvalidArgumentException("Option value at index {$index}: " . $e->getMessage());
+                throw new \InvalidArgumentException("Option value at index {$index}-{$optionValueData['option_slug']}: " . $e->getMessage());
             }
         }
         

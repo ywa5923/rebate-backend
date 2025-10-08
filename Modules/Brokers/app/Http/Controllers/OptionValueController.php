@@ -17,9 +17,11 @@ class OptionValueController extends Controller
 {
     protected OptionValueService $optionValueService;
 
+    protected bool $isAdmin;
     public function __construct(OptionValueService $optionValueService)
     {
         $this->optionValueService = $optionValueService;
+        $this->isAdmin = app('isAdmin');
     }
 
     /**
@@ -590,7 +592,7 @@ class OptionValueController extends Controller
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
         //TODO:CHECK IF IS ADMIN IS TRUE WITH THE AUTH MIDDLEWARE
-        $isAdmin=true;
+        $isAdmin=$this->isAdmin;
    
         try {
             $entityId = $request->input('entity_id');

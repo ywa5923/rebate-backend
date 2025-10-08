@@ -22,8 +22,13 @@ use Illuminate\Support\Facades\Validator;
 
 class MatrixController extends Controller
 {
-
-    public function __construct(protected MatrixService $matrixService) {}
+    protected bool $isAdmin;
+  
+    public function __construct(
+        protected MatrixService $matrixService
+    ) {
+        $this->isAdmin = app('isAdmin');
+    }
 
     public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
     {
@@ -88,7 +93,7 @@ class MatrixController extends Controller
         $brokerId = $data['broker_id'];
         $zoneId = $data['zone_id'] ?? null;
         $isAdmin = $data['is_admin'] ?? null;
-        $isAdmin=true;
+        $isAdmin=$this->isAdmin;
 
         try {
 

@@ -20,10 +20,11 @@ use App\Utilities\ModelHelper;
 class AccountTypeController extends Controller
 {
     protected AccountTypeService $accountTypeService;
-
+    protected bool $isAdmin;
     public function __construct(AccountTypeService $accountTypeService)
     {
         $this->accountTypeService = $accountTypeService;
+        $this->isAdmin = app('isAdmin');
     }
 
     /**
@@ -249,7 +250,7 @@ class AccountTypeController extends Controller
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
-        $isAdmin=false;
+        $isAdmin=$this->isAdmin;
         $id = ($id === 'null' || $id === '') ? null : $id;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required');
@@ -361,7 +362,7 @@ class AccountTypeController extends Controller
         //or is admin
         $broker_id = $request->broker_id;
         
-        $isAdmin=false;
+            $isAdmin=$this->isAdmin;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }

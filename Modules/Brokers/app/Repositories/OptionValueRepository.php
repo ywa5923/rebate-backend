@@ -176,7 +176,7 @@ class OptionValueRepository
             $hasValues = false;
             
             foreach ($updatesByCondition as $id => $data) {
-                if (isset($data[$column])) {
+                if (array_key_exists($column, $data)) {
                     $caseStatements[$column] .= "WHEN ? THEN ? ";
                     $bindings[] = $id;
                     $bindings[] = $data[$column];

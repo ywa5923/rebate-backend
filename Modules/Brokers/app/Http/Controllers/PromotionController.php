@@ -14,10 +14,11 @@ use Modules\Brokers\Transformers\PromotionResource;
 class PromotionController extends Controller
 {
     protected PromotionService $promotionService;
-
+    protected bool $isAdmin;
     public function __construct(PromotionService $promotionService)
     {
         $this->promotionService = $promotionService;
+        $this->isAdmin = app('isAdmin');
     }
 
     /**
@@ -189,6 +190,7 @@ class PromotionController extends Controller
     {
         // Check if broker ID is provided for authorization
         $broker_id = $request->broker_id;
+        $isAdmin=$this->isAdmin;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }
