@@ -469,6 +469,8 @@ class OptionValueController extends Controller
             $this->optionValueService->validateEntityTypeAndId($entityType, $entityId, $brokerId, $isAdmin);
 
             $validatedData=$this->optionValueService->validateMultipleOptionValuesData($optionValuesData);
+
+            
          
             $optionValues = $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType,  $validatedData);
           
