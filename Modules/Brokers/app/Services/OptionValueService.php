@@ -120,7 +120,7 @@ class OptionValueService
     /**
      * Create multiple option values for a broker
      */
-    public function createMultipleOptionValues(int $brokerId, string $modelClass, int $entityId, array $optionValuesData): void
+    public function createMultipleOptionValues(int $brokerId, bool $isAdmin, string $modelClass, int $entityId, array $optionValuesData): void
     {
             try {
                 // Validate input
@@ -133,27 +133,7 @@ class OptionValueService
                 $now = now();
                 $options=BrokerOption::all()->pluck('id','slug');
               
-            //    if($entityType && strtolower($entityType)!='broker'){
-            //    // $className = ucfirst($entityType); // Convert 'company' to 'Company'
-            //     $modelClass = ModelHelper::getModelClassFromSlug($entityType);
-               
-            //     if (!class_exists($modelClass)) {
-            //         throw new \InvalidArgumentException("Model class {$modelClass} not found");
-            //     }
-                
-            //     $instance = $modelClass::create([
-            //         'broker_id' => $brokerId,
-            //         //'name' => 'New Company',
-            //     ]);
-            //     $entityId = $instance->id;
-              
-            //     }else{
-            //         //if entity type is null, it means that is a broker option value
-            //         //so we need to create a new broker option value
-            //         //and we need to set the entity id to the broker id
-            //         $entityId=$brokerId;
-            //         $modelClass=ModelHelper::getModelClassFromSlug('Broker');
-            //     }
+           
                
                 foreach ($optionValuesData as $index => $optionValueData) {
                     if (!is_array($optionValueData)) {
@@ -166,9 +146,19 @@ class OptionValueService
                     $optionValueData['broker_option_id']=$options[$slug];
                     $optionValueData['optionable_id']=$entityId;
                     $optionValueData['optionable_type']=$modelClass;
+                    //if isAdmin is false, set is_updated_entry to 1 for new records
+                    if(!$isAdmin){
+                        $optionValueData['is_updated_entry']=1;
+                    }
 
                     // Ensure metadata is JSON encoded
                     if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
+                        if($isAdmin){
+                            $optionValueData['metadata'] = ["public_value"=>$optionValueData['metadata']];
+                        }else{
+                            $optionValueData['metadata'] = ["value"=>$optionValueData['metadata']];
+                        }
+
                         $optionValueData['metadata'] = json_encode($optionValueData['metadata']);
                     }
                     
@@ -178,17 +168,7 @@ class OptionValueService
                 // Bulk insert all option values in one query
                 $this->repository->bulkCreate($bulkData);
                 
-                // Get the created option values with relationships
-                // Since bulk insert doesn't return IDs, we fetch by broker_id and option_slugs
-
-                // $optionSlugs = collect($optionValuesData)->pluck('option_slug')->toArray();
-                // $createdOptionValues = $this->repository->getByBrokerIdAndOptionSlugs($brokerId, $optionSlugs)
-                //     ->load(['broker', 'option', 'zone', 'translations']);
-
-                // // Ensure we return an array of arrays, not objects
-                // return $createdOptionValues->map(function ($optionValue) {
-                //     return $optionValue->toArray();
-                // })->toArray();
+               
 
             } catch (\Exception $e) {
                 Log::error('OptionValueService createMultipleOptionValues error: ' . $e->getMessage());
@@ -250,52 +230,98 @@ class OptionValueService
                 });
 
                 // Get existing option values for comparison
+                
                 $existingOptionValues = [];
                 if (!empty($idsToCompare)) {
                     $existingOptionValues = OptionValue::whereIn('id', $idsToCompare)
                         ->get()
                         ->keyBy('id');
                 }
+                // Result (Collection):,metadata is json endocded so ti is cast to array
+                /*[
+                   100 => OptionValue { id: 100, option_slug: 'logo', value: 'test.jpg', ... },
+                   200 => OptionValue { id: 200, option_slug: 'name', value: 'Company A', ... },
+                   300 => OptionValue { id: 300, option_slug: 'email', value: 'test@test.com', ... }
+               ]*/
+            
 
+                
                 foreach ($optionValuesData as $optionValueData) {
-                    // Ensure metadata is JSON encoded
-                    if (isset($optionValueData['metadata']) && is_array($optionValueData['metadata'])) {
-                        $optionValueData['metadata'] = json_encode($optionValueData['metadata']);
-                    }
+                    // Note: Don't JSON encode metadata here - the repository's bulkUpdate 
+                    // uses parameter binding and expects raw values. Laravel will handle 
+                    // the JSON casting based on the model's $casts property.
+                   
                     $optionValueData['updated_at'] = $now;
+                    $existingValue = $optionValueData['id']?$existingOptionValues[$optionValueData['id']]:null;
 
-                    if (empty($optionValueData['id'])) {
-                        // Remove id if present and null/empty
+                    //add new inserts only if id is null and value or public_value is not empty
+                    //for empty values,the id is removed from frontend,so reject null values from new inserts
+                    //so for a new option value to be inserted: id not null,value or public_value must be set
+                    
+                    if (empty($optionValueData['id']) && 
+                       (!empty($optionValueData['value']) || !empty($optionValueData['public_value']))) {
+                   
+                       
                         unset($optionValueData['id']);
                         $optionValueData['broker_id'] = $brokerId; // Ensure broker_id is set
                         $optionValueData['optionable_id']=$entity_id;
                         $optionValueData['optionable_type']=$modelClass;
                         $optionValueData['created_at'] = $now;
                         $optionValueData['broker_option_id']=$options[$optionValueData['option_slug']];
+                        //if isAdmin is false, set is_updated_entry to 1 for new records
+                        if(!$isAdmin){
+                            $optionValueData['is_updated_entry']=1;
+                        }
+                       
                         $inserts[] = $optionValueData;
-                    } else {
+                    } else if(isset($optionValueData['id']) && !empty($optionValueData['id'])) {
+                       //if(!isset($optionValueData['id'])){ dd($optionValueData);}
                         // Check if this is an existing option value that needs comparison
-                        if (!$isAdmin && isset($existingOptionValues[$optionValueData['id']])) {
-                            $existingValue = $existingOptionValues[$optionValueData['id']];
+                        if (!$isAdmin && isset($optionValueData['id'])
+                            && isset($existingOptionValues[$optionValueData['id']])) {
+                        
+                        
+                            $existingAdminMetadata = $existingValue->metadata['public_value']??[];
+
+                            //extract the broker value from metadata which is "value" key
+
+
+                            //keep only broker metadata to compare with new value by using the hasValueChanged function
+                            $existingValue->metadata = $existingValue->metadata['value']??null;
                             
                             // Compare values to determine if they've changed
                             $valueChanged = $this->hasValueChanged($existingValue, $optionValueData);
                             
                             if ($valueChanged) {
+                                //get previous unit from metadata in case the option is a numberWithUnit
+                                $previousUnit = $existingValue->metadata['unit']??null;
                                 // Set previous_value to old value and is_updated_entry to 1
-                                $optionValueData['previous_value'] = $existingValue->value;
+                                $optionValueData['previous_value'] =  $previousUnit?$existingValue->value.'-'.$previousUnit:$existingValue->value;
                                 $optionValueData['is_updated_entry'] = 1;
+
+                                //reconstruct metadata,add new value and existing admin metadata which has public key
+                                if(isset($optionValueData['metadata'])){
+                                    $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']];
+                                }
+
+                           
+                           
                             } else {
                                 // Keep existing previous_value and is_updated_entry
                                 $optionValueData['previous_value'] = $existingValue->previous_value;
                                 $optionValueData['is_updated_entry'] = $existingValue->is_updated_entry;
                             }
-                        }else if($isAdmin){
-                            // if(isset($optionValueData['is_updated_entry'])){
-                            //     $optionValueData['is_updated_entry'] = 1;
-                            // }else{
-                            //     $optionValueData['is_updated_entry'] = 0;
-                            // }
+
+
+                        }else if($isAdmin && isset($optionValueData['metadata'])){
+
+                            //get existing broker metadata and add to admin metadata
+                            $existingMetadata = $existingValue->metadata;
+                            $existingBrokerMetadata =   $existingMetadata['value']??[];
+                            $newAdminMetadata = $optionValueData['metadata'];
+
+                            $optionValueData['metadata'] = ["public_value"=>$newAdminMetadata,"value"=>$existingBrokerMetadata];
+                            
 
                         }
                         
@@ -317,6 +343,17 @@ class OptionValueService
 
                 // Bulk insert
                 if (!empty($inserts)) {
+                    // JSON encode metadata for raw inserts (bulkCreate uses raw SQL insert)
+                    foreach ($inserts as &$insert) {
+                        if (isset($insert['metadata']) && is_array($insert['metadata'])) {
+                            if($isAdmin){
+                                $insert['metadata'] = json_encode(['public'=>$insert['metadata']]);
+                            }else{
+                                $insert['metadata'] = json_encode($insert['metadata']);
+
+                            }
+                        }
+                    }
                     $this->repository->bulkCreate($inserts);
                 }
 
@@ -446,7 +483,7 @@ class OptionValueService
         
         // Validate and convert value field
         if (array_key_exists('value', $validatedData)) {
-            if (!is_null($validatedData['value']) && !is_string($validatedData['value']) && !is_numeric($validatedData['value'])) {
+            if (!is_null($validatedData['value']) && !is_string($validatedData['value']) && !is_numeric($validatedData['value']) && !is_bool($validatedData['value'])) {
                 throw new \InvalidArgumentException('The value field must be null, a string, or numeric.');
             }
             // Convert to string if not null
@@ -457,7 +494,7 @@ class OptionValueService
         
         // Validate and convert public_value field
         if (array_key_exists('public_value', $validatedData)) {
-            if (!is_null($validatedData['public_value']) && !is_string($validatedData['public_value']) && !is_numeric($validatedData['public_value'])) {
+            if (!is_null($validatedData['public_value']) && !is_string($validatedData['public_value']) && !is_numeric($validatedData['public_value']) && !is_bool($validatedData['public_value'])) {
                 throw new \InvalidArgumentException('The public value field must be null, a string, or numeric.');
             }
             // Convert to string if not null
@@ -488,7 +525,7 @@ class OptionValueService
     public function validateMultipleOptionValuesData(array $optionValuesData, bool $isUpdate = false): array
     {
         $validatedData = [];
-       // dd($optionValuesData);
+      // dd($optionValuesData);
         foreach ($optionValuesData as $index => $optionValueData) {
             try {
                 $validatedData[] = $this->validateOptionValueData($optionValueData, $isUpdate);
@@ -580,7 +617,7 @@ class OptionValueService
     private function hasValueChanged(OptionValue $existingValue, array $newData): bool
     {
         // Compare the main value fields that indicate a change
-        $fieldsToCompare = ['value', 'public_value', 'status', 'status_message', 'default_loading', 'type'];
+        $fieldsToCompare = ['value', 'public_value', 'metadata'];
         
         foreach ($fieldsToCompare as $field) {
             if (isset($newData[$field])) {
@@ -588,6 +625,7 @@ class OptionValueService
                 $newFieldValue = $newData[$field];
                 
                 // Handle different data types
+                // Note: $existingValue->metadata is already cast to array by the model
                 if (is_array($existingFieldValue) && is_array($newFieldValue)) {
                     if (array_diff_assoc($existingFieldValue, $newFieldValue) !== [] || 
                         array_diff_assoc($newFieldValue, $existingFieldValue) !== []) {

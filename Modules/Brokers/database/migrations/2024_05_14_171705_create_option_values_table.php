@@ -16,7 +16,7 @@ return new class extends Migration
             $table->nullableMorphs('optionable');
             $table->string("option_slug");
             $table->text("previous_value")->nullable();
-            $table->text("value");
+            $table->text("value")->nullable();
             $table->text("public_value")->nullable();
             $table->boolean("is_updated_entry")->default(0);
             $table->enum("status",["published","pending","rejected"])->default("pending");

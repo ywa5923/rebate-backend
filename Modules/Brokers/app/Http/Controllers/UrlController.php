@@ -39,6 +39,8 @@ class UrlController extends Controller
             $zone_code = $request->query('zone_code') ?? null;
             $language_code = $request->query('language_code') ?? 'en';
        
+            $isAdmin = app('isAdmin');
+            
     
           $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code);
           $transformed = URLResource::collection($urls);

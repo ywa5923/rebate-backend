@@ -177,9 +177,20 @@ class OptionValueRepository
             
             foreach ($updatesByCondition as $id => $data) {
                 if (array_key_exists($column, $data)) {
-                    $caseStatements[$column] .= "WHEN ? THEN ? ";
+                    // For metadata column, use CAST to JSON for proper handling
+                    if ($column === 'metadata') {
+                        $caseStatements[$column] .= "WHEN ? THEN CAST(? AS JSON) ";
+                    } else {
+                        $caseStatements[$column] .= "WHEN ? THEN ? ";
+                    }
                     $bindings[] = $id;
-                    $bindings[] = $data[$column];
+                    
+                    // JSON encode array values (like metadata) for proper MySQL JSON column handling
+                    $value = $data[$column];
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
+                    $bindings[] = $value;
                     $hasValues = true;
                 }
             }
