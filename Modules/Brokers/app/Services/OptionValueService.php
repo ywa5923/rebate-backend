@@ -252,7 +252,8 @@ class OptionValueService
                     // the JSON casting based on the model's $casts property.
                    
                     $optionValueData['updated_at'] = $now;
-                    $existingValue = $optionValueData['id']?$existingOptionValues[$optionValueData['id']]:null;
+                    $id = $optionValueData['id'] ?? null;
+                    $existingValue = ($id && isset($existingOptionValues[$id])) ? $existingOptionValues[$id] : null;
 
                     //add new inserts only if id is null and value or public_value is not empty
                     //for empty values,the id is removed from frontend,so reject null values from new inserts
