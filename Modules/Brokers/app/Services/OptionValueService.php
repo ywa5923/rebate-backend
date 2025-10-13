@@ -332,10 +332,7 @@ class OptionValueService
                     }
                 }
 
-                // if (config('app.debug')) {
-                //     Log::debug('Bulk Update Data:', ['updatesByCondition' => $updatesByCondition]);
-                //     Log::debug('Bulk Insert Data:', ['inserts' => $inserts]);
-                // }
+               
 
                 // Bulk update
                 if (!empty($updatesByCondition)) {
@@ -347,11 +344,12 @@ class OptionValueService
                     // JSON encode metadata for raw inserts (bulkCreate uses raw SQL insert)
                     foreach ($inserts as &$insert) {
                         if (isset($insert['metadata']) && is_array($insert['metadata'])) {
-                            if($isAdmin){
-                                $insert['metadata'] = json_encode(['public'=>$insert['metadata']]);
-                            }else{
-                                $insert['metadata'] = json_encode($insert['metadata']);
-
+                            if ($isAdmin) {
+                                // Admin-provided metadata goes under public_value
+                                $insert['metadata'] = json_encode(['public_value' => $insert['metadata']]);
+                            } else {
+                                // Broker-provided metadata goes under value
+                                $insert['metadata'] = json_encode(['value' => $insert['metadata']]);
                             }
                         }
                     }
