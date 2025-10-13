@@ -29,7 +29,7 @@ class UrlService
                 $urlData['public_name'] = $urlData['name'];
             }else{
                 //TO BE DONE
-                //$urlData['is_updated_entry'] = 1;
+                $urlData['is_updated_entry'] = 1;
             }
             $modelClass = ModelHelper::getModelClassFromSlug($entityType);
             $urlData['urlable_type'] = $modelClass;
