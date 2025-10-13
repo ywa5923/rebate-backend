@@ -452,13 +452,13 @@ class OptionValueService
     /**
      * Validate option value data
      */
-    public function validateOptionValueData(array $data, bool $isUpdate = false): array
+    public function validateOptionValueData(array $data): array
     {
        
         $rules = [
             'id' => 'nullable|exists:option_values,id',
-            'option_slug' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'value' => $isUpdate ? 'sometimes|nullable' : 'required',
+            'option_slug' => 'sometimes|required|string|max:255',
+            'value' =>  'sometimes|nullable',
             'public_value' => 'sometimes|nullable',
             'status' => 'nullable|boolean',
             'status_message' => 'nullable|string|max:1000',
@@ -522,13 +522,13 @@ class OptionValueService
     /**
      * Validate multiple option values data
      */
-    public function validateMultipleOptionValuesData(array $optionValuesData, bool $isUpdate = false): array
+    public function validateMultipleOptionValuesData(array $optionValuesData): array
     {
         $validatedData = [];
       // dd($optionValuesData);
         foreach ($optionValuesData as $index => $optionValueData) {
             try {
-                $validatedData[] = $this->validateOptionValueData($optionValueData, $isUpdate);
+                $validatedData[] = $this->validateOptionValueData($optionValueData);
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException("Option value at index {$index}-{$optionValueData['option_slug']}: " . $e->getMessage());
             }
