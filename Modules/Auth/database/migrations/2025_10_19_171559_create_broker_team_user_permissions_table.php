@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('broker_team_user_permissions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('broker_team_user_id')->constrained()->onDelete('cascade');
+            $table->enum('permission_type', ['broker', 'country', 'zone', 'broker_type']);
+            $table->unsignedBigInteger('resource_id')->nullable(); // For specific broker IDs
+            $table->string('resource_value')->nullable(); // For countries, zones, broker types
+            $table->enum('action', ['view', 'edit', 'delete', 'manage']);
+            $table->json('metadata')->nullable(); // Additional permission data
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            
+            // Indexes for better performance
+            $table->index(['broker_team_user_id', 'permission_type']);
+            $table->index(['permission_type', 'resource_id']);
+            $table->index(['permission_type', 'resource_value']);
+            $table->index(['action', 'is_active']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('broker_team_user_permissions');
+    }
+};

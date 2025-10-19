@@ -42,7 +42,11 @@ class Broker extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'broker_type_id',
+        'registration_language',
+        'registration_zone',
+    ];
 
 
     public function translations(): MorphMany
