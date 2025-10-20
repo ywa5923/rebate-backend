@@ -2,18 +2,19 @@
 
 namespace Modules\Auth\Services;
 
-use Modules\Auth\Models\BrokerTeamUserPermission;
-use Modules\Auth\Repositories\BrokerTeamUserPermissionRepository;
+use Modules\Auth\Models\UserPermission;
+use Modules\Auth\Repositories\UserPermissionRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class BrokerTeamUserPermissionService
-{
-    protected BrokerTeamUserPermissionRepository $repository;
 
-    public function __construct(BrokerTeamUserPermissionRepository $repository)
+class UserPermissionService
+{
+    protected UserPermissionRepository $repository;
+
+    public function __construct(UserPermissionRepository $repository)
     {
         $this->repository = $repository;
     }
@@ -21,7 +22,7 @@ class BrokerTeamUserPermissionService
     /**
      * Create a new permission for a team user.
      */
-    public function createPermission(array $data): BrokerTeamUserPermission
+    public function createPermission(array $data): UserPermission
     {
         try {
             return $this->repository->create($data);
@@ -37,7 +38,7 @@ class BrokerTeamUserPermissionService
     /**
      * Update a permission.
      */
-    public function updatePermission(int $id, array $data): BrokerTeamUserPermission
+    public function updatePermission(int $id, array $data): UserPermission
     {
         try {
             return $this->repository->update($id, $data);
@@ -189,7 +190,7 @@ class BrokerTeamUserPermissionService
     /**
      * Toggle permission active status.
      */
-    public function togglePermissionActive(int $id): BrokerTeamUserPermission
+    public function togglePermissionActive(int $id): UserPermission
     {
         try {
             return $this->repository->toggleActive($id);
@@ -213,10 +214,11 @@ class BrokerTeamUserPermissionService
     /**
      * Assign broker permission to team user.
      */
-    public function assignBrokerPermission(int $teamUserId, int $brokerId, string $action = 'view'): BrokerTeamUserPermission
+    public function assignBrokerPermission(int $teamUserId, int $brokerId, string $action = 'view'): UserPermission
     {
         return $this->createPermission([
-            'broker_team_user_id' => $teamUserId,
+            'subject_type' => 'Modules\\Auth\\Models\\BrokerTeamUser',
+            'subject_id' => $teamUserId,
             'permission_type' => 'broker',
             'resource_id' => $brokerId,
             'action' => $action,
@@ -226,10 +228,11 @@ class BrokerTeamUserPermissionService
     /**
      * Assign country permission to team user.
      */
-    public function assignCountryPermission(int $teamUserId, string $country, string $action = 'view'): BrokerTeamUserPermission
+    public function assignCountryPermission(int $teamUserId, string $country, string $action = 'view'): UserPermission
     {
         return $this->createPermission([
-            'broker_team_user_id' => $teamUserId,
+            'subject_type' => 'Modules\\Auth\\Models\\BrokerTeamUser',
+            'subject_id' => $teamUserId,
             'permission_type' => 'country',
             'resource_value' => $country,
             'action' => $action,
@@ -239,10 +242,11 @@ class BrokerTeamUserPermissionService
     /**
      * Assign zone permission to team user.
      */
-    public function assignZonePermission(int $teamUserId, string $zone, string $action = 'view'): BrokerTeamUserPermission
+    public function assignZonePermission(int $teamUserId, string $zone, string $action = 'view'): UserPermission
     {
         return $this->createPermission([
-            'broker_team_user_id' => $teamUserId,
+            'subject_type' => 'Modules\\Auth\\Models\\BrokerTeamUser',
+            'subject_id' => $teamUserId,
             'permission_type' => 'zone',
             'resource_value' => $zone,
             'action' => $action,
@@ -252,10 +256,11 @@ class BrokerTeamUserPermissionService
     /**
      * Assign broker type permission to team user.
      */
-    public function assignBrokerTypePermission(int $teamUserId, string $brokerType, string $action = 'view'): BrokerTeamUserPermission
+    public function assignBrokerTypePermission(int $teamUserId, string $brokerType, string $action = 'view'):UserPermission
     {
         return $this->createPermission([
-            'broker_team_user_id' => $teamUserId,
+            'subject_type' => 'Modules\\Auth\\Models\\BrokerTeamUser',
+            'subject_id' => $teamUserId,
             'permission_type' => 'broker_type',
             'resource_value' => $brokerType,
             'action' => $action,

@@ -8,7 +8,7 @@ use Modules\Auth\Http\Controllers\RegisteredUserController;
 use Modules\Auth\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [RegisteredUserController::class, 'store'])
+Route::post('/user-register', [RegisteredUserController::class, 'store'])
                 ->middleware('guest')
                 ->name('register');
 

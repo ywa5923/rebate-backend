@@ -11,9 +11,9 @@ use Modules\Auth\Http\Controllers\RegisteredUserController;
 use Modules\Auth\Http\Controllers\VerifyEmailController;
 
 // Broker registration routes
-Route::prefix('api')->group(function () {
+Route::group([], function () {
     // Broker registration
-    Route::post('/register', [ApiAuthController::class, 'register']);
+    Route::post('/register-broker', [ApiAuthController::class, 'registerBroker']);
     
     // Get available broker types
     Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
@@ -23,6 +23,9 @@ Route::prefix('api')->group(function () {
     Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLink']);
     Route::post('/magic-link/revoke', [ApiAuthController::class, 'revokeBrokerTokens']);
     Route::get('/magic-link/stats', [ApiAuthController::class, 'getMagicLinkStats']);
+    
+    // Platform user magic link authentication
+    Route::post('/platform-user/magic-link/send', [ApiAuthController::class, 'sendPlatformUserMagicLink']);
     
     // Team management
     Route::post('/teams', [ApiAuthController::class, 'createTeam']);

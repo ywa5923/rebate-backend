@@ -3,17 +3,17 @@
 namespace Modules\Auth\Services;
 
 use Modules\Auth\Models\BrokerTeamUser;
-use Modules\Auth\Models\BrokerTeamUserPermission;
-use Modules\Auth\Services\BrokerTeamUserPermissionService;
+use Modules\Auth\Models\UserPermission;
+use Modules\Auth\Services\UserPermissionService;
 use Modules\Brokers\Models\Broker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SuperAdminService
 {
-    protected BrokerTeamUserPermissionService $permissionService;
+    protected UserPermissionService $permissionService;
 
-    public function __construct(BrokerTeamUserPermissionService $permissionService)
+    public function __construct(UserPermissionService $permissionService)
     {
         $this->permissionService = $permissionService;
     }
@@ -21,7 +21,7 @@ class SuperAdminService
     /**
      * Assign country management to a user (SaaS super admin function).
      */
-    public function assignCountryManagement(int $teamUserId, string $country, array $options = []): BrokerTeamUserPermission
+    public function assignCountryManagement(int $teamUserId, string $country, array $options = []): UserPermission
     {
         try {
             DB::beginTransaction();
@@ -67,7 +67,7 @@ class SuperAdminService
     /**
      * Assign zone management to a user (SaaS super admin function).
      */
-    public function assignZoneManagement(int $teamUserId, string $zone, array $options = []): BrokerTeamUserPermission
+    public function assignZoneManagement(int $teamUserId, string $zone, array $options = []): UserPermission
     {
         try {
             DB::beginTransaction();
@@ -110,7 +110,7 @@ class SuperAdminService
     /**
      * Assign global broker management to a user (SaaS super admin function).
      */
-    public function assignGlobalBrokerManagement(int $teamUserId, array $options = []): BrokerTeamUserPermission
+    public function assignGlobalBrokerManagement(int $teamUserId, array $options = []): UserPermission
     {
         try {
             DB::beginTransaction();
@@ -343,7 +343,7 @@ class SuperAdminService
     public function revokeCountryManagement(int $teamUserId, string $country): bool
     {
         try {
-            $deleted = BrokerTeamUserPermission::where('broker_team_user_id', $teamUserId)
+            $deleted = UserPermission::where('broker_team_user_id', $teamUserId)
                                              ->where('permission_type', 'country')
                                              ->where('resource_value', $country)
                                              ->where('action', 'manage')

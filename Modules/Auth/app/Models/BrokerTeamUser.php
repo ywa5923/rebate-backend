@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Modules\Auth\Models\MagicLink;
 use Modules\Brokers\Models\Broker;
 use Modules\Auth\Models\BrokerTeam;
-use Modules\Auth\Models\BrokerTeamUserPermission;
+use Modules\Auth\Models\UserPermission;
 
 class BrokerTeamUser extends Authenticatable
 {
@@ -62,7 +62,8 @@ class BrokerTeamUser extends Authenticatable
      */
     public function magicLinks(): HasMany
     {
-        return $this->hasMany(MagicLink::class, 'broker_team_user_id');
+        return $this->hasMany(MagicLink::class, 'subject_id')
+                    ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
     }
 
     /**
@@ -70,7 +71,8 @@ class BrokerTeamUser extends Authenticatable
      */
     public function resourcePermissions(): HasMany
     {
-        return $this->hasMany(BrokerTeamUserPermission::class, 'broker_team_user_id');
+        return $this->hasMany(UserPermission::class, 'subject_id')
+                    ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
     }
 
     /**

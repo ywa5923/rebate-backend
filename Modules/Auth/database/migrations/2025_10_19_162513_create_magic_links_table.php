@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('magic_links', function (Blueprint $table) {
             $table->id();
+            $table->string('subject_type')->nullable(); // Modules\Auth\Models\BrokerTeamUser or Modules\Auth\Models\PlatformUser
+            $table->unsignedBigInteger('subject_id')->nullable(); // broker_team_user_id or platform_user_id
+            $table->unsignedBigInteger('context_broker_id')->nullable(); // Optional broker context (analytics/scoping)
             $table->string('token', 64)->unique();
-            $table->foreignId('broker_id')->constrained()->onDelete('cascade');
             $table->string('email');
             $table->string('action')->default('login'); // login, registration, password_reset
             $table->json('metadata')->nullable(); // Additional data
@@ -25,7 +27,8 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index(['token', 'expires_at']);
-            $table->index(['broker_id', 'action']);
+            $table->index(['subject_type', 'subject_id']);
+            $table->index(['context_broker_id']);
         });
     }
 

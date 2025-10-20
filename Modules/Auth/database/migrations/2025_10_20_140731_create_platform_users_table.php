@@ -11,21 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broker_team_users', function (Blueprint $table) {
+        Schema::create('platform_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('broker_team_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password')->nullable(); // Optional password for direct login
-            // $table->string('role')->default('member'); // admin, manager, member
-            // $table->json('permissions')->nullable(); // Individual user permissions
+            $table->string('password')->nullable(); // Can be null if only magic link login
+            $table->string('role')->default('admin'); // e.g., 'country_admin', 'global_admin'
             $table->boolean('is_active')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('last_login_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
-            
-            $table->index(['broker_team_id', 'is_active']);
-            $table->index(['email', 'is_active']);
         });
     }
 
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('broker_team_users');
+        Schema::dropIfExists('platform_users');
     }
 };

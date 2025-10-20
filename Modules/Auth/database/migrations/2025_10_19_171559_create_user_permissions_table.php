@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broker_team_user_permissions', function (Blueprint $table) {
+        Schema::create('user_permissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('broker_team_user_id')->constrained()->onDelete('cascade');
+            $table->string('subject_type')->nullable(); // Modules\Auth\Models\BrokerTeamUser or Modules\Auth\Models\PlatformUser
+            $table->unsignedBigInteger('subject_id')->nullable(); // broker_team_user_id or platform_user_id
             $table->enum('permission_type', ['broker', 'country', 'zone', 'broker_type']);
             $table->unsignedBigInteger('resource_id')->nullable(); // For specific broker IDs
             $table->string('resource_value')->nullable(); // For countries, zones, broker types
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Indexes for better performance
-            $table->index(['broker_team_user_id', 'permission_type']);
+            $table->index(['subject_type', 'subject_id']);
             $table->index(['permission_type', 'resource_id']);
             $table->index(['permission_type', 'resource_value']);
             $table->index(['action', 'is_active']);
@@ -35,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('broker_team_user_permissions');
+        Schema::dropIfExists('user_permissions');
     }
 };

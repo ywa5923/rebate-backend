@@ -57,7 +57,7 @@ class MagicLinkRepository
      * @param int $id
      * @return MagicLink|null
      */
-    public function findById(int $id): ?MagicLink
+    public function find(int $id): ?MagicLink
     {
         return $this->model->newQuery()->find($id);
     }
@@ -73,27 +73,55 @@ class MagicLinkRepository
     }
 
     /**
-     * Find MagicLink by token with broker relationship.
+     * Check if token exists.
      * @param string $token
-     * @return MagicLink|null
+     * @return bool
      */
-    public function findByTokenWithBroker(string $token): ?MagicLink
+    public function tokenExists(string $token): bool
     {
-        return $this->model->newQuery()
-            ->with('broker')
-            ->where('token', $token)
-            ->first();
+        return $this->model->newQuery()->where('token', $token)->exists();
     }
 
     /**
-     * Get all MagicLinks for a specific broker.
+     * Mark MagicLink as used.
+     * @param MagicLink $magicLink
+     * @return bool
+     */
+    public function markAsUsed(MagicLink $magicLink): bool
+    {
+        return $magicLink->update(['used_at' => now()]);
+    }
+
+    /**
+     * Get MagicLinks by subject (polymorphic).
+     * @param string $subjectType
+     * @param int $subjectId
+     * @param string|null $action
+     * @return Collection
+     */
+    public function getBySubject(string $subjectType, int $subjectId, ?string $action = null): Collection
+    {
+        $query = $this->model->newQuery()
+            ->where('subject_type', $subjectType)
+            ->where('subject_id', $subjectId);
+
+        if ($action) {
+            $query->where('action', $action);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * Get MagicLinks by broker ID (legacy support).
      * @param int $brokerId
      * @param string|null $action
      * @return Collection
      */
     public function getByBrokerId(int $brokerId, ?string $action = null): Collection
     {
-        $query = $this->model->newQuery()->where('broker_id', $brokerId);
+        $query = $this->model->newQuery()->where('subject_type', 'Modules\\Brokers\\Models\\Broker')
+            ->where('subject_id', $brokerId);
 
         if ($action) {
             $query->where('action', $action);
@@ -137,57 +165,44 @@ class MagicLinkRepository
     }
 
     /**
-     * Get valid MagicLinks for a specific broker.
-     * @param int $brokerId
-     * @param string|null $action
-     * @return Collection
+     * Delete expired MagicLinks for a specific subject.
+     * @param string $subjectType
+     * @param int $subjectId
+     * @return int Number of deleted records
      */
-    public function getValidByBrokerId(int $brokerId, ?string $action = null): Collection
+    public function deleteExpiredBySubject(string $subjectType, int $subjectId): int
     {
-        $query = $this->model->newQuery()
-            ->where('broker_id', $brokerId)
-            ->where('expires_at', '>', now())
-            ->whereNull('used_at');
-
-        if ($action) {
-            $query->where('action', $action);
-        }
-
-        return $query->orderBy('created_at', 'desc')->get();
+        return $this->model->newQuery()
+            ->where('subject_type', $subjectType)
+            ->where('subject_id', $subjectId)
+            ->where('expires_at', '<=', now())
+            ->delete();
     }
 
     /**
-     * Check if a token exists and is unique.
-     * @param string $token
-     * @return bool
-     */
-    public function tokenExists(string $token): bool
-    {
-        return $this->model->newQuery()->where('token', $token)->exists();
-    }
-
-    /**
-     * Delete expired MagicLinks for a specific broker.
+     * Delete expired MagicLinks for a broker (legacy support).
      * @param int $brokerId
      * @return int Number of deleted records
      */
     public function deleteExpiredByBrokerId(int $brokerId): int
     {
         return $this->model->newQuery()
-            ->where('broker_id', $brokerId)
+            ->where('subject_type', 'Modules\\Brokers\\Models\\Broker')
+            ->where('subject_id', $brokerId)
             ->where('expires_at', '<=', now())
             ->delete();
     }
 
     /**
-     * Delete expired MagicLinks for a specific team user.
+     * Delete expired MagicLinks for a team user (legacy support).
      * @param int $teamUserId
      * @return int Number of deleted records
      */
     public function deleteExpiredByTeamUserId(int $teamUserId): int
     {
         return $this->model->newQuery()
-            ->where('broker_team_user_id', $teamUserId)
+            ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+            ->where('subject_id', $teamUserId)
             ->where('expires_at', '<=', now())
             ->delete();
     }
@@ -204,87 +219,80 @@ class MagicLinkRepository
     }
 
     /**
-     * Mark all valid MagicLinks for a broker as used.
+     * Mark all MagicLinks as used for a specific subject.
+     * @param string $subjectType
+     * @param int $subjectId
+     * @return int Number of updated records
+     */
+    public function markAsUsedBySubject(string $subjectType, int $subjectId): int
+    {
+        return $this->model->newQuery()
+            ->where('subject_type', $subjectType)
+            ->where('subject_id', $subjectId)
+            ->whereNull('used_at')
+            ->update(['used_at' => now()]);
+    }
+
+    /**
+     * Mark all MagicLinks as used for a broker (legacy support).
      * @param int $brokerId
      * @return int Number of updated records
      */
     public function markAsUsedByBrokerId(int $brokerId): int
     {
         return $this->model->newQuery()
-            ->where('broker_id', $brokerId)
-            ->where('expires_at', '>', now())
+            ->where('subject_type', 'Modules\\Brokers\\Models\\Broker')
+            ->where('subject_id', $brokerId)
             ->whereNull('used_at')
             ->update(['used_at' => now()]);
     }
 
     /**
-     * Mark a specific MagicLink as used.
-     * @param MagicLink $magicLink
-     * @return bool
-     */
-    public function markAsUsed(MagicLink $magicLink): bool
-    {
-        return $magicLink->update(['used_at' => now()]);
-    }
-
-    /**
-     * Get MagicLink statistics.
-     * @return array
-     */
-    public function getStats(): array
-    {
-        $total = $this->model->newQuery()->count();
-        $valid = $this->model->newQuery()
-            ->where('expires_at', '>', now())
-            ->whereNull('used_at')
-            ->count();
-        $expired = $this->model->newQuery()
-            ->where('expires_at', '<=', now())
-            ->count();
-        $used = $this->model->newQuery()
-            ->whereNotNull('used_at')
-            ->count();
-
-        $byAction = $this->model->newQuery()
-            ->selectRaw('action, COUNT(*) as count')
-            ->groupBy('action')
-            ->pluck('count', 'action')
-            ->toArray();
-
-        return [
-            'total' => $total,
-            'valid' => $valid,
-            'expired' => $expired,
-            'used' => $used,
-            'by_action' => $byAction,
-        ];
-    }
-
-    /**
-     * Get MagicLinks by action.
-     * @param string $action
+     * Get MagicLinks with filters.
+     * @param array $filters
      * @return Collection
      */
-    public function getByAction(string $action): Collection
+    public function getWithFilters(array $filters = []): Collection
     {
-        return $this->model->newQuery()
-            ->where('action', $action)
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
+        $query = $this->model->newQuery();
 
-    /**
-     * Get MagicLinks created within a date range.
-     * @param string $startDate
-     * @param string $endDate
-     * @return Collection
-     */
-    public function getByDateRange(string $startDate, string $endDate): Collection
-    {
-        return $this->model->newQuery()
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        if (isset($filters['subject_type'])) {
+            $query->where('subject_type', $filters['subject_type']);
+        }
+
+        if (isset($filters['subject_id'])) {
+            $query->where('subject_id', $filters['subject_id']);
+        }
+
+        if (isset($filters['action'])) {
+            $query->where('action', $filters['action']);
+        }
+
+        if (isset($filters['email'])) {
+            $query->where('email', 'like', '%' . $filters['email'] . '%');
+        }
+
+        if (isset($filters['is_expired'])) {
+            if ($filters['is_expired']) {
+                $query->where('expires_at', '<=', now());
+            } else {
+                $query->where('expires_at', '>', now());
+            }
+        }
+
+        if (isset($filters['is_used'])) {
+            if ($filters['is_used']) {
+                $query->whereNotNull('used_at');
+            } else {
+                $query->whereNull('used_at');
+            }
+        }
+
+        if (isset($filters['context_broker_id'])) {
+            $query->where('context_broker_id', $filters['context_broker_id']);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -296,55 +304,40 @@ class MagicLinkRepository
     public function paginate(int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $this->model->newQuery()
-            ->with('broker')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
-     * Get MagicLinks with filters.
-     * @param array $filters
-     * @return Collection
+     * Get MagicLink statistics.
+     * @return array
      */
-    public function getWithFilters(array $filters = []): Collection
+    public function getStats(): array
     {
-        $query = $this->model->newQuery()->with('broker');
+        $total = $this->model->newQuery()->count();
+        $valid = $this->model->newQuery()->where('expires_at', '>', now())->whereNull('used_at')->count();
+        $expired = $this->model->newQuery()->where('expires_at', '<=', now())->count();
+        $used = $this->model->newQuery()->whereNotNull('used_at')->count();
 
-        if (isset($filters['broker_id'])) {
-            $query->where('broker_id', $filters['broker_id']);
-        }
+        $byAction = $this->model->newQuery()
+            ->selectRaw('action, COUNT(*) as count')
+            ->groupBy('action')
+            ->pluck('count', 'action')
+            ->toArray();
 
-        if (isset($filters['action'])) {
-            $query->where('action', $filters['action']);
-        }
+        $bySubjectType = $this->model->newQuery()
+            ->selectRaw('subject_type, COUNT(*) as count')
+            ->groupBy('subject_type')
+            ->pluck('count', 'subject_type')
+            ->toArray();
 
-        if (isset($filters['email'])) {
-            $query->where('email', 'like', '%' . $filters['email'] . '%');
-        }
-
-        if (isset($filters['status'])) {
-            switch ($filters['status']) {
-                case 'valid':
-                    $query->where('expires_at', '>', now())
-                          ->whereNull('used_at');
-                    break;
-                case 'expired':
-                    $query->where('expires_at', '<=', now());
-                    break;
-                case 'used':
-                    $query->whereNotNull('used_at');
-                    break;
-            }
-        }
-
-        if (isset($filters['date_from'])) {
-            $query->where('created_at', '>=', $filters['date_from']);
-        }
-
-        if (isset($filters['date_to'])) {
-            $query->where('created_at', '<=', $filters['date_to']);
-        }
-
-        return $query->orderBy('created_at', 'desc')->get();
+        return [
+            'total' => $total,
+            'valid' => $valid,
+            'expired' => $expired,
+            'used' => $used,
+            'by_action' => $byAction,
+            'by_subject_type' => $bySubjectType,
+        ];
     }
 }

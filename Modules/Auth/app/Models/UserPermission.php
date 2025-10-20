@@ -4,14 +4,18 @@ namespace Modules\Auth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class BrokerTeamUserPermission extends Model
+class UserPermission extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_permissions';
+
     protected $fillable = [
-        'broker_team_user_id',
+        'subject_type',
+        'subject_id',
         'permission_type',
         'resource_id',
         'resource_value',
@@ -39,6 +43,14 @@ class BrokerTeamUserPermission extends Model
     public function broker(): BelongsTo
     {
         return $this->teamUser->team->broker();
+    }
+
+    /**
+     * Polymorphic subject (team user, platform user, etc.).
+     */
+    public function subject(): MorphTo
+    {
+        return $this->morphTo(null, 'subject_type', 'subject_id');
     }
 
     /**

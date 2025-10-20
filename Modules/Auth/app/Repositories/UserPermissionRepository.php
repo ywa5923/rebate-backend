@@ -2,15 +2,15 @@
 
 namespace Modules\Auth\Repositories;
 
-use Modules\Auth\Models\BrokerTeamUserPermission;
+use Modules\Auth\Models\UserPermission;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class BrokerTeamUserPermissionRepository
+class UserPermissionRepository
 {
-    protected BrokerTeamUserPermission $model;
+    protected UserPermission $model;
 
-    public function __construct(BrokerTeamUserPermission $model)
+    public function __construct(UserPermission $model)
     {
         $this->model = $model;
     }
@@ -18,7 +18,7 @@ class BrokerTeamUserPermissionRepository
     /**
      * Create a new permission.
      */
-    public function create(array $data): BrokerTeamUserPermission
+    public function create(array $data): UserPermission
     {
         return $this->model->create($data);
     }
@@ -26,7 +26,7 @@ class BrokerTeamUserPermissionRepository
     /**
      * Update a permission.
      */
-    public function update(int $id, array $data): BrokerTeamUserPermission
+    public function update(int $id, array $data): UserPermission
     {
         $permission = $this->model->findOrFail($id);
         $permission->update($data);
@@ -44,7 +44,7 @@ class BrokerTeamUserPermissionRepository
     /**
      * Find permission by ID.
      */
-    public function find(int $id): ?BrokerTeamUserPermission
+    public function find(int $id): ?UserPermission
     {
         return $this->model->find($id);
     }
@@ -54,7 +54,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getByTeamUserId(int $teamUserId): Collection
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->active()
                           ->orderBy('permission_type')
                           ->orderBy('action')
@@ -66,7 +67,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getByTeamUserAndType(int $teamUserId, string $type): Collection
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->ofType($type)
                           ->active()
                           ->get();
@@ -77,7 +79,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getByTeamUserAndAction(int $teamUserId, string $action): Collection
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->withAction($action)
                           ->active()
                           ->get();
@@ -88,7 +91,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getForResource(int $teamUserId, string $type, $resourceId = null, $resourceValue = null): Collection
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->forResource($type, $resourceId, $resourceValue)
                           ->active()
                           ->get();
@@ -99,7 +103,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function hasPermission(int $teamUserId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->forResource($type, $resourceId, $resourceValue)
                           ->withAction($action)
                           ->active()
@@ -111,7 +116,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function canPerformAction(int $teamUserId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
     {
-        $permissions = $this->model->where('broker_team_user_id', $teamUserId)
+        $permissions = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                                  ->where('subject_id', $teamUserId)
                                   ->forResource($type, $resourceId, $resourceValue)
                                   ->active()
                                   ->get();
@@ -130,7 +136,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getWithFilters(int $teamUserId, array $filters = []): Collection
     {
-        $query = $this->model->where('broker_team_user_id', $teamUserId);
+        $query = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                            ->where('subject_id', $teamUserId);
 
         if (isset($filters['permission_type'])) {
             $query->ofType($filters['permission_type']);
@@ -160,7 +167,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function paginate(int $teamUserId, int $perPage = 15, int $page = 1): LengthAwarePaginator
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->orderBy('permission_type')
                           ->orderBy('action')
                           ->paginate($perPage, ['*'], 'page', $page);
@@ -179,7 +187,9 @@ class BrokerTeamUserPermissionRepository
      */
     public function deleteByTeamUserId(int $teamUserId): int
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)->delete();
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
+                          ->delete();
     }
 
     /**
@@ -187,7 +197,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function deleteByType(int $teamUserId, string $type): int
     {
-        return $this->model->where('broker_team_user_id', $teamUserId)
+        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                          ->where('subject_id', $teamUserId)
                           ->ofType($type)
                           ->delete();
     }
@@ -195,7 +206,7 @@ class BrokerTeamUserPermissionRepository
     /**
      * Toggle permission active status.
      */
-    public function toggleActive(int $id): BrokerTeamUserPermission
+    public function toggleActive(int $id): UserPermission
     {
         $permission = $this->model->findOrFail($id);
         $permission->update(['is_active' => !$permission->is_active]);
@@ -207,7 +218,8 @@ class BrokerTeamUserPermissionRepository
      */
     public function getStats(int $teamUserId): array
     {
-        $stats = $this->model->where('broker_team_user_id', $teamUserId)
+        $stats = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
+                            ->where('subject_id', $teamUserId)
                             ->selectRaw('
                                 permission_type,
                                 action,
@@ -223,5 +235,41 @@ class BrokerTeamUserPermissionRepository
             'by_type' => $stats->groupBy('permission_type'),
             'by_action' => $stats->groupBy('action'),
         ];
+    }
+
+    /**
+     * Get permissions for any subject type (polymorphic).
+     */
+    public function getBySubject(string $subjectType, int $subjectId): Collection
+    {
+        return $this->model->where('subject_type', $subjectType)
+                          ->where('subject_id', $subjectId)
+                          ->active()
+                          ->orderBy('permission_type')
+                          ->orderBy('action')
+                          ->get();
+    }
+
+    /**
+     * Check if subject has specific permission (polymorphic).
+     */
+    public function hasSubjectPermission(string $subjectType, int $subjectId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
+    {
+        return $this->model->where('subject_type', $subjectType)
+                          ->where('subject_id', $subjectId)
+                          ->forResource($type, $resourceId, $resourceValue)
+                          ->withAction($action)
+                          ->active()
+                          ->exists();
+    }
+
+    /**
+     * Delete all permissions for a subject (polymorphic).
+     */
+    public function deleteBySubject(string $subjectType, int $subjectId): int
+    {
+        return $this->model->where('subject_type', $subjectType)
+                          ->where('subject_id', $subjectId)
+                          ->delete();
     }
 }

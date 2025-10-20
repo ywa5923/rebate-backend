@@ -4,14 +4,16 @@ namespace Modules\Auth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Brokers\Models\Broker;
 
 class MagicLink extends Model
 {
     protected $fillable = [
         'token',
-        'broker_id',
-        'broker_team_user_id',
+        'subject_type',
+        'subject_id',
+        'context_broker_id',
         'email',
         'action',
         'metadata',
@@ -19,7 +21,6 @@ class MagicLink extends Model
         'used_at',
         'ip_address',
         'user_agent',
-        'user_type',
     ];
 
     protected $casts = [
@@ -47,12 +48,9 @@ class MagicLink extends Model
     /**
      * Get the user (broker or team user) that owns the magic link.
      */
-    public function user()
+    public function subject(): MorphTo
     {
-        if ($this->user_type === 'team_user') {
-            return $this->teamUser();
-        }
-        return $this->broker();
+        return $this->morphTo(null, 'subject_type', 'subject_id');
     }
 
     /**

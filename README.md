@@ -178,3 +178,5 @@ docker exec -it backend-laravel-1 php artisan app:magic-import
  docker exec -it backend-laravel-1 php artisan db:seed --class=\\Modules\\Brokers\\Database\\Seeders\\DatabaseSeeder
 
 docker exec -it backend-laravel-1 php artisan migrate:rollback --step=2
+
+docker exec -it backend-laravel-1 php artisan migrate --path=Modules/Auth/database/migrations

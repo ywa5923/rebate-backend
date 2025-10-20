@@ -4,6 +4,7 @@ namespace Modules\Auth\Services;
 
 use Modules\Auth\Models\MagicLink;
 use Modules\Auth\Models\BrokerTeamUser;
+use Modules\Auth\Models\PlatformUser;
 use Modules\Auth\Repositories\MagicLinkRepository;
 use Modules\Brokers\Models\Broker;
 use Illuminate\Support\Str;
@@ -19,31 +20,7 @@ class MagicLinkService
         $this->repository = $repository;
     }
 
-    /**
-     * Generate a magic link for a broker.
-     */
-    public function generateForBroker(Broker $broker, string $action = 'login', array $metadata = [], int $expirationHours = 24): MagicLink
-    {
-        // Clean up old tokens for this broker
-        $this->cleanupExpiredTokens($broker->id);
-
-        $token = $this->generateUniqueToken();
-        $expiresAt = now()->addHours($expirationHours);
-
-        return $this->repository->create([
-            'token' => $token,
-            'broker_id' => $broker->id,
-            'broker_team_user_id' => null,
-            'email' => $broker->email ?? $broker->registration_language, // Fallback if no email
-            'action' => $action,
-            'metadata' => $metadata,
-            'expires_at' => $expiresAt,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'user_type' => 'broker',
-        ]);
-    }
-
+   
     /**
      * Generate a magic link for a team user.
      */
@@ -57,15 +34,40 @@ class MagicLinkService
 
         return $this->repository->create([
             'token' => $token,
-            'broker_id' => $teamUser->team->broker_id,
-            'broker_team_user_id' => $teamUser->id,
+            'subject_type' => BrokerTeamUser::class,
+            'subject_id' => $teamUser->id,
+            'context_broker_id' => $teamUser->team->broker_id,
             'email' => $teamUser->email,
             'action' => $action,
             'metadata' => $metadata,
             'expires_at' => $expiresAt,
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'user_type' => 'team_user',
+        ]);
+    }
+
+    /**
+     * Generate a magic link for a platform user.
+     */
+    public function generateForPlatformUser(PlatformUser $platformUser, string $action = 'login', array $metadata = [], int $expirationHours = 24, ?int $contextBrokerId = null): MagicLink
+    {
+        // Clean up old tokens for this platform user
+        $this->cleanupExpiredTokensForPlatformUser($platformUser->id);
+
+        $token = $this->generateUniqueToken();
+        $expiresAt = now()->addHours($expirationHours);
+
+        return $this->repository->create([
+            'token' => $token,
+            'subject_type' => PlatformUser::class,
+            'subject_id' => $platformUser->id,
+            'context_broker_id' => $contextBrokerId,
+            'email' => $platformUser->email,
+            'action' => $action,
+            'metadata' => $metadata,
+            'expires_at' => $expiresAt,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
         ]);
     }
 
@@ -103,20 +105,21 @@ class MagicLinkService
         return $token;
     }
 
-    /**
-     * Clean up expired tokens for a broker.
-     */
-    public function cleanupExpiredTokens(int $brokerId): int
-    {
-        return $this->repository->deleteExpiredByBrokerId($brokerId);
-    }
 
     /**
      * Clean up expired tokens for a team user.
      */
     public function cleanupExpiredTokensForTeamUser(int $teamUserId): int
     {
-        return $this->repository->deleteExpiredByTeamUserId($teamUserId);
+        return $this->repository->deleteExpiredBySubject('Modules\\Auth\\Models\\BrokerTeamUser', $teamUserId);
+    }
+
+    /**
+     * Clean up expired tokens for a platform user.
+     */
+    public function cleanupExpiredTokensForPlatformUser(int $platformUserId): int
+    {
+        return $this->repository->deleteExpiredBySubject('Modules\\Auth\\Models\\PlatformUser', $platformUserId);
     }
 
     /**
@@ -127,21 +130,6 @@ class MagicLinkService
         return $this->repository->deleteAllExpired();
     }
 
-    /**
-     * Get magic links for a broker.
-     */
-    public function getBrokerMagicLinks(int $brokerId, ?string $action = null): Collection
-    {
-        return $this->repository->getByBrokerId($brokerId, $action);
-    }
-
-    /**
-     * Revoke all active magic links for a broker.
-     */
-    public function revokeBrokerTokens(int $brokerId): int
-    {
-        return $this->repository->markAsUsedByBrokerId($brokerId);
-    }
 
     /**
      * Get magic link statistics.

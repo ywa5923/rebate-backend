@@ -8,29 +8,34 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerType;
 use Modules\Auth\Models\MagicLink;
 use Modules\Auth\Models\BrokerTeam;
 use Modules\Auth\Models\BrokerTeamUser;
+use Modules\Auth\Models\PlatformUser;
 use Modules\Auth\Services\MagicLinkService;
 use Modules\Auth\Services\BrokerTeamService;
-use Modules\Auth\Services\BrokerTeamUserPermissionService;
+use Modules\Auth\Services\UserPermissionService;
 use Modules\Auth\Services\SuperAdminService;
 use Modules\Auth\Mail\MagicLinkMail;
 use Illuminate\Support\Facades\Log;
+use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Models\BrokerOption;
 
 class ApiAuthController extends Controller
 {
     protected MagicLinkService $magicLinkService;
     protected BrokerTeamService $teamService;
-    protected BrokerTeamUserPermissionService $permissionService;
+    protected UserPermissionService $permissionService;
     protected SuperAdminService $superAdminService;
 
     public function __construct(
         MagicLinkService $magicLinkService, 
         BrokerTeamService $teamService,
-        BrokerTeamUserPermissionService $permissionService,
+        UserPermissionService $permissionService,
         SuperAdminService $superAdminService
     ) {
         $this->magicLinkService = $magicLinkService;
@@ -67,13 +72,19 @@ class ApiAuthController extends Controller
     /**
      * Register a new broker
      */
-    public function register(Request $request)
+    public function registerBroker(Request $request)
     {
         try {
             // Validate the request
             $validator = Validator::make($request->all(), [
                 'broker_type_name' => 'required|string|exists:broker_types,name',
-                'email' => 'required|email|unique:brokers,email',
+                'email' => [
+                    'required',
+                    'email',
+                  
+                   // Rule::unique('platform_users', 'email'),
+                    Rule::unique('broker_team_users', 'email'),
+                ],
                 'trading_name' => 'required|string|max:255',
                 'registration_language' => 'nullable|string|max:50',
                 'registration_zone' => 'nullable|string|max:50',
@@ -100,15 +111,64 @@ class ApiAuthController extends Controller
 
             // Create the broker
             $broker = DB::transaction(function () use ($request, $brokerType) {
-                return Broker::create([
+
+                $broker=Broker::create([
                     'broker_type_id' => $brokerType->id,
                     'registration_language' => $request->registration_language,
                     'registration_zone' => $request->registration_zone,
                 ]);
+
+                //insert broker option value trading_name
+                //get the trading name option
+               $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
+               OptionValue::create([
+                'optionable_type' => Broker::class,
+                'optionable_id' => $broker->id,
+                'option_slug' => 'trading_name',
+                'value' => $request->trading_name,
+                'broker_id' => $broker->id,
+                'broker_option_id' => $tradingNameOption->id,
+            ]);
+
+                //create a default team for the broker and add a user in that team
+                $team = $this->teamService->createTeam([
+                    'broker_id' => $broker->id,
+                    'name' => 'Default Team',
+                    'description' => 'Default team for the broker',
+                    'permissions' => [],
+                ]);
+                $user = $this->teamService->createTeamUser([
+                    'broker_team_id' => $team->id,
+                    'name' => 'Default User',
+                    'email' => $request->email,
+                    'is_active' => true,
+                ]);
+
+                //generate user permission for the user
+                $this->permissionService->createPermission([
+                    'subject_type' => BrokerTeamUser::class,
+                    'subject_id' => $user->id,
+                    'permission_type' => 'broker',
+                    'resource_id' => $broker->id,
+                    'action' => 'manage',
+                ]);
+
+                //generate magic link for broker
+                $magicLink = $this->magicLinkService->generateForTeamUser(
+                    $user,
+                    'registration',
+                    ['requested_at' => now()],
+                    24
+                );
+
+                //send email with magic link
+                Mail::to($user->email)->send(new MagicLinkMail($magicLink));
+
+                return $broker;
             });
 
             // Load the broker type relationship
-            $broker->load('brokerType');
+            $broker->load('brokerType','dynamicOptionsValues');
 
             return response()->json([
                 'success' => true,
@@ -155,7 +215,7 @@ class ApiAuthController extends Controller
     }
 
     /**
-     * Send magic link to broker email
+     * Send magic link to broker email (creates platform user for broker)
      */
     public function sendMagicLink(Request $request)
     {
@@ -178,17 +238,28 @@ class ApiAuthController extends Controller
             $broker = Broker::findOrFail($request->broker_id);
             $action = $request->action ?? 'login';
             $expirationHours = $request->expiration_hours ?? 24;
+            $email = $request->email ?? $broker->email ?? $broker->registration_language;
 
-            // Generate magic link
-            $magicLink = $this->magicLinkService->generateForBroker(
-                $broker, 
+            // Create or find platform user for this broker
+            $platformUser = PlatformUser::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $broker->name ?? 'Broker User',
+                    'broker_id' => $broker->id,
+                    'is_active' => true,
+                ]
+            );
+
+            // Generate magic link for platform user
+            $magicLink = $this->magicLinkService->generateForPlatformUser(
+                $platformUser, 
                 $action, 
-                ['requested_at' => now()],
-                $expirationHours
+                ['requested_at' => now(), 'broker_id' => $broker->id],
+                $expirationHours,
+                $broker->id // context_broker_id
             );
 
             // Send email
-            $email = $request->email ?? $broker->email ?? $broker->registration_language;
             Mail::to($email)->send(new MagicLinkMail($magicLink));
 
             return response()->json([
@@ -196,6 +267,7 @@ class ApiAuthController extends Controller
                 'message' => 'Magic link sent to your email',
                 'data' => [
                     'broker_id' => $broker->id,
+                    'platform_user_id' => $platformUser->id,
                     'action' => $action,
                     'expires_at' => $magicLink->expires_at,
                 ]
@@ -242,18 +314,40 @@ class ApiAuthController extends Controller
             // Mark as used
             $this->magicLinkService->markAsUsed($magicLink);
 
-            // For now, we'll return success with broker data
-            // In a real implementation, you might want to create a session or JWT token
-            $broker = $magicLink->broker->load('brokerType');
+            // Handle different subject types
+            $responseData = [
+                'action' => $magicLink->action,
+                'authenticated_at' => now(),
+                'user_type' => $magicLink->subject_type,
+            ];
+
+            // Load subject data based on type
+            switch ($magicLink->subject_type) {
+                case 'broker':
+                    $broker = $magicLink->subject->load('brokerType');
+                    $responseData['broker'] = $broker;
+                    break;
+                    
+                case 'broker_team_user':
+                    $teamUser = $magicLink->subject->load('team.broker');
+                    $responseData['team_user'] = $teamUser;
+                    $responseData['broker'] = $teamUser->team->broker;
+                    break;
+                    
+                case 'platform_user':
+                    $platformUser = $magicLink->subject;
+                    $responseData['platform_user'] = $platformUser;
+                    if ($magicLink->context_broker_id) {
+                        $broker = Broker::with('brokerType')->find($magicLink->context_broker_id);
+                        $responseData['context_broker'] = $broker;
+                    }
+                    break;
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Successfully authenticated',
-                'data' => [
-                    'broker' => $broker,
-                    'action' => $magicLink->action,
-                    'authenticated_at' => now(),
-                ]
+                'data' => $responseData
             ]);
 
         } catch (\Exception $e) {
@@ -262,6 +356,64 @@ class ApiAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to verify magic link',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send magic link for platform user
+     */
+    public function sendPlatformUserMagicLink(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'platform_user_id' => 'required|integer|exists:platform_users,id',
+                'action' => 'sometimes|string|in:login,registration,password_reset',
+                'expiration_hours' => 'sometimes|integer|min:1|max:168', // Max 1 week
+                'context_broker_id' => 'sometimes|integer|exists:brokers,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $platformUser = PlatformUser::findOrFail($request->platform_user_id);
+            $action = $request->input('action', 'login');
+            $expirationHours = $request->input('expiration_hours', 24);
+            $contextBrokerId = $request->input('context_broker_id');
+
+            $magicLink = $this->magicLinkService->generateForPlatformUser(
+                $platformUser,
+                $action,
+                [],
+                $expirationHours,
+                $contextBrokerId
+            );
+
+            // Send email
+            Mail::to($platformUser->email)->send(new MagicLinkMail($magicLink));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Magic link sent successfully',
+                'data' => [
+                    'platform_user_id' => $platformUser->id,
+                    'email' => $platformUser->email,
+                    'action' => $action,
+                    'expires_at' => $magicLink->expires_at,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Platform user magic link sending failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send magic link',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -309,7 +461,14 @@ class ApiAuthController extends Controller
                 ], 422);
             }
 
-            $revokedCount = $this->magicLinkService->revokeBrokerTokens($request->broker_id);
+            // Find platform users associated with this broker
+            $platformUsers = PlatformUser::where('broker_id', $request->broker_id)->get();
+            $revokedCount = 0;
+
+            // Revoke magic links for each platform user
+            foreach ($platformUsers as $platformUser) {
+                $revokedCount += $this->magicLinkService->cleanupExpiredTokensForPlatformUser($platformUser->id);
+            }
 
             return response()->json([
                 'success' => true,
@@ -418,7 +577,13 @@ class ApiAuthController extends Controller
             $validator = Validator::make($request->all(), [
                 'broker_team_id' => 'required|exists:broker_teams,id',
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:broker_team_users,email',
+                'email' => [
+                    'required',
+                    'email',
+                  
+                    //Rule::unique('platform_users', 'email'),
+                    Rule::unique('broker_team_users', 'email'),
+                ],
                 'password' => 'nullable|string|min:8',
                 'role' => 'required|in:admin,manager,member',
                 'permissions' => 'nullable|array',
