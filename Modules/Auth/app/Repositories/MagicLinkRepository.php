@@ -89,7 +89,12 @@ class MagicLinkRepository
      */
     public function markAsUsed(MagicLink $magicLink): bool
     {
-        return $magicLink->update(['used_at' => now()]);
+       
+            return  $magicLink->update([
+                'used_at' => now()
+            ]);
+        
+       
     }
 
     /**

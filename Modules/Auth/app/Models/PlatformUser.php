@@ -5,10 +5,14 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Auth\Models\MagicLink;
+use Modules\Auth\Models\UserPermission;
 
 class PlatformUser extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens;
 
     protected $fillable = [
         'name',
@@ -32,12 +36,22 @@ class PlatformUser extends Authenticatable
     ];
 
     /**
-     * Get magic links for this platform user.
+     * Deprecated: Get magic links for this platform user.
      */
-    public function magicLinks(): HasMany
+    public function magicLinksOld(): HasMany
     {
         return $this->hasMany(MagicLink::class, 'subject_id')
                     ->where('subject_type', 'Modules\\Auth\\Models\\PlatformUser');
+    }
+
+    /**
+     * Get magic links for this platform user.
+     * @return MorphMany
+     * @throws \Exception
+     */
+    public function magicLinks(): MorphMany
+    {
+        return $this->morphMany(MagicLink::class, 'subject');
     }
 
     /**

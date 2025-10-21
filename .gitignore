@@ -19,9 +19,6 @@ yarn-error.log
 /.vscode
 /docker/mysql
 
-# Tutorial and documentation files
-Modules/Auth/*.md
-Modules/Auth/RESOURCE_PERMISSIONS_TUTORIAL.md
-Modules/Auth/SUPER_ADMIN_TUTORIAL.md
-Modules/Auth/SAAS_SUPER_ADMIN_EXAMPLES.md
+# Documentation and tutorial files
+*.md
 

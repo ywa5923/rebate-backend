@@ -12,20 +12,25 @@ use Modules\Auth\Http\Controllers\VerifyEmailController;
 
 // Broker registration routes
 Route::group([], function () {
-    // Broker registration
+    // Broker registration by admin
     Route::post('/register-broker', [ApiAuthController::class, 'registerBroker']);
     
     // Get available broker types
     Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
     
     // Magic link authentication
-    Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
-    Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLink']);
+   // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
+   // Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLink']);
+    Route::post('/magic-link/verify-token', [ApiAuthController::class, 'verifyMagicLinkToken']);
+    Route::post('/magic-link/decode-token', [ApiAuthController::class, 'decodeToken']);
     Route::post('/magic-link/revoke', [ApiAuthController::class, 'revokeBrokerTokens']);
+    Route::post('/platform-user/revoke-tokens', [ApiAuthController::class, 'revokePlatformUserTokens']);
     Route::get('/magic-link/stats', [ApiAuthController::class, 'getMagicLinkStats']);
     
     // Platform user magic link authentication
     Route::post('/platform-user/magic-link/send', [ApiAuthController::class, 'sendPlatformUserMagicLink']);
+    
+   
     
     // Team management
     Route::post('/teams', [ApiAuthController::class, 'createTeam']);

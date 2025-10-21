@@ -115,4 +115,28 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | JWT Token Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for JWT tokens generated after magic link verification
+    |
+    */
+
+    'jwt_expiration_days' => (int) env('JWT_EXPIRATION_DAYS', 7),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Magic Link Testing Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Set to false to prevent magic links from being marked as used after verification.
+    | This allows the same magic link to be used multiple times for testing.
+    | WARNING: Only use this in development/testing environments!
+    |
+    */
+
+    'mark_magic_link_as_used' => env('MARK_MAGIC_LINK_AS_USED', true),
+
 ];

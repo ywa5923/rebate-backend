@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Brokers\Models\Broker;
+use Illuminate\Support\Facades\Log;
 
 class MagicLink extends Model
 {
@@ -82,7 +83,11 @@ class MagicLink extends Model
      */
     public function markAsUsed(): bool
     {
-        return $this->update(['used_at' => now()]);
+       
+        return $this->update([
+            'used_at' => now(),
+          
+        ]);
     }
 
     /**

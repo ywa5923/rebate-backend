@@ -7,14 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Modules\Auth\Models\MagicLink;
 use Modules\Brokers\Models\Broker;
 use Modules\Auth\Models\BrokerTeam;
 use Modules\Auth\Models\UserPermission;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
 
 class BrokerTeamUser extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens;
 
     protected $fillable = [
         'broker_team_id',
@@ -58,12 +61,22 @@ class BrokerTeamUser extends Authenticatable
     }
 
     /**
-     * Get magic links for this user.
+     * Deprecated: Get magic links for this user.
      */
-    public function magicLinks(): HasMany
+    public function magicLinksOld(): HasMany
     {
         return $this->hasMany(MagicLink::class, 'subject_id')
                     ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
+    }
+
+    /**
+     * Get magic links for this user.
+     * @return MorphMany
+     * @throws \Exception
+     */
+    public function magicLinks(): MorphMany
+    {
+        return $this->morphMany(MagicLink::class, 'subject');
     }
 
     /**

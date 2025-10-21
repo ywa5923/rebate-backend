@@ -158,11 +158,11 @@ class ApiAuthController extends Controller
                     $user,
                     'registration',
                     ['requested_at' => now()],
-                    24
+                    96 // 96 hours = 4 days
                 );
 
                 //send email with magic link
-                Mail::to($user->email)->send(new MagicLinkMail($magicLink));
+               // Mail::to($user->email)->send(new MagicLinkMail($magicLink));
 
                 return $broker;
             });
@@ -217,149 +217,153 @@ class ApiAuthController extends Controller
     /**
      * Send magic link to broker email (creates platform user for broker)
      */
-    public function sendMagicLink(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'broker_id' => 'required|exists:brokers,id',
-                'action' => 'nullable|in:login,registration,password_reset',
-                'email' => 'nullable|email',
-                'expiration_hours' => 'nullable|integer|min:1|max:168', // Max 7 days
-            ]);
+    // public function sendMagicLink(Request $request)
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'broker_id' => 'required|exists:brokers,id',
+    //             'action' => 'nullable|in:login,registration,password_reset',
+    //             'email' => 'nullable|email',
+    //             'expiration_hours' => 'nullable|integer|min:1|max:168', // Max 7 days
+    //         ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Validation failed',
+    //                 'errors' => $validator->errors()
+    //             ], 422);
+    //         }
 
-            $broker = Broker::findOrFail($request->broker_id);
-            $action = $request->action ?? 'login';
-            $expirationHours = $request->expiration_hours ?? 24;
-            $email = $request->email ?? $broker->email ?? $broker->registration_language;
+    //         $broker = Broker::findOrFail($request->broker_id);
+    //         $action = $request->action ?? 'login';
+    //         $expirationHours = $request->expiration_hours ?? 24;
+    //         $email = $request->email ?? $broker->email ?? $broker->registration_language;
 
-            // Create or find platform user for this broker
-            $platformUser = PlatformUser::firstOrCreate(
-                ['email' => $email],
-                [
-                    'name' => $broker->name ?? 'Broker User',
-                    'broker_id' => $broker->id,
-                    'is_active' => true,
-                ]
-            );
+    //         // Create or find platform user for this broker
+    //         $platformUser = PlatformUser::firstOrCreate(
+    //             ['email' => $email],
+    //             [
+    //                 'name' => $broker->name ?? 'Broker User',
+    //                 'broker_id' => $broker->id,
+    //                 'is_active' => true,
+    //             ]
+    //         );
 
-            // Generate magic link for platform user
-            $magicLink = $this->magicLinkService->generateForPlatformUser(
-                $platformUser, 
-                $action, 
-                ['requested_at' => now(), 'broker_id' => $broker->id],
-                $expirationHours,
-                $broker->id // context_broker_id
-            );
+    //         // Generate magic link for platform user
+    //         $magicLink = $this->magicLinkService->generateForPlatformUser(
+    //             $platformUser, 
+    //             $action, 
+    //             ['requested_at' => now(), 'broker_id' => $broker->id],
+    //             $expirationHours,
+    //             $broker->id // context_broker_id
+    //         );
 
-            // Send email
-            Mail::to($email)->send(new MagicLinkMail($magicLink));
+    //         // Send email
+    //         Mail::to($email)->send(new MagicLinkMail($magicLink));
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Magic link sent to your email',
-                'data' => [
-                    'broker_id' => $broker->id,
-                    'platform_user_id' => $platformUser->id,
-                    'action' => $action,
-                    'expires_at' => $magicLink->expires_at,
-                ]
-            ]);
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Magic link sent to your email',
+    //             'data' => [
+    //                 'broker_id' => $broker->id,
+    //                 'platform_user_id' => $platformUser->id,
+    //                 'action' => $action,
+    //                 'expires_at' => $magicLink->expires_at,
+    //             ]
+    //         ]);
 
-        } catch (\Exception $e) {
-            Log::error('Failed to send magic link: ' . $e->getMessage());
+    //     } catch (\Exception $e) {
+    //         Log::error('Failed to send magic link: ' . $e->getMessage());
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send magic link',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to send magic link',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
+   
+   
+   
+   
     /**
      * Verify magic link and authenticate broker
      */
-    public function verifyMagicLink(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'token' => 'required|string|size:64',
-            ]);
+    // public function verifyMagicLink(Request $request)
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'token' => 'required|string|size:64',
+    //         ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid token format',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid token format',
+    //                 'errors' => $validator->errors()
+    //             ], 422);
+    //         }
 
-            $magicLink = $this->magicLinkService->validateToken($request->token);
+    //         $magicLink = $this->magicLinkService->validateToken($request->token);
 
-            if (!$magicLink) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid or expired magic link'
-                ], 422);
-            }
+    //         if (!$magicLink) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid or expired magic link'
+    //             ], 422);
+    //         }
 
-            // Mark as used
-            $this->magicLinkService->markAsUsed($magicLink);
+    //         // Mark as used
+    //         $this->magicLinkService->markAsUsed($magicLink);
 
-            // Handle different subject types
-            $responseData = [
-                'action' => $magicLink->action,
-                'authenticated_at' => now(),
-                'user_type' => $magicLink->subject_type,
-            ];
+    //         // Handle different subject types
+    //         $responseData = [
+    //             'action' => $magicLink->action,
+    //             'authenticated_at' => now(),
+    //             'user_type' => $magicLink->subject_type,
+    //         ];
 
-            // Load subject data based on type
-            switch ($magicLink->subject_type) {
-                case 'broker':
-                    $broker = $magicLink->subject->load('brokerType');
-                    $responseData['broker'] = $broker;
-                    break;
+    //         // Load subject data based on type
+    //         switch ($magicLink->subject_type) {
+    //             case 'broker':
+    //                 $broker = $magicLink->subject->load('brokerType');
+    //                 $responseData['broker'] = $broker;
+    //                 break;
                     
-                case 'broker_team_user':
-                    $teamUser = $magicLink->subject->load('team.broker');
-                    $responseData['team_user'] = $teamUser;
-                    $responseData['broker'] = $teamUser->team->broker;
-                    break;
+    //             case 'broker_team_user':
+    //                 $teamUser = $magicLink->subject->load('team.broker');
+    //                 $responseData['team_user'] = $teamUser;
+    //                 $responseData['broker'] = $teamUser->team->broker;
+    //                 break;
                     
-                case 'platform_user':
-                    $platformUser = $magicLink->subject;
-                    $responseData['platform_user'] = $platformUser;
-                    if ($magicLink->context_broker_id) {
-                        $broker = Broker::with('brokerType')->find($magicLink->context_broker_id);
-                        $responseData['context_broker'] = $broker;
-                    }
-                    break;
-            }
+    //             case 'platform_user':
+    //                 $platformUser = $magicLink->subject;
+    //                 $responseData['platform_user'] = $platformUser;
+    //                 if ($magicLink->context_broker_id) {
+    //                     $broker = Broker::with('brokerType')->find($magicLink->context_broker_id);
+    //                     $responseData['context_broker'] = $broker;
+    //                 }
+    //                 break;
+    //         }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Successfully authenticated',
-                'data' => $responseData
-            ]);
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Successfully authenticated',
+    //             'data' => $responseData
+    //         ]);
 
-        } catch (\Exception $e) {
-            Log::error('Failed to verify magic link: ' . $e->getMessage());
+    //     } catch (\Exception $e) {
+    //         Log::error('Failed to verify magic link: ' . $e->getMessage());
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to verify magic link',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to verify magic link',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * Send magic link for platform user
@@ -461,21 +465,25 @@ class ApiAuthController extends Controller
                 ], 422);
             }
 
-            // Find platform users associated with this broker
-            $platformUsers = PlatformUser::where('broker_id', $request->broker_id)->get();
-            $revokedCount = 0;
+            $brokerId = $request->broker_id;
 
-            // Revoke magic links for each platform user
-            foreach ($platformUsers as $platformUser) {
-                $revokedCount += $this->magicLinkService->cleanupExpiredTokensForPlatformUser($platformUser->id);
+            // Revoke tokens for BrokerTeamUsers (through broker_teams relationship)
+            $brokerTeamUsers = BrokerTeamUser::whereHas('team', function($query) use ($brokerId) {
+                $query->where('broker_id', $brokerId);
+            })->get();
+            
+            $teamRevokedCount = 0;
+            foreach ($brokerTeamUsers as $teamUser) {
+                $teamRevokedCount += $this->magicLinkService->cleanupExpiredTokensForTeamUser($teamUser->id);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => "Revoked {$revokedCount} magic links",
+                'message' => "Revoked {$teamRevokedCount} magic links for team users",
                 'data' => [
-                    'broker_id' => $request->broker_id,
-                    'revoked_count' => $revokedCount,
+                    'broker_id' => $brokerId,
+                    'revoked_count' => $teamRevokedCount,
+                    'team_users_affected' => $brokerTeamUsers->count(),
                 ]
             ]);
 
@@ -485,6 +493,62 @@ class ApiAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to revoke magic links',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Revoke all magic links and delete all permissions for a platform user
+     */
+    public function revokePlatformUserTokens(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'platform_user_id' => 'required|exists:platform_users,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $platformUser = PlatformUser::findOrFail($request->platform_user_id);
+            
+            // 1. Revoke all magic links for this platform user
+            $revokedTokensCount = $this->magicLinkService->cleanupExpiredTokensForPlatformUser($platformUser->id);
+            
+            // 2. Get count of permissions before deletion
+            $permissionCount = $platformUser->resourcePermissions()->count();
+            
+            // 3. Delete all permissions for this platform user
+           // $deletedPermissionsCount = $platformUser->resourcePermissions()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Revoked {$revokedTokensCount} magic links tokens for platform user",
+                'data' => [
+                    'platform_user' => [
+                        'id' => $platformUser->id,
+                        'name' => $platformUser->name,
+                        'email' => $platformUser->email,
+                        'role' => $platformUser->role,
+                    ],
+                    'revoked_tokens_count' => $revokedTokensCount,
+                    'previous_permissions_count' => $permissionCount,
+                    'total_actions' => $revokedTokensCount,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to revoke platform user tokens and permissions: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to revoke platform user tokens and permissions',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -1323,6 +1387,237 @@ class ApiAuthController extends Controller
                 'message' => 'Failed to revoke country management',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * OK
+     * Verify magic link token and return user data for frontend authentication
+     */
+    public function verifyMagicLinkToken(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required|string|size:64',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Validate the magic link token
+            $magicLink = $this->magicLinkService->validateToken($request->token);
+
+            if (!$magicLink) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired magic link',
+                    'error' => 'The magic link is invalid or has expired. Please request a new one.'
+                ], 400);
+            }
+
+            // Mark the magic link as used (unless disabled for testing)
+            if (config('auth.mark_magic_link_as_used', true)) {
+                $this->magicLinkService->markAsUsed($magicLink);
+            }
+
+            // Get the subject (user) from the magic link
+            $subject = $magicLink->subject;
+            
+            if (!$subject) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid user',
+                    'error' => 'The magic link is associated with an invalid user.'
+                ], 400);
+            }
+
+            // Update last login
+            $subject->update(['last_login_at' => now()]);
+
+            // Generate Sanctum token with configurable expiration
+            // Option 1: Use config value
+            $jwtExpirationDays = (int) config('auth.jwt_expiration_days', 7); // Default 7 days
+            
+            // Option 2: Match magic link expiration (uncomment to use)
+            // $jwtExpirationDays = (int) $magicLink->expires_at->diffInDays(now());
+            
+            $token = $subject->createToken('magic-link-auth', ['*'], now()->addDays($jwtExpirationDays))->plainTextToken;
+
+            // Prepare user data based on type
+            $userData = [
+                'id' => $subject->id,
+                'name' => $subject->name,
+                'email' => $subject->email,
+                'user_type' => null,
+                'permissions' => [],
+                'broker_context' => null,
+            ];
+
+            if ($subject instanceof \Modules\Auth\Models\BrokerTeamUser) {
+                $userData['user_type'] = 'team_user';
+                $userData['broker_context'] = [
+                    'broker_id' => $subject->team->broker_id,
+                    'broker_name' => $subject->team->broker->trading_name ?? $subject->team->broker->name,
+                    'team_id' => $subject->broker_team_id,
+                    'team_name' => $subject->team->name,
+                ];
+                //$userData['role'] = $subject->role;
+                $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
+                    return [
+                        'type' => $permission->permission_type,
+                        'resource_id' => $permission->resource_id,
+                        'resource_value' => $permission->resource_value,
+                        'action' => $permission->action,
+                    ];
+                })->toArray();
+            } elseif ($subject instanceof \Modules\Auth\Models\PlatformUser) {
+                $userData['user_type'] = 'platform_user';
+                $userData['role'] = $subject->role;
+                $userData['broker_context'] = $subject->broker_id ? [
+                    'broker_id' => $subject->broker_id,
+                ] : null;
+                $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
+                    return [
+                        'type' => $permission->permission_type,
+                        'resource_id' => $permission->resource_id,
+                        'resource_value' => $permission->resource_value,
+                        'action' => $permission->action,
+                    ];
+                })->toArray();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Magic link verified successfully',
+                'data' => [
+                    'user' => $userData,
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_at' => now()->addDays($jwtExpirationDays)->toISOString(),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Magic link token verification failed: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Verification failed',
+                'error' => 'An error occurred while verifying your magic link. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Decode JWT token and return user data (for frontend authentication)
+     */
+    public function decodeToken(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Find the Sanctum token
+            $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($request->token);
+            
+            if (!$personalAccessToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token',
+                    'error' => 'Token not found'
+                ], 401);
+            }
+
+            // Check if token is expired
+            if ($personalAccessToken->expires_at && $personalAccessToken->expires_at->isPast()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Token expired',
+                    'error' => 'Token has expired'
+                ], 401);
+            }
+
+            // Get the user from the token
+            $user = $personalAccessToken->tokenable;
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found',
+                    'error' => 'User associated with token not found'
+                ], 401);
+            }
+
+            // Prepare user data based on type
+            $userData = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'user_type' => null,
+                'permissions' => [],
+                'broker_context' => null,
+            ];
+
+            if ($user instanceof \Modules\Auth\Models\BrokerTeamUser) {
+                $userData['user_type'] = 'team_user';
+                $userData['broker_context'] = [
+                    'broker_id' => $user->team->broker_id,
+                    'broker_name' => $user->team->broker->trading_name ?? $user->team->broker->name,
+                    'team_id' => $user->broker_team_id,
+                    'team_name' => $user->team->name,
+                ];
+                $userData['permissions'] = $user->resourcePermissions->map(function($permission) {
+                    return [
+                        'type' => $permission->permission_type,
+                        'resource_id' => $permission->resource_id,
+                        'resource_value' => $permission->resource_value,
+                        'action' => $permission->action,
+                    ];
+                })->toArray();
+            } elseif ($user instanceof \Modules\Auth\Models\PlatformUser) {
+                $userData['user_type'] = 'platform_user';
+                $userData['role'] = $user->role;
+                $userData['broker_context'] = $user->broker_id ? [
+                    'broker_id' => $user->broker_id,
+                ] : null;
+                $userData['permissions'] = $user->resourcePermissions->map(function($permission) {
+                    return [
+                        'type' => $permission->permission_type,
+                        'resource_id' => $permission->resource_id,
+                        'resource_value' => $permission->resource_value,
+                        'action' => $permission->action,
+                    ];
+                })->toArray();
+            }
+
+            return response()->json([
+                'success' => true,
+                'user' => $userData,
+                'token_expires_at' => $personalAccessToken->expires_at?->toISOString(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Token decoding failed: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Token validation failed',
+                'error' => 'An error occurred while validating the token'
+            ], 401);
         }
     }
 }
