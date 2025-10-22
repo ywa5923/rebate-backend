@@ -20,8 +20,8 @@ Route::group([], function () {
     
     // Magic link authentication
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
-   // Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLink']);
-    Route::post('/magic-link/verify-token', [ApiAuthController::class, 'verifyMagicLinkToken']);
+   
+    Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLinkToken']);
     Route::post('/magic-link/decode-token', [ApiAuthController::class, 'decodeToken']);
     Route::post('/magic-link/revoke', [ApiAuthController::class, 'revokeBrokerTokens']);
     Route::post('/platform-user/revoke-tokens', [ApiAuthController::class, 'revokePlatformUserTokens']);
@@ -76,5 +76,47 @@ Route::group([], function () {
 });
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user()->load('roles');
+    $user = $request->user();
+    $userData = [
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+      
+    ];
+    if ( $user instanceof \Modules\Auth\Models\BrokerTeamUser) {
+            $userData['user_type'] = 'team_user';
+            $userData['broker_context'] = [
+                'broker_id' => $user->team->broker_id,
+                'broker_name' => $user->team->broker->trading_name ?? $user->team->broker->name,
+                'team_id' => $user->broker_team_id,
+                'team_name' => $user->team->name,
+            ];
+            //$userData['role'] = $subject->role;
+            $userData['permissions'] = $user->resourcePermissions->map(function($permission) {
+                return [
+                    'type' => $permission->permission_type,
+                    'resource_id' => $permission->resource_id,
+                    'resource_value' => $permission->resource_value,
+                    'action' => $permission->action,
+                ];
+            })->toArray();
+            } elseif ( $user instanceof \Modules\Auth\Models\PlatformUser) {
+            $userData['user_type'] = 'platform_user';
+            $userData['role'] = $user->role;
+            $userData['broker_context'] = $user->broker_id ? [
+                'broker_id' => $user->broker_id,
+            ] : null;
+            $userData['permissions'] = $user->resourcePermissions->map(function($permission) {
+                return [
+                    'type' => $permission->permission_type,
+                    'resource_id' => $permission->resource_id,
+                    'resource_value' => $permission->resource_value,
+                    'action' => $permission->action,
+                ];
+            })->toArray();
+        }
+        return response()->json([
+            'success' => true,
+            'user' => $userData,
+        ]);
 });

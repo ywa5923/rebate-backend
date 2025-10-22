@@ -288,82 +288,7 @@ class ApiAuthController extends Controller
    
    
    
-    /**
-     * Verify magic link and authenticate broker
-     */
-    // public function verifyMagicLink(Request $request)
-    // {
-    //     try {
-    //         $validator = Validator::make($request->all(), [
-    //             'token' => 'required|string|size:64',
-    //         ]);
-
-    //         if ($validator->fails()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Invalid token format',
-    //                 'errors' => $validator->errors()
-    //             ], 422);
-    //         }
-
-    //         $magicLink = $this->magicLinkService->validateToken($request->token);
-
-    //         if (!$magicLink) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Invalid or expired magic link'
-    //             ], 422);
-    //         }
-
-    //         // Mark as used
-    //         $this->magicLinkService->markAsUsed($magicLink);
-
-    //         // Handle different subject types
-    //         $responseData = [
-    //             'action' => $magicLink->action,
-    //             'authenticated_at' => now(),
-    //             'user_type' => $magicLink->subject_type,
-    //         ];
-
-    //         // Load subject data based on type
-    //         switch ($magicLink->subject_type) {
-    //             case 'broker':
-    //                 $broker = $magicLink->subject->load('brokerType');
-    //                 $responseData['broker'] = $broker;
-    //                 break;
-                    
-    //             case 'broker_team_user':
-    //                 $teamUser = $magicLink->subject->load('team.broker');
-    //                 $responseData['team_user'] = $teamUser;
-    //                 $responseData['broker'] = $teamUser->team->broker;
-    //                 break;
-                    
-    //             case 'platform_user':
-    //                 $platformUser = $magicLink->subject;
-    //                 $responseData['platform_user'] = $platformUser;
-    //                 if ($magicLink->context_broker_id) {
-    //                     $broker = Broker::with('brokerType')->find($magicLink->context_broker_id);
-    //                     $responseData['context_broker'] = $broker;
-    //                 }
-    //                 break;
-    //         }
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Successfully authenticated',
-    //             'data' => $responseData
-    //         ]);
-
-    //     } catch (\Exception $e) {
-    //         Log::error('Failed to verify magic link: ' . $e->getMessage());
-            
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to verify magic link',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
+    
 
     /**
      * Send magic link for platform user
@@ -1409,8 +1334,10 @@ class ApiAuthController extends Controller
                 ], 422);
             }
 
+            
             // Validate the magic link token
             $magicLink = $this->magicLinkService->validateToken($request->token);
+           
 
             if (!$magicLink) {
                 return response()->json([
@@ -1427,6 +1354,7 @@ class ApiAuthController extends Controller
 
             // Get the subject (user) from the magic link
             $subject = $magicLink->subject;
+            
             
             if (!$subject) {
                 return response()->json([
@@ -1446,50 +1374,50 @@ class ApiAuthController extends Controller
             // Option 2: Match magic link expiration (uncomment to use)
             // $jwtExpirationDays = (int) $magicLink->expires_at->diffInDays(now());
             
+            // Generate the Sanctum token
             $token = $subject->createToken('magic-link-auth', ['*'], now()->addDays($jwtExpirationDays))->plainTextToken;
-
+          
             // Prepare user data based on type
             $userData = [
                 'id' => $subject->id,
                 'name' => $subject->name,
-                'email' => $subject->email,
-                'user_type' => null,
-                'permissions' => [],
-                'broker_context' => null,
+                'email' => $subject->email
             ];
 
-            if ($subject instanceof \Modules\Auth\Models\BrokerTeamUser) {
-                $userData['user_type'] = 'team_user';
-                $userData['broker_context'] = [
-                    'broker_id' => $subject->team->broker_id,
-                    'broker_name' => $subject->team->broker->trading_name ?? $subject->team->broker->name,
-                    'team_id' => $subject->broker_team_id,
-                    'team_name' => $subject->team->name,
-                ];
-                //$userData['role'] = $subject->role;
-                $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
-                    return [
-                        'type' => $permission->permission_type,
-                        'resource_id' => $permission->resource_id,
-                        'resource_value' => $permission->resource_value,
-                        'action' => $permission->action,
-                    ];
-                })->toArray();
-            } elseif ($subject instanceof \Modules\Auth\Models\PlatformUser) {
-                $userData['user_type'] = 'platform_user';
-                $userData['role'] = $subject->role;
-                $userData['broker_context'] = $subject->broker_id ? [
-                    'broker_id' => $subject->broker_id,
-                ] : null;
-                $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
-                    return [
-                        'type' => $permission->permission_type,
-                        'resource_id' => $permission->resource_id,
-                        'resource_value' => $permission->resource_value,
-                        'action' => $permission->action,
-                    ];
-                })->toArray();
-            }
+           
+
+            // if ($subject instanceof \Modules\Auth\Models\BrokerTeamUser) {
+            //     $userData['user_type'] = 'team_user';
+            //     $userData['broker_context'] = [
+            //         'broker_id' => $subject->team->broker_id,
+            //         'broker_name' => $subject->team->broker->trading_name ?? $subject->team->broker->name,
+            //         'team_id' => $subject->broker_team_id,
+            //         'team_name' => $subject->team->name,
+            //     ];
+            //     //$userData['role'] = $subject->role;
+            //     $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
+            //         return [
+            //             'type' => $permission->permission_type,
+            //             'resource_id' => $permission->resource_id,
+            //             'resource_value' => $permission->resource_value,
+            //             'action' => $permission->action,
+            //         ];
+            //     })->toArray();
+            // } elseif ($subject instanceof \Modules\Auth\Models\PlatformUser) {
+            //     $userData['user_type'] = 'platform_user';
+            //     $userData['role'] = $subject->role;
+            //     $userData['broker_context'] = $subject->broker_id ? [
+            //         'broker_id' => $subject->broker_id,
+            //     ] : null;
+            //     $userData['permissions'] = $subject->resourcePermissions->map(function($permission) {
+            //         return [
+            //             'type' => $permission->permission_type,
+            //             'resource_id' => $permission->resource_id,
+            //             'resource_value' => $permission->resource_value,
+            //             'action' => $permission->action,
+            //         ];
+            //     })->toArray();
+            // }
 
             return response()->json([
                 'success' => true,
