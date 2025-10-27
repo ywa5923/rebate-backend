@@ -63,7 +63,7 @@ class BrokerTeamUser extends Authenticatable
     /**
      * Deprecated: Get magic links for this user.
      */
-    public function magicLinksOld(): HasMany
+    public function magicLinksBuilder(): HasMany
     {
         return $this->hasMany(MagicLink::class, 'subject_id')
                     ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
@@ -165,13 +165,7 @@ class BrokerTeamUser extends Authenticatable
         return $query->where('is_active', true);
     }
 
-    /**
-     * Scope for users by role.
-     */
-    public function scopeByRole($query, string $role)
-    {
-        return $query->where('role', $role);
-    }
+    
 
     // ==================== RESOURCE PERMISSION METHODS ====================
 

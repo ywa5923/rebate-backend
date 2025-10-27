@@ -14,6 +14,10 @@ use Modules\Auth\Http\Controllers\VerifyEmailController;
 Route::group([], function () {
     // Broker registration by admin
     Route::post('/register-broker', [ApiAuthController::class, 'registerBroker']);
+    Route::post('/broker-team-user', [ApiAuthController::class, 'registerUserToBrokerDefaultTeam']);
+    Route::put('/broker-team-user/{userId}', [ApiAuthController::class, 'updateBrokerTeamUser']);
+    Route::delete('/broker-team-user/{userId}', [ApiAuthController::class, 'deleteBrokerTeamUser']);
+    Route::get('/broker-default-team/{brokerId}', [ApiAuthController::class, 'getBrokerDefaultTeam']);
     
     // Get available broker types
     Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
@@ -22,10 +26,9 @@ Route::group([], function () {
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
    
     Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLinkToken']);
-    Route::post('/magic-link/decode-token', [ApiAuthController::class, 'decodeToken']);
-    Route::post('/magic-link/revoke', [ApiAuthController::class, 'revokeBrokerTokens']);
-    Route::post('/platform-user/revoke-tokens', [ApiAuthController::class, 'revokePlatformUserTokens']);
-    Route::get('/magic-link/stats', [ApiAuthController::class, 'getMagicLinkStats']);
+
+    
+   
     
     // Platform user magic link authentication
     Route::post('/platform-user/magic-link/send', [ApiAuthController::class, 'sendPlatformUserMagicLink']);
@@ -83,11 +86,15 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
         'email' => $user->email,
       
     ];
+
     if ( $user instanceof \Modules\Auth\Models\BrokerTeamUser) {
+        $brokerTradingName=$user->team->broker->dynamicOptionsValues->where('option_slug', 'trading_name')->where('zone_id', null)->first()->value;
+
             $userData['user_type'] = 'team_user';
             $userData['broker_context'] = [
                 'broker_id' => $user->team->broker_id,
-                'broker_name' => $user->team->broker->trading_name ?? $user->team->broker->name,
+                //'broker_country' => $user->team->broker->country,
+                'broker_name' => $brokerTradingName,
                 'team_id' => $user->broker_team_id,
                 'team_name' => $user->team->name,
             ];
@@ -102,10 +109,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
             })->toArray();
             } elseif ( $user instanceof \Modules\Auth\Models\PlatformUser) {
             $userData['user_type'] = 'platform_user';
-            $userData['role'] = $user->role;
-            $userData['broker_context'] = $user->broker_id ? [
-                'broker_id' => $user->broker_id,
-            ] : null;
+            //$userData['role'] = $user->role;
+
+            
             $userData['permissions'] = $user->resourcePermissions->map(function($permission) {
                 return [
                     'type' => $permission->permission_type,

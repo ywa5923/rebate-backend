@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Brokers\Database\Factories\BrokerFactory;
 use Modules\Translations\Models\Translation;
+use Modules\Translations\Models\Country;
+use Modules\Translations\Models\Zone;
 
 /**
  * @OA\Schema(
@@ -46,7 +48,11 @@ class Broker extends Model
         'broker_type_id',
         'registration_language',
         'registration_zone',
+        'country_id',
+        'zone_id',
     ];
+
+
 
 
     public function translations(): MorphMany
@@ -71,5 +77,15 @@ class Broker extends Model
     public function brokerType():BelongsTo
     {
         return $this->belongsTo(BrokerType::class);
+    }
+
+    public function country():BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function zone():BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
     }
 }

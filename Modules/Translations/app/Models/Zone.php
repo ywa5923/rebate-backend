@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Translations\Models\Country;
-
+use Modules\Brokers\Models\Broker;
 /**
  * @OA\Schema(
  *   schema="Zone",
@@ -32,5 +32,9 @@ class Zone extends Model
     public function countries():HasMany
     {
         return $this->hasMany(Country::class);
+    }
+    public function brokers():HasMany
+    {
+        return $this->hasMany(Broker::class);
     }
 }

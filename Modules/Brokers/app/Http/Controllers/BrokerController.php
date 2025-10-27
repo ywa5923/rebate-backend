@@ -25,74 +25,20 @@ use Modules\Brokers\Models\Setting;
 
 class BrokerController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/v1/brokers/",
-     *     tags={"Broker"},
-     *     summary="Get all brokers",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation"
-     *     ),
-     * 
-     *     @OA\Response(
-     *         response=422,
-     *         description="These request do not match our records"
-     *     )
-     * )
-     */
+    
 
-     public function __construct()
+     public function __construct(protected BrokerService $brokerService)
      {
      }
 
-    public function index(BrokersQueryParser $queryParser,BrokerService $brokerService,Request $request)
+    public function index(BrokersQueryParser $queryParser,Request $request)
     {
-
-     
-      //dd($queryParser->parse($request)->getWhereInParam("filter_offices"));
-       return $brokerService->process($queryParser->parse($request));
+       return $this->brokerService->process($queryParser->parse($request));
 
         //tested with http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&columns[in]=trading_name,trading_fees,account_type,jurisdictions,promotion_title,fixed_spreads,support_options&order_by[eq]=+account_type
-
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function create()
-    // {
-    //     return view('brokers::create');
-    // }
-
-    /**
-     * @OA\Post(
-     *     path="/api/v1/brokers",
-     *     tags={"Broker"},
-     *     summary="Add a new broker",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="registration_language", type="string", example="en"),
-     *             @OA\Property(property="registration_zone", type="string", example="US"),
-     *             @OA\Property(property="broker_type_id", type="integer", example=1),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=204,
-     *         description="Successful operation"
-     *     ),
-     * 
-     *     @OA\Response(
-     *         response=422,
-     *         description="These credentials do not match our records"
-     *     )
-     * )
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //return new Response("not found", 404);
-    }
+   
 
     /**
      * @OA\Get(
@@ -171,80 +117,27 @@ class BrokerController extends Controller
     ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    // public function edit($id)
-    // {
-    //     return view('brokers::edit');
-    // }
 
     /**
-     * @OA\Put(
-     *     path="/api/v1/broker/{id}",
-     *     tags={"Broker"},
-     *     summary="Update broker",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Broker ID",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *              @OA\Property(property="registration_language", type="string", example="en"),
-     *             @OA\Property(property="registration_zone", type="string", example="US"),
-     *             @OA\Property(property="broker_type_id", type="integer", example=1),
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=204,
-     *         description="Successful operation"
-     *     ),
-     * 
-     *     @OA\Response(
-     *         response=422,
-     *         description="These credentials do not match our records"
-     *     )
-     * )
-     */
-    public function update(Request $request, $id): RedirectResponse
+     * get broker context
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+    */
+    public function getBrokerInfo(Request $request, $id)
     {
-        //return new Response("not found", 404);
+        try {
+            return response()->json($this->brokerService->getBrokerContext($id));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get broker context',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+        
     }
+   
 
-    /**
-     * @OA\Delete(
-     *     path="/api/v1/broker/{id}",
-     *     tags={"Broker"},
-     *     summary="Delete broker",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Broker ID",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=204,
-     *         description="Successful operation"
-     *     ),
-     * 
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    public function filter()
-    {
-        return "ok";
-    }
+    
 }

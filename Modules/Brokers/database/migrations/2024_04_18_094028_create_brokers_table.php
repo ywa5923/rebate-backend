@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string("registration_zone",50)->nullable();
             $table->foreignId('broker_type_id')
             ->constrained();
+            $table->foreignId('country_id')->nullable()->constrained();
+            $table->foreignId('zone_id')->nullable()->constrained();
             $table->timestamps();
             
         });

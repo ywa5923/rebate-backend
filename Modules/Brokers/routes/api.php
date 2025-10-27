@@ -31,6 +31,8 @@ use Modules\Brokers\Http\Controllers\ChallengeController;
 
 Route::group(["prefix"=>'v1'], function () {
     Route::apiResource('brokers', BrokerController::class)->names('brokers');
+    Route::get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
+
     Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
 
