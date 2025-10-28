@@ -27,12 +27,22 @@ class Zone extends Model
     use HasFactory;
 
    
-    protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'zone_code',
+        'description',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public function countries():HasMany
     {
         return $this->hasMany(Country::class);
     }
+    
     public function brokers():HasMany
     {
         return $this->hasMany(Broker::class);

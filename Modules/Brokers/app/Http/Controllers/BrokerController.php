@@ -21,6 +21,7 @@ use Modules\Brokers\Services\BrokerQueryParser;
 use Modules\Translations\Models\Zone;
 use Modules\Brokers\Models\Setting;
 use Modules\Brokers\Transformers\BrokerListResource;
+use Modules\Brokers\Http\Requests\BrokerListRequest;
 
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
@@ -141,22 +142,13 @@ class BrokerController extends Controller
 
     /**
      * Get broker list
-     * @param Request $request
+     * @param BrokerListRequest $request
      * @return \Illuminate\Http\JsonResponse
     */
-    public function getBrokerList(Request $request)
+    public function getBrokerList(BrokerListRequest $request)
     {
         try {
-            // Validate all inputs
-            $validated = $request->validate([
-                'per_page' => 'nullable|integer|min:1|max:100',
-                'order_by' => 'nullable|string|in:id,is_active,broker_type,country,zone,trading_name,created_at,updated_at',
-                'order_direction' => 'nullable|string|in:asc,desc',
-                'broker_type' => 'nullable|string|max:100',
-                'country' => 'nullable|string|max:50',
-                'zone' => 'nullable|string|max:50',
-                'trading_name' => 'nullable|string|max:255',
-            ]);
+            $validated = $request->validated();
             
             $perPage = $validated['per_page'] ?? 15;
             $orderBy = $validated['order_by'] ?? 'id';

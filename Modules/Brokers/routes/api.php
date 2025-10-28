@@ -14,6 +14,7 @@ use Modules\Brokers\Http\Controllers\UrlController;
 use Modules\Brokers\Http\Controllers\PromotionController;
 use Modules\Brokers\Http\Controllers\ContestController;
 use Modules\Brokers\Http\Controllers\ChallengeController;
+use Modules\Brokers\Http\Controllers\ZoneController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -78,4 +79,8 @@ Route::group(["prefix"=>'v1'], function () {
     // Route::get('challenges', [ChallengeController::class, 'index']);
     Route::get('challenges', [ChallengeController::class, 'show']);
      Route::get('challenges/show', [ChallengeController::class, 'show']);
+     
+     // Zone REST API routes
+     Route::get('zones/{id}/statistics', [ZoneController::class, 'statistics']);
+     Route::apiResource('zones', ZoneController::class)->names('zones');
 });

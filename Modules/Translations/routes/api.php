@@ -24,7 +24,7 @@ use Modules\Translations\Http\Controllers\ZoneController;
 Route::prefix('v1')->group(function () {
     Route::apiResource('translations', TranslationController::class)->names('translations');
     Route::get("locale_resources",[LocaleResourceController::class,'index']);
-    Route::get("zones",[ZoneController::class,'index']);
+   // Route::get("zones",[ZoneController::class,'index']);
     
     Route::apiResource("locales",LocaleController::class)->names('locales');
 });

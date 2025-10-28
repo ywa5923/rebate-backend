@@ -3,7 +3,6 @@
 namespace Modules\Translations\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Translations\Models\Country;
@@ -12,11 +11,11 @@ use Modules\Translations\Utilities\ZoneQueryParser;
 class ZoneController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get zone by country (legacy endpoint)
+     * This returns the zone_code for a given country
      */
-    public function index(ZoneQueryParser $queryParser,Request $request)
+    public function index(ZoneQueryParser $queryParser, Request $request)
     {
-
         $countryCondition = $queryParser->parse($request)->getWhereParam("country");
         $country = Country::with('zone')->where(...$countryCondition)->first();
         
@@ -25,7 +24,5 @@ class ZoneController extends Controller
         }
     
         return new Response(['zone' => $country->zone->zone_code], 200);
-        
     }
-
 }
