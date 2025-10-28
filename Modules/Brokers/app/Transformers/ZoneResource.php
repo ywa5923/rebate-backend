@@ -19,6 +19,11 @@ class ZoneResource extends JsonResource
             'name' => $this->name,
             'zone_code' => $this->zone_code,
             'description' => $this->description,
+            'countries'=>$this->whenLoaded('countries', function () {
+                return $this->countries->map(function ($country) {
+                    return $country->country_code;
+                })->implode(',');
+            }),
             'countries_count' => $this->whenLoaded('countries', function () {
                 return $this->countries->count();
             }),
