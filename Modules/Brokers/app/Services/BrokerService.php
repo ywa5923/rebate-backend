@@ -83,5 +83,81 @@ class BrokerService
 
 
 
-   
+    public function getBrokerList($perPage = 15, $orderBy = 'id', $orderDirection = 'asc', $filters = [])
+    {
+        $query = Broker::query();
+        
+        // Apply individual filters
+        if (!empty($filters['broker_type'])) {
+            $query->whereHas('brokerType', function($q) use ($filters) {
+                $q->where('name', 'like', "%{$filters['broker_type']}%");
+            });
+        }
+        
+        if (!empty($filters['country'])) {
+            $query->whereHas('country', function($q) use ($filters) {
+                $q->where('country_code', 'like', "%{$filters['country']}%")
+                  ->orWhere('name', 'like', "%{$filters['country']}%");
+            });
+        }
+        
+        if (!empty($filters['zone'])) {
+            $query->whereHas('zone', function($q) use ($filters) {
+                $q->where('zone_code', 'like', "%{$filters['zone']}%");
+            });
+        }
+        
+        if (!empty($filters['trading_name'])) {
+            $query->whereHas('dynamicOptionsValues', function($q) use ($filters) {
+                $q->where('option_slug', 'trading_name')
+                  ->whereNull('zone_code')
+                  ->where('value', 'like', "%{$filters['trading_name']}%");
+            });
+        }
+        
+        // Handle relationship ordering with joins
+        if ($orderBy === 'broker_type') {
+            $query->leftJoin('broker_types', 'brokers.broker_type_id', '=', 'broker_types.id')
+                  ->orderBy('broker_types.name', $orderDirection)
+                  ->select('brokers.*');
+        } elseif ($orderBy === 'country') {
+            $query->leftJoin('countries', 'brokers.country_id', '=', 'countries.id')
+                  ->orderBy('countries.name', $orderDirection)
+                  ->select('brokers.*');
+        } elseif ($orderBy === 'zone') {
+            $query->leftJoin('zones', 'brokers.zone_id', '=', 'zones.id')
+                  ->orderBy('zones.zone_code', $orderDirection)
+                  ->select('brokers.*');
+        } elseif ($orderBy === 'trading_name') {
+            $query->leftJoin('option_values', function($join) {
+                  $join->on('brokers.id', '=', 'option_values.optionable_id')
+                       ->where('option_values.optionable_type', '=', 'Modules\\Brokers\\Models\\Broker')
+                       ->where('option_values.option_slug', '=', 'trading_name')
+                       ->whereNull('option_values.zone_code');
+              })
+              ->orderBy('option_values.value', $orderDirection)
+              ->select('brokers.*');
+        } else {
+            // Direct column ordering
+            $query->orderBy($orderBy, $orderDirection);
+        }
+
+        $query->with([
+            'brokerType',
+            'country',
+            'zone',
+            'dynamicOptionsValues' => function($query) {
+                $query->whereIn('option_slug', ['trading_name', 'logo', 'home_url'])->whereNull('zone_code');
+            }
+        ]);
+
+        return $query->paginate($perPage);
+    }
+    public function toggleActiveStatus($id)
+    {
+        $broker = Broker::findOrFail($id);
+        $broker->is_active = !$broker->is_active;
+        $broker->save();
+        return $broker;
+    }
 }

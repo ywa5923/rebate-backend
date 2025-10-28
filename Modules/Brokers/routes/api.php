@@ -30,9 +30,12 @@ use Modules\Brokers\Http\Controllers\ChallengeController;
 // });
 
 Route::group(["prefix"=>'v1'], function () {
-    Route::apiResource('brokers', BrokerController::class)->names('brokers');
+    // Specific routes MUST come before apiResource to avoid conflicts
+    Route::get('brokers/broker-list', [BrokerController::class, 'getBrokerList']);
     Route::get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
-
+    Route::put('brokers/toggle-active-status/{id}', [BrokerController::class, 'toggleActiveStatus']);
+    Route::apiResource('brokers', BrokerController::class)->names('brokers');
+    
     Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
 
