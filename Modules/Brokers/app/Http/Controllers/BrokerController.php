@@ -22,7 +22,10 @@ use Modules\Translations\Models\Zone;
 use Modules\Brokers\Models\Setting;
 use Modules\Brokers\Transformers\BrokerListResource;
 use Modules\Brokers\Http\Requests\BrokerListRequest;
-
+use Modules\Brokers\Transformers\BrokerTypeResource;
+use Modules\Brokers\Transformers\CountryResource;
+use Modules\Brokers\Transformers\CountryCollection;
+use Modules\Brokers\Models\Country;
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
 class BrokerController extends Controller
@@ -198,6 +201,27 @@ class BrokerController extends Controller
             ], 500);
         }
     }
+
+    public function getBrokerTypesAndCountries()
+    {
+        try {
+        $countries=Country::all();
+        $brokerTypes=BrokerType::all();
+        return response()->json([
+            'success' => true,
+            'message' => 'Broker types and countries fetched successfully',
+            'countries' => new CountryCollection($countries, ['minimal' => true]),
+                'brokerTypes' => BrokerTypeResource::collection($brokerTypes),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get broker types and countries',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     /**
      * Sanitize input for LIKE queries by escaping special characters

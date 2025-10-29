@@ -24,6 +24,7 @@ use Modules\Auth\Mail\MagicLinkMail;
 use Illuminate\Support\Facades\Log;
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Models\BrokerOption;
+use Modules\Auth\Http\Requests\RegisterBrokerRequest;
 
 class ApiAuthController extends Controller
 {
@@ -51,50 +52,16 @@ class ApiAuthController extends Controller
      * OK
      * Register a new broker
      */
-    public function registerBroker(Request $request)
+    public function registerBroker(RegisterBrokerRequest $request)
     {
         try {
-            // Validate the request
-            $validator = Validator::make($request->all(), [
-                'broker_type_name' => 'required|string|exists:broker_types,name',
-                'email' => [
-                    'required',
-                    'email',
-
-                    // Rule::unique('platform_users', 'email'),
-                    Rule::unique('broker_team_users', 'email'),
-                ],
-                'trading_name' => 'required|string|max:255',
-                'registration_language' => 'nullable|string|max:50',
-                'registration_zone' => 'nullable|string|max:50',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Find the broker type by name
-            $brokerType = BrokerType::where('name', $request->broker_type_name)->first();
-
-            if (!$brokerType) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid broker type name',
-                    'error' => 'The specified broker type does not exist'
-                ], 422);
-            }
 
             // Create the broker
-            $broker = DB::transaction(function () use ($request, $brokerType) {
+            $broker = DB::transaction(function () use ($request) {
 
                 $broker = Broker::create([
-                    'broker_type_id' => $brokerType->id,
-                    'registration_language' => $request->registration_language,
-                    'registration_zone' => $request->registration_zone,
+                    'broker_type_id' => $request->broker_type_id,
+                    'country_id' => $request->country_id,
                 ]);
 
                 //insert broker option value trading_name
@@ -118,7 +85,7 @@ class ApiAuthController extends Controller
                 ]);
                 $user = $this->teamService->createTeamUser([
                     'broker_team_id' => $team->id,
-                    'name' => 'Default User',
+                    'name' => 'Broker Admin',
                     'email' => $request->email,
                     'is_active' => true,
                 ]);
@@ -167,38 +134,6 @@ class ApiAuthController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Get available broker types for registration
-     */
-    public function getBrokerTypes()
-    {
-        try {
-            $brokerTypes = BrokerType::select('id', 'name')->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $brokerTypes
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch broker types: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to fetch broker types',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-   
-
-
-
-
-   
-
-  
 
     
     /**
