@@ -60,7 +60,7 @@ class PlatformUserRepository
         }
 
         if (isset($filters['role'])) {
-            $query->where('role', $filters['role']);
+            $query->where('role', 'like', '%' . $filters['role'] . '%');
         }
 
         

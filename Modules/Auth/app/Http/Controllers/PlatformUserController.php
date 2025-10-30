@@ -69,13 +69,13 @@ class PlatformUserController extends Controller
     /**
      * Get a single platform user by ID
      * 
-     * @param int $id
+     * @param int $platform_user
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(int $platform_user): JsonResponse
     {
         try {
-            $user = $this->platformUserService->getById($id);
+            $user = $this->platformUserService->getById($platform_user);
 
             if (!$user) {
                 return response()->json([
@@ -135,14 +135,14 @@ class PlatformUserController extends Controller
      * Update a platform user
      * 
      * @param UpdatePlatformUserRequest $request
-     * @param int $id
+     * @param int $platform_user
      * @return JsonResponse
      */
-    public function update(UpdatePlatformUserRequest $request, int $id): JsonResponse
+    public function update(UpdatePlatformUserRequest $request, int $platform_user): JsonResponse
     {
         try {
             $data = $request->validated();
-            $data['id'] = $id;
+            $data['id'] = $platform_user;
 
             // Hash password if provided
             if (isset($data['password']) && !empty($data['password'])) {
@@ -177,13 +177,13 @@ class PlatformUserController extends Controller
     /**
      * Delete a platform user
      * 
-     * @param int $id
+     * @param int $platform_user
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $platform_user): JsonResponse
     {
         try {
-            $deleted = $this->platformUserService->delete($id);
+            $deleted = $this->platformUserService->delete($platform_user);
 
             if (!$deleted) {
                 return response()->json([

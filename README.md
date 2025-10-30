@@ -180,3 +180,6 @@ docker exec -it backend-laravel-1 php artisan app:magic-import
 docker exec -it backend-laravel-1 php artisan migrate:rollback --step=2
 
 docker exec -it backend-laravel-1 php artisan migrate --path=Modules/Auth/database/migrations
+
+get all routes for a path
+php artisan route:list --path=platform-users --except-vendor --json | python3 -m json.tool

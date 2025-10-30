@@ -22,7 +22,7 @@ class UpdatePlatformUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('id');
+        $userId = $this->route('platform_user');
 
         return [
             'name' => 'sometimes|required|string|max:255',
