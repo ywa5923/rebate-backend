@@ -9,18 +9,23 @@ use Modules\Auth\Http\Controllers\NewPasswordController;
 use Modules\Auth\Http\Controllers\PasswordResetLinkController;
 use Modules\Auth\Http\Controllers\RegisteredUserController;
 use Modules\Auth\Http\Controllers\VerifyEmailController;
+use Modules\Auth\Http\Controllers\BrokerTeamUserController;
+use Modules\Auth\Http\Controllers\PlatformUserController;
 
 // Broker registration routes
 Route::group([], function () {
     // Broker registration by admin
-    Route::post('/register-broker', [ApiAuthController::class, 'registerBroker']);
-    Route::post('/broker-team-user', [ApiAuthController::class, 'registerUserToBrokerDefaultTeam']);
-    Route::put('/broker-team-user/{userId}', [ApiAuthController::class, 'updateBrokerTeamUser']);
-    Route::delete('/broker-team-user/{userId}', [ApiAuthController::class, 'deleteBrokerTeamUser']);
-    Route::get('/broker-default-team/{brokerId}', [ApiAuthController::class, 'getBrokerDefaultTeam']);
+    Route::post('/register-broker', [BrokerTeamUserController::class, 'registerBroker']);
+    Route::post('/broker-team-user', [BrokerTeamUserController::class, 'registerUserToBrokerDefaultTeam']);
+    Route::put('/broker-team-user/{userId}', [BrokerTeamUserController::class, 'updateBrokerTeamUser']);
+    Route::delete('/broker-team-user/{userId}', [BrokerTeamUserController::class, 'deleteBrokerTeamUser']);
+    Route::get('/broker-default-team/{brokerId}', [BrokerTeamUserController::class, 'getBrokerDefaultTeam']);
     
     // Get available broker types
     Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
+    
+    // Platform users CRUD
+    Route::apiResource('platform-users', PlatformUserController::class);
     
     // Magic link authentication
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);

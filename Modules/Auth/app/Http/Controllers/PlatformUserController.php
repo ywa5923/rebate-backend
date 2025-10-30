@@ -1,0 +1,207 @@
+<?php
+
+namespace Modules\Auth\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Modules\Auth\Services\PlatformUserService;
+use Modules\Auth\Services\UserPermissionService;
+use Modules\Auth\Http\Requests\StorePlatformUserRequest;
+use Modules\Auth\Http\Requests\UpdatePlatformUserRequest;
+use Modules\Auth\Transformers\PlatformUserResource;
+
+class PlatformUserController extends Controller
+{
+    protected PlatformUserService $platformUserService;
+    protected UserPermissionService $permissionService;
+
+    public function __construct(PlatformUserService $platformUserService, UserPermissionService $permissionService)
+    {
+        $this->platformUserService = $platformUserService;
+        $this->permissionService = $permissionService;
+    }
+
+    /**
+     * Get paginated list of platform users with filters
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->input('per_page', 15);
+            $orderBy = $request->input('order_by', 'id');
+            $orderDirection = $request->input('order_direction', 'asc');
+
+            // Collect filters
+            $filters = [
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'role' => $request->input('role'),
+               
+            ];
+
+            $users = $this->platformUserService->getAll($filters, $orderBy, $orderDirection, $perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => PlatformUserResource::collection($users->items()),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
+                    'from' => $users->firstItem(),
+                    'to' => $users->lastItem(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get platform users list',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a single platform user by ID
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $user = $this->platformUserService->getById($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Platform user not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new PlatformUserResource($user),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get platform user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new platform user
+     * 
+     * @param StorePlatformUserRequest $request
+     * @return JsonResponse
+     */
+    public function store(StorePlatformUserRequest $request): JsonResponse
+    {
+        try {
+            $data = $request->validated();
+
+            // Hash password if provided
+            if (isset($data['password']) && !empty($data['password'])) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            $user = $this->platformUserService->create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Platform user created successfully',
+                'data' => new PlatformUserResource($user),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create platform user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update a platform user
+     * 
+     * @param UpdatePlatformUserRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(UpdatePlatformUserRequest $request, int $id): JsonResponse
+    {
+        try {
+            $data = $request->validated();
+            $data['id'] = $id;
+
+            // Hash password if provided
+            if (isset($data['password']) && !empty($data['password'])) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            $user = $this->platformUserService->update($data);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Platform user not found or could not be updated',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Platform user updated successfully',
+                'data' => new PlatformUserResource($user),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update platform user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a platform user
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $deleted = $this->platformUserService->delete($id);
+
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Platform user not found or could not be deleted',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Platform user deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete platform user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

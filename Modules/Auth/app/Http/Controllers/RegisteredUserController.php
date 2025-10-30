@@ -2,7 +2,7 @@
 
 namespace Modules\Auth\Http\Controllers;
 
-use Modules\Auth\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Modules\Auth\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
