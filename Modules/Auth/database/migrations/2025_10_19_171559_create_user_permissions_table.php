@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('subject_type')->nullable(); // Modules\Auth\Models\BrokerTeamUser or Modules\Auth\Models\PlatformUser
             $table->unsignedBigInteger('subject_id')->nullable(); // broker_team_user_id or platform_user_id
-            $table->enum('permission_type', ['broker', 'country', 'zone', 'broker_type']);
+            $table->enum('permission_type', ['broker', 'country', 'zone', 'broker','seo','translator']);
             $table->unsignedBigInteger('resource_id')->nullable(); // For specific broker IDs
             $table->string('resource_value')->nullable(); // For countries, zones, broker types
             $table->enum('action', ['view', 'edit', 'delete', 'manage']);

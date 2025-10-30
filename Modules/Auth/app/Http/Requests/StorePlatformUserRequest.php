@@ -33,7 +33,7 @@ class StorePlatformUserRequest extends FormRequest
                 Rule::unique('broker_team_users', 'email'),
             ],
             //'password' => 'nullable|string|min:8',
-            'role' => 'required|string|in:country_admin,zone_admin,broker_admin,seo_editor,translation_editor',
+            'role' => 'required|string|in:global_admin,country_admin,broker_admin,seo,translator',
             'is_active' => 'sometimes|boolean',
         ];
     }
