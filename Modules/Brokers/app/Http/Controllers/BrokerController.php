@@ -163,6 +163,7 @@ class BrokerController extends Controller
                 'country' => !empty($validated['country']) ? $this->sanitizeLikeInput($validated['country']) : null,
                 'zone' => !empty($validated['zone']) ? $this->sanitizeLikeInput($validated['zone']) : null,
                 'trading_name' => !empty($validated['trading_name']) ? $this->sanitizeLikeInput($validated['trading_name']) : null,
+                'is_active' => $validated['is_active'] ?? null,
             ];
             
             $brokers = $this->brokerService->getBrokerList($perPage, $orderBy, $orderDirection, $filters);

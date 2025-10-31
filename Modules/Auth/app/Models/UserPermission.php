@@ -53,46 +53,8 @@ class UserPermission extends Model
         return $this->morphTo(null, 'subject_type', 'subject_id');
     }
 
-    /**
-     * Scope for active permissions.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    /**
-     * Scope for specific permission type.
-     */
-    public function scopeOfType($query, string $type)
-    {
-        return $query->where('permission_type', $type);
-    }
-
-    /**
-     * Scope for specific action.
-     */
-    public function scopeWithAction($query, string $action)
-    {
-        return $query->where('action', $action);
-    }
-
-    /**
-     * Scope for specific resource.
-     */
-    public function scopeForResource($query, string $type, $resourceId = null, $resourceValue = null)
-    {
-        return $query->where('permission_type', $type)
-                    ->where(function ($q) use ($resourceId, $resourceValue) {
-                        if ($resourceId !== null) {
-                            $q->where('resource_id', $resourceId);
-                        }
-                        if ($resourceValue !== null) {
-                            $q->orWhere('resource_value', $resourceValue);
-                        }
-                    });
-    }
-
+    
+    
     /**
      * Check if permission allows specific action.
      */
@@ -110,23 +72,5 @@ class UserPermission extends Model
         return $this->action === $action;
     }
 
-    /**
-     * Check if permission is for specific resource.
-     */
-    public function isForResource(string $type, $resourceId = null, $resourceValue = null): bool
-    {
-        if ($this->permission_type !== $type) {
-            return false;
-        }
-
-        if ($resourceId !== null && $this->resource_id === $resourceId) {
-            return true;
-        }
-
-        if ($resourceValue !== null && $this->resource_value === $resourceValue) {
-            return true;
-        }
-
-        return false;
-    }
+    
 }

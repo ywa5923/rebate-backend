@@ -183,3 +183,16 @@ docker exec -it backend-laravel-1 php artisan migrate --path=Modules/Auth/databa
 
 get all routes for a path
 php artisan route:list --path=platform-users --except-vendor --json | python3 -m json.tool
+
+
+echo "Run these commands in your terminal (not here, as sudo access is needed):
+
+# 1. Remove the broken installation
+sudo rm -f /usr/local/bin/cursor
+sudo rm -rf /opt/cursor
+rm -rf ~/projects/squashfs-root
+
+# 2. Download and reinstall Cursor properly
+# Visit: https://cursor.sh/ or download the AppImage/tar.gz
+
+# 3. Or if you have the AppImage extracted in a different location, create proper symlinks"

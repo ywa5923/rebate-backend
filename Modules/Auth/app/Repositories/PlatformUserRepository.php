@@ -63,7 +63,9 @@ class PlatformUserRepository
             $query->where('role', 'like', '%' . $filters['role'] . '%');
         }
 
-        
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
 
         // Apply ordering
         $query->orderBy($orderBy, $orderDirection);

@@ -22,7 +22,7 @@ class ZoneListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'per_page' => 'nullable|integer|min:1|max:100',
+            'per_page' => 'nullable|integer|min:1',
             'order_by' => 'nullable|string|in:id,name,zone_code,created_at,updated_at',
             'order_direction' => 'nullable|string|in:asc,desc',
             'name' => 'nullable|string|max:255',

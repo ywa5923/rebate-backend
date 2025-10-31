@@ -91,4 +91,21 @@ class PlatformUserService
         
         return $query->get();
     }
+
+    /**
+     * Toggle active status of a platform user
+     */
+    public function toggleActiveStatus(int $id): ?PlatformUser
+    {
+        $user = $this->repository->find($id);
+        
+        if (!$user) {
+            return null;
+        }
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return $user;
+    }
 }

@@ -9,6 +9,7 @@ use Modules\Auth\Services\PlatformUserService;
 use Modules\Auth\Services\UserPermissionService;
 use Modules\Auth\Http\Requests\StorePlatformUserRequest;
 use Modules\Auth\Http\Requests\UpdatePlatformUserRequest;
+use Modules\Auth\Http\Requests\PlatformUserListRequest;
 use Modules\Auth\Transformers\PlatformUserResource;
 
 class PlatformUserController extends Controller
@@ -25,22 +26,24 @@ class PlatformUserController extends Controller
     /**
      * Get paginated list of platform users with filters
      * 
-     * @param Request $request
+     * @param PlatformUserListRequest $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(PlatformUserListRequest $request): JsonResponse
     {
         try {
-            $perPage = $request->input('per_page', 15);
-            $orderBy = $request->input('order_by', 'id');
-            $orderDirection = $request->input('order_direction', 'asc');
+            $validated = $request->validated();
+            
+            $perPage = $validated['per_page'] ?? 15;
+            $orderBy = $validated['order_by'] ?? 'id';
+            $orderDirection = $validated['order_direction'] ?? 'asc';
 
             // Collect filters
             $filters = [
-                'name' => $request->input('name'),
-                'email' => $request->input('email'),
-                'role' => $request->input('role'),
-               
+                'name' => $validated['name'] ?? null,
+                'email' => $validated['email'] ?? null,
+                'role' => $validated['role'] ?? null,
+                'is_active' => $validated['is_active'] ?? null,
             ];
 
             $users = $this->platformUserService->getAll($filters, $orderBy, $orderDirection, $perPage);
@@ -200,6 +203,38 @@ class PlatformUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete platform user',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle active status of a platform user
+     * 
+     * @param int $platform_user
+     * @return JsonResponse
+     */
+    public function toggleActiveStatus(int $platform_user): JsonResponse
+    {
+        try {
+            $user = $this->platformUserService->toggleActiveStatus($platform_user);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Platform user not found',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Platform user active status updated successfully',
+                'data' => new PlatformUserResource($user),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to toggle platform user status',
                 'error' => $e->getMessage(),
             ], 500);
         }

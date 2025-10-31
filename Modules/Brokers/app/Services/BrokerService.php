@@ -115,6 +115,10 @@ class BrokerService
             });
         }
         
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
         // Handle relationship ordering with joins
         if ($orderBy === 'broker_type') {
             $query->leftJoin('broker_types', 'brokers.broker_type_id', '=', 'broker_types.id')

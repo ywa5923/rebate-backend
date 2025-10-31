@@ -50,6 +50,7 @@ class Broker extends Model
         'registration_zone',
         'country_id',
         'zone_id',
+        'is_active',
     ];
 
 

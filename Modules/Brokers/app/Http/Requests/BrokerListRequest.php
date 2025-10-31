@@ -22,13 +22,14 @@ class BrokerListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'per_page' => 'nullable|integer|min:1|max:100',
+            'per_page' => 'nullable|integer|min:1',
             'order_by' => 'nullable|string|in:id,is_active,broker_type,country,zone,trading_name,created_at,updated_at',
             'order_direction' => 'nullable|string|in:asc,desc',
             'broker_type' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:50',
             'zone' => 'nullable|string|max:50',
             'trading_name' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ];
     }
 
@@ -45,6 +46,7 @@ class BrokerListRequest extends FormRequest
             'order_direction' => 'sort direction',
             'broker_type' => 'broker type',
             'trading_name' => 'company name',
+            'is_active' => 'active status',
         ];
     }
 
@@ -58,6 +60,7 @@ class BrokerListRequest extends FormRequest
         return [
             'per_page.max' => 'You cannot request more than 100 items per page',
             'order_by.in' => 'Invalid sort column. Allowed columns: id, is_active, broker_type, country, zone, trading_name, created_at, updated_at',
+            'is_active.boolean' => 'The active status must be true or false',
         ];
     }
 }

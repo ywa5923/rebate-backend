@@ -46,230 +46,68 @@ class UserPermissionRepository
      */
     public function find(int $id): ?UserPermission
     {
-        return $this->model->find($id);
+        return $this->model->with('subject')->find($id);
     }
 
     /**
-     * Get permissions for a team user.
+     * Get all permissions with optional filters
      */
-    public function getByTeamUserId(int $teamUserId): Collection
+    public function getAll(array $filters = [], string $orderBy = 'id', string $orderDirection = 'asc')
     {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->active()
-                          ->orderBy('permission_type')
-                          ->orderBy('action')
-                          ->get();
-    }
+        $query = $this->model->newQuery()->with('subject');
 
-    /**
-     * Get permissions by type for a team user.
-     */
-    public function getByTeamUserAndType(int $teamUserId, string $type): Collection
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->ofType($type)
-                          ->active()
-                          ->get();
-    }
-
-    /**
-     * Get permissions by action for a team user.
-     */
-    public function getByTeamUserAndAction(int $teamUserId, string $action): Collection
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->withAction($action)
-                          ->active()
-                          ->get();
-    }
-
-    /**
-     * Get permissions for specific resource.
-     */
-    public function getForResource(int $teamUserId, string $type, $resourceId = null, $resourceValue = null): Collection
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->forResource($type, $resourceId, $resourceValue)
-                          ->active()
-                          ->get();
-    }
-
-    /**
-     * Check if user has specific permission.
-     */
-    public function hasPermission(int $teamUserId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->forResource($type, $resourceId, $resourceValue)
-                          ->withAction($action)
-                          ->active()
-                          ->exists();
-    }
-
-    /**
-     * Check if user can perform action on resource.
-     */
-    public function canPerformAction(int $teamUserId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
-    {
-        $permissions = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                                  ->where('subject_id', $teamUserId)
-                                  ->forResource($type, $resourceId, $resourceValue)
-                                  ->active()
-                                  ->get();
-
-        foreach ($permissions as $permission) {
-            if ($permission->allowsAction($action)) {
-                return true;
-            }
+        // Apply filters
+        if (!empty($filters['subject_type'])) {
+            $query->where('subject_type', 'like', '%' . $filters['subject_type'] . '%');
         }
 
-        return false;
-    }
-
-    /**
-     * Get all permissions for a team user with filters.
-     */
-    public function getWithFilters(int $teamUserId, array $filters = []): Collection
-    {
-        $query = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                            ->where('subject_id', $teamUserId);
-
-        if (isset($filters['permission_type'])) {
-            $query->ofType($filters['permission_type']);
+        if (!empty($filters['subject_id'])) {
+            $query->where('subject_id', $filters['subject_id']);
         }
 
-        if (isset($filters['action'])) {
-            $query->withAction($filters['action']);
-        }
-
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', $filters['is_active']);
+        if (!empty($filters['permission_type'])) {
+            $query->where('permission_type', $filters['permission_type']);
         }
 
         if (isset($filters['resource_id'])) {
             $query->where('resource_id', $filters['resource_id']);
         }
 
-        if (isset($filters['resource_value'])) {
-            $query->where('resource_value', $filters['resource_value']);
+        if (!empty($filters['resource_value'])) {
+            $query->where('resource_value', 'like', '%' . $filters['resource_value'] . '%');
         }
 
-        return $query->orderBy('permission_type')->orderBy('action')->get();
+        if (!empty($filters['action'])) {
+            $query->where('action', $filters['action']);
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+
+        // Filter by subject name or email
+        if (!empty($filters['subject'])) {
+            $searchTerm = $filters['subject'];
+            $query->whereHasMorph('subject', ['Modules\Auth\Models\BrokerTeamUser', 'Modules\Auth\Models\PlatformUser'], function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Apply ordering
+        $query->orderBy($orderBy, $orderDirection);
+
+        return $query;
     }
 
     /**
-     * Get paginated permissions for a team user.
+     * Get permissions by team user ID
      */
-    public function paginate(int $teamUserId, int $perPage = 15, int $page = 1): LengthAwarePaginator
+    public function getByTeamUserId(int $teamUserId): Collection
     {
         return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->orderBy('permission_type')
-                          ->orderBy('action')
-                          ->paginate($perPage, ['*'], 'page', $page);
+                           ->where('subject_id', $teamUserId)
+                           ->get();
     }
 
-    /**
-     * Bulk create permissions.
-     */
-    public function createMany(array $permissions): bool
-    {
-        return $this->model->insert($permissions);
-    }
-
-    /**
-     * Delete all permissions for a team user.
-     */
-    public function deleteByTeamUserId(int $teamUserId): int
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->delete();
-    }
-
-    /**
-     * Delete permissions by type for a team user.
-     */
-    public function deleteByType(int $teamUserId, string $type): int
-    {
-        return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                          ->where('subject_id', $teamUserId)
-                          ->ofType($type)
-                          ->delete();
-    }
-
-    /**
-     * Toggle permission active status.
-     */
-    public function toggleActive(int $id): UserPermission
-    {
-        $permission = $this->model->findOrFail($id);
-        $permission->update(['is_active' => !$permission->is_active]);
-        return $permission->fresh();
-    }
-
-    /**
-     * Get permission statistics for a team user.
-     */
-    public function getStats(int $teamUserId): array
-    {
-        $stats = $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                            ->where('subject_id', $teamUserId)
-                            ->selectRaw('
-                                permission_type,
-                                action,
-                                COUNT(*) as count,
-                                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_count
-                            ')
-                            ->groupBy('permission_type', 'action')
-                            ->get();
-
-        return [
-            'total_permissions' => $stats->sum('count'),
-            'active_permissions' => $stats->sum('active_count'),
-            'by_type' => $stats->groupBy('permission_type'),
-            'by_action' => $stats->groupBy('action'),
-        ];
-    }
-
-    /**
-     * Get permissions for any subject type (polymorphic).
-     */
-    public function getBySubject(string $subjectType, int $subjectId): Collection
-    {
-        return $this->model->where('subject_type', $subjectType)
-                          ->where('subject_id', $subjectId)
-                          ->active()
-                          ->orderBy('permission_type')
-                          ->orderBy('action')
-                          ->get();
-    }
-
-    /**
-     * Check if subject has specific permission (polymorphic).
-     */
-    public function hasSubjectPermission(string $subjectType, int $subjectId, string $type, string $action, $resourceId = null, $resourceValue = null): bool
-    {
-        return $this->model->where('subject_type', $subjectType)
-                          ->where('subject_id', $subjectId)
-                          ->forResource($type, $resourceId, $resourceValue)
-                          ->withAction($action)
-                          ->active()
-                          ->exists();
-    }
-
-    /**
-     * Delete all permissions for a subject (polymorphic).
-     */
-    public function deleteBySubject(string $subjectType, int $subjectId): int
-    {
-        return $this->model->where('subject_type', $subjectType)
-                          ->where('subject_id', $subjectId)
-                          ->delete();
-    }
 }

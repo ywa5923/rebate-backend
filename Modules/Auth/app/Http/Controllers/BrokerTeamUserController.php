@@ -7,21 +7,115 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Modules\Auth\Models\BrokerTeam;
 use Modules\Auth\Models\BrokerTeamUser;
 use Modules\Auth\Services\BrokerTeamService;
 use Modules\Auth\Services\UserPermissionService;
+use Modules\Auth\Services\MagicLinkService;
+use Modules\Auth\Http\Requests\RegisterBrokerRequest;
+use Modules\Brokers\Models\Broker;
+use Modules\Brokers\Models\BrokerOption;
+use Modules\Brokers\Models\OptionValue;
 
 
 class BrokerTeamUserController extends Controller
 {
     protected BrokerTeamService $teamService;
     protected UserPermissionService $permissionService;
+    protected MagicLinkService $magicLinkService;
 
-    public function __construct(BrokerTeamService $teamService, UserPermissionService $permissionService)
+    public function __construct(BrokerTeamService $teamService, UserPermissionService $permissionService, MagicLinkService $magicLinkService)
     {
         $this->teamService = $teamService;
         $this->permissionService = $permissionService;
+        $this->magicLinkService = $magicLinkService;
+  }
+    /**
+     * OK
+     * Register a new broker
+     */
+    public function registerBroker(RegisterBrokerRequest $request)
+    {
+        try {
+
+            // Create the broker
+            $broker = DB::transaction(function () use ($request) {
+
+                $broker = Broker::create([
+                    'broker_type_id' => $request->broker_type_id,
+                    'country_id' => $request->country_id,
+                ]);
+
+                //insert broker option value trading_name
+                //get the trading name option
+                $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
+                OptionValue::create([
+                    'optionable_type' => Broker::class,
+                    'optionable_id' => $broker->id,
+                    'option_slug' => 'trading_name',
+                    'value' => $request->trading_name,
+                    'broker_id' => $broker->id,
+                    'broker_option_id' => $tradingNameOption->id,
+                ]);
+
+                //create a default team for the broker and add a user in that team
+                $team = $this->teamService->createTeam([
+                    'broker_id' => $broker->id,
+                    'name' => 'Default Team',
+                    'description' => 'Default team for the broker',
+                    'permissions' => [],
+                ]);
+                $user = $this->teamService->createTeamUser([
+                    'broker_team_id' => $team->id,
+                    'name' => 'Broker Admin',
+                    'email' => $request->email,
+                    'is_active' => true,
+                ]);
+
+                //generate user permission for the user
+                $this->permissionService->createPermission([
+                    'subject_type' => BrokerTeamUser::class,
+                    'subject_id' => $user->id,
+                    'permission_type' => 'broker',
+                    'resource_id' => $broker->id,
+                    'action' => 'manage',
+                ]);
+
+                //generate magic link for broker
+                $magicLink = $this->magicLinkService->generateForTeamUser(
+                    $user,
+                    'registration',
+                    ['requested_at' => now()],
+                    96 // 96 hours = 4 days
+                );
+
+                //send email with magic link
+                // Mail::to($user->email)->send(new MagicLinkMail($magicLink));
+
+                return $broker;
+            });
+
+            // Load the broker type relationship
+            $broker->load('brokerType', 'dynamicOptionsValues');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Broker registered successfully',
+                'data' => [
+                    'broker' => $broker,
+                    'broker_type' => $broker->brokerType
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Broker registration failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to register broker',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
     /**
      * ok

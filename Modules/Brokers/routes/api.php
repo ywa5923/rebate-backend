@@ -36,7 +36,7 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('brokers/broker-list', [BrokerController::class, 'getBrokerList']);
     Route::get('brokers/broker-types-and-countries', [BrokerController::class, 'getBrokerTypesAndCountries']);
     Route::get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
-    Route::put('brokers/toggle-active-status/{id}', [BrokerController::class, 'toggleActiveStatus']);
+    Route::patch('brokers/toggle-active-status/{id}', [BrokerController::class, 'toggleActiveStatus']);
     Route::get('brokers/{id}', [BrokerController::class, 'show']);
   
    // Route::apiResource('brokers', BrokerController::class)->names('brokers');

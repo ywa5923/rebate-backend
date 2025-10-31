@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Brokers\Http\Requests;
+namespace Modules\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CountryListRequest extends FormRequest
+class PlatformUserListRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,12 @@ class CountryListRequest extends FormRequest
     {
         return [
             'per_page' => 'nullable|integer|min:1',
-            'order_by' => 'nullable|string|in:id,name,country_code,zone_code,created_at,updated_at',
+            'order_by' => 'nullable|string|in:id,name,email,role,is_active,created_at,updated_at',
             'order_direction' => 'nullable|string|in:asc,desc',
             'name' => 'nullable|string|max:255',
-            'country_code' => 'nullable|string|max:100',
-            'zone_code' => 'nullable|string|max:100|exists:zones,zone_code',
+            'email' => 'nullable|string|max:255',
+            'role' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ];
     }
 
@@ -42,8 +43,7 @@ class CountryListRequest extends FormRequest
             'per_page' => 'items per page',
             'order_by' => 'sort column',
             'order_direction' => 'sort direction',
-            'country_code' => 'country code',
-            'zone_code' => 'zone code',
+            'is_active' => 'active status',
         ];
     }
 
@@ -56,7 +56,8 @@ class CountryListRequest extends FormRequest
     {
         return [
             'per_page.max' => 'You cannot request more than 100 items per page',
-            'order_by.in' => 'Invalid sort column. Allowed columns: id, name, country_code, zone, created_at, updated_at',
+            'order_by.in' => 'Invalid sort column. Allowed columns: id, name, email, role, is_active, created_at, updated_at',
+            'is_active.boolean' => 'The active status must be true or false',
         ];
     }
 }

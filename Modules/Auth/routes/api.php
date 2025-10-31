@@ -11,6 +11,7 @@ use Modules\Auth\Http\Controllers\RegisteredUserController;
 use Modules\Auth\Http\Controllers\VerifyEmailController;
 use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 use Modules\Auth\Http\Controllers\PlatformUserController;
+use Modules\Auth\Http\Controllers\UserPermissionController;
 
 // Broker registration routes
 Route::group([], function () {
@@ -26,6 +27,11 @@ Route::group([], function () {
     
     // Platform users CRUD
     Route::apiResource('platform-users', PlatformUserController::class);
+    Route::patch('/platform-users/{platform_user}/toggle', [PlatformUserController::class, 'toggleActiveStatus']);
+    
+    // User permissions CRUD
+    Route::apiResource('user-permissions', UserPermissionController::class);
+    Route::patch('/user-permissions/{user_permission}/toggle', [UserPermissionController::class, 'toggleActiveStatus']);
     
     // Magic link authentication
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
