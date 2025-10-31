@@ -13,7 +13,12 @@ class DropdownOption extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'dropdown_category_id',
+        'label',
+        'value',
+        'order',
+    ];
 
     public function dropdownCategory()
     {

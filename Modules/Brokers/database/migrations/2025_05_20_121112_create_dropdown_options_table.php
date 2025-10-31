@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('dropdown_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dropdown_category_id')->constrained('dropdown_categories');
+            $table->foreignId('dropdown_category_id')->constrained('dropdown_categories')->onDelete('cascade');
             $table->string('label');
             $table->string('value');
             $table->integer('order')->default(0);

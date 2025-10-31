@@ -16,6 +16,7 @@ use Modules\Brokers\Http\Controllers\ContestController;
 use Modules\Brokers\Http\Controllers\ChallengeController;
 use Modules\Brokers\Http\Controllers\ZoneController;
 use Modules\Brokers\Http\Controllers\CountryController;
+use Modules\Brokers\Http\Controllers\DropdownListController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -91,4 +92,12 @@ Route::group(["prefix"=>'v1'], function () {
      // Country REST API routes
      Route::get('countries/{id}/statistics', [CountryController::class, 'statistics']);
      Route::apiResource('countries', CountryController::class)->names('countries');
+     
+     // Dropdown categories REST API routes
+     Route::get('dropdown-list', [DropdownListController::class, 'index']);
+     Route::get('dropdown-list/{id}', [DropdownListController::class, 'showList']);
+     Route::delete('dropdown-list/{id}', [DropdownListController::class, 'deleteList']);
+     Route::post('dropdown-list/store-list', [DropdownListController::class, 'storeList']);
+     Route::put('dropdown-list/update-list/{id}', [DropdownListController::class, 'updateList']);
+
 });
