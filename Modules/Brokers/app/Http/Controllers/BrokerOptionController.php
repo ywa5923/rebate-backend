@@ -13,10 +13,25 @@ use Modules\Brokers\Transformers\BrokerOptionCollection;
 use Modules\Brokers\Repositories\FilterRepository;
 use Modules\Brokers\Transformers\FormBrokerOptionResource;
 use Modules\Brokers\Transformers\OptionCategoryResource;
+use Modules\Brokers\Services\BrokerOptionService;
+use Modules\Brokers\Http\Requests\BrokerOptionListRequest;
+use Modules\Brokers\Http\Requests\StoreBrokerOptionRequest;
+use Modules\Brokers\Http\Requests\UpdateBrokerOptionRequest;
+use Modules\Brokers\Transformers\BrokerOptionResource;
+use Illuminate\Http\JsonResponse;
+
 class BrokerOptionController extends Controller
 {
+
+    protected BrokerOptionService $brokerOptionService;
+    public function __construct(BrokerOptionService $brokerOptionService)
+    {
+        $this->brokerOptionService = $brokerOptionService;
+    }
     /**
      * Display a listing of the resource.
+     * These options are formatted for the broker dashboard.
+     * Return an arrat with option categories that includes the broker options.
      */
     public function index(BrokerOptionQueryParser $queryParser, BrokerOptionRepository $rep, Request $request)
     {
@@ -93,17 +108,7 @@ class BrokerOptionController extends Controller
                 $slug = array_key_first($option);
                 return [$slug => $option[$slug]];
             }, $dropdownOptions));
-            // $allowSortingOptions=array_merge(...array_map(function ($option) {
-            //     $slug=array_key_first($option);
-            //     return [$slug=>$option[$slug]];
-            // }, $allowSortingOptions)); 
-
-            // $booleanOptions=array_merge(...array_map(function ($option) {
-            //     $slug=array_key_first($option);
-            //     return [$slug=>$option[$slug]];
-            // },  $booleanOptions)); 
-
-            //add ext relation column to be shown in dropdown
+           
             $dropdownOptions = $brokerExtColumns + $dropdownOptions;
 
             // return $collection;
@@ -121,50 +126,153 @@ class BrokerOptionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get broker options.
+     * Return a collection of broker options.
+     * @param BrokerOptionRequest $request
+     * @return Response
      */
-    public function create()
+    public function getBrokerOptionsList(BrokerOptionListRequest $request): Response
     {
-        return view('brokers::create');
+        try{
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
+            
+            $brokerOptions = $this->brokerOptionService->getAllBrokerOptions($filters, $orderBy, $orderDirection, $perPage);
+            
+            // Create collection with additional parameter for detail view
+           // $collection = new BrokerOptionCollection($brokerOptions->items(), ['detail' => true]);
+            
+            return new Response(json_encode([
+                'success' => true,
+                'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => true])),
+               
+                'table_columns' => BrokerOptionResource::getTableColumnsMapping(),
+                'pagination' => [
+                    'current_page' => $brokerOptions->currentPage(),
+                    'last_page' => $brokerOptions->lastPage(),
+                    'per_page' => $brokerOptions->perPage(),
+                    'total' => $brokerOptions->total(),
+                    'from' => $brokerOptions->firstItem(),
+                    'to' => $brokerOptions->lastItem()
+                ]
+            ]), 200);
+        }catch(\Exception $e){
+            return new Response(json_encode([
+                'success' => false,
+                'error' => 'Error getting broker options',
+                'message' => $e->getMessage()
+            ]), 422);
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Get form meta data for broker options.
+     * Returns available options for applicable_for, data_type, and form_type fields.
+     * 
+     * @return JsonResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function getFormMetaData(): JsonResponse
     {
-        //
+        try {
+            $formMeta = [
+                "applicable_for" => ["broker", "company", "account_type", "promotion", "contest"],
+                "data_type" => ["text", "string", "number", "boolean"],
+                "form_type" => [
+                    "textarea",
+                    "image",
+                    "text",
+                    "multiple_select",
+                    "single_select",
+                    "string",
+                    "url",
+                    "numberWithUnit",
+                    "checkbox",
+                    "notes",
+                    "number"
+                ],
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'data' => $formMeta
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting form meta data: ' . $e->getMessage()
+            ], 422);
+        }
     }
 
     /**
-     * Show the specified resource.
+     * Store a newly created broker option.
      */
-    public function show($id)
+    public function store(StoreBrokerOptionRequest $request): JsonResponse
     {
-        return view('brokers::show');
+        
+        try {
+            $data = $request->validated();
+            $brokerOption = $this->brokerOptionService->createBrokerOption($data);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Broker option created successfully',
+                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true])
+            ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Resource not found',
+                'error' => $e->getMessage()
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create broker option',
+                'error' => $e->getMessage()
+            ], 422);
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update the specified broker option.
      */
-    public function edit($id)
+    public function update(UpdateBrokerOptionRequest $request, $id): JsonResponse
     {
-        return view('brokers::edit');
+        try {
+            $data = $request->validated();
+            $brokerOption = $this->brokerOptionService->updateBrokerOption($id, $data);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Broker option updated successfully',
+                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true])
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Broker option not found',
+                'error' => $e->getMessage()
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update broker option',
+                'error' => $e->getMessage()
+            ], 422);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
+    public function delete(Request $request, $id): JsonResponse
     {
-        //return new Response("not found", 404);
+        try {
+            $this->brokerOptionService->deleteBrokerOption($id);
+            return response()->json(['success' => true, 'message' => 'Broker option deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete broker option', 'error' => $e->getMessage()], 422);
+        }
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    
 }

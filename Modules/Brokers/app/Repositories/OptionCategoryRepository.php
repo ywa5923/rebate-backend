@@ -44,6 +44,32 @@ class OptionCategoryRepository
     }
 
     /**
+     * Get option categories list without relations
+     */
+    public function getOptionCategoriesList(array $filters = [], string $orderBy = 'id', string $orderDirection = 'asc', int $perPage = 15): LengthAwarePaginator
+    {
+        $query = $this->model->newQuery();
+
+        // Apply filters
+        if (!empty($filters['name'])) {
+            $query->where('name', 'like', "%{$filters['name']}%");
+        }
+
+        if (!empty($filters['description'])) {
+            $query->where('description', 'like', "%{$filters['description']}%");
+        }
+
+        if (!empty($filters['slug'])) {
+            $query->where('slug', 'like', "%{$filters['slug']}%");
+        }
+
+        // Apply sorting
+        $query->orderBy($orderBy, $orderDirection);
+
+        return $query->paginate($perPage);
+    }
+
+    /**
      * Get option category by ID with relations
      */
     public function findById(int $id): ?OptionCategory

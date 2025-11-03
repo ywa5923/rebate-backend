@@ -24,8 +24,8 @@ class DropdownListRequest extends FormRequest
         return [
             'per_page' => 'nullable|integer|min:1|max:100',
             'page' => 'nullable|integer|min:1',
-            'sort_by' => 'nullable|string|in:name,slug,created_at,updated_at',
-            'sort_direction' => 'nullable|string|in:asc,desc',
+            'order_by' => 'nullable|string|in:name,slug,created_at,updated_at',
+            'order_direction' => 'nullable|string|in:asc,desc',
             'slug' => 'nullable|string|max:255',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',

@@ -39,10 +39,14 @@ class DropdownListRepository
         if (!empty($filters['slug'])) {
             $query->where('slug', 'like', "%{$filters['slug']}%");
         }
-
+    
         // Apply ordering
-        if (in_array($orderBy, ['name', 'slug', 'created_at', 'updated_at'])) {
+        $allowedOrderBy = ['id', 'name', 'slug', 'description', 'created_at', 'updated_at'];
+        if (in_array($orderBy, $allowedOrderBy)) {
             $query->orderBy($orderBy, $orderDirection);
+        } else {
+            // Default ordering if invalid column provided
+            $query->orderBy('name', $orderDirection);
         }
 
         return $query;

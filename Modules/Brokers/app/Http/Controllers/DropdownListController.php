@@ -19,6 +19,8 @@ class DropdownListController extends Controller
         $this->dropdownListService = $dropdownListService;
     }
 
+    
+
     /**
      * Display a listing of dropdown categories.
      */
@@ -28,8 +30,8 @@ class DropdownListController extends Controller
             $validated = $request->validated();
             
             $perPage = $validated['per_page'] ?? 15;
-            $sortBy = $validated['sort_by'] ?? 'name';
-            $sortDirection = $validated['sort_direction'] ?? 'asc';
+            $orderBy = $validated['order_by'] ?? 'name';
+            $orderDirection = $validated['order_direction'] ?? 'asc';
 
             // Collect filters
             $filters = [
@@ -40,7 +42,7 @@ class DropdownListController extends Controller
 
           
 
-            $lists = $this->dropdownListService->getLists($filters, $sortBy, $sortDirection, $perPage);
+            $lists = $this->dropdownListService->getLists($filters, $orderBy, $orderDirection, $perPage);
             
             return response()->json([
                 'success' => true,
@@ -62,6 +64,8 @@ class DropdownListController extends Controller
             ], 500);
         }
     }
+
+    
 
     /**
      * Display the specified dropdown list.

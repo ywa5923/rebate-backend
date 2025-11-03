@@ -167,4 +167,12 @@ class OptionCategoryService
     {
         return $this->repository->searchByName($search);
     }
+
+    /**
+     * Get option categories list without relations
+     */
+    public function getOptionCategoriesList(array $filters = [], string $orderBy = 'id', string $orderDirection = 'asc', int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        return $this->repository->getOptionCategoriesList($filters, $orderBy, $orderDirection, $perPage);
+    }
 }

@@ -3,34 +3,36 @@
 namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\Broker;
+use Illuminate\Database\Eloquent\Collection;
 
 
 trait BrokerTrait
 {
 
-    function all()
+    function all(): Collection
     {
         return Broker::all();
     }
 
-    function create(array $data)
+    function create(array $data): Broker
     {
         return Broker::create($data);
     }
-    function update(array $data, $id)
+
+    function update(array $data, $id): Broker
     {
         $user = Broker::findOrFail($id);
         $user->update($data);
-        return $user;
+        return $user->fresh();
     }
 
-    function delete($id)
+    function delete($id): bool
     {
         $user = Broker::findOrFail($id);
-        $user->delete();
+        return $user->delete();
     }
 
-    function find($id)
+    function find($id): Broker
     {
         return Broker::findOrFail($id);
     }

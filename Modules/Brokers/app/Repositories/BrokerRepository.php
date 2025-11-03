@@ -2,18 +2,26 @@
 
 namespace Modules\Brokers\Repositories;
 
+
 use App\Repositories\RepositoryInterface;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Modules\Brokers\Models\Broker;
+
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Transformers\BrokerCollection;
 use Modules\Translations\Models\Translation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerOption;
 
 class BrokerRepository implements RepositoryInterface
 {
+
+    protected Broker $model;
+    public function __construct(Broker $model)
+    {
+        $this->model = $model;
+    }
 
     const TRANSLATED_DYNAMIC = 'translated-dynamic';
     const TRANSLATED_STATIC = 'translated-static';
@@ -605,7 +613,8 @@ class BrokerRepository implements RepositoryInterface
         }
     }
 
-
+   
+    
     /**
      * @param Builder $queryBuilder
      * @return void

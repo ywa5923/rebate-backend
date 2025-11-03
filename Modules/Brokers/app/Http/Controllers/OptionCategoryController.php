@@ -8,7 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\OptionCategoryService;
 use Modules\Brokers\Transformers\OptionCategoryResource;
-use Modules\Brokers\Transformers\OptionCategoryCollection;
+use Modules\Brokers\Http\Requests\OptionCategoryListRequest;
 
 /**
  * @OA\Tag(
@@ -118,17 +118,12 @@ class OptionCategoryController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name"},
+     *             required={"name", "slug"},
      *             @OA\Property(property="name", type="string", example="Trading Features"),
+     *             @OA\Property(property="slug", type="string", example="trading-features"),
      *             @OA\Property(property="description", type="string", example="Trading platform features and capabilities"),
      *             @OA\Property(property="icon", type="string", example="fas fa-chart-line"),
-     *             @OA\Property(property="color", type="string", example="#007bff"),
-     *             @OA\Property(property="background_color", type="string", example="#f8f9fa"),
-     *             @OA\Property(property="border_color", type="string", example="#dee2e6"),
-     *             @OA\Property(property="text_color", type="string", example="#212529"),
-     *             @OA\Property(property="font_weight", type="string", example="bold"),
-     *             @OA\Property(property="position", type="integer", example=1),
-     *             @OA\Property(property="default_language", type="string", example="en")
+     *             @OA\Property(property="position", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -136,17 +131,13 @@ class OptionCategoryController extends Controller
      *         description="Option category created successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionCategory"),
-     *             @OA\Property(property="message", type="string", example="Option category created successfully")
+     *             @OA\Property(property="message", type="string", example="Option category created successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OptionCategory")
      *         )
      *     ),
      *     @OA\Response(
      *         response=422,
      *         description="Validation error"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
      *     )
      * )
      */
@@ -176,59 +167,40 @@ class OptionCategoryController extends Controller
     }
 
     /**
-     * Display the specified option category.
+     * Get option categories list.
+     * Return a collection of option categories without relations.
      * 
-     * @OA\Get(
-     *     path="/api/v1/option-categories/{id}",
-     *     summary="Get a specific option category",
-     *     tags={"Option Categories"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Option category ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionCategory")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Option category not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
+     * @param OptionCategoryListRequest $request
+     * @return Response
      */
-    public function show(int $id): JsonResponse
+    public function getOptionCategoriesList(OptionCategoryListRequest $request): Response
     {
         try {
-            $optionCategory = $this->service->getOptionCategoryById($id);
-
-            if (!$optionCategory) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Option category not found'
-                ], 404);
-            }
-
-            return response()->json([
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
+            
+            $optionCategories = $this->service->getOptionCategoriesList($filters, $orderBy, $orderDirection, $perPage);
+            
+            return new Response(json_encode([
                 'success' => true,
-                'data' => new OptionCategoryResource($optionCategory)
-            ], 200);
-
+                'data' => $optionCategories->items(),
+                'pagination' => [
+                    'current_page' => $optionCategories->currentPage(),
+                    'last_page' => $optionCategories->lastPage(),
+                    'per_page' => $optionCategories->perPage(),
+                    'total' => $optionCategories->total(),
+                    'from' => $optionCategories->firstItem(),
+                    'to' => $optionCategories->lastItem()
+                ]
+            ]), 200);
         } catch (\Exception $e) {
-            return response()->json([
+            return new Response(json_encode([
                 'success' => false,
-                'message' => 'Error retrieving option category: ' . $e->getMessage()
-            ], 500);
+                'error' => 'Error getting option categories list',
+                'message' => $e->getMessage()
+            ]), 422);
         }
     }
 
@@ -250,15 +222,10 @@ class OptionCategoryController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string", example="Updated Trading Features"),
+     *             @OA\Property(property="slug", type="string", example="updated-trading-features"),
      *             @OA\Property(property="description", type="string", example="Updated trading platform features"),
      *             @OA\Property(property="icon", type="string", example="fas fa-chart-line"),
-     *             @OA\Property(property="color", type="string", example="#007bff"),
-     *             @OA\Property(property="background_color", type="string", example="#f8f9fa"),
-     *             @OA\Property(property="border_color", type="string", example="#dee2e6"),
-     *             @OA\Property(property="text_color", type="string", example="#212529"),
-     *             @OA\Property(property="font_weight", type="string", example="bold"),
-     *             @OA\Property(property="position", type="integer", example=1),
-     *             @OA\Property(property="default_language", type="string", example="en")
+     *             @OA\Property(property="position", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -266,8 +233,8 @@ class OptionCategoryController extends Controller
      *         description="Option category updated successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", ref="#/components/schemas/OptionCategory"),
-     *             @OA\Property(property="message", type="string", example="Option category updated successfully")
+     *             @OA\Property(property="message", type="string", example="Option category updated successfully"),
+     *             @OA\Property(property="data", ref="#/components/schemas/OptionCategory")
      *         )
      *     ),
      *     @OA\Response(
@@ -277,10 +244,6 @@ class OptionCategoryController extends Controller
      *     @OA\Response(
      *         response=422,
      *         description="Validation error"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
      *     )
      * )
      */
@@ -341,10 +304,6 @@ class OptionCategoryController extends Controller
      *     @OA\Response(
      *         response=404,
      *         description="Option category not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
      *     )
      * )
      */
