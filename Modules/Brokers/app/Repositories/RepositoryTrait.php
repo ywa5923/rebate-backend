@@ -66,5 +66,9 @@ trait RepositoryTrait
     {
         return $this->model->find($id);
     }
+    function findWith($id, $with=[]): ?Model
+    {
+        return $this->model->with($with)->findOrFail($id);
+    }
 }
 

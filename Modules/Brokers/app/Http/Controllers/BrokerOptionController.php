@@ -141,8 +141,7 @@ class BrokerOptionController extends Controller
             
             $brokerOptions = $this->brokerOptionService->getAllBrokerOptions($filters, $orderBy, $orderDirection, $perPage);
             
-            // Create collection with additional parameter for detail view
-           // $collection = new BrokerOptionCollection($brokerOptions->items(), ['detail' => true]);
+          //table definitions are in the BrokerOptionResource class
             
             return new Response(json_encode([
                 'success' => true,
@@ -207,6 +206,37 @@ class BrokerOptionController extends Controller
     }
 
     /**
+     * Display the specified broker option.
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id): JsonResponse
+    {
+        try {
+            $brokerOption = $this->brokerOptionService->getBrokerOptionById($id);
+            
+            if (!$brokerOption) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Broker option not found'
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true])
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving broker option',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Store a newly created broker option.
      */
     public function store(StoreBrokerOptionRequest $request): JsonResponse
@@ -243,7 +273,8 @@ class BrokerOptionController extends Controller
     {
         try {
             $data = $request->validated();
-            $brokerOption = $this->brokerOptionService->updateBrokerOption($id, $data);
+          
+            $brokerOption = $this->brokerOptionService->updateBrokerOption($data, $id);
             
             return response()->json([
                 'success' => true,

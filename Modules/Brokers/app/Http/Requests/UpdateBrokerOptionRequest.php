@@ -40,9 +40,9 @@ class UpdateBrokerOptionRequest extends FormRequest
             'max_constraint' => 'nullable|string|max:100',
             'load_in_dropdown' => 'nullable|boolean',
             'default_loading' => 'nullable|boolean',
-            'default_loading_position' => 'nullable|integer|min:1',
-            'dropdown_position' => 'nullable|integer|min:1',
-            'position_in_category' => 'nullable|integer|min:1',
+            'default_loading_position' => 'nullable|integer|min:0',
+            'dropdown_position' => 'nullable|integer|min:0',
+            'position_in_category' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
             'allow_sorting' => 'nullable|boolean',
             'category_name' => 'sometimes|integer|exists:option_categories,id',
@@ -64,6 +64,40 @@ class UpdateBrokerOptionRequest extends FormRequest
             'default_loading_position' => 'default loading position',
             'is_active' => 'is active',
         ];
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    // protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    // {
+    //     $response = response()->json([
+    //         'success' => false,
+    //         'message' => 'Validation failed',
+    //         'errors' => $validator->errors()->toArray()
+    //     ], 422);
+
+    //     throw new \Illuminate\Validation\ValidationException($validator, $response);
+    // }
+
+    /**
+     * Get the proper response for a failed validation.
+     *
+     * @param  array<string, mixed>  $errors
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function response(array $errors)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $errors
+        ], 422);
     }
 }
 

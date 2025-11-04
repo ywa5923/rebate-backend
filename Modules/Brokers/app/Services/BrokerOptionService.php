@@ -55,7 +55,8 @@ class BrokerOptionService
             $data['dropdown_category_id'] = $data['dropdown_list_attached'];
             unset($data['dropdown_list_attached']);
         }
-        
+       
+     
         // meta_data conversion is handled automatically by the model's setMetaDataAttribute mutator
         return $this->brokerOptionRepository->update($data, $id);
     }
@@ -63,5 +64,10 @@ class BrokerOptionService
     public function deleteBrokerOption(int $id): bool
     {
         return $this->brokerOptionRepository->delete($id);
+    }
+
+    public function getBrokerOptionById($id): ?BrokerOption
+    {
+        return $this->brokerOptionRepository->findWith($id, ['category', 'dropdownCategory']);
     }
 }

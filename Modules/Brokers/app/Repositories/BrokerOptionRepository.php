@@ -171,11 +171,11 @@ class BrokerOptionRepository implements RepositoryInterface
      */
     public function update(array $data, $id): ?BrokerOption
     {
-        $brokerOption = $this->model->find($id);
+        $brokerOption = $this->model->findOrFail($id);
         if($brokerOption)
         {
             $brokerOption->update($data);
-            return $brokerOption->fresh();
+            return $brokerOption->fresh()->load('category','dropdownCategory');
         }
         return null;
     }

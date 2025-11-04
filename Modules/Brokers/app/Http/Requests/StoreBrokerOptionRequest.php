@@ -38,9 +38,9 @@ class StoreBrokerOptionRequest extends FormRequest
             'max_constraint' => 'nullable|string|max:100',
             'load_in_dropdown' => 'nullable|boolean',
             'default_loading' => 'nullable|boolean',
-            'default_loading_position' => 'nullable|integer|min:1',
-            'dropdown_position' => 'nullable|integer|min:1',
-            'position_in_category' => 'nullable|integer|min:1',
+            'default_loading_position' => 'nullable|integer|min:0',
+            'dropdown_position' => 'nullable|integer|min:0',
+            'position_in_category' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
             'allow_sorting' => 'nullable|boolean',
             'category_name' => 'nullable|integer|exists:option_categories,id',
@@ -75,7 +75,13 @@ class StoreBrokerOptionRequest extends FormRequest
      */
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        throw new \Illuminate\Validation\ValidationException($validator);
+        $response = response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $validator->errors()->toArray()
+        ], 422);
+
+        throw new \Illuminate\Validation\ValidationException($validator, $response);
     }
 
     /**
