@@ -139,4 +139,17 @@ return [
 
     'mark_magic_link_as_used' => env('MARK_MAGIC_LINK_AS_USED', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Magic Link Expiration Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for magic link expiration hours for different user types.
+    | These values determine how long magic links remain valid before expiring.
+    |
+    */
+
+    'magic_link_expiration_hours_for_broker_team_user' => (int) env('MAGIC_LINK_EXPIRATION_HOURS_FOR_BROKER_TEAM_USER', 24),
+    'magic_link_expiration_hours_for_platform_user' => (int) env('MAGIC_LINK_EXPIRATION_HOURS_FOR_PLATFORM_USER', 24),
+
 ];

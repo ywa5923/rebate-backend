@@ -10,6 +10,8 @@ use Modules\Brokers\Models\Broker;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Mail;
+use Modules\Auth\Mail\MagicLinkMail;
 
 class MagicLinkService
 {
@@ -44,6 +46,20 @@ class MagicLinkService
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
+    }
+
+    public function sendMagicLinkToBrokerTeamUser(BrokerTeamUser $brokerTeamUser, string $action = 'login', int $expirationHours = 24): MagicLink
+    {
+        $magicLink = $this->generateForTeamUser($brokerTeamUser, $action, [], $expirationHours);
+        Mail::to($brokerTeamUser->email)->send(new MagicLinkMail($magicLink));
+        return $magicLink;
+    }
+
+    public function sendMagicLinkToPlatformUser(PlatformUser $platformUser, string $action = 'login', int $expirationHours = 24): MagicLink
+    {
+        $magicLink = $this->generateForPlatformUser($platformUser, $action, [], $expirationHours);
+        Mail::to($platformUser->email)->send(new MagicLinkMail($magicLink));
+        return $magicLink;
     }
 
     /**

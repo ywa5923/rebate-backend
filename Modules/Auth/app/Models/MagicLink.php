@@ -30,13 +30,7 @@ class MagicLink extends Model
         'metadata' => 'array',
     ];
 
-    /**
-     * Get the broker that owns the magic link.
-     */
-    public function broker(): BelongsTo
-    {
-        return $this->belongsTo(Broker::class);
-    }
+    
 
     /**
      * Get the team user that owns the magic link.

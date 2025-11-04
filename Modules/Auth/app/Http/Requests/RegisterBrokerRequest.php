@@ -22,6 +22,7 @@ class RegisterBrokerRequest extends FormRequest
      */
     public function rules(): array
     {
+        
         return [
             'broker_type_id' => 'required|integer|exists:broker_types,id',
             'email' => [

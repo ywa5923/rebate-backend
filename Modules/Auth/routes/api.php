@@ -35,7 +35,7 @@ Route::group([], function () {
     
     // Magic link authentication
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
-   
+    Route::post('/login-with-email', [ApiAuthController::class, 'loginWithEmail']);
     Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLinkToken']);
 
     

@@ -4,7 +4,6 @@ namespace Modules\Auth\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -25,6 +24,9 @@ use Illuminate\Support\Facades\Log;
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Auth\Http\Requests\RegisterBrokerRequest;
+use Modules\Auth\Http\Requests\VerifyMagicLinkTokenRequest;
+use Modules\Auth\Http\Requests\DecodeTokenRequest;
+use Modules\Auth\Http\Requests\LoginWithEmailRequest;
 
 class ApiAuthController extends Controller
 {
@@ -55,26 +57,14 @@ class ApiAuthController extends Controller
      * OK
      * Verify magic link token and return user data for frontend authentication
      */
-    public function verifyMagicLinkToken(Request $request)
+    public function verifyMagicLinkToken(VerifyMagicLinkTokenRequest $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'token' => 'required|string|size:64',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-
+           
             // Validate the magic link token
             $magicLink = $this->magicLinkService->validateToken($request->token);
 
-
+          
             if (!$magicLink) {
                 return response()->json([
                     'success' => false,
@@ -90,7 +80,7 @@ class ApiAuthController extends Controller
 
             // Get the subject (user) from the magic link
             $subject = $magicLink->subject;
-
+            
 
             if (!$subject) {
                 return response()->json([
@@ -113,6 +103,7 @@ class ApiAuthController extends Controller
             // Generate the Sanctum token
             $token = $subject->createToken('magic-link-auth', ['*'], now()->addDays($expirationDays))->plainTextToken;
 
+               
             // Prepare user data based on type
             $userData = [
                 'id' => $subject->id,
@@ -131,9 +122,10 @@ class ApiAuthController extends Controller
                 ];
             } elseif ($subject instanceof \Modules\Auth\Models\PlatformUser) {
                 $userData['user_type'] = 'platform_user';
+                $brokerContext = [];
             }
 
-            
+           
 
             return response()->json([
                 'success' => true,
@@ -157,25 +149,57 @@ class ApiAuthController extends Controller
         }
     }
 
+    public function loginWithEmail(LoginWithEmailRequest $request)
+    {
+
+        try {
+            $brokerTeamUser = BrokerTeamUser::where('email', $request->email)->first();
+
+           
+           if ($brokerTeamUser instanceof \Modules\Auth\Models\BrokerTeamUser) {
+            $expirationHours = config('auth.magic_link_expiration_hours_for_broker_team_user', 72);
+            $magicLink = $this->magicLinkService->sendMagicLinkToBrokerTeamUser($brokerTeamUser, 'login');
+            
+           return response()->json([
+            'success' => true,
+            'message' => 'Magic link created successfully',
+            'data' => $magicLink
+        ]);
+           }
+           $platformUser = PlatformUser::where('email', $request->email)->first();
+          
+           if ($platformUser instanceof \Modules\Auth\Models\PlatformUser) {
+            $expirationHours = config('auth.magic_link_expiration_hours_for_platform_user', 72);
+            $magicLink = $this->magicLinkService->sendMagicLinkToPlatformUser($platformUser, 'login');
+            return response()->json([
+                'success' => true,
+                'message' => 'Magic link created successfully',
+                'data' => $magicLink
+            ]);
+           }
+
+           
+          
+        } catch (\Exception $e) {
+            Log::error('Login with email failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Login failed',
+                'error' => 'An error occurred while logging in with email. Please try again.'
+            ], 500);
+        }
+      
+           
+        
+    }
+
     /**
-     * ??
+     * ?
      * Decode JWT token and return user data (for frontend authentication)
      */
-    public function decodeToken(Request $request)
+    public function decodeToken(DecodeTokenRequest $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'token' => 'required|string',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
             // Find the Sanctum token
             $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($request->token);
 

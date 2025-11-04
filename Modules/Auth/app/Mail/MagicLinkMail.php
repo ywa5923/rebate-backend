@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use Modules\Auth\Models\MagicLink;
 
@@ -33,6 +34,10 @@ class MagicLinkMail extends Mailable
         $subject = $this->getSubjectByAction();
         
         return new Envelope(
+            from: new Address(
+                config('mail.from.address'),
+                config('mail.from.name')
+            ),
             subject: $subject,
         );
     }
@@ -47,7 +52,7 @@ class MagicLinkMail extends Mailable
             with: [
                 'magicLink' => $this->magicLink,
                 'magicLinkUrl' => $this->magicLinkUrl,
-                'broker' => $this->magicLink->broker,
+                'subject' => $this->magicLink->subject,
                 'action' => $this->magicLink->action,
                 'expiresAt' => $this->magicLink->expires_at,
             ],
@@ -72,7 +77,7 @@ class MagicLinkMail extends Mailable
         $baseUrl = config('app.url');
         $frontendUrl = config('app.frontend_url', $baseUrl);
         
-        return $frontendUrl . '/auth/magic-link?token=' . $this->magicLink->token;
+        return $frontendUrl . '/en/verify-token?token=' . $this->magicLink->token;
     }
 
     /**
@@ -81,10 +86,10 @@ class MagicLinkMail extends Mailable
     private function getSubjectByAction(): string
     {
         return match ($this->magicLink->action) {
-            'login' => 'Your Magic Link for Login',
-            'registration' => 'Complete Your Broker Registration',
-            'password_reset' => 'Reset Your Password',
-            default => 'Your Magic Link',
+            'login' => 'FXREBATE - Your Magic Link for Login',
+            'registration' => 'FXREBATE - Complete Your Broker Registration',
+            'password_reset' => 'FXREBATE - Reset Your Password',
+            default => 'FXREBATE - Your Magic Link for Login',
         };
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic Link Authentication</title>
+    <title>FXREBATE - Magic Link Authentication</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,7 +78,7 @@
             @endswitch
         </h2>
 
-        <p>Hello {{ $broker->registration_language ?? 'Broker' }},</p>
+        <p>Hello {{ $subject->name ?? 'FXREBATE User' }},</p>
 
         <p>
             @switch($action)

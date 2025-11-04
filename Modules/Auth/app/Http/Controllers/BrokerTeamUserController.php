@@ -17,6 +17,9 @@ use Modules\Auth\Http\Requests\RegisterBrokerRequest;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Models\OptionValue;
+use Illuminate\Support\Facades\Mail;
+
+use Modules\Auth\Mail\MagicLinkMail;
 
 
 class BrokerTeamUserController extends Controller
@@ -24,12 +27,14 @@ class BrokerTeamUserController extends Controller
     protected BrokerTeamService $teamService;
     protected UserPermissionService $permissionService;
     protected MagicLinkService $magicLinkService;
-
-    public function __construct(BrokerTeamService $teamService, UserPermissionService $permissionService, MagicLinkService $magicLinkService)
+    protected Mail $mailService;
+    public function __construct(BrokerTeamService $teamService, 
+    UserPermissionService $permissionService, MagicLinkService $magicLinkService)
     {
         $this->teamService = $teamService;
         $this->permissionService = $permissionService;
         $this->magicLinkService = $magicLinkService;
+       
   }
     /**
      * OK
@@ -37,6 +42,8 @@ class BrokerTeamUserController extends Controller
      */
     public function registerBroker(RegisterBrokerRequest $request)
     {
+
+        
         try {
 
             // Create the broker
@@ -91,7 +98,7 @@ class BrokerTeamUserController extends Controller
                 );
 
                 //send email with magic link
-                // Mail::to($user->email)->send(new MagicLinkMail($magicLink));
+                 Mail::to($user->email)->send(new MagicLinkMail($magicLink));
 
                 return $broker;
             });
