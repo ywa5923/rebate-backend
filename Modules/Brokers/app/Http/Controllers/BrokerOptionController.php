@@ -19,15 +19,18 @@ use Modules\Brokers\Http\Requests\StoreBrokerOptionRequest;
 use Modules\Brokers\Http\Requests\UpdateBrokerOptionRequest;
 use Modules\Brokers\Transformers\BrokerOptionResource;
 use Illuminate\Http\JsonResponse;
+use Modules\Brokers\Table\BrokerOptionTableConfig;
 
 class BrokerOptionController extends Controller
 {
 
-    protected BrokerOptionService $brokerOptionService;
-    public function __construct(BrokerOptionService $brokerOptionService)
-    {
-        $this->brokerOptionService = $brokerOptionService;
-    }
+  
+    public function __construct(
+        protected BrokerOptionService $brokerOptionService,
+        private readonly BrokerOptionTableConfig $tableConfig
+    ){}
+
+   
     /**
      * Display a listing of the resource.
      * These options are formatted for the broker dashboard.
@@ -147,7 +150,7 @@ class BrokerOptionController extends Controller
                 'success' => true,
                 'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => true])),
                
-                'table_columns' => BrokerOptionResource::getTableColumnsMapping(),
+                'table_columns_config' => $this->tableConfig->columns(),
                 'pagination' => [
                     'current_page' => $brokerOptions->currentPage(),
                     'last_page' => $brokerOptions->lastPage(),
@@ -155,7 +158,9 @@ class BrokerOptionController extends Controller
                     'total' => $brokerOptions->total(),
                     'from' => $brokerOptions->firstItem(),
                     'to' => $brokerOptions->lastItem()
-                ]
+                ],
+                'filters_config'=>$this->tableConfig->filters()
+
             ]), 200);
         }catch(\Exception $e){
             return new Response(json_encode([

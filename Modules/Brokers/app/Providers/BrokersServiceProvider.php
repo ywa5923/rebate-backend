@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\Brokers\Repositories\BrokerRepository;
 use Modules\Brokers\Services\BrokerService;
+use Modules\Brokers\Http\Controllers\BrokerOptionController;
+use Modules\Brokers\Table\BrokerOptionTableConfig;
+use Modules\Brokers\Table\TableConfigInterface;
 
 class BrokersServiceProvider extends ServiceProvider
 {
@@ -37,6 +40,14 @@ class BrokersServiceProvider extends ServiceProvider
         $this->app->bind(BrokerService::class, function ($app) {
             return new BrokerService($app->make(BrokerRepository::class));
         });
+
+        // $this->app->when(BrokerOptionController::class)
+        //     ->needs(TableConfigInterface::class)
+        //     ->give(function () {
+        //         return new BrokerOptionTableConfig();
+        //     });
+
+        
     }
 
     /**
