@@ -49,66 +49,107 @@ final class BrokerOptionTableConfig implements TableConfigInterface
 
         
         return [
-            'name' => ['type' => 'text', 'placeholder' => 'Search by name'],
+            'name' => [
+                'type' => 'text', 
+                'label' => 'Name',
+                'tooltip' => 'Filter by name',
+                'placeholder' => 'Search by name'
+                ]
+                ,
             'applicable_for' => [
                 'type' => 'select', 
+                'label' => 'Applicable For',
+                'tooltip' => 'Filter by applicable for',
                 'options' => $this->getDistinctOptions('applicable_for')
             ],
             'data_type' => [
                 'type' => 'select', 
+                'label' => 'Data Type',
+                'tooltip' => 'Filter by data type',
                 'options' => $this->getDistinctOptions('data_type')
             ],
             'form_type' => [
                 'type' => 'select',
+                'label' => 'Form Type',
                 'tooltip' => 'Filter by form type',
                 'options' => $this->getDistinctOptions('form_type')
             ],
             'for_brokers' => [
                 'type' => 'select',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'label' => 'For Brokers',
+                'tooltip' => 'Filter by for brokers options',
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No',
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ]]
             ],
             'for_crypto' => [
                 'type' => 'select',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'label' => 'For Crypto',
+                'tooltip' => 'Filter by for crypto options',
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No',
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ]]
             ],
             'for_props' => [
                 'type' => 'select',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'label' => 'For Props',
+                'tooltip' => 'Filter by for props options',
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No',
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ]]
             ],
             'required' => [
                 'type' => 'select',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'label' => 'Required',
+                'tooltip' => 'Filter by required options',
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No',
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ]]
             ],
             'load_in_dropdown' => [
                 'type' => 'select',
+                'label' => 'Load in Dropdown',
                 'tooltip' => 'This filter shows options that are loaded in dropdown list which is opened when the user click Select Columns button in a dynamic table',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No',
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes',
+                ]]
             ],
             'default_loading' => [
                 'type' => 'select',
+                'label' => 'Default Loading',
                 'tooltip' => 'This filter shows options that are loaded by default in brokers dynamic table',
-                'options' => [
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ]
+                'options' => [[
+                    'value' => 0,
+                    'label' => 'No'
+                ], [
+                    'value' => 1,
+                    'label' => 'Yes'
+                    
+                ]]
             ],
             'category_name' => [
                 'type' => 'select',
+                'label' => 'Category Name',
                 'tooltip' => 'Filter by option category name',
                 'options' => OptionCategory::all()->map(function($category) {
                     return [
@@ -119,6 +160,7 @@ final class BrokerOptionTableConfig implements TableConfigInterface
             ],
             'dropdown_list_attached' => [
                 'type' => 'select',
+                'label' => 'Dropdown List Attached',
                 'tooltip' => 'Filter by dropdown list attached',
                 'options' => DropdownCategory::all()->map(function($dropdownCategory) {
                     return [
@@ -133,16 +175,34 @@ final class BrokerOptionTableConfig implements TableConfigInterface
 
     public function getDistinctOptions(string $column): array
     {
-       return BrokerOption::select($column)
-                    ->distinct()
-                    ->orderBy($column)
-                    ->get()
-                    ->map(function($option) use ($column): array {
-                        return [
-                            'value' => $option->$column,
-                            'label' => ucfirst(str_replace('_', ' ', $option->$column)),
-                        ];
-                    })
-                    ->toArray();
+        $hasEmptyValues = BrokerOption::query()
+            ->whereNull($column)
+            ->orWhere($column, '=', '')
+            ->exists();
+
+        $options = BrokerOption::query()
+            ->select($column)
+            ->whereNotNull($column)
+            ->where($column, '!=', '')
+            ->distinct()
+            ->orderBy($column)
+            ->pluck($column)
+            ->map(function ($value) {
+                return [
+                    'value' => $value,
+                    'label' => ucfirst(str_replace('_', ' ', $value)),
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        if ($hasEmptyValues) {
+            array_unshift($options, [
+                'value' => '__EMPTY__',
+                'label' => 'Empty',
+            ]);
+        }
+
+        return $options;
     }
 }
