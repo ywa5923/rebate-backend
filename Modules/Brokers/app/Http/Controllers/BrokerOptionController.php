@@ -20,7 +20,7 @@ use Modules\Brokers\Http\Requests\UpdateBrokerOptionRequest;
 use Modules\Brokers\Transformers\BrokerOptionResource;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Table\BrokerOptionTableConfig;
-
+use Modules\Brokers\Form\BrokerOptionForm;
 class BrokerOptionController extends Controller
 {
 
@@ -216,7 +216,7 @@ class BrokerOptionController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show($id, BrokerOptionForm $form): JsonResponse
     {
         try {
             $brokerOption = $this->brokerOptionService->getBrokerOptionById($id);
@@ -230,7 +230,8 @@ class BrokerOptionController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true])
+                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true]),
+                'form' => $form->getFormData()
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
