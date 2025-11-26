@@ -136,6 +136,7 @@ class BrokerOptionController extends Controller
      */
     public function getBrokerOptionsList(BrokerOptionListRequest $request): Response
     {
+       
         try{
             $filters = $request->getFilters();
             $orderBy = $request->getOrderBy();
@@ -144,13 +145,14 @@ class BrokerOptionController extends Controller
             
             $brokerOptions = $this->brokerOptionService->getAllBrokerOptions($filters, $orderBy, $orderDirection, $perPage);
             
-          //table definitions are in the BrokerOptionResource class
+         
             
             return new Response(json_encode([
                 'success' => true,
                 'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => true])),
                
                 'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config'=>$this->tableConfig->filters(),
                 'pagination' => [
                     'current_page' => $brokerOptions->currentPage(),
                     'last_page' => $brokerOptions->lastPage(),
@@ -159,13 +161,12 @@ class BrokerOptionController extends Controller
                     'from' => $brokerOptions->firstItem(),
                     'to' => $brokerOptions->lastItem()
                 ],
-                'filters_config'=>$this->tableConfig->filters()
+                
 
             ]), 200);
         }catch(\Exception $e){
             return new Response(json_encode([
                 'success' => false,
-                'error' => 'Error getting broker options',
                 'message' => $e->getMessage()
             ]), 422);
         }
@@ -237,6 +238,22 @@ class BrokerOptionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving broker option',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getFormData(BrokerOptionForm $form): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $form->getFormData()
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting form data',
                 'error' => $e->getMessage()
             ], 500);
         }

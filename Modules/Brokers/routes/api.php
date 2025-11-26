@@ -45,7 +45,8 @@ Route::group(["prefix"=>'v1'], function () {
     //Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
     Route::get('broker_options', [BrokerOptionController::class, 'index']);
     Route::get('broker-options/get-list', [BrokerOptionController::class, 'getBrokerOptionsList']);
-    Route::get('broker-options/form-meta-data', [BrokerOptionController::class, 'getFormMetaData']);
+    //Route::get('broker-options/form-meta-data', [BrokerOptionController::class, 'getFormMetaData']);
+    Route::get('broker-options/form-data', [BrokerOptionController::class, 'getFormData']);
     Route::get('broker-options/{id}', [BrokerOptionController::class, 'show']);
     Route::post('broker-options', [BrokerOptionController::class, 'store']);
     Route::put('broker-options/{id}', [BrokerOptionController::class, 'update']);

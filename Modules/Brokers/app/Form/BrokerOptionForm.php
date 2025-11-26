@@ -17,8 +17,8 @@ class BrokerOptionForm extends Form
                 'firstRow' => [
                     
                     'fields' => [
-                        'name' => Field::text('Name', ['required', 'min:3', 'max:100']),
-                        'slug' => Field::text('Slug', ['required']),
+                        'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
+                        'slug' => Field::text('Slug', ['required'=>true]),
                     ],
                 ],
                 'applicability' => [
@@ -26,12 +26,16 @@ class BrokerOptionForm extends Form
                     'fields' => [
                         'applicable_for' => Field::select(
                             'Applicable For',
-                            $this->getDistinctOptions(BrokerOption::class, 'applicable_for'),
-                            ['required']
+                            'string',
+                            $this->getDistinctOptions(BrokerOption::class, 'applicable_for')
                         ),
-                        'for_brokers' => Field::select('For Brokers', $this->booleanOptions(), ['required']),
-                        'for_props'   => Field::select('For Props', $this->booleanOptions(), ['required']),
-                        'for_crypto'  => Field::select('For Crypto', $this->booleanOptions(), ['required']),
+                        'for_brokers' => Field::select('For Brokers', 'numeric',$this->booleanOptions()),
+                        'for_props'   => Field::select('For Props', 'numeric',$this->booleanOptions()),
+                        'for_crypto'  => Field::select('For Crypto', 'numeric',$this->booleanOptions()),
+                        'test_array' => Field::array_fields('Test Array', [
+                            'field_name' => Field::text('Field Name', ['required'=>true, 'min'=>3, 'max'=>100]),
+                            'field_slug' => Field::text('Field Value', ['required'=>true, 'min'=>3, 'max'=>100]),
+                        ]),
                     ],
                 ],
             ],
