@@ -27,7 +27,8 @@ class BrokerOptionController extends Controller
   
     public function __construct(
         protected BrokerOptionService $brokerOptionService,
-        private readonly BrokerOptionTableConfig $tableConfig
+        private readonly BrokerOptionTableConfig $tableConfig,
+        private readonly BrokerOptionForm $formConfig
     ){}
 
    
@@ -150,7 +151,7 @@ class BrokerOptionController extends Controller
             return new Response(json_encode([
                 'success' => true,
                 'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => true])),
-               
+                'form_config'=> $this->formConfig->getFormData(),
                 'table_columns_config' => $this->tableConfig->columns(),
                 'filters_config'=>$this->tableConfig->filters(),
                 'pagination' => [
@@ -172,44 +173,7 @@ class BrokerOptionController extends Controller
         }
     }
 
-    /**
-     * Get form meta data for broker options.
-     * Returns available options for applicable_for, data_type, and form_type fields.
-     * 
-     * @return JsonResponse
-     */
-    public function getFormMetaData(): JsonResponse
-    {
-        try {
-            $formMeta = [
-                "applicable_for" => ["broker", "company", "account_type", "promotion", "contest"],
-                "data_type" => ["text", "string", "number", "boolean"],
-                "form_type" => [
-                    "textarea",
-                    "image",
-                    "text",
-                    "multiple_select",
-                    "single_select",
-                    "string",
-                    "url",
-                    "numberWithUnit",
-                    "checkbox",
-                    "notes",
-                    "number"
-                ],
-            ];
-            
-            return response()->json([
-                'success' => true,
-                'data' => $formMeta
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error getting form meta data: ' . $e->getMessage()
-            ], 422);
-        }
-    }
+    
 
     /**
      * Display the specified broker option.
@@ -243,12 +207,12 @@ class BrokerOptionController extends Controller
         }
     }
 
-    public function getFormData(BrokerOptionForm $form): JsonResponse
+    public function getFormData(): JsonResponse
     {
         try {
             return response()->json([
                 'success' => true,
-                'data' => $form->getFormData()
+                'data' => $this->formConfig->getFormData()
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
