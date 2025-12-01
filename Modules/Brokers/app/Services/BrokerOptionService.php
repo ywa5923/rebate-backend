@@ -45,16 +45,16 @@ class BrokerOptionService
     public function updateBrokerOption(array $data, $id): ?BrokerOption
     {
         // Convert category_name to option_category_id
-        if (isset($data['category_name'])) {
-            $data['option_category_id'] = $data['category_name'];
-            unset($data['category_name']);
-        }
+        // if (isset($data['category_name'])) {
+        //     $data['option_category_id'] = $data['category_name'];
+        //     unset($data['category_name']);
+        // }
         
-        // Convert dropdown_list_attached to dropdown_category_id
-        if (isset($data['dropdown_list_attached'])) {
-            $data['dropdown_category_id'] = $data['dropdown_list_attached'];
-            unset($data['dropdown_list_attached']);
-        }
+        // // Convert dropdown_list_attached to dropdown_category_id
+        // if (isset($data['dropdown_list_attached'])) {
+        //     $data['dropdown_category_id'] = $data['dropdown_list_attached'];
+        //     unset($data['dropdown_list_attached']);
+        // }
        
      
         // meta_data conversion is handled automatically by the model's setMetaDataAttribute mutator

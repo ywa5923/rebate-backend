@@ -36,8 +36,8 @@ class UpdateBrokerOptionRequest extends FormRequest
             'required' => 'sometimes|boolean',
             'placeholder' => 'nullable|string|max:100',
             'tooltip' => 'nullable|string|max:500',
-            'min_constraint' => 'nullable|string|max:100',
-            'max_constraint' => 'nullable|string|max:100',
+            'min_constraint' => 'nullable|integer',
+            'max_constraint' => 'nullable|integer',
             'load_in_dropdown' => 'nullable|boolean',
             'default_loading' => 'nullable|boolean',
             'default_loading_position' => 'nullable|integer|min:0',
@@ -45,8 +45,8 @@ class UpdateBrokerOptionRequest extends FormRequest
             'position_in_category' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
             'allow_sorting' => 'nullable|boolean',
-            'category_name' => 'sometimes|integer|exists:option_categories,id',
-            'dropdown_list_attached' => 'nullable|integer|exists:dropdown_categories,id',
+            'option_category_id' => 'nullable|integer|exists:option_categories,id',
+            'dropdown_category_id' => 'nullable|integer|exists:dropdown_categories,id',
         ];
     }
 
@@ -58,8 +58,8 @@ class UpdateBrokerOptionRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'category_name' => 'category name',
-            'dropdown_list_attached' => 'dropdown list attached',
+            'option_category_id' => 'option category id',
+            'dropdown_category_id' => 'dropdown category id',
             'position_in_category' => 'position in category',
             'default_loading_position' => 'default loading position',
             'is_active' => 'is active',
