@@ -19,7 +19,7 @@ class BrokerOptionForm extends Form
                     'label' => 'Definitions',
                     'fields' => [
                         'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'slug' => Field::text('Slug', ['required'=>true]),
+                        'slug' => Field::text('Slug', ['required'=>true, 'min'=>3, 'max'=>100]),
                     ],
                 ],
                 'form_settings' => [
@@ -28,8 +28,8 @@ class BrokerOptionForm extends Form
                         'form_type' => Field::select('Form Type', 'string', $this->getFormTypes(), ['required'=>true]),
                         'data_type' => Field::select('Data Type', 'string', $this->getDataTypes(), ['required'=>true]),
                         'dropdown_category_id' => Field::select('Dropdown List Attached', 'numeric',$this->getDropdownCategories(),['required'=>false]),
-                        'placeholder' => Field::text('Placeholder', ['required'=>false]),
-                        'tooltip' => Field::text('Tooltip', ['required'=>false]),
+                        'placeholder' => Field::text('Placeholder', ['required'=>false,'nullable'=>true]),
+                        'tooltip' => Field::text('Tooltip', ['required'=>false,'nullable'=>true]),
                     ],
                 ],
                 'applicability' => [
@@ -38,8 +38,9 @@ class BrokerOptionForm extends Form
                         'applicable_for' => Field::select(
                             'Applicable For',
                             'string',
-                            $this->getDistinctOptions(BrokerOption::class, 'applicable_for')
-                          ,['required'=>true]),
+                            //$this->getDistinctOptions(BrokerOption::class, 'applicable_for')
+                            $this->getApplicableForOptions()
+                          ,['required'=>false,'nullable'=>true]),
                         'for_brokers' => Field::select('For Brokers', 'numeric',$this->booleanOptions(),['required'=>true]),
                         'for_props'   => Field::select('For Props', 'numeric',$this->booleanOptions(),['required'=>true]),
                         'for_crypto'  => Field::select('For Crypto', 'numeric',$this->booleanOptions(),['required'=>true]),
@@ -63,14 +64,14 @@ class BrokerOptionForm extends Form
                     'label' => 'OptionCategory Settings',
                     'fields' => [
                         'option_category_id' => Field::select('Option Category', 'numeric',$this->getOptionCategories(),['required'=>true]),
-                        'category_position' => Field::number('Category Position', ['required'=>false]),
+                        'category_position' => Field::number('Category Position', ['required'=>true]),
                     ],
                 ],
                 'constraints' => [
                     'label' => 'Constraints',
                     'fields' => [
-                        'min_constraint' => Field::number('Min Constraint', ['required'=>true]),
-                        'max_constraint' => Field::number('Max Constraint', ['required'=>true]),
+                        'min_constraint' => Field::number('Min Constraint', ['required'=>false,'min'=>100]),
+                        'max_constraint' => Field::number('Max Constraint', ['required'=>false,'min'=>100]),
                         'required' => Field::select('Required', 'numeric',$this->booleanOptions(),['required'=>true]),
                     ],
                 ],
@@ -81,6 +82,7 @@ class BrokerOptionForm extends Form
     private function booleanOptions(): array
     {
         return [
+            
             ['value' => 0, 'label' => 'No'],
             ['value' => 1, 'label' => 'Yes'],
         ];
@@ -139,5 +141,17 @@ class BrokerOptionForm extends Form
             })
             ->values()
             ->all();
+    }
+
+    private function getApplicableForOptions(): array
+    {
+        return [
+            ['value' => 'broker', 'label' => 'Broker'],
+            ['value' => 'company', 'label' => 'Company'],
+            ['value' => 'account_type', 'label' => 'Account Type'],
+            ['value' => 'promotion', 'label' => 'Promotion'],
+            ['value' => 'contest', 'label' => 'Contest'],
+            ['value' => 'other', 'label' => 'Other'],
+        ];
     }
 }

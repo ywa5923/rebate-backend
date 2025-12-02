@@ -4,7 +4,8 @@ namespace Modules\Brokers\Table;
 use Modules\Brokers\Models\OptionCategory;
 use Modules\Brokers\Models\DropdownCategory;
 use Modules\Brokers\Models\BrokerOption;
-final class BrokerOptionTableConfig implements TableConfigInterface
+use App\Tables\TableConfig;
+final class BrokerOptionTableConfig extends TableConfig
 {
     /**
      * Get the table column mapping configuration.
@@ -14,7 +15,7 @@ final class BrokerOptionTableConfig implements TableConfigInterface
      */
     public  function columns(): array
     {
-        // Column order matches exactly the order in toArray() method (lines 61-89)
+       
         return [
             'id' => ['label' => 'ID', 'type' => 'number', 'visible' => true, 'sortable' => true, 'filterable' => false],
             'name' => ['label' => 'Name', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],

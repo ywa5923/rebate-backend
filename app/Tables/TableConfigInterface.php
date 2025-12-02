@@ -1,5 +1,5 @@
 <?php
-namespace Modules\Brokers\Table;
+namespace App\Tables;
 
 interface TableConfigInterface
 {

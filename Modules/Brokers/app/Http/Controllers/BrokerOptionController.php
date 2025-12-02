@@ -141,6 +141,7 @@ class BrokerOptionController extends Controller
         try{
             $filters = $request->getFilters();
             $orderBy = $request->getOrderBy();
+            
             $orderDirection = $request->getOrderDirection();
             $perPage = $request->getPerPage();
             
@@ -150,7 +151,7 @@ class BrokerOptionController extends Controller
             
             return new Response(json_encode([
                 'success' => true,
-                'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => true])),
+                'data'=> (new BrokerOptionCollection($brokerOptions->items(), ['detail' => 'table-list'])),
                 'form_config'=> $this->formConfig->getFormData(),
                 'table_columns_config' => $this->tableConfig->columns(),
                 'filters_config'=>$this->tableConfig->filters(),
@@ -181,7 +182,7 @@ class BrokerOptionController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id, BrokerOptionForm $form): JsonResponse
+    public function show($id): JsonResponse
     {
         try {
             $brokerOption = $this->brokerOptionService->getBrokerOptionById($id);
@@ -195,8 +196,8 @@ class BrokerOptionController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => true]),
-                'form' => $form->getFormData()
+                'data' => (new BrokerOptionResource($brokerOption))->additional(['detail' => 'form-edit']),
+                //'form' => $form->getFormData()
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -212,7 +213,7 @@ class BrokerOptionController extends Controller
         try {
             return response()->json([
                 'success' => true,
-                'data' => $this->formConfig->getFormData()
+                'form_data' => $this->formConfig->getFormData()
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -260,6 +261,8 @@ class BrokerOptionController extends Controller
     {
         try {
             $data = $request->validated();
+
+            
           
             $brokerOption = $this->brokerOptionService->updateBrokerOption($data, $id);
             

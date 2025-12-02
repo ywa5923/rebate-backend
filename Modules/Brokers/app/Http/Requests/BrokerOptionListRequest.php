@@ -3,9 +3,13 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Modules\Brokers\Table\BrokerOptionTableConfig;
 class BrokerOptionListRequest extends FormRequest
 {
+    public function __construct(private BrokerOptionTableConfig $tableConfig)
+    {
+        parent::__construct();
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,26 +25,20 @@ class BrokerOptionListRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            // Filter parameters
-            'category_name' => 'nullable|string|max:255',
-            'dropdown_category_name' => 'nullable|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'applicable_for' => 'nullable|string|max:255',
-            'data_type' => 'nullable|string|max:100',
-            'form_type' => 'nullable|string|max:200',
-            'for_brokers' => 'nullable|boolean',
-            'for_crypto' => 'nullable|boolean',
-            'for_props' => 'nullable|boolean',
-            'required' => 'nullable|boolean',
-            
-            // Ordering parameters
-            'order_by' => 'nullable|string|in:id,category_name,dropdown_category_name,category_position,name,applicable_for,data_type,form_type,for_brokers,for_crypto,for_props,required,allow_sorting,default_loading,default_loading_position',
+       
+        $filtersConstraints = $this->tableConfig->getFiltersConstraints();
+        $sortableColumns = $this->tableConfig->getSortableColumns();
+     
+        $rules= [
+            ...$filtersConstraints,
+            //'order_by' => 'nullable|string|in:id,category_name,dropdown_list_attached,category_position,name,applicable_for,data_type,form_type,for_brokers,for_crypto,for_props,required,allow_sorting,default_loading,default_loading_position',
+            'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
             'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
-            
             // Pagination parameter
             'per_page' => 'nullable|integer|min:1|max:100',
         ];
+       
+        return $rules;
     }
 
     /**
@@ -68,25 +66,14 @@ class BrokerOptionListRequest extends FormRequest
     {
         $filters = [];
         
-        $filterKeys = [
-            'category_name',
-            'dropdown_category_name',
-            'name',
-            'applicable_for',
-            'data_type',
-            'form_type',
-            'for_brokers',
-            'for_crypto',
-            'for_props',
-            'required'
-        ];
-        
+        $filterKeys = array_keys($this->tableConfig->getFiltersConstraints());
+       
         foreach ($filterKeys as $key) {
             if ($this->has($key) && $this->filled($key)) {
                 $filters[$key] = $this->input($key);
             }
         }
-        
+       
         return $filters;
     }
 
