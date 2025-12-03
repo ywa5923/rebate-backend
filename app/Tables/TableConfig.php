@@ -21,7 +21,7 @@ abstract class TableConfig implements TableConfigInterface
         $filtersConstraints = [];
         foreach($this->filters() as $key => $filter) {
             //all search params are recive in server as string when call $this->input($key) in Request class
-            $filtersConstraints[$key] = 'nullable|string|max:1255';
+            $filtersConstraints[$key] = 'nullable|string|max:555';
             // if($filter['type'] == 'text' || $filter['type'] == 'select') {
             //     $filtersConstraints[$key] = 'nullable|string|max:255';
             // }else if($filter['type'] == 'boolean') {

@@ -101,7 +101,7 @@ Route::group(["prefix"=>'v1'], function () {
      Route::apiResource('zones', ZoneController::class)->names('zones');
      
      // Country REST API routes
-     Route::get('countries/{id}/statistics', [CountryController::class, 'statistics']);
+     Route::get('countries/form-config', [CountryController::class, 'getFormConfig']);
      Route::apiResource('countries', CountryController::class)->names('countries');
      
      // Dropdown categories REST API routes

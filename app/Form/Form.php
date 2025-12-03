@@ -18,6 +18,19 @@ abstract class Form
             foreach ($section['fields'] as $key => $field) {
                 $validationRules = $field['validation'];
                 $validationString = "";
+                if ($field['type'] == 'array') {
+                    $validationString .= "array|";
+                } else if ($field['type'] == 'number') {
+                    $validationString .= "numeric|";
+                } else if ($field['type'] == 'boolean') {
+                    $validationString .= "boolean|";
+                } else if ($field['type'] == 'select') {
+                    $validationString .= "string|";
+                }
+                else if ($field['type'] == 'text' || $field['type'] == 'string') {
+                    $validationString .= "string|";
+                }
+                
                 foreach ($validationRules as $rule => $value) {
                     
                     if ($rule == 'required' && $value == true) {
@@ -27,18 +40,7 @@ abstract class Form
                         $validationString .= "nullable|";
                     }
                     //add filter type
-                     if ($field['type'] == 'array') {
-                        $validationString .= "array|";
-                    } else if ($field['type'] == 'number') {
-                        $validationString .= "numeric|";
-                    } else if ($field['type'] == 'boolean') {
-                        $validationString .= "boolean|";
-                    } else if ($field['type'] == 'select') {
-                        $validationString .= "string|";
-                    }
-                    else {
-                        $validationString .= "string|";
-                    }
+                    
 
                     //ADD RULSES CONSTRAINTS
 

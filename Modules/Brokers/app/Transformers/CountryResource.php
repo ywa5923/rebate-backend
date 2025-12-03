@@ -31,13 +31,13 @@ class CountryResource extends JsonResource
             //'flag' => $this->flag,
             'zone_name' => $this->when($this->relationLoaded('zone') && $this->zone, $this->zone->name),
             'zone_code' => $this->when($this->relationLoaded('zone') && $this->zone, $this->zone->zone_code),
-            'zone' => $this->when($this->relationLoaded('zone') && $this->zone, function () {
-                return [
-                    'id' => $this->zone->id,
-                    'name' => $this->zone->name,
-                    'zone_code' => $this->zone->zone_code,
-                ];
-            }),
+            // 'zone' => $this->when($this->relationLoaded('zone') && $this->zone, function () {
+            //     return [
+            //         'id' => $this->zone->id,
+            //         'name' => $this->zone->name,
+            //         'zone_code' => $this->zone->zone_code,
+            //     ];
+            // }),
             //'zone_id' => $this->zone_id,
             'brokers_count' => $this->whenLoaded('brokers', function () {
                 return $this->brokers->count();

@@ -10,11 +10,15 @@ use Modules\Brokers\Http\Requests\StoreCountryRequest;
 use Modules\Brokers\Http\Requests\UpdateCountryRequest;
 use Modules\Brokers\Http\Requests\CountryListRequest;
 use Modules\Brokers\Transformers\CountryResource;
+use Modules\Brokers\Table\CountryTableConfig;
+use Modules\Brokers\Form\CountryForm;
 
 class CountryController extends Controller
 {
     public function __construct(
-        protected CountryService $countryService
+        protected CountryService $countryService,
+        private readonly CountryTableConfig $tableConfig,
+        private readonly CountryForm $formConfig
     ) {
     }
 
@@ -27,24 +31,32 @@ class CountryController extends Controller
     public function index(CountryListRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
+            // $validated = $request->validated();
             
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'id';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
+            // $perPage = $validated['per_page'] ?? 15;
+            // $orderBy = $validated['order_by'] ?? 'id';
+            // $orderDirection = $validated['order_direction'] ?? 'asc';
             
-            // Collect and sanitize filters
-            $filters = [
-                'name' => !empty($validated['name']) ? $this->sanitizeLikeInput($validated['name']) : null,
-                'country_code' => !empty($validated['country_code']) ? $this->sanitizeLikeInput($validated['country_code']) : null,
-                'zone_code' => !empty($validated['zone_code']) ? $this->sanitizeLikeInput($validated['zone_code']) : null,
-            ];
+            // // Collect and sanitize filters
+            // $filters = [
+            //     'name' => !empty($validated['name']) ? $this->sanitizeLikeInput($validated['name']) : null,
+            //     'country_code' => !empty($validated['country_code']) ? $this->sanitizeLikeInput($validated['country_code']) : null,
+            //     'zone_code' => !empty($validated['zone_code']) ? $this->sanitizeLikeInput($validated['zone_code']) : null,
+            // ];
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
             
             $countries = $this->countryService->getCountryList($perPage, $orderBy, $orderDirection, $filters);
             
             return response()->json([
                 'success' => true,
                 'data' => CountryResource::collection($countries->items()),
+                'form_config'=> $this->formConfig->getFormData(),
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config'=>$this->tableConfig->filters(),
                 'pagination' => [
                     'current_page' => $countries->currentPage(),
                     'last_page' => $countries->lastPage(),
@@ -73,11 +85,14 @@ class CountryController extends Controller
     {
         try {
             $country = $this->countryService->getCountryById($id);
-            
+            $attrs = $country->only(['id', 'name', 'country_code', 'zone_id']);
+           
             return response()->json([
                 'success' => true,
-                'data' => new CountryResource($country),
+                //'data' => new CountryResource($country),
+                'data' => $country->only(['id', 'name', 'country_code', 'zone_id']),
             ]);
+
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -88,6 +103,22 @@ class CountryController extends Controller
                 'success' => false,
                 'message' => 'Failed to get country',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getFormConfig(): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $this->formConfig->getFormData()
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting form data',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -126,7 +157,9 @@ class CountryController extends Controller
      */
     public function update(UpdateCountryRequest $request, int $id): JsonResponse
     {
+      
         try {
+            
             $country = $this->countryService->updateCountry($id, $request->validated());
             
             return response()->json([

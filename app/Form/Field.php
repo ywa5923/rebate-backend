@@ -21,7 +21,6 @@ class Field
             'type' => 'select',
             'label' => $label,
             'options' => $options,
-           
             'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
             'validation' => $rules,
         ];

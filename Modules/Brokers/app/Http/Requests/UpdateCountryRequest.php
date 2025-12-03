@@ -4,9 +4,13 @@ namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
+use Modules\Brokers\Form\CountryForm;
 class UpdateCountryRequest extends FormRequest
 {
+    public function __construct(private CountryForm $formConfig)
+    {
+        parent::__construct();
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,20 +26,23 @@ class UpdateCountryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $countryId = $this->route('country'); // Get country ID from route parameter (apiResource uses singular name)
+        $constraints = $this->formConfig->getFormConstraints();
+       
+        return $constraints;
+        // $countryId = $this->route('country'); // Get country ID from route parameter (apiResource uses singular name)
         
-        return [
-            'name' => 'sometimes|required|string|max:255',
-            'country_code' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('countries', 'country_code')->ignore($countryId),
-            ],
+        // return [
+        //     'name' => 'sometimes|required|string|max:255',
+        //     'country_code' => [
+        //         'sometimes',
+        //         'required',
+        //         'string',
+        //         'max:100',
+        //         Rule::unique('countries', 'country_code')->ignore($countryId),
+        //     ],
           
-            'zone_id' => 'sometimes|required|integer|exists:zones,id',
-        ];
+        //     'zone_id' => 'sometimes|required|integer|exists:zones,id',
+        // ];
     }
 
     /**

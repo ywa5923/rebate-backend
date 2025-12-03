@@ -3,9 +3,13 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Modules\Brokers\Form\CountryForm;
 class StoreCountryRequest extends FormRequest
 {
+    public function __construct(private CountryForm $formConfig)
+    {
+        parent::__construct();
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,12 +25,15 @@ class StoreCountryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'country_code' => 'required|string|max:100|unique:countries,country_code',
+        $constraints = $this->formConfig->getFormConstraints();
+       
+        return $constraints;
+        // return [
+        //     'name' => 'required|string|max:255',
+        //     'country_code' => 'required|string|max:100|unique:countries,country_code',
            
-            'zone_id' => 'required|integer|exists:zones,id',
-        ];
+        //     'zone_id' => 'required|integer|exists:zones,id',
+        // ];
     }
 
     /**

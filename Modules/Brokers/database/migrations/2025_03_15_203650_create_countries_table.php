@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('country_code',100);
+            $table->string('country_code',100)->unique();
             $table->string('flag')->nullable();
             $table->timestamps();
             $table->foreignId("zone_id")->constrained();
