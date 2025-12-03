@@ -27,13 +27,16 @@ abstract class Form
                         $validationString .= "nullable|";
                     }
                     //add filter type
-                    if (($field['type'] == 'select' && $field['valueType'] == 'numeric') || ($field['type'] == 'numeric' || $field['type'] == 'number')) {
-                        $validationString .= "numeric|";
-                    } else if (($field['type'] == 'select' && $field['valueType'] == 'boolean') || ($field['type'] == 'checkbox')) {
-                        $validationString .= "boolean|";
-                    } else if ($field['type'] == 'array') {
+                     if ($field['type'] == 'array') {
                         $validationString .= "array|";
-                    } else {
+                    } else if ($field['type'] == 'number') {
+                        $validationString .= "numeric|";
+                    } else if ($field['type'] == 'boolean') {
+                        $validationString .= "boolean|";
+                    } else if ($field['type'] == 'select') {
+                        $validationString .= "string|";
+                    }
+                    else {
                         $validationString .= "string|";
                     }
 

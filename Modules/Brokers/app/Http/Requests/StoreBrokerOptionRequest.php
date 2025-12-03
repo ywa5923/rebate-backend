@@ -3,9 +3,13 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Modules\Brokers\Form\BrokerOptionForm;
 class StoreBrokerOptionRequest extends FormRequest
 {
+    public function __construct(private BrokerOptionForm $formConfig)
+    {
+        parent::__construct();
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,32 +25,34 @@ class StoreBrokerOptionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:100',
-            'slug' => 'required|string|max:100|unique:broker_options,slug',
-            'applicable_for' => 'required|string|max:255',
-            'data_type' => 'required|string|max:100',
-            'form_type' => 'required|string|max:200',
-            'meta_data' => 'nullable|string|max:10000',
-            'for_crypto' => 'required|boolean',
-            'for_brokers' => 'required|boolean',
-            'for_props' => 'required|boolean',
-            'required' => 'required|boolean',
-            'placeholder' => 'nullable|string|max:100',
-            'tooltip' => 'nullable|string|max:500',
-            'min_constraint' => 'nullable|string|max:100',
-            'max_constraint' => 'nullable|string|max:100',
-            'load_in_dropdown' => 'nullable|boolean',
-            'default_loading' => 'nullable|boolean',
-            'default_loading_position' => 'nullable|integer|min:0',
-            'dropdown_position' => 'nullable|integer|min:0',
-            'position_in_category' => 'nullable|integer|min:0',
-            'is_active' => 'nullable|boolean',
-            'allow_sorting' => 'nullable|boolean',
-            'category_name' => 'nullable|integer|exists:option_categories,id',
-            'dropdown_list_attached' => 'nullable|integer|exists:dropdown_categories,id',
-            'default_language' => 'nullable|string|max:50',
-        ];
+        $constraints = $this->formConfig->getFormConstraints();
+        return $constraints;
+        // return [
+        //     'name' => 'required|string|max:100',
+        //     'slug' => 'required|string|max:100|unique:broker_options,slug',
+        //     'applicable_for' => 'required|string|max:255',
+        //     'data_type' => 'required|string|max:100',
+        //     'form_type' => 'required|string|max:200',
+        //     'meta_data' => 'nullable|string|max:10000',
+        //     'for_crypto' => 'required|boolean',
+        //     'for_brokers' => 'required|boolean',
+        //     'for_props' => 'required|boolean',
+        //     'required' => 'required|boolean',
+        //     'placeholder' => 'nullable|string|max:100',
+        //     'tooltip' => 'nullable|string|max:500',
+        //     'min_constraint' => 'nullable|string|max:100',
+        //     'max_constraint' => 'nullable|string|max:100',
+        //     'load_in_dropdown' => 'nullable|boolean',
+        //     'default_loading' => 'nullable|boolean',
+        //     'default_loading_position' => 'nullable|integer|min:0',
+        //     'dropdown_position' => 'nullable|integer|min:0',
+        //     'position_in_category' => 'nullable|integer|min:0',
+        //     'is_active' => 'nullable|boolean',
+        //     'allow_sorting' => 'nullable|boolean',
+        //     'category_name' => 'nullable|integer|exists:option_categories,id',
+        //     'dropdown_list_attached' => 'nullable|integer|exists:dropdown_categories,id',
+        //     'default_language' => 'nullable|string|max:50',
+        // ];
     }
 
     /**

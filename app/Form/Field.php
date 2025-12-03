@@ -15,13 +15,13 @@ class Field
         ];
     }
 
-    public static function select(string $label, string $valueType, array $options, array $rules = []): array
+    public static function select(string $label,array $options, array $rules = []): array
     {
         return [
             'type' => 'select',
             'label' => $label,
             'options' => $options,
-            'valueType'=>$valueType,
+           
             'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
             'validation' => $rules,
         ];

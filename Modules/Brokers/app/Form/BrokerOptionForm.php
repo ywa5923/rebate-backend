@@ -25,9 +25,9 @@ class BrokerOptionForm extends Form
                 'form_settings' => [
                     'label' => 'Form Settings',
                     'fields' => [
-                        'form_type' => Field::select('Form Type', 'string', $this->getFormTypes(), ['required'=>true]),
-                        'data_type' => Field::select('Data Type', 'string', $this->getDataTypes(), ['required'=>true]),
-                        'dropdown_category_id' => Field::select('Dropdown List Attached', 'numeric',$this->getDropdownCategories(),['required'=>false]),
+                        'form_type' => Field::select('Form Type', $this->getFormTypes(), ['required'=>true]),
+                        'data_type' => Field::select('Data Type',  $this->getDataTypes(), ['required'=>true]),
+                        'dropdown_category_id' => Field::select('Dropdown List Attached', $this->getDropdownCategories(),['required'=>false,'nullable'=>true]),
                         'placeholder' => Field::text('Placeholder', ['required'=>false,'nullable'=>true]),
                         'tooltip' => Field::text('Tooltip', ['required'=>false,'nullable'=>true]),
                     ],
@@ -37,13 +37,13 @@ class BrokerOptionForm extends Form
                     'fields' => [
                         'applicable_for' => Field::select(
                             'Applicable For',
-                            'string',
+                           
                             //$this->getDistinctOptions(BrokerOption::class, 'applicable_for')
                             $this->getApplicableForOptions()
                           ,['required'=>false,'nullable'=>true]),
-                        'for_brokers' => Field::select('For Brokers', 'numeric',$this->booleanOptions(),['required'=>true]),
-                        'for_props'   => Field::select('For Props', 'numeric',$this->booleanOptions(),['required'=>true]),
-                        'for_crypto'  => Field::select('For Crypto', 'numeric',$this->booleanOptions(),['required'=>true]),
+                        'for_brokers' => Field::select('For Brokers', $this->booleanOptions(),['required'=>true]),
+                        'for_props'   => Field::select('For Props', $this->booleanOptions(),['required'=>true]),
+                        'for_crypto'  => Field::select('For Crypto', $this->booleanOptions(),['required'=>true]),
                         // 'test_array' => Field::array_fields('Test Array', [
                         //     'field_name' => Field::text('Field Name', ['required'=>true, 'min'=>3, 'max'=>100]),
                         //     'field_slug' => Field::text('Field Value', ['required'=>true, 'min'=>3, 'max'=>100]),
@@ -53,26 +53,26 @@ class BrokerOptionForm extends Form
                 'table_settings' => [
                     'label' => 'Table Settings',
                     'fields' => [
-                        'load_in_dropdown' => Field::select('Load In Dropdown', 'numeric',$this->booleanOptions(),['required'=>true]),
+                        'load_in_dropdown' => Field::select('Load In Dropdown', $this->booleanOptions(),['required'=>true]),
                         'dropdown_position' => Field::number('Dropdown Position', ['required'=>true]),
-                        'default_loading' => Field::select('Default Loading', 'numeric',$this->booleanOptions(),['required'=>true]),
+                        'default_loading' => Field::select('Default Loading', $this->booleanOptions(),['required'=>true]),
                         'default_loading_position' => Field::number('Default Loading Position', ['required'=>true]),
-                        'allow_sorting' => Field::select('Allow Sorting', 'numeric',$this->booleanOptions(),['required'=>true]),
+                        'allow_sorting' => Field::select('Allow Sorting', $this->booleanOptions(),['required'=>true]),
                     ],
                 ],
                 'category_settings' => [
                     'label' => 'OptionCategory Settings',
                     'fields' => [
-                        'option_category_id' => Field::select('Option Category', 'numeric',$this->getOptionCategories(),['required'=>true]),
+                        'option_category_id' => Field::select('Option Category', $this->getOptionCategories(),['required'=>true]),
                         'category_position' => Field::number('Category Position', ['required'=>true]),
                     ],
                 ],
                 'constraints' => [
                     'label' => 'Constraints',
                     'fields' => [
-                        'min_constraint' => Field::number('Min Constraint', ['required'=>false,'min'=>100]),
-                        'max_constraint' => Field::number('Max Constraint', ['required'=>false,'min'=>100]),
-                        'required' => Field::select('Required', 'numeric',$this->booleanOptions(),['required'=>true]),
+                        'min_constraint' => Field::number('Min Constraint', ['required'=>false,'nullable'=>true]),
+                        'max_constraint' => Field::number('Max Constraint', ['required'=>false,'nullable'=>true]),
+                        'required' => Field::select('Required', $this->booleanOptions(),['required'=>true]),
                     ],
                 ],
             ],

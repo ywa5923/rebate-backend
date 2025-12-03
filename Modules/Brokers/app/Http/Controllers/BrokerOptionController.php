@@ -208,12 +208,12 @@ class BrokerOptionController extends Controller
         }
     }
 
-    public function getFormData(): JsonResponse
+    public function getFormConfig(): JsonResponse
     {
         try {
             return response()->json([
                 'success' => true,
-                'form_data' => $this->formConfig->getFormData()
+                'data' => $this->formConfig->getFormData()
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
