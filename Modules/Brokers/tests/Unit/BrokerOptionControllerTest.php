@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\Brokers\Http\Controllers\BrokerOptionController;
 use Modules\Brokers\Services\BrokerOptionService;
-use Modules\Brokers\Table\TableConfigInterface;
+use App\Tables\TableConfigInterface;
 use Modules\Brokers\Http\Requests\BrokerOptionListRequest;
 use Modules\Brokers\Transformers\BrokerOptionCollection;
 

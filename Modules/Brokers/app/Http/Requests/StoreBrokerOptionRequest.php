@@ -2,14 +2,20 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Modules\Brokers\Form\BrokerOptionForm;
-class StoreBrokerOptionRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Forms\BrokerOptionForm;
+
+class StoreBrokerOptionRequest extends BaseRequest
 {
-    public function __construct(private BrokerOptionForm $formConfig)
+    protected function tableConfigClass(): ?string
     {
-        parent::__construct();
+        return null;
     }
+    protected function formConfigClass(): string
+    {
+        return BrokerOptionForm::class;
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -25,7 +31,8 @@ class StoreBrokerOptionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $constraints = $this->formConfig->getFormConstraints();
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
         return $constraints;
         // return [
         //     'name' => 'required|string|max:100',

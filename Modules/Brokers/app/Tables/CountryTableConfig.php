@@ -1,10 +1,7 @@
 <?php
 
-namespace Modules\Brokers\Table;
+namespace Modules\Brokers\Tables;
 
-use Modules\Brokers\Models\OptionCategory;
-use Modules\Brokers\Models\DropdownCategory;
-use Modules\Brokers\Models\BrokerOption;
 use Modules\Brokers\Models\Zone;
 use App\Tables\TableConfig;
 use App\Utilities\ModelHelper;

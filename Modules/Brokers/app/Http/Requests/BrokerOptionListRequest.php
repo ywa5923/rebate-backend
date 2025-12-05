@@ -1,14 +1,20 @@
 <?php
 
 namespace Modules\Brokers\Http\Requests;
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Tables\BrokerOptionTableConfig;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Modules\Brokers\Table\BrokerOptionTableConfig;
-class BrokerOptionListRequest extends FormRequest
+class BrokerOptionListRequest extends BaseRequest
 {
-    public function __construct(private BrokerOptionTableConfig $tableConfig)
+   
+
+    protected function tableConfigClass(): string
     {
-        parent::__construct();
+        return BrokerOptionTableConfig::class;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return null;
     }
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +31,12 @@ class BrokerOptionListRequest extends FormRequest
      */
     public function rules(): array
     {
-       
-        $filtersConstraints = $this->tableConfig->getFiltersConstraints();
-        $sortableColumns = $this->tableConfig->getSortableColumns();
+       $tableConfig = $this->getTableConfig();
+       $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+       $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
+      
+       // $filtersConstraints = $this->tableConfig->getFiltersConstraints();
+       // $sortableColumns = $this->tableConfig->getSortableColumns();
      
         $rules= [
             ...$filtersConstraints,
@@ -65,8 +74,12 @@ class BrokerOptionListRequest extends FormRequest
     public function getFilters(): array
     {
         $filters = [];
-        
-        $filterKeys = array_keys($this->tableConfig->getFiltersConstraints());
+        $tableConfig = $this->getTableConfig();
+        if($tableConfig === null) {
+            return [];
+        }
+
+        $filterKeys = array_keys($tableConfig->getFiltersConstraints());
        
         foreach ($filterKeys as $key) {
             if ($this->has($key) && $this->filled($key)) {

@@ -1,15 +1,18 @@
 <?php
 
 namespace Modules\Brokers\Http\Requests;
-
-use Illuminate\Foundation\Http\FormRequest;
-use Modules\Brokers\Form\BrokerOptionForm;
-class UpdateBrokerOptionRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Forms\BrokerOptionForm;
+class UpdateBrokerOptionRequest extends BaseRequest
 {
 
-    public function __construct(private BrokerOptionForm $formConfig)
+    protected function tableConfigClass(): ?string
     {
-        parent::__construct();
+        return null;
+    }
+    protected function formConfigClass(): string
+    {
+        return BrokerOptionForm::class;
     }
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +29,9 @@ class UpdateBrokerOptionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $brokerOptionId = $this->route('id');
-        $constraints = $this->formConfig->getFormConstraints();
+        //$brokerOptionId = $this->route('id');
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
       
        //dd($constraints);
         return $constraints;

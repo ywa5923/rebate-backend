@@ -3,7 +3,7 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Modules\Brokers\Table\CountryTableConfig;
+use Modules\Brokers\Tables\CountryTableConfig;
 
 class CountryListRequest extends FormRequest
 {

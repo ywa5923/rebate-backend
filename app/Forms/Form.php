@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Forms;
 
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;

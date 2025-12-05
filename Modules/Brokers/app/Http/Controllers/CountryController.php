@@ -10,8 +10,8 @@ use Modules\Brokers\Http\Requests\StoreCountryRequest;
 use Modules\Brokers\Http\Requests\UpdateCountryRequest;
 use Modules\Brokers\Http\Requests\CountryListRequest;
 use Modules\Brokers\Transformers\CountryResource;
-use Modules\Brokers\Table\CountryTableConfig;
-use Modules\Brokers\Form\CountryForm;
+use Modules\Brokers\Tables\CountryTableConfig;
+use Modules\Brokers\Forms\CountryForm;
 
 class CountryController extends Controller
 {

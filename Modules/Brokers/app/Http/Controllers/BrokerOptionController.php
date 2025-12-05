@@ -19,8 +19,8 @@ use Modules\Brokers\Http\Requests\StoreBrokerOptionRequest;
 use Modules\Brokers\Http\Requests\UpdateBrokerOptionRequest;
 use Modules\Brokers\Transformers\BrokerOptionResource;
 use Illuminate\Http\JsonResponse;
-use Modules\Brokers\Table\BrokerOptionTableConfig;
-use Modules\Brokers\Form\BrokerOptionForm;
+use Modules\Brokers\Tables\BrokerOptionTableConfig;
+use Modules\Brokers\Forms\BrokerOptionForm;
 class BrokerOptionController extends Controller
 {
 

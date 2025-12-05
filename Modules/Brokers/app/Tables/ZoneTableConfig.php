@@ -1,5 +1,5 @@
 <?php
-namespace Modules\Brokers\Table;
+namespace Modules\Brokers\Tables;
 
 use Modules\Brokers\Models\OptionCategory;
 use Modules\Brokers\Models\DropdownCategory;
