@@ -10,11 +10,15 @@ use Modules\Brokers\Http\Requests\StoreZoneRequest;
 use Modules\Brokers\Http\Requests\UpdateZoneRequest;
 use Modules\Brokers\Http\Requests\ZoneListRequest;
 use Modules\Brokers\Transformers\ZoneResource;
+use Modules\Brokers\Tables\ZoneTableConfig;
+use Modules\Brokers\Forms\ZoneForm;
 
 class ZoneController extends Controller
 {
     public function __construct(
-        protected ZoneService $zoneService
+        protected ZoneService $zoneService,
+        private readonly ZoneTableConfig $tableConfig,
+        private readonly ZoneForm $formConfig
     ) {
     }
 

@@ -2,16 +2,19 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class ZoneListRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Tables\ZoneTableConfig;
+use Modules\Brokers\Forms\ZoneForm;
+class ZoneListRequest extends BaseRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function tableConfigClass(): ?string
     {
-        return true;
+        return ZoneTableConfig::class;
+    }
+
+    protected function formConfigClass(): ?string
+    {
+        return ZoneForm::class;
     }
 
     /**
@@ -21,14 +24,39 @@ class ZoneListRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'per_page' => 'nullable|integer|min:1',
-            'order_by' => 'nullable|string|in:id,name,zone_code,created_at,updated_at',
-            'order_direction' => 'nullable|string|in:asc,desc',
-            'name' => 'nullable|string|max:255',
-            'zone_code' => 'nullable|string|max:100',
-            'description' => 'nullable|string|max:255',
+
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+        $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
+     
+        $rules= [
+            ...$filtersConstraints,
+            //'order_by' => 'nullable|string|in:id,category_name,dropdown_list_attached,category_position,name,applicable_for,data_type,form_type,for_brokers,for_crypto,for_props,required,allow_sorting,default_loading,default_loading_position',
+            'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
+            'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
+            // Pagination parameter
+            'per_page' => 'nullable|integer|min:1|max:1000',
         ];
+
+        return $rules;
+    }
+    /**
+     * Get the filters array from the request.
+     */
+    public function getFilters(): array
+    {
+        $filters = [];
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+       
+       
+        foreach ($filtersConstraints as $key) {
+            if ($this->has($key) && $this->filled($key)) {
+                $filters[$key] = $this->input($key);
+            }
+        }
+       
+        return $filters;
     }
 
     /**

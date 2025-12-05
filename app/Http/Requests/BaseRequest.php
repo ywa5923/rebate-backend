@@ -28,4 +28,24 @@ abstract class BaseRequest extends FormRequest
         }
         return $this->cachedFormConfig ??= app($this->formConfigClass());
     }
+
+      /**
+     * Get the filters array from the request.
+     *
+     * @return array
+     */
+    public function getFilters(): array
+    {
+        $filters = [];
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+       
+        foreach ($filtersConstraints as $key) {
+            if ($this->has($key) && $this->filled($key)) {
+                $filters[$key] = $this->input($key);
+            }
+        }
+       
+        return $filters;
+    }
 }

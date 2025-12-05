@@ -2,14 +2,19 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Tables\CountryTableConfig;
-
-class CountryListRequest extends FormRequest
+use Modules\Brokers\Forms\CountryForm;
+class CountryListRequest extends BaseRequest
 {
-    public function __construct(private CountryTableConfig $tableConfig)
+    protected function tableConfigClass(): ?string
     {
-        parent::__construct();
+        return CountryTableConfig::class;
+    }
+
+    protected function formConfigClass(): ?string
+    {
+        return CountryForm::class;
     }
     /**
      * Determine if the user is authorized to make this request.
@@ -18,7 +23,7 @@ class CountryListRequest extends FormRequest
     {
         return true;
     }
-
+    
     /**
      * Get the validation rules that apply to the request.
      *
@@ -34,8 +39,9 @@ class CountryListRequest extends FormRequest
         //     'country_code' => 'nullable|string|max:100',
         //     'zone_code' => 'nullable|string|max:100|exists:zones,zone_code',
         // ];
-        $filtersConstraints = $this->tableConfig->getFiltersConstraints();
-        $sortableColumns = $this->tableConfig->getSortableColumns();
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+        $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
      
         $rules= [
             ...$filtersConstraints,
@@ -56,10 +62,11 @@ class CountryListRequest extends FormRequest
     public function getFilters(): array
     {
         $filters = [];
-        
-        $filterKeys = array_keys($this->tableConfig->getFiltersConstraints());
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
        
-        foreach ($filterKeys as $key) {
+       
+        foreach ($filtersConstraints as $key) {
             if ($this->has($key) && $this->filled($key)) {
                 $filters[$key] = $this->input($key);
             }
