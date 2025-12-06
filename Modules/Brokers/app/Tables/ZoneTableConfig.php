@@ -22,8 +22,8 @@ final class ZoneTableConfig extends TableConfig
         return [
             'id' => ['label' => 'ID', 'type' => 'number', 'visible' => true, 'sortable' => true, 'filterable' => false],
             'name' => ['label' => 'Name', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
-            'description' => ['label' => 'Description', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
             'zone_code' => ['label' => 'Zone Code', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
+            'description' => ['label' => 'Description', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
             'countries' => ['label' => 'Countries', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
             'countries_count' => ['label' => 'Countries Count', 'type' => 'number', 'visible' => true, 'sortable' => true, 'filterable' => true],
             'brokers_count' => ['label' => 'Brokers Count', 'type' => 'number', 'visible' => true, 'sortable' => true, 'filterable' => true],
@@ -54,13 +54,13 @@ final class ZoneTableConfig extends TableConfig
                 'tooltip' => 'Filter by zone code',
                 'placeholder' => 'Search by zone code'
             ],
-            'countries' => [
-                'type' => 'select', 
-                'label' => 'Countries',
-                'tooltip' => 'Filter by countries',
-                'placeholder' => 'Search by countries',
-                'options' => ModelHelper::getDistinctOptions(Country::class, 'country_code')
-            ]
+            // 'countries' => [
+            //     'type' => 'select', 
+            //     'label' => 'Countries',
+            //     'tooltip' => 'Filter by countries',
+            //     'placeholder' => 'Search by countries',
+            //     'options' => ModelHelper::getDistinctOptions(Country::class, 'country_code')
+            // ]
         ];
     }
 

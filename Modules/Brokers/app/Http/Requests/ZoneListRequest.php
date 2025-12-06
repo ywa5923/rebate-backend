@@ -5,6 +5,7 @@ namespace Modules\Brokers\Http\Requests;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Tables\ZoneTableConfig;
 use Modules\Brokers\Forms\ZoneForm;
+
 class ZoneListRequest extends BaseRequest
 {
     protected function tableConfigClass(): ?string
@@ -26,6 +27,7 @@ class ZoneListRequest extends BaseRequest
     {
 
         $tableConfig = $this->getTableConfig();
+       
         $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
         $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
      
@@ -40,24 +42,7 @@ class ZoneListRequest extends BaseRequest
 
         return $rules;
     }
-    /**
-     * Get the filters array from the request.
-     */
-    public function getFilters(): array
-    {
-        $filters = [];
-        $tableConfig = $this->getTableConfig();
-        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
-       
-       
-        foreach ($filtersConstraints as $key) {
-            if ($this->has($key) && $this->filled($key)) {
-                $filters[$key] = $this->input($key);
-            }
-        }
-       
-        return $filters;
-    }
+   
 
     /**
      * Get custom attribute names for validator errors.

@@ -97,7 +97,7 @@ Route::group(["prefix"=>'v1'], function () {
      Route::get('challenges/show', [ChallengeController::class, 'show']);
      
      // Zone REST API routes
-     Route::get('zones/{id}/statistics', [ZoneController::class, 'statistics']);
+     Route::get('zones/form-config', [ZoneController::class, 'getFormConfig']);
      Route::apiResource('zones', ZoneController::class)->names('zones');
      
      // Country REST API routes

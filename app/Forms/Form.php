@@ -5,9 +5,9 @@ namespace App\Forms;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 
-abstract class Form
+abstract class Form implements FormConfigInterface
 {
-    abstract public function getFormData();
+    abstract public function getFormData(): array;
     public const MODE_CREATE = 'create';
     public const MODE_UPDATE = 'update';
 

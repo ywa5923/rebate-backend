@@ -31,24 +31,21 @@ class ZoneController extends Controller
     public function index(ZoneListRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
             
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'id';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
-            
-            // Collect and sanitize filters
-            $filters = [
-                'name' => !empty($validated['name']) ? $this->sanitizeLikeInput($validated['name']) : null,
-                'zone_code' => !empty($validated['zone_code']) ? $this->sanitizeLikeInput($validated['zone_code']) : null,
-                'description' => !empty($validated['description']) ? $this->sanitizeLikeInput($validated['description']) : null,
-            ];
-            
+
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
+           
             $zones = $this->zoneService->getZoneList($perPage, $orderBy, $orderDirection, $filters);
             
             return response()->json([
                 'success' => true,
                 'data' => ZoneResource::collection($zones->items()),
+                'form_config'=> $this->formConfig->getFormData(),
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config'=>$this->tableConfig->filters(),
                 'pagination' => [
                     'current_page' => $zones->currentPage(),
                     'last_page' => $zones->lastPage(),
@@ -80,7 +77,8 @@ class ZoneController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => new ZoneResource($zone),
+                //'data' => new ZoneResource($zone),
+                'data' => $zone->only(['id', 'name', 'zone_code', 'description']),
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -92,6 +90,22 @@ class ZoneController extends Controller
                 'success' => false,
                 'message' => 'Failed to get zone',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getFormConfig(): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $this->formConfig->getFormData()
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting form data',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

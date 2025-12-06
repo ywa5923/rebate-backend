@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+
 use App\Tables\TableConfigInterface;
 use App\Forms\FormConfigInterface;
 
@@ -15,21 +16,32 @@ abstract class BaseRequest extends FormRequest
 
     public function  getTableConfig(): ?TableConfigInterface
     {
-        if($this->tableConfigClass() === null) {
+        if ($this->tableConfigClass() === null) {
             return null;
         }
-        return $this->cachedTableConfig ??= app($this->tableConfigClass());
+        $config = app($this->tableConfigClass());
+
+        if (! $config instanceof TableConfigInterface) {
+            throw new \LogicException(
+                $this->tableConfigClass() . ' must implement TableConfigInterface'
+            );
+        }
+        return $this->cachedTableConfig ??= $config;
     }
 
     public function getFormConfig(): ?FormConfigInterface
     {
-        if($this->formConfigClass() === null) {
-            return null;
+        $config = app($this->formConfigClass());
+
+        if (! $config instanceof FormConfigInterface) {
+            throw new \LogicException(
+                $this->formConfigClass().' must implement FormConfigInterface'
+            );
         }
-        return $this->cachedFormConfig ??= app($this->formConfigClass());
+        return $this->cachedFormConfig ??= $config;
     }
 
-      /**
+    /**
      * Get the filters array from the request.
      *
      * @return array
@@ -38,14 +50,50 @@ abstract class BaseRequest extends FormRequest
     {
         $filters = [];
         $tableConfig = $this->getTableConfig();
+        if($tableConfig === null) {
+            return [];
+        }
         $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+
        
-        foreach ($filtersConstraints as $key) {
+        foreach ($filtersConstraints as $key=>$value) {
             if ($this->has($key) && $this->filled($key)) {
                 $filters[$key] = $this->input($key);
             }
         }
-       
+      
         return $filters;
+    }
+    /**
+     * Get the order by parameter from the request.
+     *
+     * @param string $default
+     * @return string
+     */
+    public function getOrderBy(string $default = 'id'): string
+    {
+        return $this->input('order_by', $default);
+    }
+
+    /**
+     * Get the order direction parameter from the request.
+     *
+     * @param string $default
+     * @return string
+     */
+    public function getOrderDirection(string $default = 'asc'): string
+    {
+        return strtolower($this->input('order_direction', $default));
+    }
+
+    /**
+     * Get the per page parameter from the request.
+     *
+     * @param int $default
+     * @return int
+     */
+    public function getPerPage(int $default = 15): int
+    {
+        return (int) $this->input('per_page', $default);
     }
 }

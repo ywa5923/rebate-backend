@@ -2,13 +2,18 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Modules\Brokers\Form\CountryForm;
-class StoreCountryRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Forms\CountryForm;
+
+class StoreCountryRequest extends BaseRequest
 {
-    public function __construct(private CountryForm $formConfig)
+    protected function tableConfigClass(): ?string
     {
-        parent::__construct();
+        return null;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return CountryForm::class;
     }
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +30,8 @@ class StoreCountryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $constraints = $this->formConfig->getFormConstraints();
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
        
         return $constraints;
         // return [

@@ -31,18 +31,7 @@ class CountryController extends Controller
     public function index(CountryListRequest $request): JsonResponse
     {
         try {
-            // $validated = $request->validated();
-            
-            // $perPage = $validated['per_page'] ?? 15;
-            // $orderBy = $validated['order_by'] ?? 'id';
-            // $orderDirection = $validated['order_direction'] ?? 'asc';
-            
-            // // Collect and sanitize filters
-            // $filters = [
-            //     'name' => !empty($validated['name']) ? $this->sanitizeLikeInput($validated['name']) : null,
-            //     'country_code' => !empty($validated['country_code']) ? $this->sanitizeLikeInput($validated['country_code']) : null,
-            //     'zone_code' => !empty($validated['zone_code']) ? $this->sanitizeLikeInput($validated['zone_code']) : null,
-            // ];
+           
             $filters = $request->getFilters();
             $orderBy = $request->getOrderBy();
             
@@ -85,7 +74,7 @@ class CountryController extends Controller
     {
         try {
             $country = $this->countryService->getCountryById($id);
-            $attrs = $country->only(['id', 'name', 'country_code', 'zone_id']);
+           
            
             return response()->json([
                 'success' => true,

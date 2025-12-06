@@ -3,9 +3,18 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
-class StoreZoneRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Forms\ZoneForm;
+class StoreZoneRequest extends BaseRequest
 {
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return ZoneForm::class;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,11 +30,9 @@ class StoreZoneRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'zone_code' => 'required|string|max:100|unique:zones,zone_code',
-            'description' => 'nullable|string|max:1000',
-        ];
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
+        return $constraints;
     }
 
     /**
