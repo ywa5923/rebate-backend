@@ -9,14 +9,19 @@ use Modules\Brokers\Transformers\DropdownListResource;
 use Modules\Brokers\Http\Requests\DropdownListRequest;
 use Modules\Brokers\Http\Requests\StoreDropdownListRequest;
 use Modules\Brokers\Http\Requests\UpdateDropdownListRequest;
-
+use Modules\Brokers\Tables\DropdownListTableConfig;
+use Modules\Brokers\Forms\DropdownListForm;
 class DropdownListController extends Controller
 {
-    protected DropdownListService $dropdownListService;
+    
 
-    public function __construct(DropdownListService $dropdownListService)
+    public function __construct( 
+        private readonly DropdownListService $dropdownListService,
+        private readonly DropdownListTableConfig $tableConfig,
+        private readonly DropdownListForm $formConfig
+    )
     {
-        $this->dropdownListService = $dropdownListService;
+        
     }
 
     
@@ -27,18 +32,22 @@ class DropdownListController extends Controller
     public function index(DropdownListRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
+            // $validated = $request->validated();
             
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'name';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
+            // $perPage = $validated['per_page'] ?? 15;
+            // $orderBy = $validated['order_by'] ?? 'name';
+            // $orderDirection = $validated['order_direction'] ?? 'asc';
 
-            // Collect filters
-            $filters = [
-                'description' => $validated['description'] ?? null,
-                'name' => $validated['name'] ?? null,
-                'slug' => $validated['slug'] ?? null,
-            ];
+            // // Collect filters
+            // $filters = [
+            //     'description' => $validated['description'] ?? null,
+            //     'name' => $validated['name'] ?? null,
+            //     'slug' => $validated['slug'] ?? null,
+            // ];
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
 
           
 
@@ -47,6 +56,9 @@ class DropdownListController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => DropdownListResource::collection($lists->items()),
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config'=>$this->tableConfig->filters(),
+                'form_config'=> $this->formConfig->getFormData(),
                 'pagination' => [
                     'current_page' => $lists->currentPage(),
                     'last_page' => $lists->lastPage(),
@@ -70,7 +82,7 @@ class DropdownListController extends Controller
     /**
      * Display the specified dropdown list.
      */
-    public function showList($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
             $list = $this->dropdownListService->getListById($id);
@@ -90,7 +102,7 @@ class DropdownListController extends Controller
     /**
      * Store a newly created dropdown list.
      */
-    public function storeList(StoreDropdownListRequest $request): JsonResponse
+    public function store(StoreDropdownListRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -113,7 +125,7 @@ class DropdownListController extends Controller
     /**
      * Update the specified dropdown list.
      */
-    public function updateList(UpdateDropdownListRequest $request, $id): JsonResponse
+    public function update(UpdateDropdownListRequest $request, int $id): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -136,7 +148,7 @@ class DropdownListController extends Controller
     /**
      * Delete the specified dropdown list.
      */
-    public function deleteList($id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         try {
             $this->dropdownListService->deleteList($id);
