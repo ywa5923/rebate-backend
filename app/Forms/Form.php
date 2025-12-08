@@ -16,51 +16,75 @@ abstract class Form implements FormConfigInterface
         $constraints = [];
         foreach ($this->getFormData()['sections'] as $section) {
             foreach ($section['fields'] as $key => $field) {
-                $validationRules = $field['validation'];
-                $validationString = "";
-                if ($field['type'] == 'array') {
-                    $validationString .= "array|";
-                } else if ($field['type'] == 'number') {
-                    $validationString .= "numeric|";
-                } else if ($field['type'] == 'boolean') {
-                    $validationString .= "boolean|";
-                } else if ($field['type'] == 'select') {
-                    $validationString .= "string|";
-                }
-                else if ($field['type'] == 'text' || $field['type'] == 'string') {
-                    $validationString .= "string|";
-                }
-                
-                foreach ($validationRules as $rule => $value) {
-                    
-                    if ($rule == 'required' && $value == true) {
-                        $validationString .= "required|";
-                    } 
-                    if ($rule == 'nullable' && $value == true) {
-                        $validationString .= "nullable|";
-                    }
-                    //add filter type
-                    
 
-                    //ADD RULSES CONSTRAINTS
+                if ($field['type'] == 'array_fields') {
 
-                    if ($rule == 'min' && $value != null) {
-                        $validationString .= "min:" . $value . "|";
-                    } else if ($rule == 'max' && $value != null) {
-                        $validationString .= "max:" . $value . "|";
-                    } else if ($rule == 'in' && $value != null) {
-                        $validationString .= "in:" . $value . "|";
-                    } else if ($rule == 'exists' && $value != null) {
-                        $validationString .= "exists:" . $value . "|";
-                    } else if ($rule == 'unique' && $value != null) {
-                        $validationString .= "unique:" . $value . "|";
+                    //Example of array fields validation
+                    //'options' => 'required|array|min:1',
+                    //'options.*' => 'required|array',
+                    //'options.*.slug'  => 'required|string|max:255|distinct',
+                    //'options.*.value' => 'required|string|max:255',
+                    //'options.*.order' => 'nullable|integer|min:0',
+
+                    $constraints[$key] = $this->getValidationString($field);
+                    foreach ($field['fields'] as $subFieldKey => $subField) {
+                        $constraints[$key . '.*.' . $subFieldKey] = $this->getValidationString($subField);
                     }
+                } else {
+                    $constraints[$key] = $this->getValidationString($field);
                 }
-                $constraints[$key] = rtrim($validationString, "|");
-            }
-        }
+            } //end foreach
+        } //end foreach
         return $constraints;
     }
+
+    public function getValidationString(array $field): string
+    {
+
+        $validationString = "";
+        if ($field['type'] == 'array' || $field['type'] == 'array_fields') {
+            $validationString .= "array|";
+        } else if ($field['type'] == 'number') {
+            $validationString .= "numeric|";
+        } else if ($field['type'] == 'boolean') {
+            $validationString .= "boolean|";
+        } else if ($field['type'] == 'select') {
+            $validationString .= "string|";
+        } else if ($field['type'] == 'text' || $field['type'] == 'string') {
+            $validationString .= "string|";
+        }
+
+        $validationRules = $field['validation'];
+
+        foreach ($validationRules as $rule => $value) {
+
+            if ($rule == 'required' && $value == true) {
+                $validationString .= "required|";
+            }
+            if ($rule == 'nullable' && $value == true) {
+                $validationString .= "nullable|";
+            }
+            //add filter type
+
+
+            //ADD RULSES CONSTRAINTS
+
+            if ($rule == 'min' && is_numeric($value)) {
+                $validationString .= "min:" . $value . "|";
+            } else if ($rule == 'max' && is_numeric($value)) {
+                $validationString .= "max:" . $value . "|";
+            } else if ($rule == 'in' && is_array(explode(',', $value))) {
+                $validationString .= "in:" . $value . "|";
+            } else if ($rule == 'exists' && is_string($value)) {
+                $validationString .= "exists:" . $value . "|";
+            } else if ($rule == 'unique' && is_string($value)) {
+                $validationString .= "unique:" . $value . "|";
+            }
+        }
+        return rtrim($validationString, "|");
+    }
+
+
 
     public function getDistinctOptions(string $modelClass, string $column): array
     {

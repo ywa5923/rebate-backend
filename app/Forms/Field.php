@@ -56,13 +56,14 @@ class Field
         ];
     }
 
-    public static function array_fields(string $label,array $fields): array
+    public static function array_fields(string $label,array $fields, array $rules = []): array
     {
         return [
             'type' => 'array_fields',
             'label' => $label,
             'fields' => $fields,
-            
+            'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
+            'validation' => $rules,
         ];
     }
 

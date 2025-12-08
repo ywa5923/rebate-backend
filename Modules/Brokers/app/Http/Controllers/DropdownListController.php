@@ -11,6 +11,7 @@ use Modules\Brokers\Http\Requests\StoreDropdownListRequest;
 use Modules\Brokers\Http\Requests\UpdateDropdownListRequest;
 use Modules\Brokers\Tables\DropdownListTableConfig;
 use Modules\Brokers\Forms\DropdownListForm;
+use Modules\Brokers\Transformers\DropdownListCollection;
 class DropdownListController extends Controller
 {
     
@@ -77,7 +78,13 @@ class DropdownListController extends Controller
         }
     }
 
-    
+    public function getFormConfig(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $this->formConfig->getFormData()
+        ], 200);
+    }
 
     /**
      * Display the specified dropdown list.
@@ -85,10 +92,12 @@ class DropdownListController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $list = $this->dropdownListService->getListById($id);
+            $dropdownList = $this->dropdownListService->getListById($id);
+         
             return response()->json([
                 'success' => true,
-                'data' => new DropdownListResource($list)
+                'data' => (new DropdownListResource($dropdownList))->additional(['detail' => 'form-edit']),
+              // 'data'=>(new DropdownListCollection($dropdownList->items(), ['detail' => 'table-list'])),
             ], 200);
         }catch (\Exception $e) {
             return response()->json([
@@ -129,6 +138,7 @@ class DropdownListController extends Controller
     {
         try {
             $data = $request->validated();
+            
             $list = $this->dropdownListService->updateList($id, $data);
             return response()->json([
                 'success' => true,

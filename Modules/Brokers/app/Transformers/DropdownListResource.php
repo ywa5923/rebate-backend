@@ -12,18 +12,26 @@ class DropdownListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        
-        return [
+       $aditional = $this->additional['detail'] ?? false;
+      
+       $baseData = [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            //'options' => DropdownOptionResource::collection($this->whenLoaded('dropdownOptions')),
-            "options"=>$this->whenLoaded('dropdownOptions', function () {
-                return $this->dropdownOptions->pluck('label')->implode(', ');
-            }),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
+        if($aditional == 'form-edit'){
+            $baseData['options'] = DropdownOptionResource::collection($this->whenLoaded('dropdownOptions'))->collect()->map(function ($option) {
+                return [
+                    'label' => $option->label,
+                    'value' => $option->value,
+                ];
+            });
+        }else{
+            $baseData['options'] = $this->whenLoaded('dropdownOptions', function () {
+                return $this->dropdownOptions->pluck('label')->implode(', ');
+            });
+        }
+        return $baseData;
     }
 }

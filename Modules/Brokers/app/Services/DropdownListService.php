@@ -51,7 +51,7 @@ class DropdownListService
         return DB::transaction(function () use ($data) {
             try {
                 // Generate slug from list_name
-                $slug = \Illuminate\Support\Str::slug($data['list_name']);
+                $slug = \Illuminate\Support\Str::slug($data['name']);
                 
                 // Ensure unique slug
                 $originalSlug = $slug;
@@ -63,7 +63,7 @@ class DropdownListService
 
                 // Create the category
                 $categoryData = [
-                    'name' => $data['list_name'],
+                    'name' => $data['name'],
                     'slug' => $slug,
                     'description' => $data['description'] ?? null,
                 ];
@@ -112,11 +112,11 @@ class DropdownListService
                 }
 
                 // Update category name if provided
-                if (isset($data['list_name'])) {
-                    $category->name = $data['list_name'];
-                    
+                if (isset($data['name'])) {
+                    $category->name = $data['name'];
+
                     // Generate new slug if name changed
-                    $slug = \Illuminate\Support\Str::slug($data['list_name']);
+                    $slug = \Illuminate\Support\Str::slug($data['name']);
                     $originalSlug = $slug;
                     $counter = 1;
                     while (DropdownCategory::where('slug', $slug)->where('id', '!=', $id)->exists()) {

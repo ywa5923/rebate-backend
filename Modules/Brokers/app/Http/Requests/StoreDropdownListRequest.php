@@ -2,11 +2,21 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreDropdownListRequest extends FormRequest
+
+use Modules\Brokers\Forms\DropdownListForm;
+use App\Http\Requests\BaseRequest;
+
+class StoreDropdownListRequest extends BaseRequest
 {
+    protected function formConfigClass(): string
+    {
+        return DropdownListForm::class;
+    }
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,14 +32,9 @@ class StoreDropdownListRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'list_name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'options' => 'required|array|min:1',
-            'options.*.label' => 'required|string|max:255',
-            'options.*.value' => 'required|string|max:255',
-            'options.*.order' => 'nullable|integer|min:0',
-        ];
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
+        return $constraints;
     }
 
     /**
