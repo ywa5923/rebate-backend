@@ -21,13 +21,13 @@ final class DropdownListTableConfig extends TableConfig
     {
        
         return [
-            'id' => ['label' => 'ID', 'type' => 'number', 'visible' => true, 'sortable' => true, 'filterable' => false],
-            'name' => ['label' => 'Name', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
-            'slug' => ['label' => 'Slug', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
-            'description' => ['label' => 'Description', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
-            'options' => ['label' => 'Options', 'type' => 'text', 'visible' => true, 'sortable' => true, 'filterable' => true],
-            'created_at' => ['label' => 'Created At', 'type' => 'text', 'visible' => false, 'sortable' => true, 'filterable' => false],
-            'updated_at' => ['label' => 'Updated At', 'type' => 'text', 'visible' => false, 'sortable' => true, 'filterable' => false],
+            'id' => ['label' => 'ID', 'type' => 'number', 'visible' => true, 'sortable' => true, ],
+            'name' => ['label' => 'Name', 'type' => 'text', 'visible' => true, 'sortable' => true, ],
+            'slug' => ['label' => 'Slug', 'type' => 'text', 'visible' => true, 'sortable' => true, ],
+            'description' => ['label' => 'Description', 'type' => 'text', 'visible' => true, 'sortable' => true],
+            'options' => ['label' => 'Options', 'type' => 'text', 'visible' => true, 'sortable' => false],
+            'created_at' => ['label' => 'Created At', 'type' => 'text', 'visible' => false, 'sortable' => true],
+            'updated_at' => ['label' => 'Updated At', 'type' => 'text', 'visible' => false, 'sortable' => true],
         ];
     }
     public function filters(): array

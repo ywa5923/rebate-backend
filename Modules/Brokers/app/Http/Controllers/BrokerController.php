@@ -26,13 +26,18 @@ use Modules\Brokers\Transformers\BrokerTypeResource;
 use Modules\Brokers\Transformers\CountryResource;
 use Modules\Brokers\Transformers\CountryCollection;
 use Modules\Brokers\Models\Country;
+use Modules\Brokers\Tables\BrokerTableConfig;
+use Modules\Brokers\Forms\BrokerForm;
+
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
 class BrokerController extends Controller
 {
     
 
-     public function __construct(protected BrokerService $brokerService)
+     public function __construct(protected BrokerService $brokerService,
+     private readonly BrokerTableConfig $tableConfig,
+     private readonly BrokerForm $formConfig)
      {
      }
 
@@ -151,26 +156,33 @@ class BrokerController extends Controller
     public function getBrokerList(BrokerListRequest $request)
     {
         try {
-            $validated = $request->validated();
+
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
             
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'id';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
+            // $perPage = $validated['per_page'] ?? 15;
+            // $orderBy = $validated['order_by'] ?? 'id';
+            // $orderDirection = $validated['order_direction'] ?? 'asc';
             
-            // Collect and sanitize filters
-            $filters = [
-                'broker_type' => !empty($validated['broker_type']) ? $this->sanitizeLikeInput($validated['broker_type']) : null,
-                'country' => !empty($validated['country']) ? $this->sanitizeLikeInput($validated['country']) : null,
-                'zone' => !empty($validated['zone']) ? $this->sanitizeLikeInput($validated['zone']) : null,
-                'trading_name' => !empty($validated['trading_name']) ? $this->sanitizeLikeInput($validated['trading_name']) : null,
-                'is_active' => $validated['is_active'] ?? null,
-            ];
+            // // Collect and sanitize filters
+            // $filters = [
+            //     'broker_type' => !empty($validated['broker_type']) ? $this->sanitizeLikeInput($validated['broker_type']) : null,
+            //     'country' => !empty($validated['country']) ? $this->sanitizeLikeInput($validated['country']) : null,
+            //     'zone' => !empty($validated['zone']) ? $this->sanitizeLikeInput($validated['zone']) : null,
+            //     'trading_name' => !empty($validated['trading_name']) ? $this->sanitizeLikeInput($validated['trading_name']) : null,
+            //     'is_active' => $validated['is_active'] ?? null,
+            // ];
             
             $brokers = $this->brokerService->getBrokerList($perPage, $orderBy, $orderDirection, $filters);
             
             return response()->json([
                 'success' => true,
                 'data' => BrokerListResource::collection($brokers->items()),
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config'=>$this->tableConfig->filters(),
+                'form_config'=> $this->formConfig->getFormData(),
                 'pagination' => [
                     'current_page' => $brokers->currentPage(),
                     'last_page' => $brokers->lastPage(),

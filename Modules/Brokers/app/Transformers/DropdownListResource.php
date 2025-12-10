@@ -22,9 +22,13 @@ class DropdownListResource extends JsonResource
         ];
         if($aditional == 'form-edit'){
             $baseData['options'] = DropdownOptionResource::collection($this->whenLoaded('dropdownOptions'))->collect()->map(function ($option) {
+                // return [
+                //     'label' => $option->label,
+                //     'value' => $option->value,
+                // ];
                 return [
-                    'label' => $option->label,
-                    'value' => $option->value,
+                    'label' => $option['label'] ?? null,
+                    'value' => $option['value'] ?? null,
                 ];
             });
         }else{
