@@ -16,7 +16,8 @@ use Modules\Auth\Http\Controllers\UserPermissionController;
 // Broker registration routes
 Route::group([], function () {
     // Broker registration by admin
-    Route::post('/register-broker', [BrokerTeamUserController::class, 'registerBroker']);
+    //Route::post('/register-broker', [BrokerTeamUserController::class, 'registerBroker']);
+   
     Route::post('/broker-team-user', [BrokerTeamUserController::class, 'registerUserToBrokerDefaultTeam']);
     Route::put('/broker-team-user/{userId}', [BrokerTeamUserController::class, 'updateBrokerTeamUser']);
     Route::delete('/broker-team-user/{userId}', [BrokerTeamUserController::class, 'deleteBrokerTeamUser']);

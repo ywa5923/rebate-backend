@@ -17,6 +17,7 @@ use Modules\Brokers\Http\Controllers\ChallengeController;
 use Modules\Brokers\Http\Controllers\ZoneController;
 use Modules\Brokers\Http\Controllers\CountryController;
 use Modules\Brokers\Http\Controllers\DropdownListController;
+use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -34,8 +35,10 @@ use Modules\Brokers\Http\Controllers\DropdownListController;
 
 Route::group(["prefix"=>'v1'], function () {
     // Specific routes MUST come before apiResource to avoid conflicts
+    Route::post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
     Route::get('brokers/broker-list', [BrokerController::class, 'getBrokerList']);
     Route::get('brokers/broker-types-and-countries', [BrokerController::class, 'getBrokerTypesAndCountries']);
+    Route::get('brokers/form-config', [BrokerController::class, 'getFormConfig']);
     Route::get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
     Route::patch('brokers/toggle-active-status/{id}', [BrokerController::class, 'toggleActiveStatus']);
     Route::get('brokers/{id}', [BrokerController::class, 'show']);

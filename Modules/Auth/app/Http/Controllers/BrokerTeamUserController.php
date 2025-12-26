@@ -49,9 +49,10 @@ class BrokerTeamUserController extends Controller
             // Create the broker
             $broker = DB::transaction(function () use ($request) {
 
+                $data = $request->validated();
                 $broker = Broker::create([
-                    'broker_type_id' => $request->broker_type_id,
-                    'country_id' => $request->country_id,
+                    'broker_type_id' => $data['broker_type_id'],
+                    'country_id' => $data['country_id'],
                 ]);
 
                 //insert broker option value trading_name
@@ -61,7 +62,7 @@ class BrokerTeamUserController extends Controller
                     'optionable_type' => Broker::class,
                     'optionable_id' => $broker->id,
                     'option_slug' => 'trading_name',
-                    'value' => $request->trading_name,
+                    'value' => $data['trading_name'],
                     'broker_id' => $broker->id,
                     'broker_option_id' => $tradingNameOption->id,
                 ]);
@@ -76,7 +77,7 @@ class BrokerTeamUserController extends Controller
                 $user = $this->teamService->createTeamUser([
                     'broker_team_id' => $team->id,
                     'name' => 'Broker Admin',
-                    'email' => $request->email,
+                    'email' => $data['email'],
                     'is_active' => true,
                 ]);
 

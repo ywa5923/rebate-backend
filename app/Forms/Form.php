@@ -126,4 +126,25 @@ abstract class Form implements FormConfigInterface
 
         return $options;
     }
+
+    //get options list for a model used in a dropdown list
+    /**
+     * @param string $modelClass
+     * @param string $column
+     * @return array
+     * [
+     *     ['value' => '1', 'label' => 'Option 1'],
+     *     ['value' => '2', 'label' => 'Option 2'],
+     *     ['value' => '3', 'label' => 'Option 3'],
+     * ]
+     */
+    public function getOtionsList(string $modelClass, string $column): array
+    {
+        return $modelClass::all()
+            ->map(function ($item) use ($column) {
+                return ['value' => $item->id, 'label' => $item->$column];
+            })
+            ->values()
+            ->all();
+    }
 }

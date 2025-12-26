@@ -1,15 +1,13 @@
 <?php
 
 
-namespace Modules\Brokers\Forms;
+namespace Modules\Auth\Forms;
 
 use App\Forms\Form;
 use App\Forms\Field;
 
-use Modules\Brokers\Models\Zone;
-use Modules\Brokers\Models\BrokerType;
-use Modules\Translations\Models\Country;
-class BrokerForm extends Form
+use Modules\Auth\Models\PlatformUser;
+class PlatformUserForm extends Form
 {
     public function getFormData(): array
     {
@@ -18,22 +16,26 @@ class BrokerForm extends Form
             'description' => 'Broker option form configuration',
             'sections' => [
                 'definitions' => [
-                    'label' => 'Broker Definitions',
+                    'label' => 'Platform User Definitions',
                     'fields' => [
                         //'broker_type' => Field::select('Broker Type', $this->getBrokerTypes(),['required'=>true,'exists'=>'broker_types,id']),
-                        'broker_type_id' => Field::select('Broker Type', $this->getOtionsList(BrokerType::class, 'name'),['required'=>true,'exists'=>'broker_types,id']),
-                       
-                        'trading_name' => Field::text('Trading Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                    
+                        'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
                         'email' => Field::text('Email', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        
-                        'country_id' => Field::select('Country', $this->getOtionsList(Country::class, 'name'),['required'=>true,'exists'=>'countries,id']),   
-                       
+                        'role' => Field::select('Role', $this->getOtionsList(PlatformUser::class, 'role'),['required'=>true,'exists'=>'platform_users,role']),
+                        'is_active' => Field::select('Is Active', $this->booleanOptions(),['required'=>true]),
                     ]
                     
                     ]
                 
             ]
+        ];
+    }
+
+    private function booleanOptions(): array
+    {
+        return [
+            ['value' => 1, 'label' => 'Yes'],
+            ['value' => 0, 'label' => 'No'],
         ];
     }
 
@@ -57,4 +59,5 @@ class BrokerForm extends Form
     //         ->all();
     // }
 }
+
 

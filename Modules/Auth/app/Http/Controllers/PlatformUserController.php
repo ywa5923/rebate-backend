@@ -11,16 +11,21 @@ use Modules\Auth\Http\Requests\StorePlatformUserRequest;
 use Modules\Auth\Http\Requests\UpdatePlatformUserRequest;
 use Modules\Auth\Http\Requests\PlatformUserListRequest;
 use Modules\Auth\Transformers\PlatformUserResource;
-
+use Modules\Auth\Tables\PlatformUsersTableConfig;
+use Modules\Auth\Forms\PlatformUserForm;
 class PlatformUserController extends Controller
 {
-    protected PlatformUserService $platformUserService;
-    protected UserPermissionService $permissionService;
+    //protected PlatformUserService $platformUserService;
+   // protected UserPermissionService $permissionService;
 
-    public function __construct(PlatformUserService $platformUserService, UserPermissionService $permissionService)
+    public function __construct(
+        protected PlatformUserService $platformUserService,
+        protected UserPermissionService $permissionService,
+        protected PlatformUsersTableConfig $tableConfig,
+        protected PlatformUserForm $formConfig,
+    )
     {
-        $this->platformUserService = $platformUserService;
-        $this->permissionService = $permissionService;
+       
     }
 
     /**
@@ -51,6 +56,9 @@ class PlatformUserController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => PlatformUserResource::collection($users->items()),
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config' => $this->tableConfig->filters(),
+                'form_config' => $this->formConfig->getFormData(),
                 'pagination' => [
                     'current_page' => $users->currentPage(),
                     'last_page' => $users->lastPage(),

@@ -2,11 +2,19 @@
 
 namespace Modules\Auth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
-
-class RegisterBrokerRequest extends FormRequest
+use Modules\Brokers\Forms\BrokerForm;
+class RegisterBrokerRequest extends BaseRequest
 {
+    protected function formConfigClass(): ?string
+    {
+        return BrokerForm::class;
+    }
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,16 +31,19 @@ class RegisterBrokerRequest extends FormRequest
     public function rules(): array
     {
         
-        return [
-            'broker_type_id' => 'required|integer|exists:broker_types,id',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('broker_team_users', 'email'),
-            ],
-            'trading_name' => 'required|string|max:255',
-            'country_id' => 'required|integer|exists:countries,id',
-        ];
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
+        return $constraints;
+        // return [
+        //     'broker_type_id' => 'required|integer|exists:broker_types,id',
+        //     'email' => [
+        //         'required',
+        //         'email',
+        //         Rule::unique('broker_team_users', 'email'),
+        //     ],
+        //     'trading_name' => 'required|string|max:255',
+        //     'country_id' => 'required|integer|exists:countries,id',
+        // ];
     }
 
     /**

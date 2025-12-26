@@ -33,22 +33,22 @@ use Modules\Brokers\Forms\BrokerForm;
 
 class BrokerController extends Controller
 {
-    
 
-     public function __construct(protected BrokerService $brokerService,
-     private readonly BrokerTableConfig $tableConfig,
-     private readonly BrokerForm $formConfig)
-     {
-     }
 
-    public function index(BrokersQueryParser $queryParser,Request $request)
+    public function __construct(
+        protected BrokerService $brokerService,
+        private readonly BrokerTableConfig $tableConfig,
+        private readonly BrokerForm $formConfig
+    ) {}
+
+    public function index(BrokersQueryParser $queryParser, Request $request)
     {
-       return $this->brokerService->process($queryParser->parse($request));
+        return $this->brokerService->process($queryParser->parse($request));
 
         //tested with http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&columns[in]=trading_name,trading_fees,account_type,jurisdictions,promotion_title,fixed_spreads,support_options&order_by[eq]=+account_type
     }
 
-   
+
 
     /**
      * @OA\Get(
@@ -73,58 +73,57 @@ class BrokerController extends Controller
      *     )
      * )
      */
-    public function show($id,Request $request)
+    public function show($id, Request $request)
     {
-      
-    $validator = Validator::make($request->query(), [
-        'language.eq' => 'required|string',
-        'country.eq' => 'required|string',
-        'tab.eq' => 'nullable|string|in:reviews,default',
-    ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
-    }
-    $brokerData = Broker::findOrFail($id);
-    // Retrieve query parameters
-    $lang = $request->query('language')['eq']; // Fetch `lang[eq]`
-    $country = $request->query('country')['eq'];
-    $tab = $request->query('tab')['eq']??"all";
+        $validator = Validator::make($request->query(), [
+            'language.eq' => 'required|string',
+            'country.eq' => 'required|string',
+            'tab.eq' => 'nullable|string|in:reviews,default',
+        ]);
 
-    $zone=Zone::where("countries","like","%$country%")->first()->zone_code;
-    if($tab=="all"){
-        //return all options
-    }else{
-        $setting=Setting::where('key',"tab_".$tab)->firstOrFail();
-       //return options of a specific tab
-       $tabData=json_decode($setting->value,1);
-       if (!empty($tabData['options'])) {
-        $options = $tabData['options'];
-    
-        // If 'relations' is absent, set to null, otherwise use the value
-        $relations = $tabData['relations'] ?? null;
-         
-        //dd($options,$relations);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $brokerData = Broker::findOrFail($id);
+        // Retrieve query parameters
+        $lang = $request->query('language')['eq']; // Fetch `lang[eq]`
+        $country = $request->query('country')['eq'];
+        $tab = $request->query('tab')['eq'] ?? "all";
 
-    } else {
+        $zone = Zone::where("countries", "like", "%$country%")->first()->zone_code;
+        if ($tab == "all") {
+            //return all options
+        } else {
+            $setting = Setting::where('key', "tab_" . $tab)->firstOrFail();
+            //return options of a specific tab
+            $tabData = json_decode($setting->value, 1);
+            if (!empty($tabData['options'])) {
+                $options = $tabData['options'];
+
+                // If 'relations' is absent, set to null, otherwise use the value
+                $relations = $tabData['relations'] ?? null;
+
+                //dd($options,$relations);
+
+            } else {
+                return response()->json([
+                    'error' => "The required keys 'options' or 'relations' are missing in the settings tab for key={$tab}.",
+                ], 422);
+            }
+        }
+
+
+        $additionalInfo = [
+            'language' => $lang ?? 'default',
+            'zone' => $zone ?? 'default',
+            'tab' => $tab ?? 'default',
+        ];
+
         return response()->json([
-            'error' => "The required keys 'options' or 'relations' are missing in the settings tab for key={$tab}.",
-        ], 422);
-    }
-        
-    }
-
-
-    $additionalInfo = [
-        'language' => $lang ?? 'default',
-        'zone' => $zone ?? 'default',
-        'tab' => $tab ?? 'default',
-    ];
-
-    return response()->json([
-        'broker' => $brokerData,
-        'additional_info' => $additionalInfo,
-    ]);
+            'broker' => $brokerData,
+            'additional_info' => $additionalInfo,
+        ]);
     }
 
 
@@ -133,7 +132,7 @@ class BrokerController extends Controller
      * @param Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
-    */
+     */
     public function getBrokerInfo(Request $request, $id)
     {
         try {
@@ -145,14 +144,34 @@ class BrokerController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-        
+    }
+
+    /**
+     * Get form config
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFormConfig()
+    {
+       
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $this->formConfig->getFormData()
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting form data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Get broker list
      * @param BrokerListRequest $request
      * @return \Illuminate\Http\JsonResponse
-    */
+     */
     public function getBrokerList(BrokerListRequest $request)
     {
         try {
@@ -161,11 +180,11 @@ class BrokerController extends Controller
             $orderBy = $request->getOrderBy();
             $orderDirection = $request->getOrderDirection();
             $perPage = $request->getPerPage();
-            
+
             // $perPage = $validated['per_page'] ?? 15;
             // $orderBy = $validated['order_by'] ?? 'id';
             // $orderDirection = $validated['order_direction'] ?? 'asc';
-            
+
             // // Collect and sanitize filters
             // $filters = [
             //     'broker_type' => !empty($validated['broker_type']) ? $this->sanitizeLikeInput($validated['broker_type']) : null,
@@ -174,15 +193,15 @@ class BrokerController extends Controller
             //     'trading_name' => !empty($validated['trading_name']) ? $this->sanitizeLikeInput($validated['trading_name']) : null,
             //     'is_active' => $validated['is_active'] ?? null,
             // ];
-            
+
             $brokers = $this->brokerService->getBrokerList($perPage, $orderBy, $orderDirection, $filters);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => BrokerListResource::collection($brokers->items()),
                 'table_columns_config' => $this->tableConfig->columns(),
-                'filters_config'=>$this->tableConfig->filters(),
-                'form_config'=> $this->formConfig->getFormData(),
+                'filters_config' => $this->tableConfig->filters(),
+                'form_config' => $this->formConfig->getFormData(),
                 'pagination' => [
                     'current_page' => $brokers->currentPage(),
                     'last_page' => $brokers->lastPage(),
@@ -218,12 +237,12 @@ class BrokerController extends Controller
     public function getBrokerTypesAndCountries()
     {
         try {
-        $countries=Country::all();
-        $brokerTypes=BrokerType::all();
-        return response()->json([
-            'success' => true,
-            'message' => 'Broker types and countries fetched successfully',
-            'countries' => new CountryCollection($countries, ['minimal' => true]),
+            $countries = Country::all();
+            $brokerTypes = BrokerType::all();
+            return response()->json([
+                'success' => true,
+                'message' => 'Broker types and countries fetched successfully',
+                'countries' => new CountryCollection($countries, ['minimal' => true]),
                 'brokerTypes' => BrokerTypeResource::collection($brokerTypes),
             ]);
         } catch (\Exception $e) {
@@ -246,6 +265,4 @@ class BrokerController extends Controller
         // Escape special LIKE characters: %, _, \
         return str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $input);
     }
-   
-    
 }

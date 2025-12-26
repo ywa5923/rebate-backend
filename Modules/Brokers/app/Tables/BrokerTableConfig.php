@@ -17,15 +17,17 @@ final class BrokerTableConfig extends TableConfig
        
         return [
             'id' => ['label' => 'ID', 'type' => 'number', 'visible' => true, 'sortable' => true],
+            'logo' => ['label' => 'Logo', 'type' => 'image', 'visible' => true, 'sortable' => false],
             'trading_name' => ['label' => 'Trading Name', 'type' => 'text', 'visible' => true, 'sortable' => true],
+   
             'broker_type' => ['label' => 'Broker Type', 'type' => 'text', 'visible' => true, 'sortable' => true],
             'is_active' => ['label' => 'Is Active', 'type' => 'boolean', 'visible' => true, 'sortable' => true],
             'country_id' => ['label' => 'Country ID', 'type' => 'number', 'visible' => false, 'sortable' => true],
             'zone_id' => ['label' => 'Zone ID', 'type' => 'number', 'visible' => false, 'sortable' => true],
             'country_code' => ['label' => 'Country Code', 'type' => 'text', 'visible' => true, 'sortable' => true],
             'zone_code' => ['label' => 'Zone Code', 'type' => 'text', 'visible' => true, 'sortable' => true],
-            'logo' => ['label' => 'Logo', 'type' => 'text', 'visible' => true, 'sortable' => false],
-            'home_url' => ['label' => 'Home URL', 'type' => 'text', 'visible' => true, 'sortable' => false],
+          
+            'home_url' => ['label' => 'Home URL', 'type' => 'text', 'visible' => false, 'sortable' => false],
             'created_at' => ['label' => 'Created At', 'type' => 'text', 'visible' => false, 'sortable' => true],
             'updated_at' => ['label' => 'Updated At', 'type' => 'text', 'visible' => false, 'sortable' => true],
             

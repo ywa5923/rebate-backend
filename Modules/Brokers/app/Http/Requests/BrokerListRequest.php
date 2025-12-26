@@ -5,6 +5,7 @@ namespace Modules\Brokers\Http\Requests;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Tables\BrokerTableConfig;
 use Modules\Brokers\Forms\BrokerForm;
+
 class BrokerListRequest extends BaseRequest
 {
     protected function tableConfigClass(): ?string
