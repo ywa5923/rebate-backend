@@ -27,8 +27,10 @@ Route::group([], function () {
     Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
     
     // Platform users CRUD
+    Route::get('platform-users/form-config', [PlatformUserController::class, 'getFormConfig']);
     Route::apiResource('platform-users', PlatformUserController::class);
-    Route::patch('/platform-users/{platform_user}/toggle', [PlatformUserController::class, 'toggleActiveStatus']);
+   
+    Route::patch('/platform-users/toggle-active-status/{platform_user}', [PlatformUserController::class, 'toggleActiveStatus']);
     
     // User permissions CRUD
     Route::apiResource('user-permissions', UserPermissionController::class);

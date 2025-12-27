@@ -1,11 +1,21 @@
 <?php
 
 namespace Modules\Auth\Http\Requests;
+use App\Http\Requests\BaseRequest;
+use Modules\Auth\Tables\PlatformUsersTableConfig;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class PlatformUserListRequest extends FormRequest
+class PlatformUserListRequest extends BaseRequest
 {
+   
+
+    protected function tableConfigClass(): string
+    {
+        return PlatformUsersTableConfig::class;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return null;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,15 +31,23 @@ class PlatformUserListRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'per_page' => 'nullable|integer|min:1',
-            'order_by' => 'nullable|string|in:id,name,email,role,is_active,created_at,updated_at',
-            'order_direction' => 'nullable|string|in:asc,desc',
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|string|max:255',
-            'role' => 'nullable|string|max:255',
-            'is_active' => 'nullable|boolean',
+       $tableConfig = $this->getTableConfig();
+       $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+       $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
+      
+       // $filtersConstraints = $this->tableConfig->getFiltersConstraints();
+       // $sortableColumns = $this->tableConfig->getSortableColumns();
+     
+        $rules= [
+            ...$filtersConstraints,
+            //'order_by' => 'nullable|string|in:id,category_name,dropdown_list_attached,category_position,name,applicable_for,data_type,form_type,for_brokers,for_crypto,for_props,required,allow_sorting,default_loading,default_loading_position',
+            'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
+            'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
+            // Pagination parameter
+            'per_page' => 'nullable|integer|min:1|max:100',
         ];
+       
+        return $rules;
     }
 
     /**
@@ -40,25 +58,14 @@ class PlatformUserListRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'per_page' => 'items per page',
-            'order_by' => 'sort column',
-            'order_direction' => 'sort direction',
-            'is_active' => 'active status',
+            'name' => 'name',
+            'email' => 'email',
+            'role' => 'role',
+            'is_active' => 'is active',
+            'order_by' => 'order by',
+            'order_direction' => 'order direction',
+            'per_page' => 'per page',
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'per_page.max' => 'You cannot request more than 100 items per page',
-            'order_by.in' => 'Invalid sort column. Allowed columns: id, name, email, role, is_active, created_at, updated_at',
-            'is_active.boolean' => 'The active status must be true or false',
-        ];
-    }
 }
-

@@ -37,19 +37,13 @@ class PlatformUserController extends Controller
     public function index(PlatformUserListRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
+           
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+           // dd($filters, $orderBy);
             
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'id';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
-
-            // Collect filters
-            $filters = [
-                'name' => $validated['name'] ?? null,
-                'email' => $validated['email'] ?? null,
-                'role' => $validated['role'] ?? null,
-                'is_active' => $validated['is_active'] ?? null,
-            ];
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
 
             $users = $this->platformUserService->getAll($filters, $orderBy, $orderDirection, $perPage);
 
@@ -72,6 +66,27 @@ class PlatformUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to get platform users list',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get form config for platform users
+     * 
+     * @return JsonResponse
+     */
+    public function getFormConfig(): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $this->formConfig->getFormData(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get form config',
                 'error' => $e->getMessage(),
             ], 500);
         }

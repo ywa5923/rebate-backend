@@ -20,8 +20,8 @@ class PlatformUserForm extends Form
                     'fields' => [
                         //'broker_type' => Field::select('Broker Type', $this->getBrokerTypes(),['required'=>true,'exists'=>'broker_types,id']),
                         'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'email' => Field::text('Email', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'role' => Field::select('Role', $this->getOtionsList(PlatformUser::class, 'role'),['required'=>true,'exists'=>'platform_users,role']),
+                        'email' => Field::text('Email', ['required'=>true, 'min'=>3, 'max'=>100, 'email','unique'=>'platform_users,email']),
+                        'role' => Field::select('Role', $this->getRoles(),['required'=>true]),
                         'is_active' => Field::select('Is Active', $this->booleanOptions(),['required'=>true]),
                     ]
                     
@@ -36,6 +36,17 @@ class PlatformUserForm extends Form
         return [
             ['value' => 1, 'label' => 'Yes'],
             ['value' => 0, 'label' => 'No'],
+        ];
+    }
+
+    private function getRoles(): array
+    {
+        return [
+            ['value' => 'global_admin', 'label' => 'Global Admin'],
+            ['value' => 'country_admin', 'label' => 'Country Admin'],
+            ['value' => 'broker_admin', 'label' => 'Broker Admin'],
+            ['value' => 'seo', 'label' => 'SEO'],
+            ['value' => 'translator', 'label' => 'Translator'],
         ];
     }
 

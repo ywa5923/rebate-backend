@@ -19,7 +19,7 @@ class PlatformUserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            'is_active' => $this->is_active,
+            'is_active' => $this->is_active?1:0,
            
             'last_login_at' => $this->last_login_at?->toISOString(),
             'permissions' => $this->whenLoaded('resourcePermissions', function () {

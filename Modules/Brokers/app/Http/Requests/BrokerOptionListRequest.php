@@ -81,7 +81,7 @@ class BrokerOptionListRequest extends BaseRequest
 
         //$filterKeys = array_keys($tableConfig->getFiltersConstraints());
        
-        foreach ($tableConfig->getFiltersConstraints() as $key) {
+        foreach ($tableConfig->getFiltersConstraints() as $key=>$value) {
             if ($this->has($key) && $this->filled($key)) {
                 $filters[$key] = $this->input($key);
             }
