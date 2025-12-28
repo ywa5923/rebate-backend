@@ -34,7 +34,7 @@ Route::group([], function () {
     
     // User permissions CRUD
     Route::apiResource('user-permissions', UserPermissionController::class);
-    Route::patch('/user-permissions/{user_permission}/toggle', [UserPermissionController::class, 'toggleActiveStatus']);
+    Route::patch('/user-permissions/toggle-active-status/{user_permission}', [UserPermissionController::class, 'toggleActiveStatus']);
     
     // Magic link authentication
    // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);

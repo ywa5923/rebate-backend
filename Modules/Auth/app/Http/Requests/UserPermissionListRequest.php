@@ -2,10 +2,19 @@
 
 namespace Modules\Auth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
+use Modules\Auth\Tables\UserPermissionsTableConfig;
 
-class UserPermissionListRequest extends FormRequest
+class UserPermissionListRequest extends BaseRequest
 {
+    protected function tableConfigClass(): string
+    {
+        return UserPermissionsTableConfig::class;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return null;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,19 +30,17 @@ class UserPermissionListRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'per_page' => 'nullable|integer|min:1|max:100',
-            'order_by' => 'nullable|string|in:id,subject_type,subject_id,permission_type,resource_id,resource_value,action,is_active,created_at,updated_at',
-            'order_direction' => 'nullable|string|in:asc,desc',
-            'subject_type' => 'nullable|string',
-            'subject_id' => 'nullable|integer',
-            'permission_type' => 'nullable|string|in:broker,country,zone,seo,translator',
-            'resource_id' => 'nullable|integer',
-            'resource_value' => 'nullable|string|max:255',
-            'action' => 'nullable|string|in:view,edit,delete,manage',
-            'subject' => 'nullable|string|max:255',
-            'is_active' => 'nullable|boolean',
+        $tableConfig = $this->getTableConfig();
+        $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
+        $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
+        $rules = [
+            ...$filtersConstraints,
+            'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
+            'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
+            'per_page' => 'nullable|integer|min:1|max:10000000',
         ];
+        return $rules;
+       
     }
 
     /**

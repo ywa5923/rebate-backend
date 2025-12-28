@@ -11,13 +11,19 @@ use Modules\Auth\Http\Requests\UpdateUserPermissionRequest;
 use Modules\Auth\Http\Requests\UserPermissionListRequest;
 use Modules\Auth\Transformers\UserPermissionResource;
 use App\Utilities\ModelHelper;
+use Modules\Auth\Tables\UserPermissionsTableConfig;
+use Modules\Auth\Forms\UserPermissionForm;
 class UserPermissionController extends Controller
 {
-    protected UserPermissionService $userPermissionService;
+    
 
-    public function __construct(UserPermissionService $userPermissionService)
+    public function __construct(
+        protected UserPermissionService $userPermissionService,
+        protected UserPermissionsTableConfig $tableConfig,
+        protected UserPermissionForm $formConfig,
+    )
     {
-        $this->userPermissionService = $userPermissionService;
+        
     }
 
     /**
@@ -29,30 +35,23 @@ class UserPermissionController extends Controller
     public function index(UserPermissionListRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
-            
-            $perPage = $validated['per_page'] ?? 15;
-            $orderBy = $validated['order_by'] ?? 'id';
-            $orderDirection = $validated['order_direction'] ?? 'asc';
-
-            // Collect filters
-            $filters = [
-                'subject_type' => $validated['subject_type'] ?? null,
-                'subject_id' => $validated['subject_id'] ?? null,
-                'permission_type' => $validated['permission_type'] ?? null,
-                'resource_id' => $validated['resource_id'] ?? null,
-                'resource_value' => $validated['resource_value'] ?? null,
-                'action' => $validated['action'] ?? null,
-                'subject' => $validated['subject'] ?? null,
-                'is_active' => $validated['is_active'] ?? null,
-            ];
+            // $validated = $request->validated();
+            $filters = $request->getFilters();
+            $orderBy = $request->getOrderBy();
+            $orderDirection = $request->getOrderDirection();
+            $perPage = $request->getPerPage();
+           
 
             $permissions = $this->userPermissionService->getAll($filters, $orderBy, $orderDirection, $perPage);
+          
 
             return response()->json([
                 'success' => true,
                 'data' => UserPermissionResource::collection($permissions->items()),
-                'meta' => [
+                'table_columns_config' => $this->tableConfig->columns(),
+                'filters_config' => $this->tableConfig->filters(),
+                'form_config' => $this->formConfig->getFormData(),
+                'pagination' => [
                     'current_page' => $permissions->currentPage(),
                     'last_page' => $permissions->lastPage(),
                     'per_page' => $permissions->perPage(),
@@ -60,6 +59,7 @@ class UserPermissionController extends Controller
                     'from' => $permissions->firstItem(),
                     'to' => $permissions->lastItem(),
                 ]
+                
             ]);
         } catch (\Exception $e) {
             return response()->json([

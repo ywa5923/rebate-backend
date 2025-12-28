@@ -2,11 +2,19 @@
 
 namespace Modules\Auth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
-
-class StorePlatformUserRequest extends FormRequest
+use Modules\Auth\Forms\PlatformUserForm;
+class StorePlatformUserRequest extends BaseRequest
 {
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return PlatformUserForm::class;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,20 +30,11 @@ class StorePlatformUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('platform_users', 'email'),
-                Rule::unique('broker_team_users', 'email'),
-            ],
-            //'password' => 'nullable|string|min:8',
-            'role' => 'required|string|in:global_admin,country_admin,broker_admin,seo,translator',
-            'is_active' => 'sometimes|boolean',
-        ];
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
+       
+        return $constraints;
+        
     }
 
     /**

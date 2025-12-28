@@ -19,11 +19,12 @@ class UserPermissionResource extends JsonResource
             'subject_type' => $this->subject_type ? class_basename($this->subject_type) : null,
             'subject_id' => $this->subject_id,
             'subject' => $this->whenLoaded('subject', function () {
-                return [
-                    'id' => $this->subject->id,
-                    'name' => $this->subject->name,
-                    'email' => $this->subject->email,
-                ];
+                // return [
+                //     'id' => $this->subject->id,
+                //     'name' => $this->subject->name,
+                //     'email' => $this->subject->email,
+                // ];
+                return $this->subject->name." (".$this->subject->email.")";
             }),
             'permission_type' => $this->permission_type,
             'resource_id' => $this->resource_id,

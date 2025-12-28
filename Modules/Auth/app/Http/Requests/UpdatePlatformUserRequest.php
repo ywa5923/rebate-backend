@@ -36,17 +36,7 @@ class UpdatePlatformUserRequest extends BaseRequest
         $constraints = $formConfig?->getFormConstraints() ?? [];
        
         return $constraints;
-        //  return [
-        //     'name' => 'sometimes|required|string|max:255',
-        //     'email' => [
-        //         'sometimes',
-        //         'required',
-        //         'string',
-        //         'email',
-        //         'max:255',
-        //         Rule::unique('platform_users', 'email')->ignore($userId),
-        //         Rule::unique('broker_team_users', 'email'),
-        //     ],
+       
     }
 
     /**

@@ -23,8 +23,6 @@ class PlatformUserService
         try {
             $user = $this->repository->create($data);
             
-            Log::info('Platform user created', ['user_id' => $user->id]);
-            
             return $user;
         } catch (\Exception $e) {
             Log::error('PlatformUserService create error: ' . $e->getMessage());
@@ -39,11 +37,6 @@ class PlatformUserService
     {
         try {
             $user = $this->repository->update($data);
-            
-            if ($user) {
-                Log::info('Platform user updated', ['user_id' => $data['id']]);
-            }
-            
             return $user;
         } catch (\Exception $e) {
             Log::error('PlatformUserService update error: ' . $e->getMessage());
@@ -58,10 +51,6 @@ class PlatformUserService
     {
         try {
             $deleted = $this->repository->deleteById($id);
-            
-            if ($deleted) {
-                Log::info('Platform user deleted', ['user_id' => $id]);
-            }
             
             return $deleted;
         } catch (\Exception $e) {

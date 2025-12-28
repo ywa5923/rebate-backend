@@ -44,7 +44,7 @@ class PlatformUserListRequest extends BaseRequest
             'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
             'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
             // Pagination parameter
-            'per_page' => 'nullable|integer|min:1|max:100',
+            'per_page' => 'nullable|integer|min:1|max:10000000',
         ];
        
         return $rules;
