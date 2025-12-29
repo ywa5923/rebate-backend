@@ -9,6 +9,7 @@ use App\Forms\Field;
 use Modules\Auth\Models\PlatformUser;
 class PlatformUserForm extends Form
 {
+    
     public function getFormData(): array
     {
         return [

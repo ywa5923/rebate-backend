@@ -138,7 +138,7 @@ abstract class Form implements FormConfigInterface
      *     ['value' => '3', 'label' => 'Option 3'],
      * ]
      */
-    public function getOtionsList(string $modelClass, string $column): array
+    public function getOptionsList(string $modelClass, string $column): array
     {
         return $modelClass::all()
             ->map(function ($item) use ($column) {

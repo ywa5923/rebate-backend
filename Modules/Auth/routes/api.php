@@ -33,7 +33,12 @@ Route::group([], function () {
     Route::patch('/platform-users/toggle-active-status/{platform_user}', [PlatformUserController::class, 'toggleActiveStatus']);
     
     // User permissions CRUD
-    Route::apiResource('user-permissions', UserPermissionController::class);
+    Route::get('/user-permissions', [UserPermissionController::class, 'index']);
+    Route::delete('/user-permissions/{user_permission}', [UserPermissionController::class, 'destroy']);
+    Route::get('/user-permissions/form-config/{permissionType}', [UserPermissionController::class, 'getFormConfig']);
+    //Route::apiResource('user-permissions', UserPermissionController::class);
+    Route::post('/user-permissions/{permissionType}', [UserPermissionController::class, 'store']);
+  
     Route::patch('/user-permissions/toggle-active-status/{user_permission}', [UserPermissionController::class, 'toggleActiveStatus']);
     
     // Magic link authentication

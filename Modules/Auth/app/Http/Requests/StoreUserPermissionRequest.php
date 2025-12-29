@@ -2,11 +2,20 @@
 
 namespace Modules\Auth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
-
-class StoreUserPermissionRequest extends FormRequest
+use Modules\Auth\Forms\UserPermissionForm;
+use Modules\Auth\Services\UserPermissionService;
+class StoreUserPermissionRequest extends BaseRequest
 {
+    protected function formConfigClass(): string
+    {
+        return UserPermissionForm::class;
+    }
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,29 +31,35 @@ class StoreUserPermissionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'subject_type' => 'required|string',
-            'subject_id' => ['required', 'integer'],
-            'permission_type' => 'required|string|in:broker,country,zone,seo,translator',
-            'resource_id' => 'nullable|integer',
-            'resource_value' => 'nullable|string|max:255',
-            'action' => 'required|string|in:view,edit,delete,manage',
-            'metadata' => 'nullable|array',
-            'is_active' => 'sometimes|boolean',
-        ];
+        $permissionType = $this->route('permissionType');
+        $formConfig = $this->formConfigClass();
+        $permissionService = app(UserPermissionService::class);
+        $formConfigObject = new $formConfig($permissionType,$permissionService);
+        $constraints = $formConfigObject?->getFormConstraints() ?? [];
+        return $constraints;
+        // $rules = [
+        //     'subject_type' => 'required|string',
+        //     'subject_id' => ['required', 'integer'],
+        //     'permission_type' => 'required|string|in:broker,country,zone,seo,translator',
+        //     'resource_id' => 'nullable|integer',
+        //     'resource_value' => 'nullable|string|max:255',
+        //     'action' => 'required|string|in:view,edit,delete,manage',
+        //     'metadata' => 'nullable|array',
+        //     'is_active' => 'sometimes|boolean',
+        // ];
         
-        // Add conditional validation for subject_id based on subject_type
-        if ($this->has('subject_type')) {
-            $subjectType = $this->input('subject_type');
+        // // Add conditional validation for subject_id based on subject_type
+        // if ($this->has('subject_type')) {
+        //     $subjectType = $this->input('subject_type');
             
-            if (in_array($subjectType, ['PlatformUser', 'platform_user'])) {
-                $rules['subject_id'][] = Rule::exists('platform_users', 'id');
-            } elseif (in_array($subjectType, ['BrokerTeamUser', 'broker_team_user'])) {
-                $rules['subject_id'][] = Rule::exists('broker_team_users', 'id');
-            }
-        }
+        //     if (in_array($subjectType, ['PlatformUser', 'platform_user'])) {
+        //         $rules['subject_id'][] = Rule::exists('platform_users', 'id');
+        //     } elseif (in_array($subjectType, ['BrokerTeamUser', 'broker_team_user'])) {
+        //         $rules['subject_id'][] = Rule::exists('broker_team_users', 'id');
+        //     }
+        // }
         
-        return $rules;
+        // return $rules;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Modules\Auth\Repositories;
 use Modules\Auth\Models\UserPermission;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\Brokers\Models\Broker;
 
 class UserPermissionRepository
 {
@@ -110,4 +111,16 @@ class UserPermissionRepository
                            ->get();
     }
 
+    public function getOrderedBrokersList(): array
+    {
+        return Broker::query()
+        ->join('option_values as ov', function ($j) {
+          $j->on('ov.broker_id', 'brokers.id')->where('ov.option_slug', 'trading_name');
+        })
+        ->orderBy('ov.value')
+        ->get(['brokers.id', 'ov.value as trading_name'])
+        ->map(fn ($b) => ['value' => $b->id, 'label' => $b->trading_name])
+        ->values()
+        ->all();
+    }
 }

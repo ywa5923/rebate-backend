@@ -13,6 +13,7 @@ use Modules\Auth\Transformers\UserPermissionResource;
 use App\Utilities\ModelHelper;
 use Modules\Auth\Tables\UserPermissionsTableConfig;
 use Modules\Auth\Forms\UserPermissionForm;
+use Modules\Auth\Models\PlatformUser;
 class UserPermissionController extends Controller
 {
     
@@ -20,7 +21,7 @@ class UserPermissionController extends Controller
     public function __construct(
         protected UserPermissionService $userPermissionService,
         protected UserPermissionsTableConfig $tableConfig,
-        protected UserPermissionForm $formConfig,
+        //protected UserPermissionForm $formConfig,
     )
     {
         
@@ -41,16 +42,14 @@ class UserPermissionController extends Controller
             $orderDirection = $request->getOrderDirection();
             $perPage = $request->getPerPage();
            
-
             $permissions = $this->userPermissionService->getAll($filters, $orderBy, $orderDirection, $perPage);
           
-
             return response()->json([
                 'success' => true,
                 'data' => UserPermissionResource::collection($permissions->items()),
                 'table_columns_config' => $this->tableConfig->columns(),
                 'filters_config' => $this->tableConfig->filters(),
-                'form_config' => $this->formConfig->getFormData(),
+               // 'form_config' => $this->formConfig->getFormData(),
                 'pagination' => [
                     'current_page' => $permissions->currentPage(),
                     'last_page' => $permissions->lastPage(),
@@ -107,24 +106,27 @@ class UserPermissionController extends Controller
      * @param StoreUserPermissionRequest $request
      * @return JsonResponse
      */
-    public function store(StoreUserPermissionRequest $request): JsonResponse
+    public function store(StoreUserPermissionRequest $request,string $permissionType): JsonResponse
     {
         try {
             $data = $request->validated();
 
-            $subject_type = $data['subject_type'];
-            //subject type is a PlatformUser or BrokerTeamUser defined in Auth module
-            $modelClass = ModelHelper::getModelClassFromSlug($subject_type,'Modules\\Auth\\Models\\');
+            // $subject_type = $data['subject_type'];
+            // //subject type is a PlatformUser or BrokerTeamUser defined in Auth module
+            // $modelClass = ModelHelper::getModelClassFromSlug($subject_type,'Modules\\Auth\\Models\\');
            
-            if (!$modelClass) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid subject type',
-                ], 400);
-            }
+            // if (!$modelClass) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Invalid subject type',
+            //     ], 400);
+            // }
           
-            $data['subject_type'] = $modelClass;    
-            $permission = $this->userPermissionService->createPermission($data);
+            //$data['subject_type'] = $modelClass; 
+           
+          ;
+
+            $permission = $this->userPermissionService->createPermission($data,$permissionType);
 
             return response()->json([
                 'success' => true,
@@ -135,6 +137,29 @@ class UserPermissionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create user permission',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get the form configuration for a user permission
+     * 
+     * @param string $permissionType
+     * @return JsonResponse
+     */
+    public function getFormConfig(string $permissionType): JsonResponse
+    {
+        try {
+            $formConfig = new UserPermissionForm($permissionType,$this->userPermissionService);
+            return response()->json([
+                'success' => true,
+                'data' => $formConfig->getFormData(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get user permission form config',
                 'error' => $e->getMessage(),
             ], 500);
         }
