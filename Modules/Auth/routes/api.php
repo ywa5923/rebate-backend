@@ -38,7 +38,6 @@ Route::group([], function () {
     Route::get('/user-permissions/form-config/{permissionType}', [UserPermissionController::class, 'getFormConfig']);
     //Route::apiResource('user-permissions', UserPermissionController::class);
     Route::post('/user-permissions/{permissionType}', [UserPermissionController::class, 'store']);
-  
     Route::patch('/user-permissions/toggle-active-status/{user_permission}', [UserPermissionController::class, 'toggleActiveStatus']);
     
     // Magic link authentication

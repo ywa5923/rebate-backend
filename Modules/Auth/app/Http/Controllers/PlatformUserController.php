@@ -13,6 +13,7 @@ use Modules\Auth\Http\Requests\PlatformUserListRequest;
 use Modules\Auth\Transformers\PlatformUserResource;
 use Modules\Auth\Tables\PlatformUsersTableConfig;
 use Modules\Auth\Forms\PlatformUserForm;
+use Modules\Auth\Models\BrokerTeamUser;
 class PlatformUserController extends Controller
 {
     //protected PlatformUserService $platformUserService;
@@ -133,15 +134,28 @@ class PlatformUserController extends Controller
     {
         try {
             $data = $request->validated();
-
+                
             // Hash password if provided
-            if (isset($data['password']) && !empty($data['password'])) {
-                $data['password'] = bcrypt($data['password']);
-            } else {
-                unset($data['password']);
-            }
+            // if (isset($data['password']) && !empty($data['password'])) {
+            //     $data['password'] = bcrypt($data['password']);
+            // } else {
+            //     unset($data['password']);
+            // }
 
+            //check if this user is not registered as a broker team user
+            $brokerTeamUser = BrokerTeamUser::where('email', $data['email'])->first();
+            if ($brokerTeamUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is already registered as a broker team user',
+                ], 400);
+            }
+             //check if this user is not registered as a platform user is made in request's rule
+           
             $user = $this->platformUserService->create($data);
+
+            //send email to registered user
+            //Mail::to($user->email)->send(new PlatformUserCreatedMail($user));
 
             return response()->json([
                 'success' => true,

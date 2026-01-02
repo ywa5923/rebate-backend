@@ -91,9 +91,9 @@ final class UserPermissionsTableConfig extends TableConfig
              ],
              'subject'=>[
                 'type' => 'text', 
-                'label' => 'Subject',
-                'tooltip' => 'Filter by subject',
-                'placeholder' => 'Search by subject'
+                'label' => 'User Info',
+                'tooltip' => 'Filter by user name or email',
+                'placeholder' => 'Search by user info'
              ],
             'is_active' => [
                 'type' => 'select', 

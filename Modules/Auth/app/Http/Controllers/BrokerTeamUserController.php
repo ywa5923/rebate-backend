@@ -20,7 +20,9 @@ use Modules\Brokers\Models\OptionValue;
 use Illuminate\Support\Facades\Mail;
 
 use Modules\Auth\Mail\MagicLinkMail;
-
+use Modules\Auth\Forms\UserPermissionForm;
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Enums\AuthAction;
 
 class BrokerTeamUserController extends Controller
 {
@@ -85,10 +87,9 @@ class BrokerTeamUserController extends Controller
                 $this->permissionService->createPermission([
                     'subject_type' => BrokerTeamUser::class,
                     'subject_id' => $user->id,
-                    'permission_type' => 'broker',
                     'resource_id' => $broker->id,
-                    'action' => 'manage',
-                ]);
+                    'resource_value' => $data['trading_name'],
+                ],AuthPermission::BROKER,AuthAction::MANAGE);
 
                 //generate magic link for broker
                 $magicLink = $this->magicLinkService->generateForTeamUser(
@@ -134,7 +135,12 @@ class BrokerTeamUserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'broker_id' => 'required|exists:brokers,id',
-            'email' => 'required|email|unique:broker_team_users,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('broker_team_users', 'email'),
+                Rule::unique('platform_users', 'email'),
+              ],
             'name' => 'required|string|max:255',
             'permission_action' => 'required|string|in:manage,view,edit,delete',
         ]);
@@ -174,14 +180,28 @@ class BrokerTeamUserController extends Controller
                     'email' => $request->email,
                     'is_active' => true,
                 ]);
+                $actionType = AuthAction::from($request->permission_action);
                 //add permission to user
                 $this->permissionService->createPermission([
                     'subject_type' => BrokerTeamUser::class,
                     'subject_id' => $teamUser->id,
-                    'permission_type' => 'broker',
                     'resource_id' => $request->broker_id,
-                    'action' => $request->permission_action,
-                ]);
+                    //resource value is handled in the service layer
+                ],AuthPermission::BROKER, $actionType);
+
+                //generate magic link for broker
+                $magicLink = $this->magicLinkService->generateForTeamUser(
+                    $teamUser,
+                    'registration',
+                    ['requested_at' => now()],
+                    96 // 96 hours = 4 days
+                );
+
+                //send email with magic link
+                Mail::to($teamUser->email)->send(new MagicLinkMail($magicLink));
+
+               
+
             });
         } catch (\Exception $e) {
             Log::error('Failed to add team user to default team: ' . $e->getMessage());
@@ -295,7 +315,7 @@ class BrokerTeamUserController extends Controller
                     // Find existing permission for this user and broker
                     $permission = \Modules\Auth\Models\UserPermission::where('subject_type', BrokerTeamUser::class)
                         ->where('subject_id', $teamUser->id)
-                        ->where('permission_type', 'broker')
+                        ->where('permission_type', UserPermissionForm::BROKER_PERMISSION_TYPE)
                         ->where('resource_id', $brokerId)
                         ->first();
 
@@ -309,10 +329,10 @@ class BrokerTeamUserController extends Controller
                         $this->permissionService->createPermission([
                             'subject_type' => BrokerTeamUser::class,
                             'subject_id' => $teamUser->id,
-                            'permission_type' => 'broker',
+                            //'permission_type' => 'broker',
                             'resource_id' => $brokerId,
                             'action' => $request->permission_action,
-                        ]);
+                        ],UserPermissionForm::BROKER_PERMISSION_TYPE);
                     }
                 }
             });

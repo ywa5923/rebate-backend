@@ -135,6 +135,7 @@ class BrokerController extends Controller
      */
     public function getBrokerInfo(Request $request, $id)
     {
+        
         try {
             return response()->json($this->brokerService->getBrokerContext($id));
         } catch (\Exception $e) {

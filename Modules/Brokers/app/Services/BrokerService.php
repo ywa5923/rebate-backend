@@ -66,17 +66,17 @@ class BrokerService
                 $query->where('option_slug', '=', 'trading_name')->whereNull('zone_code');
             }
         ])->findOrFail($id);
-        
+        //dd($broker);
         return [
             'success' => true,
             'data' => [
                 'broker_id' => $broker->id,
-                 'broker_type' => $broker->brokerType->name,
-                 'broker_trading_name' => $broker->dynamicOptionsValues->first()->value,
-                 'country_id' => $broker->country->id,
-                 'zone_id' => $broker->country->zone->id,
-                'country_code' => $broker->country->country_code ?? null,
-                'zone_code' => $broker->country->zone->zone_code ?? null,
+                 'broker_type' => $broker?->brokerType?->name,
+                 'broker_trading_name' => $broker?->dynamicOptionsValues?->first()?->value,
+                 'country_id' => $broker?->country?->id,
+                 'zone_id' => $broker?->country?->zone?->id,
+                'country_code' => $broker?->country?->country_code ?? null,
+                'zone_code' => $broker?->country?->zone?->zone_code ?? null,
             ],
         ];
     }

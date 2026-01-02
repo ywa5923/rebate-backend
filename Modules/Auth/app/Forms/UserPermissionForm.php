@@ -12,63 +12,47 @@ use Modules\Auth\Models\PlatformUser;
 use Modules\Brokers\Models\Broker;
 use Modules\Translations\Models\Country;
 use Modules\Brokers\Models\Zone;
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Services\UserPermissionService;
+use Modules\Auth\Enums\AuthAction;
+
 
 class UserPermissionForm extends Form
 {
-    protected $permissionService;
-    private $permissionType;
-    const BROKER_PERMISSION_TYPE = 'broker';
-    const COUNTRY_PERMISSION_TYPE = 'country';
-    const ZONE_PERMISSION_TYPE = 'zone';
-    const SEO_PERMISSION_TYPE = 'seo';
-    const TRANSLATOR_PERMISSION_TYPE = 'translator';
-
-    public function __construct(string $permissionType,$permissionService)
-    {
-        //parent::__construct();
-        $allowedTypes = [
-            self::BROKER_PERMISSION_TYPE,
-            self::COUNTRY_PERMISSION_TYPE,
-            self::ZONE_PERMISSION_TYPE,
-            self::SEO_PERMISSION_TYPE,
-            self::TRANSLATOR_PERMISSION_TYPE,
-        ];
-        if (!in_array($permissionType, $allowedTypes, true)) {
-            throw new InvalidArgumentException('Invalid permission type: ' . $permissionType);
-        }
-        $this->permissionType = $permissionType;
-        $this->permissionService = $permissionService;
+  
+    public function __construct(private AuthPermission $permissionType,
+    private UserPermissionService $permissionService)
+    {   
     }
 
     public function getFormData(): array
     {
-        if ($this->permissionType == self::BROKER_PERMISSION_TYPE) {
+        if ($this->permissionType == AuthPermission::BROKER) {
             $resourceList = $this->permissionService->getOrderedBrokersList();
         } else {
-            $resourceList = $this->getOptionsList($this->getResourceClass($this->permissionType), 'name');
+             $resourceList = $this->getOptionsList($this->permissionType->resourceModel(), 'name');
         }
 
-        if($this->permissionType == self::SEO_PERMISSION_TYPE || $this->permissionType == self::TRANSLATOR_PERMISSION_TYPE) {
+        if($this->permissionType == AuthPermission::SEO || $this->permissionType == AuthPermission::TRANSLATOR) {
             $resourceIdLabel = 'Select Country';
         } else {
-            $resourceIdLabel = 'Select '.ucfirst($this->permissionType);
+            $resourceIdLabel = 'Select '.ucfirst($this->permissionType->value);
         }
  
-       // $resourceLabel = ucfirst($this->permissionType);
+       
         return [
             'name' => 'User Permission',
             'description' => "User permission form configuration",
             'sections' => [
                 'definitions' => [
-                    'label' => ucfirst($this->permissionType) . " Permission Type",
+                    'label' => ucfirst($this->permissionType->value) . " Permission Type",
                     'fields' => [
-                        //'broker_type' => Field::select('Broker Type', $this->getBrokerTypes(),['required'=>true,'exists'=>'broker_types,id']),
-                        //'subject_type' => Field::select('Subject Type', $this->getSubjectTypes(),['required'=>true]),
-                        // 'subject_id' => Field::text('Subject ID', ['required'=>true, 'min'=>3, 'max'=>100]),
+                       
                         'subject_id' => Field::select('Select Platform User', $this->getOptionsList(PlatformUser::class, 'name'), ['required' => true]),
                         //'permission_type' => Field::select('Permission Type', $this->getPermissionTypes(),['required'=>true]),
                         'resource_id' => Field::select($resourceIdLabel, $resourceList, ['required' => true]),
-                        //'resource_value' => Field::text('Resource Value', ['required'=>true, 'min'=>3, 'max'=>100]),
+                        //resource_value is not required
+                        //resource value is obtained in the service layer
                         'action' => Field::select('Action', $this->getActions(), ['required' => true]),
                         'is_active' => Field::select('Is Active', $this->booleanOptions(), ['required' => true]),
                     ]
@@ -87,48 +71,17 @@ class UserPermissionForm extends Form
         ];
     }
 
-    private function getSubjectTypes(): array
-    {
-        return [
-            ['value' => 'PlatformUser', 'label' => 'Platform User'],
-            ['value' => 'BrokerTeamUser', 'label' => 'Broker Team User'],
-        ];
-    }
-
-    private function getPermissionTypes(): array
-    {
-        return [
-            ['value' => 'broker', 'label' => 'Broker'],
-            ['value' => 'country', 'label' => 'Country'],
-            ['value' => 'zone', 'label' => 'Zone'],
-            ['value' => 'seo', 'label' => 'SEO'],
-            ['value' => 'translator', 'label' => 'Translator'],
-        ];
-    }
-    private function getResourceClass(string $permissionType): ?string
-    {
-        switch ($permissionType) {
-            case 'broker':
-                return Broker::class;
-            case 'country':
-            case 'seo':
-            case 'translator':
-                return Country::class;
-            case 'zone':
-                return Zone::class;
-            default:
-                return null;
-        }
-    }
+   
+   
 
     private function getActions(): array
     {
-        return [
-            ['value' => 'view', 'label' => 'View'],
-            ['value' => 'edit', 'label' => 'Edit'],
-            ['value' => 'delete', 'label' => 'Delete'],
-            ['value' => 'manage', 'label' => 'Manage'],
-        ];
+        $actions = AuthAction::cases();
+        return array_map(function ($action) {
+            return ['value' => $action->value, 'label' => ucfirst($action->value.' Action')];
+        }, $actions);
+
+        
     }
 
     private function getBrokersList(): array

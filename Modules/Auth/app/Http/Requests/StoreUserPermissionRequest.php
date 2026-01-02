@@ -6,6 +6,7 @@ use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 use Modules\Auth\Forms\UserPermissionForm;
 use Modules\Auth\Services\UserPermissionService;
+use Modules\Auth\Enums\AuthPermission;
 class StoreUserPermissionRequest extends BaseRequest
 {
     protected function formConfigClass(): string
@@ -31,7 +32,7 @@ class StoreUserPermissionRequest extends BaseRequest
      */
     public function rules(): array
     {
-        $permissionType = $this->route('permissionType');
+        $permissionType = AuthPermission::from($this->route('permissionType'));
         $formConfig = $this->formConfigClass();
         $permissionService = app(UserPermissionService::class);
         $formConfigObject = new $formConfig($permissionType,$permissionService);

@@ -158,7 +158,7 @@ class DropdownListController extends Controller
     /**
      * Delete the specified dropdown list.
      */
-    public function delete(int $id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         try {
             $this->dropdownListService->deleteList($id);

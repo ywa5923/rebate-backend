@@ -14,6 +14,8 @@ use App\Utilities\ModelHelper;
 use Modules\Auth\Tables\UserPermissionsTableConfig;
 use Modules\Auth\Forms\UserPermissionForm;
 use Modules\Auth\Models\PlatformUser;
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Enums\AuthAction;
 class UserPermissionController extends Controller
 {
     
@@ -110,30 +112,20 @@ class UserPermissionController extends Controller
     {
         try {
             $data = $request->validated();
-
-            // $subject_type = $data['subject_type'];
-            // //subject type is a PlatformUser or BrokerTeamUser defined in Auth module
-            // $modelClass = ModelHelper::getModelClassFromSlug($subject_type,'Modules\\Auth\\Models\\');
-           
-            // if (!$modelClass) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Invalid subject type',
-            //     ], 400);
-            // }
-          
-            //$data['subject_type'] = $modelClass; 
-           
-          ;
-
-            $permission = $this->userPermissionService->createPermission($data,$permissionType);
+            $data['subject_type'] = PlatformUser::class;
+            $permissionType = AuthPermission::from($permissionType);
+            $actionType = AuthAction::from($data['action'] ?? '');
+      
+           $permission = $this->userPermissionService->createPermission($data, $permissionType, $actionType);
 
             return response()->json([
                 'success' => true,
                 'message' => 'User permission created successfully',
                 'data' => new UserPermissionResource($permission),
             ], 201);
-        } catch (\Exception $e) {
+
+        } catch (\Throwable $e) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create user permission',
@@ -151,6 +143,7 @@ class UserPermissionController extends Controller
     public function getFormConfig(string $permissionType): JsonResponse
     {
         try {
+            $permissionType = AuthPermission::from($permissionType);
             $formConfig = new UserPermissionForm($permissionType,$this->userPermissionService);
             return response()->json([
                 'success' => true,

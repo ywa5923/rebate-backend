@@ -13,6 +13,8 @@ use Modules\Auth\Forms\UserPermissionForm;
 use Modules\Brokers\Models\Broker;
 use Modules\Translations\Models\Country;
 use Modules\Brokers\Models\Zone;
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Enums\AuthAction;
 
 
 
@@ -28,12 +30,13 @@ class UserPermissionService
     /**
      * Create a new permission for a team user.
      */
-    public function createPermission(array $data,string $permissionType): UserPermission
+    public function createPermission(array $data,AuthPermission $permissionType,AuthAction $actionType): UserPermission
     {
-        $data['permission_type'] = $permissionType;
-        $data['subject_type'] = PlatformUser::class;
+        $data['permission_type'] =  $permissionType->value;
+        $data['action'] = $actionType->value;
+       
         try {
-            if($permissionType == UserPermissionForm::BROKER_PERMISSION_TYPE) {
+            if($permissionType == AuthPermission::BROKER && !isset($data['resource_value'])) {
                 $broker = Broker::with(['dynamicOptionsValues' => function ($q) {
                     $q->where('option_slug', 'trading_name')->latest('id')->limit(1);
                 }])->find($data['resource_id']);
@@ -41,14 +44,15 @@ class UserPermissionService
                 $tradingName = optional($broker?->dynamicOptionsValues->first())->value;
 
                 $data['resource_value'] = $tradingName;
-            } elseif($permissionType == UserPermissionForm::COUNTRY_PERMISSION_TYPE) {
-                $data['resource_value'] = Country::find($data['resource_id'])->name;
-            } elseif($permissionType == UserPermissionForm::ZONE_PERMISSION_TYPE) {
-                $data['resource_value'] = Zone::find($data['resource_id'])->name;
-            } elseif($permissionType == UserPermissionForm::SEO_PERMISSION_TYPE) {
-                $data['resource_value'] = Country::find($data['resource_id'])->name;
-            } elseif($permissionType == UserPermissionForm::TRANSLATOR_PERMISSION_TYPE) {
-                $data['resource_value'] = Country::find($data['resource_id'])->name;
+            } else{
+                //resurce model return specific class like Country, Zone, Broker, SEO, Translator
+                //for broker prmission type  the resource value is the trading name
+                //for country,  seo, translator the resource value is Country::name
+                //for zone the resource value is Zone::name
+                $model = $permissionType->resourceModel();
+                $resource = $model::find($data['resource_id']);
+                $data['resource_value'] = $resource->name;
+                
             }
             return $this->repository->create($data);
         } catch (\Exception $e) {
