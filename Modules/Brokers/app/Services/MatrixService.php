@@ -114,7 +114,7 @@ class MatrixService
                  && $cell['colHeader'] == $colSlug 
                
                  && $this->compareSelectedRowHeaderSubOptions($previousRowSubOptions, $rowSubOptions)){
-                     return $cell['value'];
+                     return [$cell['value'],$cell['is_updated_entry']];
                  }
              }
             // $index++;
@@ -141,19 +141,20 @@ class MatrixService
                 $colSlug=$cell['colHeader'];
                 $rowSubOptions = $cell['selectedRowHeaderSubOptions'] ?? null;
              
-                $previousCellValueArray=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
-                $index==2 && dd($previousCellValueArray);
-                //$previousCellValueArray=json_decode($previousCellValue, true);
+                [$previousCellValueArray,$isUpdatedEntry]=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
+
                // $index=2 && dd($previousCellValueArray,$cellValueArray,(array_diff_assoc($previousCellValueArray, $cellValueArray)));
-                //$index==1 && dd($previousCellValueArray, $cellValueArray);
-               //  $index==1 && dd(empty(array_diff_assoc($previousCellValueArray, $cellValueArray)));
+                
                 if ($previousCellValueArray && 
                 !empty(array_diff_assoc($previousCellValueArray, $cellValueArray))){
                    $cell["previous_value"]=$previousCellValueArray;
                    $cell["is_updated_entry"]=true;
-                //  dd($cell);
-                  //dd($previousCellValueArray, $cellValueArray);
+               
 
+                }
+                //if the was updated in the previous matrix data, set the is_updated_entry to true.
+                if($isUpdatedEntry){
+                    $cell["is_updated_entry"]=true;
                 }
                 
             }

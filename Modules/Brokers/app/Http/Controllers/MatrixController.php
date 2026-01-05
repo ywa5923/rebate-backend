@@ -106,11 +106,13 @@ class MatrixController extends Controller
 
             $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
             if (!empty($previousMatrixData) && !$isAdmin) {
+                //set the previous value in the matrix data only if the admin is not true.
+                //admin save in public_value, so we don't need to set the previous value.
                 $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
             }
             $result = DB::transaction(function () use ($data, $brokerId, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
 
-               // dd($data['matrix']);
+            
                 //matrix cell's is_updated_entry is used to identify the updated entries and previous values in the matrix data.
                 //it is set to 1 in MAtrixService::setPreviousValueInMatrixData if the cell value is different from the previous value.
                 //when admin save the matrix, all matrix cells will have is_updated_entry=0. See MatrixHeaderRepository::insertMatrixValues

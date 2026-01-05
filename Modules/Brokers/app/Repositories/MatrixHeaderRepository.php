@@ -459,9 +459,7 @@ class MatrixHeaderRepository
                     'value' => json_encode($cell['value']),
                     'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null,
                     'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null,
-                    //if isAdmin is true, set is_updated_entry to 0.
-                    //we don't want to update the is_updated_entry field for admin.
-                    //when admin save the matrix,all updated cells will be set to 0.
+                    //deprecated: if isAdmin is true, set is_updated_entry is set in frontend correctly
                    // 'is_updated_entry' => $isAdmin ? 0 :$cell['is_updated_entry'] ?? false,
                     'is_updated_entry' => $cell['is_updated_entry'] ?? false,
                     'zone_id' => $zoneId
