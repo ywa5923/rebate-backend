@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Repositories\CostDiscountRepository;
-use Modules\Brokers\Models\CostDiscount;
-use Modules\Brokers\Models\Url;
+
 use Modules\Brokers\Transformers\CostDiscountResource;
 use Modules\Brokers\Transformers\AffiliateLinkResource;
 
@@ -62,7 +61,7 @@ class ChallengeService
             'category_id' => 'required|integer|exists:challenge_categories,id',
             'step_id' => 'required|integer|exists:challenge_steps,id',
             'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-            'is_placeholder' => 'nullable|boolean',
+            'is_placeholder' => 'required|boolean',
             'broker_id' => 'nullable|integer|exists:brokers,id',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
         ]);
@@ -71,11 +70,11 @@ class ChallengeService
     /**
      * Store challenge with matrix data
      */
-    public function processRequest(array $validatedData, int $brokerId, bool $isPlaceholder, bool $isAdmin, ?int $zoneId = null): array
+    public function processRequest(array $validatedData, ?int $brokerId, bool $isPlaceholder, bool $isAdmin, ?int $zoneId = null): array
     {
 
-        $brokerId = $validatedData['broker_id'];
-        $zoneId = $validatedData['zone_id'] ?? null;
+       // $brokerId = $validatedData['broker_id']??null;
+       // $zoneId = $validatedData['zone_id'] ?? null;
        // $isAdmin = $validatedData['is_admin'] ?? null;
        // $isPlaceholder = $validatedData['is_placeholder'];
 
@@ -96,6 +95,7 @@ class ChallengeService
                     'challenge_step_id' => $validatedData['step_id'],
                     'challenge_amount_id' => $validatedData['amount_id'] ?? null,
                     'broker_id' => $brokerId,
+                    'zone_id' => $zoneId
 
                 ]);
                 // Save matrix data
@@ -125,7 +125,7 @@ class ChallengeService
                     $validatedData['matrix'],
                 );
                 //remove old chalenge's matrix values
-                $this->challengeRepository->deleteChallengeMatrixValues($challenge->id, $zoneId); // Save matrix data
+                $this->challengeRepository->deleteChallengeMatrixValues($challenge->id); // Save matrix data
                //save the new matrix data
                 $this->saveMatrixData($newMatrix, $challenge->id, $brokerId, $zoneId, $isAdmin);
              
@@ -147,115 +147,13 @@ class ChallengeService
         }
     }
     
-    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
+    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, ?int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
     {
         $this->costDiscountRepository->upsertCostDiscount($challengeId, $validatedData['evaluation_cost_discount']??null, $brokerId, $isAdmin, $isPlaceholder, $zoneId);
         $this->urlRepository->upsertAffiliateLink($challengeId, $validatedData['affiliate_link']??null, 'Affiliate Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
         $this->urlRepository->upsertAffiliateLink(null, $validatedData['affiliate_master_link']??null, 'Affiliate Master Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
     }
-    /**
-     * =========== DEPRECATED FUNCTION =================
-     * Update matrix and extra data:affiliate link, affiliate master link, evaluation cost discount
-     * @param array $validatedData
-     * @param int $challengeId
-     * @param int $brokerId
-     * @param bool $isPlaceholder
-     * @param bool $isAdmin
-     * @param int|null $zoneId
-     * @return void
-     * @throws \Exception
-     */
-    public function updateMatrixAndExtraData2(array $validatedData, int $challengeId, int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
-    {
-        $oldCostDiscount = $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
-       
-        $oldAffiliateLink = $this->urlRepository->findByUrlableTypeAndId(Challenge::class, $challengeId, $brokerId, $isPlaceholder, $zoneId);
-        $oldAffiliateMasterLink = $this->urlRepository->findByUrlableTypeAndId( Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
-           
-    
-        //update the evaluation cost discount
-        if ($oldCostDiscount) {
-            //if old evaluation cost discount is found, update it
-            $oldDiscountValue = $isAdmin ? $oldCostDiscount->public_value : $oldCostDiscount->value;
-            
-            $newDiscountValue = $validatedData['evaluation_cost_discount']??null;
-            if ( $oldDiscountValue != $newDiscountValue && !is_null($newDiscountValue)) {
-                $oldCostDiscount->update([
-                    ($isAdmin || $isPlaceholder) ? null : 'previous_value' => $oldDiscountValue,
-                    $isAdmin && !$isPlaceholder ? 'public_value' : 'value' => $newDiscountValue,
-                    'is_updated_entry' => $isAdmin ? false : true,
-                ]);
-            }elseif(is_null($newDiscountValue)){
-                $oldCostDiscount->delete();
-            }
-        } else {
-            //if the old evaluation cost discount is not found, create a new one
-            if (!empty($validatedData['evaluation_cost_discount'])) {
-                $this->costDiscountRepository->createCostDiscount(
-                    $challengeId,
-                    $validatedData['evaluation_cost_discount'],
-                    $brokerId,
-                    $isAdmin,
-                    $isPlaceholder,
-                    $zoneId,
-                );
-            }
-        }
-        if ($oldAffiliateLink) {
-            $oldAffiliateLinkValue = $isAdmin ? $oldAffiliateLink->public_url : $oldAffiliateLink->url;
-            $newAffiliateLinkValue = $validatedData['affiliate_link']??null;
-            if ($oldAffiliateLinkValue !=   $newAffiliateLinkValue && !is_null($newAffiliateLinkValue)) {
-                $oldAffiliateLink->update([
-                    ($isAdmin || $isPlaceholder) ? null : 'previous_url' => $oldAffiliateLink?->url,
-                    $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $newAffiliateLinkValue,
-                    'is_updated_entry' => $isAdmin || $isPlaceholder ? false : true,
-                ]);
-            }elseif(is_null($newAffiliateLinkValue)){
-                $oldAffiliateLink->delete();
-            }
-        } else {
-            //if the old affiliate link is not found, create a new one
-            if (!empty($validatedData['affiliate_link'])) {
-                $this->urlRepository->saveAffiliateLink(
-                    $challengeId,
-                    $validatedData['affiliate_link'],
-                    'Affiliate Link',
-                    $brokerId,
-                    $isAdmin,
-                    $isPlaceholder,
-                    $zoneId,
-                );
-            }
-        }
-
-        if ($oldAffiliateMasterLink!=null) {
-            $oldAffiliateMasterLinkValue = $isAdmin ? $oldAffiliateMasterLink->public_url : $oldAffiliateMasterLink->url;
-            $newAffiliateMasterLinkValue = $validatedData['affiliate_master_link']??null;
-           
-            if ( trim($oldAffiliateMasterLinkValue) != trim($newAffiliateMasterLinkValue) && !is_null($newAffiliateMasterLinkValue)) {
-                $oldAffiliateMasterLink->update([
-                    ($isAdmin || $isPlaceholder) ? null : 'previous_url' => $oldAffiliateMasterLink->url,
-                    $isAdmin && !$isPlaceholder ? 'public_url' : 'url' => $newAffiliateMasterLinkValue,
-                    'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
-                ]);
-            }elseif(is_null($newAffiliateMasterLinkValue)){
-                $oldAffiliateMasterLink->delete();
-            }
-        } else {
-            //if the old affiliate master link is not found, create a new one
-            if (!empty($validatedData['affiliate_master_link'])) {
-                $this->urlRepository->saveAffiliateLink(
-                    null,
-                    $validatedData['affiliate_master_link'],
-                    'Affiliate Master Link',
-                    $brokerId,
-                    $isAdmin,
-                    $isPlaceholder,
-                    $zoneId,
-                );
-            }
-        }
-    }
+  
 
     /**
      * Save new matrix extra data:affiliate link, affiliate master link, evaluation cost discount
@@ -268,8 +166,9 @@ class ChallengeService
      * @return void
      * @throws \Exception
      */
-    public function saveNewMatrixExtraData(array $validatedData, int $challengeId, int $brokerId,bool $isPlaceholder, ?bool $isAdmin = null, ?int $zoneId = null): void
+    public function saveNewMatrixExtraData(array $validatedData, int $challengeId, ?int $brokerId,bool $isPlaceholder, ?bool $isAdmin = null, ?int $zoneId = null): void
     {
+        //broker id is nullable for placeholder data
         if (!empty($validatedData['affiliate_link'])) {
             $this->urlRepository->saveAffiliateLink(
                 $challengeId,
@@ -309,7 +208,7 @@ class ChallengeService
     /**
      * Save matrix data to challenge_matrix_values table
      */
-    private function saveMatrixData(array $matrixData, int $challengeId, int $brokerId, ?int $zoneId = null, ?bool $isAdmin = null): void
+    private function saveMatrixData(array $matrixData, int $challengeId, ?int $brokerId, ?int $zoneId = null, ?bool $isAdmin = null): void
     {
         $challengeMatrixValues = [];
         $groupNames = ['challenge', 'step-0', 'step-1', 'step-2'];
@@ -319,6 +218,7 @@ class ChallengeService
             ->getMatrixHeadersByGroups($groupNames)
             ->keyBy('slug');
 
+        //dd($matrixData);
         foreach ($matrixData as $rowIndex => $rowData) {
             foreach ($rowData as $colIndex => $cellData) {
                 $rowHeaderSlug = $cellData['rowHeader'];
@@ -337,7 +237,7 @@ class ChallengeService
                     'value' => !empty($cellData['value']) ? json_encode($cellData['value']) : null,
                     'public_value' => !empty($cellData['public_value']) ? json_encode($cellData['public_value']) : null,
                    // 'is_updated_entry' => $isAdmin ? 0 : (int)($cellData['is_updated_entry'] ?? 0),
-                    'is_updated_entry' => (int)$cellData['is_updated_entry'] ?? 0,
+                    'is_updated_entry' => $cellData['is_updated_entry'] ?? 0,
                     'is_invariant' => isset($zoneId) ? false : true,
                     'zone_id' => $zoneId,
                     'challenge_id' => $challengeId,
@@ -360,7 +260,7 @@ class ChallengeService
      * @param bool|null $isPlaceholder
      * @return AffiliateLinkResource|null
      */
-    public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, int $brokerId, bool $isPlaceholder = false, ?int $zoneId = null): ?AffiliateLinkResource
+    public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, ?int $brokerId, bool $isPlaceholder = false, ?int $zoneId = null): ?AffiliateLinkResource
     {
        $chalengeObject=$this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $isPlaceholder, $zoneId);
        if($chalengeObject){
@@ -370,10 +270,10 @@ class ChallengeService
     }
 
 
-    public function findDiscountByChallengeId(int $challengeId, int $brokerId, ?int $zoneId = null): ?CostDiscountResource
+    public function findDiscountByChallengeId(int $challengeId, ?int $brokerId): ?CostDiscountResource
     {
-        $discountObject=$this->costDiscountRepository->findByChallengeId($challengeId, $brokerId, $zoneId);
-       //dd($challengeId, $brokerId, $zoneId, $discountObject);
+        $discountObject=$this->costDiscountRepository->findByChallengeId($challengeId, $brokerId);
+       
        
         if($discountObject){
             return CostDiscountResource::make($discountObject);
@@ -393,9 +293,9 @@ class ChallengeService
     /**
      * Find challenge by parameters
      */
-    public function findChallengeByParams(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, int $brokerId): ?Challenge
+    public function findChallengeByParams(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null,?int $zoneId = null): ?Challenge
     {
-        return $this->challengeRepository->exists($isPlaceholder, $categoryId, $stepId, $amountId, $brokerId);
+        return $this->challengeRepository->exists($isPlaceholder, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
     }
 
     /**
@@ -462,6 +362,8 @@ class ChallengeService
                 $previousByKey[$key] = [
                     'previous_value' => $cell['value'] ?? null,
                     /// 'is_updated_entry' => $cell['is_updated_entry'] ?? 0,
+                    //NEW
+                    'is_updated_entry' => $cell['is_updated_entry'] ?? 0,
                 ];
             }
         }
@@ -474,6 +376,10 @@ class ChallengeService
                     $currentValue = $cell['value'];
                     if ($previousValue && $currentValue && !empty(array_diff_assoc($previousValue, $currentValue))) {
                         $cell['previous_value'] = $previousByKey[$key]['previous_value'];
+                        $cell['is_updated_entry'] = true;
+                    }
+                    //NEW
+                    if($previousByKey[$key]['is_updated_entry']){
                         $cell['is_updated_entry'] = true;
                     }
                 }
@@ -504,16 +410,23 @@ class ChallengeService
     }
 
     /**
+     * =======Deprecated method=================
      * Handle placeholder challenge request
      */
-    public function handlePlaceholderRequest(array $validatedData, int $brokerId, ?int $zoneId): array
+    public function handlePlaceholderRequest(array $validatedData): array
     {
+        $brokerId = $validatedData['broker_id'] ?? null;
+        $zoneId = $validatedData['zone_id'] ?? null;
+        $categoryId = $validatedData['category_id'];
+        $stepId = $validatedData['step_id'];
+
         $placeholderChallenge = $this->findChallengeByParams(
             true,
-            $validatedData['category_id'],
-            $validatedData['step_id'],
+            $categoryId,
+            $stepId,
             null,
-            $brokerId
+            $brokerId,
+            $zoneId
         );
 
         if ($placeholderChallenge?->id) {
@@ -522,7 +435,7 @@ class ChallengeService
                 'data' => [
                     'challenge_id' => $placeholderChallenge->id,
                     'matrix' => $this->getChallengeMatrixData($placeholderChallenge->id),
-                    'evaluation_cost_discount' => $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId),
+                    'evaluation_cost_discount' => $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId),
                     'affiliate_link' => $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId),
                     'affiliate_master_link' => $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)
                 ]
@@ -539,26 +452,36 @@ class ChallengeService
     }
 
     /**
+     * =======Deprecated method=================
      * Handle regular challenge request
      */
-    public function handleRegularChallengeRequest(array $validatedData, int $brokerId, ?int $zoneId): array
+    public function old_handleRegularChallengeRequest(array $validatedData): array
     {
+        $brokerId = $validatedData['broker_id'] ?? null;
+        $zoneId = $validatedData['zone_id'] ?? null;
+        $categoryId = $validatedData['category_id'];
+        $stepId = $validatedData['step_id'];
+        $amountId = $validatedData['amount_id'];
+
         $challenge = $this->findChallengeByParams(
             false,
-            $validatedData['category_id'],
-            $validatedData['step_id'],
-            $validatedData['amount_id'],
-            $brokerId
+            $categoryId,
+            $stepId,
+            $amountId,
+            $brokerId,
+            $zoneId
         );
 
+
         if ($challenge?->id) {
-            return $this->handleExistingChallenge($challenge, $brokerId, $zoneId, $validatedData);
+            return $this->handleExistingChallenge($challenge->id, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
         }
 
-        return $this->handleMissingChallenge($brokerId, $zoneId, $validatedData);
+        return $this->handleMissingChallenge($brokerId, $categoryId, $stepId, $zoneId);
     }
 
     /**
+     * =======Deprecated method=================
      * Handle existing challenge
      * If the challenge is found, return the challenge data for challenge matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
      * and add placeholder data if needed
@@ -568,15 +491,15 @@ class ChallengeService
      * @param array $validatedData
      * @return array
      */
-    public function handleExistingChallenge(Challenge $challenge, int $brokerId, ?int $zoneId, array $validatedData): array
+    public function old_handleExistingChallenge(int $challengeId, int $categoryId, int $stepId, int $brokerId, ?int $zoneId): array
     {
-        $matrix = $this->getChallengeMatrixData($challenge->id);
-        $discount = $this->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
-        $affiliateLink = $this->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, false, $zoneId);
+        $matrix = $this->getChallengeMatrixData($challengeId);
+        $discount = $this->findDiscountByChallengeId($challengeId, $brokerId, $zoneId);
+        $affiliateLink = $this->findUrlByUrlableTypeAndId(Challenge::class, $challengeId, $brokerId, false, $zoneId);
         $affiliateMasterLink = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
 
         $responseArray = [
-            'challenge_id' => $challenge->id,
+            'challenge_id' => $challengeId,
             'matrix' => $matrix,
             'evaluation_cost_discount' => $discount,
             'affiliate_link' => $affiliateLink,
@@ -584,7 +507,7 @@ class ChallengeService
         ];
 
         // Add placeholder data if needed
-        $this->addPlaceholderDataIfNeeded($responseArray, $matrix, $discount, $affiliateLink, $affiliateMasterLink, $brokerId, $zoneId, $validatedData);
+        $this->addPlaceholderData($responseArray,  $categoryId, $stepId,  $zoneId);
 
         return [
             'success' => true,
@@ -593,6 +516,7 @@ class ChallengeService
     }
 
     /**
+     * =======Deprecated method=================
      * Handle missing challenge
      * If the challenge is not found, return matrix pleaceholders array and placeholder data for evaluation cost discount,
      *  affiliate link and affiliate master link
@@ -601,43 +525,49 @@ class ChallengeService
      * @param array $validatedData
      * @return array
      */
-    public function handleMissingChallenge(int $brokerId, ?int $zoneId, array $validatedData): array
+    public function old_handleMissingChallenge(int $brokerId,$categoryId, $stepId, ?int $zoneId): array
     {
         $affiliateMasterLinkObject = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-        $affiliateMasterLinkPlaceholder = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
+        //$affiliateMasterLinkPlaceholder = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
 
         $responseArray = [
             'affiliate_master_link' => $affiliateMasterLinkObject
         ];
-
-        if (is_null($affiliateMasterLinkObject)) {
-            $responseArray['affiliate_master_link_placeholder'] = $affiliateMasterLinkPlaceholder;
-        }
-
-        // Add placeholder challenge data if available
-        $placeholderChallenge = $this->findChallengeByParams(
-            true,
-            $validatedData['category_id'],
-            $validatedData['step_id'],
-            null,
-            $brokerId
-        );
-
-        if ($placeholderChallenge?->id) {
-            $responseArray = array_merge($responseArray, [
-                'challenge_id' => $placeholderChallenge->id,
-                'matrix' => null,
-                'matrix_placeholders_array' => $this->getMatrixPlaceholderArray($placeholderChallenge->id, null),
-                'evaluation_cost_discount_placeholder' => $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value,
-                'affiliate_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url,
-                'affiliate_master_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url,
-            ]);
-        }
+        $this->addPlaceholderData($responseArray,  $categoryId, $stepId,   $zoneId);
 
         return [
             'success' => true,
             'data' => $responseArray
         ];
+
+        // if (is_null($affiliateMasterLinkObject)) {
+        //     $responseArray['affiliate_master_link_placeholder'] = $affiliateMasterLinkPlaceholder;
+        // }
+
+        // // Add placeholder challenge data if available
+        // $placeholderChallenge = $this->findChallengeByParams(
+        //     true,
+        //     $validatedData['category_id'],
+        //     $validatedData['step_id'],
+        //     null,
+        //     $brokerId
+        // );
+
+        // if ($placeholderChallenge?->id) {
+        //     $responseArray = array_merge($responseArray, [
+        //         'challenge_id' => $placeholderChallenge->id,
+        //         'matrix' => null,
+        //         'matrix_placeholders_array' => $this->getMatrixPlaceholderArray($placeholderChallenge->id, null),
+        //         'evaluation_cost_discount_placeholder' => $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value,
+        //         'affiliate_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url,
+        //         'affiliate_master_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url,
+        //     ]);
+        // }
+
+        // return [
+        //     'success' => true,
+        //     'data' => $responseArray
+        // ];
     }
 
     /**
@@ -652,37 +582,26 @@ class ChallengeService
      * @param array $validatedData
      * @return void
      */
-    private function addPlaceholderDataIfNeeded(array &$responseArray, array $matrix, CostDiscountResource|null $discount, AffiliateLinkResource|null $affiliateLink, AffiliateLinkResource|null $affiliateMasterLink, int $brokerId, ?int $zoneId, array $validatedData): void
+    public function addPlaceholderData(array &$responseArray, int $categoryId, int $stepId, ?int $zoneId): void
     {
         $placeholderChallenge = $this->findChallengeByParams(
             true,
-            $validatedData['category_id'],
-            $validatedData['step_id'],
-            null,
-            $brokerId
+            $categoryId,
+            $stepId,
+            ChallengeRepository::AMOUNT_ID_NULL,
+            ChallengeRepository::BROKER_ID_NULL,
+            $zoneId
         );
 
         if (!$placeholderChallenge?->id) {
             return;
         }
 
-        // Add matrix placeholders if matrix has empty cells
-        if ($this->hasEmptyMatrixCells($matrix)) {
-            $responseArray['matrix_placeholders_array'] = $this->getMatrixPlaceholderArray($placeholderChallenge->id, $responseArray['challenge_id']);
-        }
-
-        // Add placeholder data for null values
-        if (is_null($discount)) {
-            $responseArray['evaluation_cost_discount_placeholder'] = $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value;
-        }
-
-        if (is_null($affiliateLink)) {
-            $responseArray['affiliate_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url;
-        }
-
-        if (is_null($affiliateMasterLink)) {
-            $responseArray['affiliate_master_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
-        }
+        $responseArray['matrix_placeholders_array'] = $this->getMatrixPlaceholderArray($placeholderChallenge->id);
+        $responseArray['evaluation_cost_discount_placeholder'] = $this->findDiscountByChallengeId($placeholderChallenge->id, null, $zoneId)?->value;
+        $responseArray['affiliate_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, null, true, $zoneId)?->url;
+        $responseArray['affiliate_master_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, null, null, true, $zoneId)?->url; 
+       
     }
 
     /**
@@ -711,7 +630,7 @@ class ChallengeService
     {
         $placeholderMatrix = $this->getChallengeMatrixData($placeholderChallengeId);
         $challengeMatrix = ($challengeId) ? $this->getChallengeMatrixData($challengeId) : null;
-        return $this->extractPlaceholderValuesFromMatrix($placeholderMatrix, $challengeMatrix);
+        return $this->extractPlaceholderValuesFromMatrix($placeholderMatrix);
     }
 
     /**

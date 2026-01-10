@@ -15,11 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->boolean('is_placeholder')->default(false);
+           
            // $table->foreignId('matrix_id')->constrained('matrices');
-            $table->foreignId('challenge_category_id')->constrained('challenge_categories');
-            $table->foreignId('challenge_step_id')->nullable()->constrained('challenge_steps');
-            $table->foreignId('challenge_amount_id')->nullable()->constrained('challenge_amounts');
-            $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
+            $table->foreignId('challenge_category_id')->constrained('challenge_categories')->nullable()->nullOnDelete();
+            $table->foreignId('challenge_step_id')->constrained('challenge_steps')->nullable()->nullOnDelete();
+            $table->foreignId('challenge_amount_id')->constrained('challenge_amounts')->nullable()->nullOnDelete();
+            //FOR PLACEHOLDER DATA, BROKER ID AND ZONE ID ARE NULL
+            $table->foreignId('broker_id')->constrained('brokers')->nullable()->nullOnDelete();
+            $table->foreignId('zone_id')->constrained('zones')->nullable()->nullOnDelete();
             $table->timestamps();
         });
     }

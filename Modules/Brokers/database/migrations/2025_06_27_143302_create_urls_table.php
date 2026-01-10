@@ -30,7 +30,8 @@ return new class extends Migration
             $table->enum("status",["published","pending","rejected"])->default("published");
             $table->text("status_reason",1000)->nullable();
             $table->foreignId("option_category_id")->nullable()->constrained("option_categories");
-            $table->foreignId("broker_id")->constrained();
+            //placeholder entry can have no broker id
+            $table->foreignId("broker_id")->nullable()->constrained();
             $table->foreignId("zone_id")->nullable()->constrained();
             $table->timestamps();
         });

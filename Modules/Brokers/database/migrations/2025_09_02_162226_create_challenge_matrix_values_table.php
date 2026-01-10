@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreignId('challenge_id')->constrained('challenges')->onDelete('cascade');
             $table->foreignId('row_id')->constrained('matrix_headers')->nullable()->onDelete('cascade');
             $table->foreignId('column_id')->constrained('matrix_headers')->nullable()->onDelete('cascade');
-            $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
+            $table->foreignId('broker_id')->constrained('brokers')->nullable()->onDelete('cascade');
             $table->timestamps();
         });
     }

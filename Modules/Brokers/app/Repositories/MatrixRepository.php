@@ -132,8 +132,8 @@ class MatrixRepository
         return $this->modelValue->where('matrix_id', $matrixId)
         ->where('broker_id', $brokerId)
         ->where(function($query) use ($zoneId){
-            $query->where('zone_id', $zoneId)
-            ->orWhere('is_invariant', 1);
+            $query->where('zone_id', $zoneId);
+            //->orWhere('is_invariant', 1);
         })
 
         ->get() ?? null;

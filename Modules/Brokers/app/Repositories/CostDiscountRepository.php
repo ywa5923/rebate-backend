@@ -174,13 +174,16 @@ class CostDiscountRepository
 
         if ($brokerId !== null) {
             $query->where('broker_id', $brokerId);
+        }else{
+            $query->whereNull('broker_id');
         }
 
-        if ($zoneId !== null) {
-            $query->where('zone_id', $zoneId);
-        } else {
-            $query->whereNull('zone_id');
-        }
+        //zone id is moved to the challenge tables
+        // if ($zoneId !== null) {
+        //     $query->where('zone_id', $zoneId);
+        // } else {
+        //     $query->whereNull('zone_id');
+        // }
 
         return $query->orderBy('id', 'desc')->first();
     }
@@ -210,7 +213,7 @@ class CostDiscountRepository
     public function upsertCostDiscount(
         int $challengeId,
         string|null $costDiscount,
-        int $brokerId,
+        ?int $brokerId,
         bool $isAdmin,
         bool $isPlaceholder,
         ?int $zoneId = null,

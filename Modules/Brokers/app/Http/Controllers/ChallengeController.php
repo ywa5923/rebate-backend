@@ -3,23 +3,17 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+
 use Illuminate\Http\JsonResponse;
-use Modules\Brokers\Models\ChallengeCategory;
+
 use Modules\Brokers\Services\ChallengeCategoryService;
 use Modules\Brokers\Transformers\ChallengeCategoryResource;
-use Illuminate\Support\Facades\DB;
+
 use Modules\Brokers\Models\Challenge;
-use Modules\Brokers\Models\Matrix;
-use Modules\Brokers\Models\MatrixValue;
-use Modules\Brokers\Models\MatrixDimension;
-use Modules\Brokers\Models\MatrixHeader;
-use Modules\Brokers\Models\ChallengeMatrixValue;
+
 use Modules\Brokers\Services\ChallengeService;
-use Modules\Brokers\Transformers\AffiliateLinkResource;
-use Modules\Brokers\Transformers\CostDiscountResource;
 
 class ChallengeController extends Controller
 {
@@ -35,189 +29,98 @@ class ChallengeController extends Controller
     }
 
 
-    /**
-     * =========== DEPRECATED FUNCTION =================
-     * Show the challenge data
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function showOld(Request $request): JsonResponse
-    {
-        try {
-            $validatedData = $this->challengeService->validateGetRequestData($request);
-            
-            $brokerId = $validatedData['broker_id'] ?? 1;
-            $zoneId = $validatedData['zone_id'] ?? null;
-            $isPlaceholder = $validatedData['is_placeholder'];
-
-            $placeholderChallenge = $this->challengeService->findChallengeByParams(
-                true,
-                $validatedData['category_id'],
-                $validatedData['step_id'],
-                null,
-                $brokerId
-            );
-           
-            $responseArray =   [];
-
-            if ($isPlaceholder && $placeholderChallenge?->id) {
-                //this code is executed when the admin is in the placehoder page
-                //and he wants to view only the placehoder data for challenge matrix and
-                //discount, affiliate link and affiliate master link
-
-                //if placeholder challenge is found then return the placehoder data
-                //placeholder challenge is an entry in the challenge table that has is_placeholder true
-                //and amount_id is null
-                //a challenge  has a different id for every combination of category, step and ammount
-                //we use the challenge id to get the matrix, discount, affiliate link and affiliate master link
-                //for every combination of category, step and ammount
-
-                //in placeholder mode the data is returned same as for the challenges matrix,but has a different $challengeId
-
-                   // dd($placeholderChallenge->id);
-                    //get the placehoder data for challenge matrix, discount, affiliate link and affiliate master link
-                    $responseArray =   array_merge($responseArray, [
-                        'challenge_id' => $placeholderChallenge->id,
-                        'matrix' => $this->challengeService->getChallengeMatrixData($placeholderChallenge->id),
-                        'evaluation_cost_discount' => $this->challengeService->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId),
-                        'affiliate_link' => $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId),
-                        //get master affiliate link that is placeholder,so the 4th parameter is true
-                        'affiliate_master_link' => $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)
-                    ]);
-
-                    return response()->json([
-                        'success' => true,
-                        'data' => $responseArray
-                    ]);
-                
-            }elseif($isPlaceholder)
-            {
-                //if the admin is in the placeholder page and the placeholder challenge is not found
-                //then return only the affiliate master link placeholder which is the same for all challenges combinations
-                $placeholderMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId);
-                $responseArray['affiliate_master_link'] = $placeholderMasterLink;
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Placeholder challenge not found,return only the affiliate master link placeholder', 
-                    'data' => $responseArray
-                ]);
-            }
-
-            //this code is executed when the user or admin is in the challenge matrix page
-            //and he wants to view and edit the challenge matrix data
-            //if challenge is found then return the challenge data
-
-
-            // First, try to find the specific challenge  that is not placeholder
-            $challenge = $this->challengeService->findChallengeByParams(
-                false,
-                $validatedData['category_id'],
-                $validatedData['step_id'],
-                $validatedData['amount_id'],
-                $brokerId
-            );
-           
-
-            if ($challenge?->id) {
-                // Get the main challenge data
-                $matrix = $this->challengeService->getChallengeMatrixData($challenge->id);
-                $discount = $this->challengeService->findDiscountByChallengeId($challenge->id, $brokerId, $zoneId);
-                $affiliateLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $challenge->id, $brokerId, false, $zoneId);
-                 //get master affiliate link that is not placeholder,so the 4th parameter is false
-                $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-              
-                $responseArray = array_merge($responseArray, [
-                    'challenge_id' => $challenge->id,
-                    'matrix' => $matrix,
-                    'evaluation_cost_discount' => $discount,
-                    'affiliate_link' => $affiliateLink,
-                    'affiliate_master_link' => $affiliateMasterLink
-                ]);
-
-
-                // Check if matrix has empty cells - if so, get placeholder array for matrix cells
-                if ($this->challengeService->hasEmptyMatrixCells($matrix) && $placeholderChallenge?->id) {
-                    $responseArray['matrix_placeholders_array'] = $this->challengeService->getMatrixPlaceholderArray($placeholderChallenge->id, $challenge->id);
-                }
-
-                
-                //if discount and affiliate links are null then get the placeholder data
-                if ($placeholderChallenge?->id) {
-
-                    is_null($discount) && $responseArray['evaluation_cost_discount_placeholder'] = $this->challengeService->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value;
-
-
-                    is_null($affiliateLink) && $responseArray['affiliate_link_placeholder'] =
-                        $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url;
-
-                    is_null($affiliateMasterLink) && $responseArray['affiliate_master_link_placeholder'] =
-                        $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
-                }
-
-            } else {
-
-                $affiliateMasterLinkObiect = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-                //if challenge is not found and we are not in the placeholder page then return only the placeholder data
-                //to be displayed in the challenge matrix page if a cell is empty
-               $affiliateMasterLinkPlaceholder = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
-               $responseArray['affiliate_master_link'] = $affiliateMasterLinkObiect;
-
-               //if the affiliate master link is null then return the placeholder data for it
-               is_null($affiliateMasterLinkObiect) && $responseArray['affiliate_master_link_placeholder'] = $affiliateMasterLinkPlaceholder;
-                
-               if ($placeholderChallenge?->id) {
-                    $responseArray = array_merge($responseArray, [
-                        'challenge_id' => $placeholderChallenge->id,
-                        'matrix' => null,
-                        'matrix_placeholders_array' => $this->challengeService->getMatrixPlaceholderArray($placeholderChallenge->id, null),
-                        'evaluation_cost_discount_placeholder' =>
-                        $this->challengeService->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value,
-
-                        'affiliate_link_placeholder' =>
-                        $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url,
-
-                        'affiliate_master_link_placeholder' =>
-                        $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url,
-
-                    ]);
-                }
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $responseArray
-            ]);
-        }
-       catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve challenge data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
+    
     /**
      * Refactored show method using helper methods from ChallengeService
      */
     public function show(Request $request): JsonResponse
     {
-        
+        //to do
+        //check if the logged in user can view broker challenge data
         try {
-            $validatedData = $this->challengeService->validateGetRequestData($request);
+           // $validatedData = $this->challengeService->validateGetRequestData($request);
+            
+           $validatedData=$request->validate([
+            'category_id' => 'required|integer|exists:challenge_categories,id',
+            'step_id' => 'required|integer|exists:challenge_steps,id',
+            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
+            'is_placeholder' => 'required|boolean',
+            'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
+            'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+        ]);
+            
+           // for placeholder mode, the amount id is null,we return the matrix placeholders array and placeholder data for evaluation cost discount,
+           //  affiliate link and affiliate master link
+           //so in placeholder mode we return only placeholder data useful for admin only to add/edit placeholders
+           //these placeholders are shown in broker's dashboard  challenge page when data is empty
+           $isPlaceholder=$validatedData['is_placeholder']?true:false;
+           $amountId= $isPlaceholder ?null:$validatedData['amount_id'];
+           $brokerId=$validatedData['broker_id'] ?? null;
+           $zoneId = $validatedData['zone_id'] ?? null;
+           $categoryId=$validatedData['category_id'];
+           $stepId=$validatedData['step_id'];
 
-            $brokerId = $validatedData['broker_id'] ?? 1;
-            $zoneId = $validatedData['zone_id'] ?? null;
-            $isPlaceholder = $validatedData['is_placeholder'];
+           //the chalenge row for the current parameters
+           $challenge=  $this->challengeService->findChallengeByParams(
+            $isPlaceholder,
+            $categoryId,
+            $stepId,
+            $amountId,
+            $brokerId,
+            $zoneId
+        );
+        $chId=$challenge?->id??null;
+        $responseData= [];
 
-            if ($isPlaceholder) {
-                //return the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
-                return response()->json($this->challengeService->handlePlaceholderRequest($validatedData, $brokerId, $zoneId));
-            }
+        $matrix = $chId?$this->challengeService->getChallengeMatrixData($chId):null;
+        $discount = $chId?$this->challengeService->findDiscountByChallengeId($chId, $brokerId):null;
+        $affiliateLink = $chId?$this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, $isPlaceholder,  $zoneId):null;
+        $affiliateMasterLink = $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
+        $responseData = [
+            'challenge_id' => $chId,
+            'matrix' => $matrix,
+            'evaluation_cost_discount' => $discount,
+            'affiliate_link' => $affiliateLink,
+            'affiliate_master_link' => $affiliateMasterLink
+        ];
+        if(!$isPlaceholder){
+            //if not placeholder mode, add the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+            $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => array_filter($responseData, fn($v) => $v !== null)
+        ]);
+        // if ($validatedData['is_placeholder']) {
 
+            //     $responseData= [
+            //         'challenge_id' => $chId,
+            //         'matrix' => $chId?$this->challengeService->getChallengeMatrixData($chId):null,
+            //         'evaluation_cost_discount' => $chId?$this->challengeService->findDiscountByChallengeId($chId, $brokerId):null,
+            //         'affiliate_link' => $chId?$this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, true,  $zoneId):null,
+            //         'affiliate_master_link' => $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)
+            //     ];
+               
+            //     //return the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+            //     //return response()->json($this->challengeService->handlePlaceholderRequest($validatedData));
+            // }else{
+            //     $responseData = [
+            //         'challenge_id' => $chId,
+            //         'matrix' => $chId?$this->challengeService->getChallengeMatrixData($chId):null,
+            //         'evaluation_cost_discount' => $chId?$this->challengeService->findDiscountByChallengeId($chId, $brokerId, $zoneId):null,
+            //         'affiliate_link' => $chId?$this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, false, $zoneId):null,
+            //         'affiliate_master_link' => $this->challengeService->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId)
+            //     ];   
+            //     $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
+
+            // }
+            // return response()->json([
+            //     'success' => true,
+            //     'data' => array_filter($responseData, fn($v) => $v !== null)
+            // ]);
             //return the regular challenge data for challenge matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
-            return response()->json($this->challengeService->handleRegularChallengeRequest($validatedData, $brokerId, $zoneId));
+            //return response()->json($this->challengeService->handleRegularChallengeRequest($validatedData));
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -235,18 +138,7 @@ class ChallengeController extends Controller
     }
 
     
-    /**
-     * =========== DEPRECATED FUNCTION =================
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): JsonResponse
-    {
-        return response()->json([
-            'success' => false,
-            'message' => 'Deprecated function',
-            'error' => 'This function is deprecated'
-        ], 400);
-    }
+    
 
     /**
      * @OA\Get(
@@ -322,13 +214,7 @@ class ChallengeController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('brokers::create');
-    }
+   
 
     /**
      * Store a newly created resource in storage.
@@ -337,7 +223,7 @@ class ChallengeController extends Controller
     {
         try { 
             $validatedData = $this->challengeService->validatePostRequestData($request);
-            $brokerId = $validatedData['broker_id'];
+            $brokerId = $validatedData['broker_id']??null;
             $zoneId = $validatedData['zone_id'] ?? null;
             $isAdmin = $validatedData['is_admin'] ?? null;
             $isPlaceholder = $validatedData['is_placeholder'];
@@ -365,28 +251,5 @@ class ChallengeController extends Controller
     }
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('brokers::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        // Implementation for updating challenge category
-        return redirect()->back();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        // Implementation for deleting challenge category
-    }
+    
 }

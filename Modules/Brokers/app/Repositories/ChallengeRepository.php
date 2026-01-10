@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Collection;
 class ChallengeRepository
 {
     protected Challenge $model;
+    const ZONE_ID_NULL = null;
+    const BROKER_ID_NULL = null;
+    const AMOUNT_ID_NULL = null;
 
     public function __construct(Challenge $model)
     {
@@ -75,9 +78,9 @@ class ChallengeRepository
      * @param int $challengeId
      * @return void
      */
-    public function deleteChallengeMatrixValues(int $challengeId,?int $zoneId=null): void
+    public function deleteChallengeMatrixValues(int $challengeId): void
     {
-        ChallengeMatrixValue::where('challenge_id', $challengeId)->where('zone_id', $zoneId)->delete();
+        ChallengeMatrixValue::where('challenge_id', $challengeId)->delete();
     }
 
     /**
@@ -102,13 +105,25 @@ class ChallengeRepository
      * @param int $brokerId
      * @return Challenge|null
      */
-    public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, int $brokerId): ?Challenge
+    public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null,?int $zoneId = null): ?Challenge
     {
-        return $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
+        $qb= $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
             ->where('challenge_category_id', $categoryId)
-            ->where('challenge_step_id', $stepId)
-            ->where('challenge_amount_id', $amountId)
-            ->where('broker_id', $brokerId)
-            ->first();
+            ->where('challenge_step_id', $stepId);
+
+            if(isset($zoneId)){
+                $qb->where('zone_id', $zoneId);
+            }else{
+                $qb->whereNull('zone_id');
+            }
+
+            if(isset($brokerId) ){
+                $qb->where('broker_id', $brokerId);
+            }
+
+            if(isset($amountId) ){
+                $qb->where('challenge_amount_id', $amountId);
+            }
+            return $qb->first();
     }
 }

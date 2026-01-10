@@ -17,8 +17,10 @@ return new class extends Migration
             $table->string('public_value')->nullable();
             $table->string('previous_value')->nullable();
             $table->boolean('is_updated_entry')->default(false);
-            $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
-            $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
+            $table->boolean('is_placeholder')->default(false);
+            //FOR PLACEHOLDER DATA, BROKER ID AND ZONE ID ARE NULL
+            $table->foreignId('broker_id')->constrained('brokers')->nullable()->onDelete('cascade');
+            $table->foreignId('zone_id')->constrained('zones')->nullable()->nullOnDelete();
             $table->foreignId('challenge_id')->constrained('challenges')->onDelete('cascade');
             $table->timestamps();
         });

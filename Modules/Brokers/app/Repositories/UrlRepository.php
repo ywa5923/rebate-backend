@@ -137,7 +137,7 @@ class UrlRepository
      * @param int|null $zoneId
      * @return Url|null
      */
-    public function findByUrlableTypeAndId($urlableType, $urlableId, $brokerId,$isPlaceholder, $zoneId = null): ?Url
+    public function findByUrlableTypeAndId($urlableType, ?int $urlableId, ?int $brokerId, bool $isPlaceholder = false, ?int $zoneId = null): ?Url
     {
        $qb= $this->model->newQuery()->where('urlable_type', $urlableType);
       
@@ -148,6 +148,8 @@ class UrlRepository
        }
        if(isset($brokerId)){
         $qb->where('broker_id', $brokerId);
+       }else{
+        $qb->whereNull('broker_id');
        }
        if(isset($zoneId)){
         $qb->where('zone_id', $zoneId);
@@ -216,7 +218,7 @@ class UrlRepository
         ?int $challengeId = null, 
         string|null $affiliateLink, 
         string $affiliateLinkName, 
-        int $brokerId, 
+        ?int $brokerId, 
         ?bool $isAdmin = null,
         ?bool $isPlaceholder = false,
         ?int $zoneId = null,
