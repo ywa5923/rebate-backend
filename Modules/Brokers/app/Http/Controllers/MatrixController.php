@@ -3,19 +3,16 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Modules\Brokers\Models\MatrixHeader;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Brokers\Transformers\MatrixHeaderResource;
 use Modules\Brokers\Services\MatrixHeadearsQueryParser;
 use Modules\Brokers\Repositories\MatrixHeaderRepository;
-use Modules\Brokers\Models\Matrix;
-use Modules\Brokers\Models\MatrixDimension;
-use Modules\Brokers\Models\MatrixValue;
-use Modules\Brokers\Models\MatrixHeaderOption;
+
 use Illuminate\Support\Str;
 use Modules\Brokers\Services\MatrixService;
 use Illuminate\Support\Facades\Validator;
@@ -226,47 +223,6 @@ class MatrixController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('brokers::create');
-    }
-
-
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('brokers::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('brokers::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): void
-    {
-        // return redirect()->back();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
-    }
 
     /**
      * Generate a unique matrix header slug

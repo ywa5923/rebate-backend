@@ -6,6 +6,8 @@ use Modules\Brokers\Repositories\ChallengeCategoryRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\ChallengeCategory;
 
@@ -21,7 +23,7 @@ class ChallengeCategoryService
     /**
      * Get paginated challenge categories with filters
      */
-    public function getChallengeCategories(Request $request)
+    public function getChallengeCategories(Request $request): LengthAwarePaginator|Collection
     {
        
       return $this->repository->getChallengeCategories($request);
