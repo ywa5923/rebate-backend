@@ -47,6 +47,7 @@ class ChallengeService
             'evaluation_cost_discount' => 'sometimes|nullable|string',
             'affiliate_link' => 'sometimes|nullable|string',
             'affiliate_master_link' => 'sometimes|nullable|string',
+           
         ]);
     }
 
@@ -84,7 +85,7 @@ class ChallengeService
             //check if challenge already exists
             //if it exist delete it
             $challenge = $this->challengeRepository->exists((int)$validatedData['is_placeholder'], $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
-            
+           
             if (!$challenge) {
 
                 //create a new challenge if it does not exist even in placeholder mode
@@ -137,10 +138,7 @@ class ChallengeService
             // Create challenge
             DB::commit();
 
-            return [
-                'success' => true,
-                'challenge_id' => $challenge->id
-            ];
+            return ['challenge_id' => $challenge->id];
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -659,5 +657,20 @@ class ChallengeService
             }
         }
         return $placeholders;
+    }
+
+    public function getChallengeData(?int $chId, ?int $brokerId, bool $isPlaceholder, ?int $zoneId): array
+    {
+        $matrix = $chId?$this->getChallengeMatrixData($chId):null;
+        $discount = $chId?$this->findDiscountByChallengeId($chId, $brokerId):null;
+        $affiliateLink = $chId?$this->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, $isPlaceholder,  $zoneId):null;
+        $affiliateMasterLink = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
+        return [
+            'challenge_id' => $chId,
+            'matrix' => $matrix,
+            'evaluation_cost_discount' => $discount,
+            'affiliate_link' => $affiliateLink,
+            'affiliate_master_link' => $affiliateMasterLink
+        ];
     }
 }

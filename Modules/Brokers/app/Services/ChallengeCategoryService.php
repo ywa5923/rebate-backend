@@ -21,31 +21,11 @@ class ChallengeCategoryService
     /**
      * Get paginated challenge categories with filters
      */
-    public function getChallengeCategories(Request $request): array
+    public function getChallengeCategories(Request $request)
     {
-        try {
-            $challengeCategories = $this->repository->getChallengeCategories($request);
+       
+      return $this->repository->getChallengeCategories($request);
 
-            $response = [
-                'success' => true,
-                'data' => $challengeCategories,
-            ];
-
-            if ($request->has('per_page')) {
-                $response['pagination'] = [
-                    'current_page' => $challengeCategories->currentPage(),
-                    'last_page' => $challengeCategories->lastPage(),
-                    'per_page' => $challengeCategories->perPage(),
-                    'total' => $challengeCategories->total(),
-                ];
-            }
-
-            return $response;
-
-        } catch (\Exception $e) {
-            Log::error('ChallengeCategoryService getChallengeCategories error: ' . $e->getMessage());
-            throw $e;
-        }
     }
 
     /**

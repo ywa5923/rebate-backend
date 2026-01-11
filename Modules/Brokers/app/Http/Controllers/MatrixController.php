@@ -32,6 +32,8 @@ class MatrixController extends Controller
 
     public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
     {
+       
+       try {
         $queryParser->parse($request);
         // dd( $queryParser->getWhereParams());
 
@@ -60,10 +62,22 @@ class MatrixController extends Controller
         );
 
 
-        return [
-            'columnHeaders' => MatrixHeaderResource::collection($columnHeaders),
-            'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
-        ];
+        return response()->json([
+            'success'=>true,
+            'data'=>[
+                'columnHeaders' => MatrixHeaderResource::collection($columnHeaders),
+                'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
+            ]
+        ]);
+        
+       } catch (\Exception $e) {
+        return response()->json([
+            'success'=>false,
+            'message' => 'Failed to get headers',
+            'error' => $e->getMessage()
+        ], 500);
+       }
+       
     }
 
 
