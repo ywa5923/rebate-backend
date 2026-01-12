@@ -326,6 +326,7 @@ class ChallengeService
 
             foreach ($rowValues as $value) {
                 $row[] = [
+                    'id'=>$value->id,
                     'previous_value' => json_decode($value->previous_value, true) ?: [],
                     'value' => json_decode($value->value, true) ?: [],
                     'public_value' => json_decode($value->public_value, true) ?: [],

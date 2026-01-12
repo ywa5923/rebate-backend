@@ -220,6 +220,7 @@ class ChallengeController extends Controller
             $processResult = $this->challengeService->processRequest($validatedData, $brokerId, $isPlaceholder, $isAdmin,$zoneId);
 
             $responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $brokerId, $isPlaceholder, $zoneId);
+            
             $responseData['category_id']=$validatedData['category_id'];
             $responseData['step_id']=$validatedData['step_id'];
             $responseData['amount_id']=$validatedData['amount_id']??null;

@@ -33,8 +33,8 @@ class MagicImport extends Command
         // $this->call('app:export-urls');
         // $this->call('app:export-dynamic-options');
 
-        // $this->info("====...switching to new database...====");
-        // DB::statement("use fxrebate");
+        $this->info("====...switching to new database...====");
+         DB::statement("use fxrebate");
 
         $this->info("\\\\///...importing brokers to new database");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\StaticBrokersSeeder"]);
@@ -101,9 +101,6 @@ class MagicImport extends Command
         $this->info("\\\\///...importing challenge categories");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ChallengeSeeder"]);
         
-
-
-    
 
     }
 }

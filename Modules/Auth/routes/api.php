@@ -2,13 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Modules\Auth\Http\Controllers\AuthenticatedSessionController;
 use Modules\Auth\Http\Controllers\ApiAuthController;
-use Modules\Auth\Http\Controllers\EmailVerificationNotificationController;
-use Modules\Auth\Http\Controllers\NewPasswordController;
-use Modules\Auth\Http\Controllers\PasswordResetLinkController;
-use Modules\Auth\Http\Controllers\RegisteredUserController;
-use Modules\Auth\Http\Controllers\VerifyEmailController;
 use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 use Modules\Auth\Http\Controllers\PlatformUserController;
 use Modules\Auth\Http\Controllers\UserPermissionController;
@@ -24,7 +18,7 @@ Route::group([], function () {
     Route::get('/broker-default-team/{brokerId}', [BrokerTeamUserController::class, 'getBrokerDefaultTeam']);
     
     // Get available broker types
-    Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
+   # Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
     
     // Platform users CRUD
     Route::get('platform-users/form-config', [PlatformUserController::class, 'getFormConfig']);
@@ -46,54 +40,6 @@ Route::group([], function () {
     Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLinkToken']);
 
     
-   
-    
-    // Platform user magic link authentication
-    Route::post('/platform-user/magic-link/send', [ApiAuthController::class, 'sendPlatformUserMagicLink']);
-    
-   
-    
-    // Team management
-    Route::post('/teams', [ApiAuthController::class, 'createTeam']);
-    Route::get('/teams', [ApiAuthController::class, 'getBrokerTeams']);
-    Route::post('/team-users', [ApiAuthController::class, 'createTeamUser']);
-    Route::get('/team-users', [ApiAuthController::class, 'getTeamUsers']);
-    Route::post('/team-users/magic-link', [ApiAuthController::class, 'sendTeamUserMagicLink']);
-    Route::get('/team-roles-permissions', [ApiAuthController::class, 'getTeamRolesAndPermissions']);
-    
-    // Resource permission management
-    Route::post('/resource-permissions', [ApiAuthController::class, 'createResourcePermission']);
-    Route::get('/team-users/{teamUserId}/resource-permissions', [ApiAuthController::class, 'getResourcePermissions']);
-    Route::put('/resource-permissions/{permissionId}', [ApiAuthController::class, 'updateResourcePermission']);
-    Route::delete('/resource-permissions/{permissionId}', [ApiAuthController::class, 'deleteResourcePermission']);
-    Route::patch('/resource-permissions/{permissionId}/toggle', [ApiAuthController::class, 'togglePermissionActive']);
-    Route::get('/team-users/{teamUserId}/permission-stats', [ApiAuthController::class, 'getPermissionStats']);
-    
-    // Specific permission assignments
-    Route::post('/assign-broker-permission', [ApiAuthController::class, 'assignBrokerPermission']);
-    Route::post('/assign-country-permission', [ApiAuthController::class, 'assignCountryPermission']);
-    Route::post('/assign-zone-permission', [ApiAuthController::class, 'assignZonePermission']);
-    
-    // Permission options
-    Route::get('/permission-options', [ApiAuthController::class, 'getPermissionOptions']);
-    
-    // Super Admin functions (should be protected with super admin middleware)
-    Route::prefix('super-admin')->group(function () {
-        // Country management
-        Route::post('/assign-country-management', [ApiAuthController::class, 'assignCountryManagement']);
-        Route::post('/revoke-country-management', [ApiAuthController::class, 'revokeCountryManagement']);
-        Route::post('/bulk-assign-country-management', [ApiAuthController::class, 'bulkAssignCountryManagement']);
-        
-        // Zone management
-        Route::post('/assign-zone-management', [ApiAuthController::class, 'assignZoneManagement']);
-        
-        // Global broker management
-        Route::post('/assign-global-broker-management', [ApiAuthController::class, 'assignGlobalBrokerManagement']);
-        
-        // Management queries
-        Route::get('/team-users/{teamUserId}/manageable-brokers', [ApiAuthController::class, 'getManageableBrokers']);
-        Route::get('/team-users/{teamUserId}/management-stats', [ApiAuthController::class, 'getManagementStats']);
-    });
 });
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -127,7 +73,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
             })->toArray();
             } elseif ( $user instanceof \Modules\Auth\Models\PlatformUser) {
             $userData['user_type'] = 'platform_user';
-            //$userData['role'] = $user->role;
+            $userData['role'] = $user->role;
 
             
             $userData['permissions'] = $user->resourcePermissions->map(function($permission) {

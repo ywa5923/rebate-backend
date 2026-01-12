@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 use Modules\Auth\Mail\MagicLinkMail;
+use Modules\Auth\Enums\AuthUser;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class MagicLinkService
 {
@@ -24,6 +26,7 @@ class MagicLinkService
 
    
     /**
+     * ===> Deprecated: Use createMagicLink instead.
      * Generate a magic link for a team user.
      */
     public function generateForTeamUser(BrokerTeamUser $teamUser, string $action = 'login', array $metadata = [], int $expirationHours = 24): MagicLink
@@ -48,6 +51,10 @@ class MagicLinkService
         ]);
     }
 
+    /**
+     * ===> Deprecated: Mail is sent in the controller instead.
+     * Send a magic link to a broker team user.
+     */
     public function sendMagicLinkToBrokerTeamUser(BrokerTeamUser $brokerTeamUser, string $action = 'login', int $expirationHours = 24): MagicLink
     {
         $magicLink = $this->generateForTeamUser($brokerTeamUser, $action, [], $expirationHours);
@@ -55,6 +62,52 @@ class MagicLinkService
         return $magicLink;
     }
 
+    
+
+    /**
+     * Create a magic link for a user.
+     * @param AuthUser $authUserType
+     * @param Authenticatable $userObject
+     * @param string $action
+     * @param array $metadata
+     * @param int $expirationHours
+     * @return MagicLink
+     * @throws \Exception
+     */
+    public function createMagicLink(AuthUser $authUserType, Authenticatable $userObject,string $action = 'login', array $metadata = [],int $expirationHours = 24): MagicLink
+    {
+        $subjectType = null;
+        $contextBrokerId = null;
+        if ($authUserType === AuthUser::BROKER_TEAM_USER) {
+            $subjectType = BrokerTeamUser::class;
+            $contextBrokerId = $userObject->team->broker_id;
+        } elseif ($authUserType === AuthUser::PLATFORM_USER) {
+            $subjectType = PlatformUser::class;
+           
+        }
+
+        $this->cleanupExpiredTokensForTeamUser($userObject->id);
+
+        $token = $this->generateUniqueToken();
+        $expiresAt = now()->addHours($expirationHours);
+
+        return $this->repository->create([
+            'token' => $token,
+            'subject_type' => $subjectType,
+            'subject_id' => $userObject->id,
+            'context_broker_id' => $contextBrokerId,
+            'email' => $userObject->email,
+            'action' => $action,
+            'metadata' => $metadata,
+            'expires_at' => $expiresAt,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * ===> Deprecated: Mail is sent in the controller instead.
+     */
     public function sendMagicLinkToPlatformUser(PlatformUser $platformUser, string $action = 'login', int $expirationHours = 24): MagicLink
     {
         $magicLink = $this->generateForPlatformUser($platformUser, $action, [], $expirationHours);
@@ -63,6 +116,7 @@ class MagicLinkService
     }
 
     /**
+     * ===> Deprecated: Use createMagicLink instead.
      * Generate a magic link for a platform user.
      */
     public function generateForPlatformUser(PlatformUser $platformUser, string $action = 'login', array $metadata = [], int $expirationHours = 24, ?int $contextBrokerId = null): MagicLink
