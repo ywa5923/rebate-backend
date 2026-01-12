@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('brokers', function (Blueprint $table) {
             $table->id();
-           
             $table->string('registration_language',50)->nullable();
             $table->string("registration_zone",50)->nullable();
             $table->boolean("is_active")->default(true);

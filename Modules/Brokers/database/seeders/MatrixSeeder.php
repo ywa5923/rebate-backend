@@ -33,7 +33,7 @@ class MatrixSeeder extends Seeder
             'is_invariant'=>true,
             'parent_id'=>null,
             'form_type_id'=>1,
-            'broker_id'=>1,
+            'broker_id'=>null,
         ],[
             'id'=>2,
             'matrix_id'=>1,
@@ -56,7 +56,7 @@ class MatrixSeeder extends Seeder
                 'is_invariant'=>true,
                 'parent_id'=>null,
                 'form_type_id'=>3,
-                'broker_id'=>2,
+                'broker_id'=>null,
             ],
             [
                 'id'=>4,
@@ -68,7 +68,7 @@ class MatrixSeeder extends Seeder
                 'is_invariant'=>true,
                 'parent_id'=>null,
                 'form_type_id'=>1,
-                'broker_id'=>1,
+                'broker_id'=>null,
             ],
             [
                 'id'=>5,
