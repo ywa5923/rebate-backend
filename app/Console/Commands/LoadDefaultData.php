@@ -27,6 +27,19 @@ class LoadDefaultData extends Command
     public function handle()
     {
         DB::statement("use fxrebate");
+        $this->info("\\\\///...importing Option Categories");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
+
+        $this->info("\\\\///...importing URLs ");
+       // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
+
+        $this->info("\\\\///...importing broker_options ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+
+         
+        $this->info("\\\\///...importing broker_types ");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\BrokerTypesSeeder"]);
+
         $this->info("\\\\///...importing settings table ");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\SettingsSeeder"]);
 
