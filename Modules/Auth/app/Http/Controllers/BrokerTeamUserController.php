@@ -52,14 +52,26 @@ class BrokerTeamUserController extends Controller
             $broker = DB::transaction(function () use ($request) {
 
                 $data = $request->validated();
+               
+
+                //insert broker option value trading_name
+                //get the trading name option
+               
+                $exists = OptionValue::where('optionable_type', Broker::class)
+                ->where('option_slug', 'trading_name')
+                ->where('value', $data['trading_name'])
+                ->first();
+                if($exists) {
+                    throw new \Exception('Trading name already exists');
+                }
+
                 $broker = Broker::create([
                     'broker_type_id' => $data['broker_type_id'],
                     'country_id' => $data['country_id'],
                 ]);
-
-                //insert broker option value trading_name
-                //get the trading name option
                 $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
+                //check if the trading name exists in the option values
+                
                 OptionValue::create([
                     'optionable_type' => Broker::class,
                     'optionable_id' => $broker->id,

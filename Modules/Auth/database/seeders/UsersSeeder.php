@@ -5,7 +5,7 @@ namespace Modules\Auth\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Auth\Models\PlatformUser;
 use Modules\Auth\Models\UserPermission;
-use Modules\Auth\Enums\AuthPermission;
+
 use Modules\Auth\Enums\AuthAction;
 
 class UsersSeeder extends Seeder
@@ -30,7 +30,7 @@ class UsersSeeder extends Seeder
             'is_active'       => true,
         ]);
         $user2 = PlatformUser::create([
-            'name' => 'Ion Ivan',
+            'name' => 'Felix',
             'email' => 'felix@websynergy.ro',
             'role' => 'super-admin',
             'is_active' => true,
@@ -46,7 +46,7 @@ class UsersSeeder extends Seeder
 
         $user3 = PlatformUser::create([
             'name' => 'Ion Ivan',
-            'email' => 'ionivan1043@gmail.com',
+            'email' => 'ionivan10@gmail.com',
             'role' => 'super-admin',
             'is_active' => true,
         ]);

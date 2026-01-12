@@ -18,7 +18,7 @@ class SetIsAdminFlag
     {
         if (App::environment('local')) {
             //$isAdmin = true; // or false, depending on your test case
-            $isAdmin =true;
+            $isAdmin =false;
         } else {
             //TODO: Implement the logic to check if the user is an admin
            // $isAdmin = Auth::check() && Auth::user()->is_admin; // Adjust to match your DB field
