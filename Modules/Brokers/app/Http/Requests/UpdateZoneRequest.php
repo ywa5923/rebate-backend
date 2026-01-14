@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Forms\ZoneForm;
+use App\Forms\Form;
 class UpdateZoneRequest extends BaseRequest
 {
     protected function tableConfigClass(): ?string
@@ -33,9 +34,21 @@ class UpdateZoneRequest extends BaseRequest
     {
         $zoneId = $this->route('zone'); // Get zone ID from route parameter (apiResource uses singular name)
         $formConfig = $this->getFormConfig();
-        $constraints = $formConfig?->getFormConstraints() ?? [];
+        $constraints = $formConfig?->getFormConstraints(Form::MODE_UPDATE, $zoneId) ?? [];
+
+       
         return $constraints;
-      
+        // return [
+        //     'name' => 'sometimes|required|string|max:255',
+        //     'zone_code' => [
+        //         'sometimes',
+        //         'required',
+        //         'string',
+        //         'max:100',
+        //         Rule::unique('zones', 'zone_code')->ignore($zoneId),
+        //     ],
+        //     'description' => 'nullable|string|max:1000',
+        // ];
     }
 
     /**

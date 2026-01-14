@@ -11,7 +11,7 @@ abstract class Form implements FormConfigInterface
     public const MODE_CREATE = 'create';
     public const MODE_UPDATE = 'update';
 
-    public function getFormConstraints($mode = self::MODE_CREATE): array
+    public function getFormConstraints($mode = self::MODE_CREATE,?int $itemId = null): array
     {
         $constraints = [];
         foreach ($this->getFormData()['sections'] as $section) {
@@ -26,19 +26,19 @@ abstract class Form implements FormConfigInterface
                     //'options.*.value' => 'required|string|max:255',
                     //'options.*.order' => 'nullable|integer|min:0',
 
-                    $constraints[$key] = $this->getValidationString($field);
+                    $constraints[$key] = $this->getValidationString($field, $mode, $itemId);
                     foreach ($field['fields'] as $subFieldKey => $subField) {
-                        $constraints[$key . '.*.' . $subFieldKey] = $this->getValidationString($subField);
+                        $constraints[$key . '.*.' . $subFieldKey] = $this->getValidationString($subField, $mode, $itemId);
                     }
                 } else {
-                    $constraints[$key] = $this->getValidationString($field);
+                    $constraints[$key] = $this->getValidationString($field, $mode, $itemId);
                 }
             } //end foreach
         } //end foreach
         return $constraints;
     }
 
-    public function getValidationString(array $field): string
+    public function getValidationString(array $field,$mode,?int $itemId = null): string
     {
 
         $validationString = "";
@@ -67,7 +67,7 @@ abstract class Form implements FormConfigInterface
             if($rule == 'sometimes' && $value == true) {
                 $validationString .= "sometimes|";
             }
-            
+
             if ($rule == 'nullable' && $value == true) {
                 $validationString .= "nullable|";
             }
@@ -85,7 +85,12 @@ abstract class Form implements FormConfigInterface
             } else if ($rule == 'exists' && is_string($value)) {
                 $validationString .= "exists:" . $value . "|";
             } else if ($rule == 'unique' && is_string($value)) {
-                $validationString .= "unique:" . $value . "|";
+                if($itemId && is_numeric($itemId) && self::MODE_UPDATE == $mode) {
+                    $validationString .= "unique:" . $value . "," . $itemId . ",id|";
+                } else {
+                    $validationString .= "unique:" . $value . "|";
+                }
+               // $validationString .= "unique:" . $value . "|";
             }
         }
         return rtrim($validationString, "|");

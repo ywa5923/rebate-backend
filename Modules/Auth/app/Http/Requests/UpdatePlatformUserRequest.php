@@ -3,8 +3,8 @@
 namespace Modules\Auth\Http\Requests;
 
 use App\Http\Requests\BaseRequest;
-use Illuminate\Validation\Rule;
 use Modules\Auth\Forms\PlatformUserForm;
+use App\Forms\Form;
 class UpdatePlatformUserRequest extends BaseRequest
 {
     protected function formConfigClass(): string
@@ -31,9 +31,8 @@ class UpdatePlatformUserRequest extends BaseRequest
     public function rules(): array
     {
         $userId = $this->route('platform_user');
-
         $formConfig = $this->getFormConfig();
-        $constraints = $formConfig?->getFormConstraints() ?? [];
+        $constraints = $formConfig?->getFormConstraints(Form::MODE_UPDATE, $userId) ?? [];
        
         return $constraints;
        

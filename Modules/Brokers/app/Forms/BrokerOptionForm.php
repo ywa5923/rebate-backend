@@ -19,7 +19,7 @@ class BrokerOptionForm extends Form
                     'label' => 'Definitions',
                     'fields' => [
                         'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'slug' => Field::text('Slug', ['required'=>true, 'min'=>3, 'max'=>100]),
+                        'slug' => Field::text('Slug', ['required'=>true, 'min'=>3, 'max'=>100,'unique'=>'broker_options,slug']),
                     ],
                 ],
                 'form_settings' => [

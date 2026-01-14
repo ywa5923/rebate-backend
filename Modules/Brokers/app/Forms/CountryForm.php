@@ -19,7 +19,7 @@ class CountryForm extends Form
                     'label' => 'CountryDefinitions',
                     'fields' => [
                         'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'country_code' => Field::text('Slug', ['required'=>true, 'min'=>2, 'max'=>10]),
+                        'country_code' => Field::text('Country Code', ['required'=>true, 'min'=>2, 'max'=>10,'unique'=>'countries,country_code']),
                         'zone_id' => Field::select('Zone', $this->getZones(),['required'=>true,'exists'=>'zones,id']),
                     ]
                     

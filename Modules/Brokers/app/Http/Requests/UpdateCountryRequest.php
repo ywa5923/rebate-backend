@@ -2,10 +2,10 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+
 use Modules\Brokers\Forms\CountryForm;
 use App\Http\Requests\BaseRequest;
+use App\Forms\Form;
 class UpdateCountryRequest extends BaseRequest
 {
     protected function tableConfigClass(): ?string
@@ -32,8 +32,9 @@ class UpdateCountryRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $countryId = $this->route('country'); // Get country ID from route parameter (apiResource uses singular name)
         $formConfig = $this->getFormConfig();
-        $constraints = $formConfig?->getFormConstraints() ?? [];
+        $constraints = $formConfig?->getFormConstraints(Form::MODE_UPDATE, $countryId) ?? [];
        
         return $constraints;
         // $countryId = $this->route('country'); // Get country ID from route parameter (apiResource uses singular name)

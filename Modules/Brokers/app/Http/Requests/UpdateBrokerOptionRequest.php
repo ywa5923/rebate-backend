@@ -3,6 +3,7 @@
 namespace Modules\Brokers\Http\Requests;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Forms\BrokerOptionForm;
+use App\Forms\Form;
 class UpdateBrokerOptionRequest extends BaseRequest
 {
 
@@ -29,9 +30,9 @@ class UpdateBrokerOptionRequest extends BaseRequest
      */
     public function rules(): array
     {
-        //$brokerOptionId = $this->route('id');
+        $brokerOptionId = $this->route('id');
         $formConfig = $this->getFormConfig();
-        $constraints = $formConfig?->getFormConstraints() ?? [];
+        $constraints = $formConfig?->getFormConstraints(Form::MODE_UPDATE, $brokerOptionId) ?? [];
       
        //dd($constraints);
         return $constraints;
