@@ -7,6 +7,7 @@ use App\Forms\Form;
 use App\Forms\Field;
 
 use Modules\Auth\Models\PlatformUser;
+use Modules\Auth\Enums\AuthRole;
 class PlatformUserForm extends Form
 {
     
@@ -42,13 +43,21 @@ class PlatformUserForm extends Form
 
     private function getRoles(): array
     {
-        return [
-            ['value' => 'global_admin', 'label' => 'Global Admin'],
-            ['value' => 'country_admin', 'label' => 'Country Admin'],
-            ['value' => 'broker_admin', 'label' => 'Broker Admin'],
-            ['value' => 'seo', 'label' => 'SEO'],
-            ['value' => 'translator', 'label' => 'Translator'],
-        ];
+        // return [
+        //     ['value' => 'super-admin', 'label' => 'Super Admin'],
+        //     ['value' => 'country_admin', 'label' => 'Country Admin'],
+        //     ['value' => 'broker_admin', 'label' => 'Broker Admin'],
+        //     ['value' => 'seo', 'label' => 'SEO'],
+        //     ['value' => 'translator', 'label' => 'Translator'],
+        // ];
+       
+            $roles = AuthRole::cases();
+            return array_map(function ($role) {
+                return ['value' => $role->value, 'label' => ucfirst($role->value.' Role')];
+            }, $roles);
+    
+            
+        
     }
 
     // private function getBrokerTypes(): array

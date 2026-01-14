@@ -4,9 +4,18 @@ namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
-class UpdateZoneRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Modules\Brokers\Forms\ZoneForm;
+class UpdateZoneRequest extends BaseRequest
 {
+    protected function tableConfigClass(): ?string
+    {
+        return null;
+    }
+    protected function formConfigClass(): ?string
+    {
+        return ZoneForm::class;
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,18 +32,10 @@ class UpdateZoneRequest extends FormRequest
     public function rules(): array
     {
         $zoneId = $this->route('zone'); // Get zone ID from route parameter (apiResource uses singular name)
-        
-        return [
-            'name' => 'sometimes|required|string|max:255',
-            'zone_code' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('zones', 'zone_code')->ignore($zoneId),
-            ],
-            'description' => 'nullable|string|max:1000',
-        ];
+        $formConfig = $this->getFormConfig();
+        $constraints = $formConfig?->getFormConstraints() ?? [];
+        return $constraints;
+      
     }
 
     /**

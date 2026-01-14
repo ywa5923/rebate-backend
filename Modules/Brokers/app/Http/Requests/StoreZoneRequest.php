@@ -2,7 +2,7 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Forms\ZoneForm;
 class StoreZoneRequest extends BaseRequest
@@ -32,6 +32,7 @@ class StoreZoneRequest extends BaseRequest
     {
         $formConfig = $this->getFormConfig();
         $constraints = $formConfig?->getFormConstraints() ?? [];
+     
         return $constraints;
     }
 

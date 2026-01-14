@@ -21,12 +21,10 @@ class ZoneForm extends Form
                     'label' => 'Country Definitions',
                     'fields' => [
                         'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'zone_code' => Field::text('Zone Code', ['required'=>true, 'min'=>2, 'max'=>10]),
+                        'zone_code' => Field::text('Zone Code', ['required'=>true, 'min'=>2, 'max'=>10, 'unique'=>'zones,zone_code']),
                         'description' => Field::text('Description', ['required'=>false, 'min'=>0, 'max'=>255])
                     ]
-                    
-                    ]
-                
+                ]
             ]
         ];
     }

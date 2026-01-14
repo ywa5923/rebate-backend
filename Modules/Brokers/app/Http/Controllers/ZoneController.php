@@ -118,6 +118,7 @@ class ZoneController extends Controller
      */
     public function store(StoreZoneRequest $request): JsonResponse
     {
+        
         try {
             $zone = $this->zoneService->createZone($request->validated());
             
@@ -144,6 +145,7 @@ class ZoneController extends Controller
      */
     public function update(UpdateZoneRequest $request, int $id): JsonResponse
     {
+      
         try {
             $zone = $this->zoneService->updateZone($id, $request->validated());
             

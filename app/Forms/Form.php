@@ -60,7 +60,14 @@ abstract class Form implements FormConfigInterface
 
             if ($rule == 'required' && $value == true) {
                 $validationString .= "required|";
+            }else if($rule == 'required' && $value == false) {
+                $validationString .= "nullable|";
             }
+
+            if($rule == 'sometimes' && $value == true) {
+                $validationString .= "sometimes|";
+            }
+            
             if ($rule == 'nullable' && $value == true) {
                 $validationString .= "nullable|";
             }
