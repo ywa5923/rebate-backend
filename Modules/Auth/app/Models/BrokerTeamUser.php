@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class BrokerTeamUser extends Authenticatable
 {
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens, AuthUserTrait;
 
     protected $fillable = [
         'broker_team_id',
@@ -60,24 +60,24 @@ class BrokerTeamUser extends Authenticatable
             ->through('team');
     }
 
-    /**
-     * Deprecated: Get magic links for this user.
-     */
-    public function magicLinksBuilder(): HasMany
-    {
-        return $this->hasMany(MagicLink::class, 'subject_id')
-                    ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
-    }
+    // /**
+    //  * Deprecated: Get magic links for this user.
+    //  */
+    // public function magicLinksBuilder(): HasMany
+    // {
+    //     return $this->hasMany(MagicLink::class, 'subject_id')
+    //                 ->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser');
+    // }
 
-    /**
-     * Get magic links for this user.
-     * @return MorphMany
-     * @throws \Exception
-     */
-    public function magicLinks(): MorphMany
-    {
-        return $this->morphMany(MagicLink::class, 'subject');
-    }
+    // /**
+    //  * Get magic links for this user.
+    //  * @return MorphMany
+    //  * @throws \Exception
+    //  */
+    // public function magicLinks(): MorphMany
+    // {
+    //     return $this->morphMany(MagicLink::class, 'subject');
+    // }
 
     /**
      * Get resource permissions for this user.
@@ -160,10 +160,10 @@ class BrokerTeamUser extends Authenticatable
     /**
      * Scope for active users.
      */
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
+    // public function scopeActive($query)
+    // {
+    //     return $query->where('is_active', true);
+    // }
 
     
 
@@ -172,52 +172,52 @@ class BrokerTeamUser extends Authenticatable
     /**
      * Check if user can access specific broker.
      */
-    public function canAccessBroker(int $brokerId): bool
-    {
-        return $this->resourcePermissions()
-                   ->where('permission_type', 'broker')
-                   ->where('resource_id', $brokerId)
-                   ->where('is_active', true)
-                   ->whereIn('action', ['view', 'edit', 'delete', 'manage'])
-                   ->exists();
-    }
+    // public function canAccessBroker(int $brokerId): bool
+    // {
+    //     return $this->resourcePermissions()
+    //                ->where('permission_type', 'broker')
+    //                ->where('resource_id', $brokerId)
+    //                ->where('is_active', true)
+    //                ->whereIn('action', ['view', 'edit', 'delete', 'manage'])
+    //                ->exists();
+    // }
 
-    /**
-     * Check if user can edit specific broker.
-     */
-    public function canEditBroker(int $brokerId): bool
-    {
-        return $this->resourcePermissions()
-                   ->where('permission_type', 'broker')
-                   ->where('resource_id', $brokerId)
-                   ->where('is_active', true)
-                   ->whereIn('action', ['edit', 'manage'])
-                   ->exists();
-    }
+    // /**
+    //  * Check if user can edit specific broker.
+    //  */
+    // public function canEditBroker(int $brokerId): bool
+    // {
+    //     return $this->resourcePermissions()
+    //                ->where('permission_type', 'broker')
+    //                ->where('resource_id', $brokerId)
+    //                ->where('is_active', true)
+    //                ->whereIn('action', ['edit', 'manage'])
+    //                ->exists();
+    // }
 
-    /**
-     * Check if user can manage specific broker.
-     */
-    public function canManageBroker(int $brokerId): bool
-    {
-        return $this->resourcePermissions()
-                   ->where('permission_type', 'broker')
-                   ->where('resource_id', $brokerId)
-                   ->where('is_active', true)
-                   ->where('action', 'manage')
-                   ->exists();
-    }
+    // /**
+    //  * Check if user can manage specific broker.
+    //  */
+    // public function canManageBroker(int $brokerId): bool
+    // {
+    //     return $this->resourcePermissions()
+    //                ->where('permission_type', 'broker')
+    //                ->where('resource_id', $brokerId)
+    //                ->where('is_active', true)
+    //                ->where('action', 'manage')
+    //                ->exists();
+    // }
 
     
-    /**
-     * Check if user has any resource permissions.
-     */
-    public function hasResourcePermissions(): bool
-    {
-        return $this->resourcePermissions()
-                   ->where('is_active', true)
-                   ->exists();
-    }
+    // /**
+    //  * Check if user has any resource permissions.
+    //  */
+    // public function hasResourcePermissions(): bool
+    // {
+    //     return $this->resourcePermissions()
+    //                ->where('is_active', true)
+    //                ->exists();
+    // }
 
    
 }

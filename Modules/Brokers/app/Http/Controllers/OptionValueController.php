@@ -284,6 +284,14 @@ class OptionValueController extends Controller
      */
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
+        $user = $request->user(); 
+        $isAdmin=$user->isAdmin();
+
+        //TODO:check if the loged user has country or zone permission
+        //i.e has permision: 'country:manage:{CountryId}}' or 'zone:manage:{ZoneId}'
+        if (! $user || ! $user->tokenCan("broker:manage:{$brokerId}")) {
+            abort(403, 'Forbidden');
+        }
         //Example request
         // {
         //     "option_values": [
@@ -305,7 +313,7 @@ class OptionValueController extends Controller
             ], 422);
         }
 
-        $isAdmin=$this->isAdmin;
+        
         try {
             DB::transaction(function () use ($request, $brokerId,$entityType,$isAdmin) {
             // Validate data

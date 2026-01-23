@@ -28,6 +28,7 @@ use Modules\Brokers\Transformers\CountryCollection;
 use Modules\Brokers\Models\Country;
 use Modules\Brokers\Tables\BrokerTableConfig;
 use Modules\Brokers\Forms\BrokerForm;
+use Modules\Brokers\Http\Requests\BrokerToggleActiveRequest;
 
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
@@ -170,14 +171,22 @@ class BrokerController extends Controller
 
     /**
      * Get broker list
+     * This action is used in dashboards so we don't need multilanguage support
+     * Auth is done in the BrokerListRequest::authorize() method
      * @param BrokerListRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getBrokerList(BrokerListRequest $request)
+    public function getBrokerList(BrokerListRequest $request, ?int $zone_id, ?int $country_id=null)
     {
+      //TO DO 1: Get table filters as a function of logged user permissions
+      //If the user is a platform user he should see only brokers that he has access to
+      //TO DO 2: Add zone_id and country_id to filters
+     // $filters['zone_id'] = $zone_id;
+     // $filters['country_id'] = $country_id;
         try {
 
             $filters = $request->getFilters();
+           
             $orderBy = $request->getOrderBy();
             $orderDirection = $request->getOrderDirection();
             $perPage = $request->getPerPage();
@@ -222,10 +231,17 @@ class BrokerController extends Controller
     }
 
 
-    public function toggleActiveStatus(Request $request, $id)
+    /**
+     * Toggle active status of a broker
+     * @param Request $request
+     * @param Broker $broker
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleActiveStatus(BrokerToggleActiveRequest $request, Broker $broker)
     {
+       
         try {
-            return response()->json($this->brokerService->toggleActiveStatus($id));
+            return response()->json($this->brokerService->toggleActiveStatus($broker->id));
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

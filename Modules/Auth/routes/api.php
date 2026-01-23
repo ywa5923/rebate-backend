@@ -20,22 +20,22 @@ Route::group([], function () {
     // Get available broker types
    # Route::get('/broker-types', [ApiAuthController::class, 'getBrokerTypes']);
     
-    // Platform users CRUD
-    Route::get('platform-users/form-config', [PlatformUserController::class, 'getFormConfig']);
-    Route::apiResource('platform-users', PlatformUserController::class);
+    //=================================SUPERADMIN ONLY ROUTES======================================
+    //TODO: Establish if platform admins can add other platform users like seo,translators,country admins,broker admins,etc.
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->get('platform-users/form-config', [PlatformUserController::class, 'getFormConfig']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->apiResource('platform-users', PlatformUserController::class);
    
-    Route::patch('/platform-users/toggle-active-status/{platform_user}', [PlatformUserController::class, 'toggleActiveStatus']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->patch('/platform-users/toggle-active-status/{platform_user}', [PlatformUserController::class, 'toggleActiveStatus']);
     
-    // User permissions CRUD
-    Route::get('/user-permissions', [UserPermissionController::class, 'index']);
-    Route::delete('/user-permissions/{user_permission}', [UserPermissionController::class, 'destroy']);
-    Route::get('/user-permissions/form-config/{permissionType}', [UserPermissionController::class, 'getFormConfig']);
-    //Route::apiResource('user-permissions', UserPermissionController::class);
-    Route::post('/user-permissions/{permissionType}', [UserPermissionController::class, 'store']);
-    Route::patch('/user-permissions/toggle-active-status/{user_permission}', [UserPermissionController::class, 'toggleActiveStatus']);
+    //=================================PLATFORM ADMIN ONLY ROUTES======================================
+    //TODO: Establish if platform admins cand add permissions to seo,translators
+    Route::middleware('auth:sanctum')->get('/user-permissions', [UserPermissionController::class, 'index']);
+    Route::middleware('auth:sanctum')->delete('/user-permissions/{user_permission}', [UserPermissionController::class, 'destroy']);
+    Route::middleware('auth:sanctum')->get('/user-permissions/form-config/{permissionType}', [UserPermissionController::class, 'getFormConfig']);
+    Route::middleware('auth:sanctum')->post('/user-permissions/{permissionType}', [UserPermissionController::class, 'store']);
+    Route::middleware('auth:sanctum')->patch('/user-permissions/toggle-active-status/{user_permission}', [UserPermissionController::class, 'toggleActiveStatus']);
     
     // Magic link authentication
-   // Route::post('/magic-link/send', [ApiAuthController::class, 'sendMagicLink']);
     Route::post('/login-with-email', [ApiAuthController::class, 'loginWithEmail']);
     Route::post('/magic-link/verify', [ApiAuthController::class, 'verifyMagicLinkToken']);
 

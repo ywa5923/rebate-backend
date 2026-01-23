@@ -33,12 +33,14 @@ class BrokerOptionController extends Controller
 
    
     /**
+     * Require broker permission and at least view action.
      * Display a listing of the resource.
      * These options are formatted for the broker dashboard.
      * Return an arrat with option categories that includes the broker options.
      */
     public function index(BrokerOptionQueryParser $queryParser, BrokerOptionRepository $rep, Request $request)
     {
+        
         //{{PATH}}/broker_options?language[eq]=ro
         $queryParser->parse($request);
         if (empty($queryParser->getWhereParams())) {
@@ -131,6 +133,8 @@ class BrokerOptionController extends Controller
 
     /**
      * Get broker options.
+     * Auth is done in the BrokerOptionListRequest::authorize() method
+     * These options are formatted for the super admin dashboard.
      * Return a collection of broker options.
      * @param BrokerOptionRequest $request
      * @return Response
@@ -178,12 +182,15 @@ class BrokerOptionController extends Controller
 
     /**
      * Display the specified broker option.
-     * 
+     * Only super admin can access this action
+     * Auth is done in RequireSuperAdmin middleware
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        
+       
         try {
             $brokerOption = $this->brokerOptionService->getBrokerOptionById($id);
             

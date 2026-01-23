@@ -6,6 +6,7 @@ use App\Tables\TableConfigInterface;
 use App\Forms\FormConfigInterface;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 abstract class BaseRequest extends FormRequest
 {
@@ -95,5 +96,15 @@ abstract class BaseRequest extends FormRequest
     public function getPerPage(int $default = 15): int
     {
         return (int) $this->input('per_page', $default);
+    }
+
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Forbidden',
+            ], 403)
+        );
     }
 }

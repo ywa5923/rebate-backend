@@ -33,31 +33,42 @@ use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 //     Route::apiResource('brokers', BrokerController::class)->names('brokers');
 // });
 
-Route::group(["prefix"=>'v1'], function () {
+Route::prefix('v1')->group( function () {
+
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+
+       
+      
+    });
+
+       // OptionValue routes
+       Route::apiResource('option-values', OptionValueController::class)->names('option-values');
+       // Multiple option values routes for brokers
+       Route::post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
+       Route::put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
+       
     // Specific routes MUST come before apiResource to avoid conflicts
-    Route::post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
-    Route::get('brokers/broker-list', [BrokerController::class, 'getBrokerList']);
-    Route::get('brokers/broker-types-and-countries', [BrokerController::class, 'getBrokerTypesAndCountries']);
-    Route::get('brokers/form-config', [BrokerController::class, 'getFormConfig']);
-    Route::get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
-    Route::patch('brokers/toggle-active-status/{id}', [BrokerController::class, 'toggleActiveStatus']);
+    Route::middleware('auth:sanctum')->post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
+    Route::middleware('auth:sanctum')->get('brokers/broker-list/{zone_id?}/{country_id?}', [BrokerController::class, 'getBrokerList']);
+    Route::middleware('auth:sanctum')->get('brokers/broker-types-and-countries', [BrokerController::class, 'getBrokerTypesAndCountries']);
+    Route::middleware('auth:sanctum')->get('brokers/form-config', [BrokerController::class, 'getFormConfig']);
+    Route::middleware('auth:sanctum')->get('brokers/broker-info/{id}', [BrokerController::class, 'getBrokerInfo']);
+    Route::middleware('auth:sanctum')->patch('brokers/toggle-active-status/{broker}', [BrokerController::class, 'toggleActiveStatus']);
     Route::get('brokers/{id}', [BrokerController::class, 'show']);
   
-   // Route::apiResource('brokers', BrokerController::class)->names('brokers');
-    
-    //Route::apiResource('broker_options', BrokerOptionController::class)->names('broker_options');
+   
     Route::get('broker_options', [BrokerOptionController::class, 'index']);
-    Route::get('broker-options/get-list', [BrokerOptionController::class, 'getBrokerOptionsList']);
-    //Route::get('broker-options/form-meta-data', [BrokerOptionController::class, 'getFormMetaData']);
-    Route::get('broker-options/form-config', [BrokerOptionController::class, 'getFormConfig']);
-    Route::get('broker-options/{id}', [BrokerOptionController::class, 'show']);
-    Route::post('broker-options', [BrokerOptionController::class, 'store']);
-    Route::put('broker-options/{id}', [BrokerOptionController::class, 'update']);
-    Route::delete('broker-options/{id}', [BrokerOptionController::class, 'delete']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->get('broker-options/get-list', [BrokerOptionController::class, 'getBrokerOptionsList']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->get('broker-options/form-config', [BrokerOptionController::class, 'getFormConfig']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->get('broker-options/{id}', [BrokerOptionController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->post('broker-options', [BrokerOptionController::class, 'store']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->put('broker-options/{id}', [BrokerOptionController::class, 'update']);
+    Route::middleware(['auth:sanctum', 'superadmin-only'])->delete('broker-options/{id}', [BrokerOptionController::class, 'delete']);
     
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
 
-    // Option Category routes - specific routes must come before apiResource
+    //ROUTES FOR BROKER DASHBOARD
     Route::get('option-categories/get-list', [OptionCategoryController::class, 'getOptionCategoriesList']);
     Route::apiResource('option-categories', OptionCategoryController::class)->names('option-categories');
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
@@ -77,13 +88,6 @@ Route::group(["prefix"=>'v1'], function () {
     Route::apiResource('companies', CompanyController::class)->names('companies');
     Route::apiResource('regulators', RegulatorController::class)->names('regulators');
     
-    // OptionValue routes
-    Route::apiResource('option-values', OptionValueController::class)->names('option-values');
-    
-    // Multiple option values routes for brokers
-    Route::post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
-    Route::put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
-    
     // Promotion routes
     Route::get('promotions', [PromotionController::class, 'index']);
     Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);
@@ -99,23 +103,18 @@ Route::group(["prefix"=>'v1'], function () {
     Route::get('challenges', [ChallengeController::class, 'show']);
      Route::get('challenges/show', [ChallengeController::class, 'show']);
      
-     // Zone REST API routes
-     Route::get('zones/form-config', [ZoneController::class, 'getFormConfig']);
-     Route::apiResource('zones', ZoneController::class)->names('zones');
+     //=================================SUPERADMIN ONLY ROUTES======================================
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->get('zones/form-config', [ZoneController::class, 'getFormConfig']);
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->apiResource('zones', ZoneController::class)->names('zones');
      
      // Country REST API routes
-     Route::get('countries/form-config', [CountryController::class, 'getFormConfig']);
-     Route::apiResource('countries', CountryController::class)->names('countries');
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->get('countries/form-config', [CountryController::class, 'getFormConfig']);
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->apiResource('countries', CountryController::class)->names('countries');
 
     // Country REST API routes
-     Route::get('dropdown-lists/form-config', [DropdownListController::class, 'getFormConfig']);
-     Route::apiResource('dropdown-lists', DropdownListController::class)->names('dropdown-lists');
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->get('dropdown-lists/form-config', [DropdownListController::class, 'getFormConfig']);
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->apiResource('dropdown-lists', DropdownListController::class)->names('dropdown-lists');
      
-     // Dropdown categories REST API routes
-    //  Route::get('dropdown-lists', [DropdownListController::class, 'index']);
-    //  Route::get('dropdown-lists/{id}', [DropdownListController::class, 'showList']);
-    //  Route::delete('dropdown-list/{id}', [DropdownListController::class, 'deleteList']);
-    //  Route::post('dropdown-list/store-list', [DropdownListController::class, 'storeList']);
-    //  Route::put('dropdown-list/update-list/{id}', [DropdownListController::class, 'updateList']);
+   
 
 });

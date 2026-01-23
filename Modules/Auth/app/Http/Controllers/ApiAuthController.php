@@ -33,25 +33,21 @@ use Modules\Auth\Enums\AuthUser;
 class ApiAuthController extends Controller
 {
     protected MagicLinkService $magicLinkService;
-    protected BrokerTeamService $teamService;
-    protected UserPermissionService $permissionService;
-    protected SuperAdminService $superAdminService;
+        // protected BrokerTeamService $teamService;
+        // protected UserPermissionService $permissionService;
+        // protected SuperAdminService $superAdminService;
 
     public function __construct(
         MagicLinkService $magicLinkService,
-        BrokerTeamService $teamService,
-        UserPermissionService $permissionService,
-        SuperAdminService $superAdminService
+       // BrokerTeamService $teamService,
+       // UserPermissionService $permissionService,
+       // SuperAdminService $superAdminService
     ) {
         $this->magicLinkService = $magicLinkService;
-        $this->teamService = $teamService;
-        $this->permissionService = $permissionService;
-        $this->superAdminService = $superAdminService;
+        //$this->teamService = $teamService;
+        //$this->permissionService = $permissionService;
+        //$this->superAdminService = $superAdminService;
     }
-
-
-
-
 
 
 
@@ -75,21 +71,15 @@ class ApiAuthController extends Controller
                 ], 400);
             }
 
+            [$userData,$brokerContext,$token]=DB::transaction(function() use ($magicLink) {
             // Mark the magic link as used (unless disabled for testing)
             if (config('auth.mark_magic_link_as_used', true)) {
                 $this->magicLinkService->markAsUsed($magicLink);
             }
-
             // Get the subject (user) from the magic link
             $subject = $magicLink->subject;
-
-
             if (!$subject) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid user',
-                    'error' => 'The magic link is associated with an invalid user.'
-                ], 400);
+                throw new \Exception('Invalid user');
             }
 
             // Update last login
@@ -99,26 +89,27 @@ class ApiAuthController extends Controller
             // Option 1: Use config value
             $expirationDays = (int) config('auth.jwt_expiration_days', 7); // Default 7 days
 
-            // Option 2: Match magic link expiration (uncomment to use)
-            // $jwtExpirationDays = (int) $magicLink->expires_at->diffInDays(now());
-
+            //EXAMPLE OF A SANCTUM PERMISSIONS ARRAY. SUPER ADMIN HAS ALL PERMISSIONS I.E. ['*']
+            // [
+            //     'super-admin',
+            //     'broker:view:1',
+            //     'country:view:1',
+            //     'zone:view:1',
+            //     'seo:view:1',
+            //     'translator:view:1',
+            // ]
             // Generate the Sanctum token
-            $token = $subject->createToken('magic-link-auth', ['*'], now()->addDays($expirationDays))->plainTextToken;
-
+            $token = $subject->createToken('magic-link-auth', $subject->getSanctumPermissions(), now()->addDays($expirationDays))->plainTextToken;
+   
 
             // Prepare user data based on type
             $userData = [
                 'id' => $subject->id,
                 'name' => $subject->name,
                 'email' => $subject->email,
-                'permissions' => $subject->resourcePermissions->map(function($permission) {
-                    return [
-                        'type' => $permission->permission_type,
-                        'resource_id' => $permission->resource_id,
-                        'resource_value' => $permission->resource_value,
-                        'action' => $permission->action,
-                    ];
-                })->toArray(),
+                'role' => $subject->role,
+                'sanctum_permissions' => $subject->getSanctumPermissions(),
+                'permissions' => $subject->getPermissionsArray(),
             ];
 
 
@@ -136,18 +127,26 @@ class ApiAuthController extends Controller
             }
 
 
+            return [$userData,$brokerContext,$token];
+        });
+        //end of transaction
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Magic link verified successfully',
-                'data' => [
-                    'user' => $userData,
-                    'broker_context' => $brokerContext,
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'expires_at' => now()->addDays($expirationDays)->toISOString(),
-                ]
-            ]);
+        if(!$userData || !$token){
+            throw new \Exception('Failed to verify magic link');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Magic link verified successfully',
+            
+            'data' => [
+                'user' => $userData,
+                'broker_context' => $brokerContext??null,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'expires_at' => now()->addDays(config('auth.jwt_expiration_days', 7))->toISOString(),
+            ]
+        ]);
         } catch (\Exception $e) {
             Log::error('Magic link token verification failed: ' . $e->getMessage());
 

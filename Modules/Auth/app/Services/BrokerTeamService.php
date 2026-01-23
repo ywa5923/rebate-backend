@@ -6,11 +6,10 @@ use Modules\Auth\Models\BrokerTeam;
 use Modules\Auth\Models\BrokerTeamUser;
 use Modules\Auth\Repositories\BrokerTeamRepository;
 use Modules\Auth\Repositories\BrokerTeamUserRepository;
-use Modules\Brokers\Models\Broker;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+
 use Illuminate\Database\Eloquent\Collection;
 
+ 
 class BrokerTeamService
 {
     protected BrokerTeamRepository $teamRepository;

@@ -26,18 +26,20 @@ use Modules\Auth\Enums\AuthAction;
 
 class BrokerTeamUserController extends Controller
 {
-    protected BrokerTeamService $teamService;
-    protected UserPermissionService $permissionService;
-    protected MagicLinkService $magicLinkService;
-    protected Mail $mailService;
-    public function __construct(BrokerTeamService $teamService, 
-    UserPermissionService $permissionService, MagicLinkService $magicLinkService)
+    // protected BrokerTeamService $teamService;
+    // protected UserPermissionService $permissionService;
+    // protected MagicLinkService $magicLinkService;
+    //protected Mail $mailService;
+
+    public function __construct(
+    protected BrokerTeamService $teamService, 
+    protected UserPermissionService $permissionService, 
+    protected MagicLinkService $magicLinkService,
+    protected Mail $mailService
+    )
     {
-        $this->teamService = $teamService;
-        $this->permissionService = $permissionService;
-        $this->magicLinkService = $magicLinkService;
        
-  }
+    }
     /**
      * OK
      * Register a new broker
@@ -112,7 +114,7 @@ class BrokerTeamUserController extends Controller
                 );
 
                 //send email with magic link
-                 Mail::to($user->email)->send(new MagicLinkMail($magicLink));
+               $this->mailService->to($user->email)->send(new MagicLinkMail($magicLink));
 
                 return $broker;
             });
