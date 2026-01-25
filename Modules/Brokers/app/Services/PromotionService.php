@@ -21,10 +21,10 @@ class PromotionService
     /**
      * Get paginated promotions with filters
      */
-    public function getPromotions(Request $request): array
+    public function getPromotions(Request $request,int $broker_id): array
     {
         try {
-            $promotions = $this->repository->getPromotions($request);
+            $promotions = $this->repository->getPromotions($request,$broker_id);
 
             $response = [
                 'success' => true,

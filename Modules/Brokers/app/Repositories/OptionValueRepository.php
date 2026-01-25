@@ -61,27 +61,27 @@ class OptionValueRepository
     /**
      * Get paginated option values with filters
      */
-    public function getOptionValues(Request $request): LengthAwarePaginator|Collection
+    public function getOptionValues(array $filters,int $broker_id): LengthAwarePaginator|Collection
     {
-        if ($request->has('language_code')) {
-            $locale = $request->language_code;
+        if (isset($filters['language_code'])) {
+            $locale = $filters['language_code'];
         } else {
             $locale = 'en';
         }
         $query = $this->model->with(['broker', 'option', 'zone', 'translations' => function ($query) use ($locale) {
             $query->where('language_code', $locale);
-        }]);
+        }])->where('broker_id', $broker_id);
 
         // Apply filters
-        $this->applyFilters($query, $request);
+        $this->applyFilters($query, $filters);
 
         // Apply sorting
-        $this->applySorting($query, $request);
+        $this->applySorting($query, $filters);
 
-        if ($request->has('per_page') || $request->has('page')) {
+        if (isset($filters['per_page']) || isset($filters['page'])) {
             // Paginate with specific page
-            $perPage = $request->get('per_page', 15);
-            $page = $request->get('page', 1);
+            $perPage = $filters['per_page'] ?? 15;
+            $page = $filters['page'] ?? 1;
             return $query->paginate($perPage, ['*'], 'page', $page);
         } else {
             return $query->get();
@@ -368,44 +368,57 @@ class OptionValueRepository
     /**
      * Apply filters to query
      */
-    private function applyFilters($query, Request $request): void
+    private function applyFilters($query, array $filters): void
     {
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
         }
 
-        if ($request->has('broker_id')) {
-            $query->where('broker_id', $request->broker_id);
+        if(isset($filters['entity_type'])) {
+            if($filters['entity_type'] == 'Broker') {
+            //For backward compatibility with old data
+            $query->where(function ($q) use ($filters) {
+                $q->where('optionable_type', ModelHelper::getModelClassFromSlug($filters['entity_type']))
+                  ->orWhereNull('optionable_type');
+            });
+            }else{
+                $query->where('optionable_type', ModelHelper::getModelClassFromSlug($filters['entity_type']));
+            }
         }
 
-        if ($request->has('broker_option_id')) {
-            $query->where('broker_option_id', $request->broker_option_id);
+        if(isset($filters['entity_id'])) {
+            $query->where('optionable_id', $filters['entity_id']);
         }
 
-        if ($request->has('option_slug')) {
-            $query->where('option_slug', $request->option_slug);
+        if (isset($filters['broker_option_id'])) {
+            $query->where('broker_option_id', $filters['broker_option_id']);
         }
 
-        if($request->has('category_id')){
+        if (isset($filters['option_slug'])) {
+            $query->where('option_slug', $filters['option_slug']);
+        }
 
-            $query->whereHas('option', function ($q) use ($request) {
-                $q->where('option_category_id', $request->category_id);
+        if(isset($filters['category_id'])) {
+
+            $query->whereHas('option', function ($q) use ($filters) {
+                $q->where('option_category_id', $filters['category_id']);
             });
         }
 
-        if ($request->has('zone_code')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('is_invariant', true)
-                    ->orWhereHas('zone', function ($subQ) use ($request) {
-                        $subQ->where('zone_code', $request->zone_code);
-                    });
+        if (isset($filters['zone_code'])) {
+            $query->where(function ($q) use ($filters) {
+               $q->where('is_invariant', true)->orWhere('zone_code', $filters['zone_code']);
+                
+                    // ->orWhereHas('zone', function ($subQ) use ($filters) {
+                    //     $subQ->where('zone_code', $filters['zone_code']);
+                    // });
             });
         }else{
             $query->where('zone_id',null)->where('zone_code',null);
         }
 
-        if ($request->has('search')) {
-            $search = $request->search;
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('value', 'like', "%{$search}%")
                     ->orWhere('public_value', 'like', "%{$search}%")
@@ -413,9 +426,9 @@ class OptionValueRepository
             });
         }
 
-        $query->with('translations',function($q) use ($request){
+        $query->with('translations',function($q) use ($filters){
 
-            $languageCode = $request->has('language_code') ? $request->language_code : 'en';
+            $languageCode = isset($filters['language_code']) ? $filters['language_code'] : 'en';
             $q->where('language_code', $languageCode);
         });
 
@@ -431,10 +444,10 @@ class OptionValueRepository
     /**
      * Apply sorting to query
      */
-    private function applySorting($query, Request $request): void
+    private function applySorting($query, array $filters): void
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
+        $sortBy = isset($filters['sort_by']) ? $filters['sort_by'] : 'created_at';
+        $sortDirection = isset($filters['sort_direction']) ? $filters['sort_direction'] : 'desc';
 
         $allowedSortFields = ['option_slug', 'value', 'status', 'created_at', 'updated_at'];
 

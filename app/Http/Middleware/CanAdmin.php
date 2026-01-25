@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\App;
 use Modules\Brokers\Models\Broker;
 use Modules\Countries\Models\Country;
 use Modules\Zones\Models\Zone;
-
-class SetIsAdminFlag
+use App\Utilities\ModelHelper;
+use Modules\Brokers\Models\AccountType;
+class CanAdmin
 {
     /**
      * Handle an incoming request.
@@ -22,25 +23,31 @@ class SetIsAdminFlag
         $isAdmin = false;
         $countryId = null;
         $zoneId = null;
+        $brokerId = null;
         if (App::environment('local')) {
             //$isAdmin = true; // or false, depending on your test case
-            $isAdmin =false;
-        } else {
-            //TODO: Implement the logic to check if the user is an admin
-           // $isAdmin = Auth::check() && Auth::user()->is_admin; // Adjust to match your DB field
+          
         }
-      
+        $resourceClassName=ModelHelper::getModelClassFromSlug($resourceClass);
         $user=$request->user();
         $resourceId = $request->route($routeParamKey);
-        $resource = $resourceClass::find($resourceId);
+        $resource = $resourceClassName::find($resourceId);
 
         if (!$resource) {
             return response()->json(['success' => false, 'message' => 'Resource not found'], 404);
         }
         if($resource instanceof Broker) {
-            $countryId = $resource->country->id;
-            $zoneId = $resource->zone->id;
-        } ;
+            $brokerId = $resource->id;
+            $country=$resource->country;
+            $countryId = $country?->id;
+            $zoneId = $country?->zone?->id;
+        } else if($resource instanceof AccountType) {
+            $brokerId = $resource->broker->id;
+            $country = $resource->broker->country;
+            $countryId = $country?->id;
+            $zoneId = $country?->zone?->id;
+        }
+
 
         if($user->tokenCan('zone:manage:'.$zoneId) || $user->tokenCan('zone:edit:'.$zoneId)) {
             $isAdmin = true;
@@ -50,18 +57,15 @@ class SetIsAdminFlag
 
         app()->instance('isAdmin', $isAdmin);
 
-        if($isAdmin || $user->tokenCan('broker:manage:'.$resourceId) || $user->tokenCan('broker:edit:'.$resourceId)) {
+        if($isAdmin || $user->tokenCan('broker:manage:'.$brokerId) || $user->tokenCan('broker:edit:'.$brokerId)) {
             return $next($request);
+        }else{
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
-
 
         // Share it globally to all views
        // View::share('isAdmin', $isAdmin);
        
-
-        // Also store in the app container (optional)
         
-
-        return $next($request);
     }
 }

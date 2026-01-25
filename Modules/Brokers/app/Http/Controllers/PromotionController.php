@@ -14,11 +14,11 @@ use Modules\Brokers\Transformers\PromotionResource;
 class PromotionController extends Controller
 {
     protected PromotionService $promotionService;
-    protected bool $isAdmin;
+   
     public function __construct(PromotionService $promotionService)
     {
         $this->promotionService = $promotionService;
-        $this->isAdmin = app('isAdmin');
+       
     }
 
     /**
@@ -90,11 +90,11 @@ class PromotionController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request,int $broker_id)
     {
         try {
-            $result = $this->promotionService->getPromotions($request);
-           //dd($result['data']);
+            $result = $this->promotionService->getPromotions($request,$broker_id);
+          
             // Transform the data collection
             $result['data'] = PromotionResource::collection($result['data']);
             return $result;
@@ -107,47 +107,9 @@ class PromotionController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('brokers::create');
-    }
+  
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        // Implementation for storing promotion
-        return redirect()->back();
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('brokers::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('brokers::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        // Implementation for updating promotion
-        return redirect()->back();
-    }
+   
 
     /**
      * @OA\Delete(
@@ -190,7 +152,7 @@ class PromotionController extends Controller
     {
         // Check if broker ID is provided for authorization
         $broker_id = $request->broker_id;
-        $isAdmin=$this->isAdmin;
+      
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }

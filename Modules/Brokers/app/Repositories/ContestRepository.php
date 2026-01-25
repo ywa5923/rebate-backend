@@ -20,9 +20,9 @@ class ContestRepository
     /**
      * Get paginated contests with filters
      */
-    public function getContests(Request $request): LengthAwarePaginator|Collection
+    public function getContests(Request $request,int $broker_id): LengthAwarePaginator|Collection
     {
-        $query = $this->model->newQuery();
+        $query = $this->model->newQuery()->where('broker_id', $broker_id);
         
         // Apply filters
         $this->applyFilters($query, $request);
@@ -86,9 +86,9 @@ class ContestRepository
     protected function applyFilters($query, Request $request): void
     {
         // Filter by broker ID
-        if ($request->has('broker_id')) {
-            $query->where('broker_id', $request->broker_id);
-        }
+        // if ($request->has('broker_id')) {
+        //     $query->where('broker_id', $request->broker_id);
+        // }
 
         if ($request->has('contest_id')) {
             $query->where('id', $request->contest_id);

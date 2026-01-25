@@ -17,11 +17,10 @@ class OptionValueController extends Controller
 {
     protected OptionValueService $optionValueService;
 
-    protected bool $isAdmin;
     public function __construct(OptionValueService $optionValueService)
     {
         $this->optionValueService = $optionValueService;
-        $this->isAdmin = app('isAdmin');
+       
     }
 
     /**
@@ -114,10 +113,26 @@ class OptionValueController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request,int $broker_id): JsonResponse
     {
         try {
-            $result = $this->optionValueService->getOptionValues($request);
+            $validatedFilters = $request->validate([
+                'entity_type' => 'required|string|max:255',
+                'entity_id' => 'sometimes|integer|exists:option_values,optionable_id',
+                'broker_option_id' => 'sometimes|integer|exists:broker_options,id',
+                'category_id' => 'sometimes|integer|exists:option_categories,id',
+                'option_slug' => 'sometimes|string|exists:broker_options,option_slug',
+                'page' => 'nullable|integer|min:1',
+                'per_page' => 'nullable|integer|min:1',
+                'language_code' => 'nullable|string|max:255',
+                'zone_code' => 'nullable|string|max:255',
+                'sort_by' => 'nullable|string|in:option_slug,value,status,created_at,updated_at',
+                'search' => 'nullable|string|max:255',
+                'status' => 'nullable|string|in:published,pending,rejected',
+                'sort_direction' => 'nullable|string|in:asc,desc',
+                
+            ]);
+            $result = $this->optionValueService->getOptionValues($validatedFilters,$broker_id);
           
             // Transform the data collection
             $result['data'] = OptionValueResource::collection($result['data']);
@@ -284,14 +299,10 @@ class OptionValueController extends Controller
      */
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
-        $user = $request->user(); 
-        $isAdmin=$user->isAdmin();
+       
+       $isAdmin=app('isAdmin');
 
-        //TODO:check if the loged user has country or zone permission
-        //i.e has permision: 'country:manage:{CountryId}}' or 'zone:manage:{ZoneId}'
-        if (! $user || ! $user->tokenCan("broker:manage:{$brokerId}")) {
-            abort(403, 'Forbidden');
-        }
+        
         //Example request
         // {
         //     "option_values": [
@@ -465,8 +476,9 @@ class OptionValueController extends Controller
      */
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
-        //TODO:CHECK IF IS ADMIN IS TRUE WITH THE AUTH MIDDLEWARE
-        $isAdmin=$this->isAdmin;
+        $isAdmin=app('isAdmin');
+
+       
    
         try {
             $entityId = $request->input('entity_id');

@@ -25,17 +25,19 @@ class OptionValueService
     /**
      * Get paginated option values with filters
      */
-    public function getOptionValues(Request $request): array
+    public function getOptionValues(array $filters,int $broker_id): array
     {
+       
         try {
-            $optionValues = $this->repository->getOptionValues($request);
+            
+            $optionValues = $this->repository->getOptionValues($filters,$broker_id);
 
             $response = [
                 'success' => true,
                 'data' => $optionValues,
             ];
 
-            if ($request->has('per_page')) {
+            if (isset($filters['per_page'])) {
                 $response['pagination'] = [
                     'current_page' => $optionValues->currentPage(),
                     'last_page' => $optionValues->lastPage(),

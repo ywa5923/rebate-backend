@@ -21,10 +21,10 @@ class ContestService
     /**
      * Get paginated contests with filters
      */
-    public function getContests(Request $request): array
+    public function getContests(Request $request,int $broker_id): array
     {
         try {
-            $contests = $this->repository->getContests($request);
+            $contests = $this->repository->getContests($request,$broker_id);
 
             $response = [
                 'success' => true,

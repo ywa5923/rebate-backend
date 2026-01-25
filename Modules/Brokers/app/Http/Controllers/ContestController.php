@@ -96,10 +96,10 @@ class ContestController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request,int $broker_id)
     {
         try {
-            $result = $this->contestService->getContests($request);
+            $result = $this->contestService->getContests($request,$broker_id);
             
             // Transform the data collection
             $result['data'] = ContestResource::collection($result['data']);

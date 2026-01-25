@@ -42,11 +42,7 @@ Route::prefix('v1')->group( function () {
       
     });
 
-       // OptionValue routes
-       Route::apiResource('option-values', OptionValueController::class)->names('option-values');
-       // Multiple option values routes for brokers
-       Route::post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
-       Route::put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
+      
        
     // Specific routes MUST come before apiResource to avoid conflicts
     Route::middleware('auth:sanctum')->post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
@@ -69,8 +65,16 @@ Route::prefix('v1')->group( function () {
     Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
 
     //ROUTES FOR BROKER DASHBOARD
+     // OptionValue routes
+    // Route::apiResource('option-values', OptionValueController::class)->names('option-values');
+     // Multiple option values routes for brokers
+     Route::middleware(['auth:sanctum'])->get('option-values/{broker_id}', [OptionValueController::class, 'index']);
+     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
+     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
     Route::get('option-categories/get-list', [OptionCategoryController::class, 'getOptionCategoriesList']);
-    Route::apiResource('option-categories', OptionCategoryController::class)->names('option-categories');
+    Route::get('option-categories', [OptionCategoryController::class, 'index']);
+   // Route::apiResource('option-categories', OptionCategoryController::class)->names('option-categories');
+   
     Route::get('/matrix/headers', [MatrixController::class, 'getHeaders']);
     Route::get('/matrix', [MatrixController::class, 'index']);
     Route::post('/matrix/store', [MatrixController::class, 'store']);
@@ -84,16 +88,19 @@ Route::prefix('v1')->group( function () {
     Route::put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
     Route::delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteAccountTypeUrl']);
     Route::get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
-    // Company routes
-    Route::apiResource('companies', CompanyController::class)->names('companies');
-    Route::apiResource('regulators', RegulatorController::class)->names('regulators');
+   
+    //=============== Company routes =======================
+   // Route::apiResource('companies', CompanyController::class)->names('companies');
+    Route::get('companies/{broker_id}', [CompanyController::class, 'index']);
+ 
+    //Route::apiResource('regulators', RegulatorController::class)->names('regulators');
     
     // Promotion routes
-    Route::get('promotions', [PromotionController::class, 'index']);
+    Route::get('promotions/{broker_id}', [PromotionController::class, 'index']);
     Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);
     
     // Contest routes
-    Route::get('contests', [ContestController::class, 'index']);
+    Route::get('contests/{broker_id}', [ContestController::class, 'index']);
     Route::delete('contests/{id}', [ContestController::class, 'destroy']);
 
      // Challenges table routes

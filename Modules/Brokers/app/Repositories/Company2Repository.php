@@ -52,14 +52,14 @@ class Company2Repository
     /**
      * Get paginated companies with filters
      */
-    public function getCompanies(Request $request): LengthAwarePaginator|Collection
+    public function getCompanies(Request $request,int $broker_id): LengthAwarePaginator|Collection
     {
 
         //tested with http://localhost:8080/api/v1/companies?language_code=ro&broker_id=200&company_id=1&zone_code=sua
         //DB::enableQueryLog();
         //dd(DB::getQueryLog());
 
-        $query = $this->model->newQuery();
+        $query = $this->model->newQuery()->where('broker_id', $broker_id);
       
        
         $this->applyFilters($query, $request);
@@ -163,9 +163,9 @@ class Company2Repository
     {
 
 
-        if ($request->has('broker_id')) {
-            $query->where('broker_id', $request->broker_id);
-        }
+        // if ($request->has('broker_id')) {
+        //     $query->where('broker_id', $request->broker_id);
+        // }
 
         if ($request->has('company_id')) {
             $query->where('id', $request->company_id);

@@ -22,10 +22,10 @@ class CompanyService
     /**
      * Get paginated companies with filters
      */
-    public function getCompanies(Request $request): array
+    public function getCompanies(Request $request,int $broker_id): array
     {
         try {
-            $companies = $this->repository->getCompanies($request);
+            $companies = $this->repository->getCompanies($request,$broker_id);
 
             $response = [
                 'success' => true,

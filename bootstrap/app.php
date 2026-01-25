@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
            // 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
            // 'set.is_admin' => \App\Http\Middleware\SetIsAdminFlag::class,
             'superadmin-only' => \App\Http\Middleware\RequireSuperAdmin::class,
+            'can-admin' => \App\Http\Middleware\CanAdmin::class,
         ]);
         
     })

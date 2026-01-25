@@ -95,11 +95,11 @@ class CompanyController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request,int $broker_id)
     {
         try {
             //get companies by query params: broker_id, status, search, sort_by, sort_direction, per_page, language_code
-            $result = $this->companyService->getCompanies($request);
+            $result = $this->companyService->getCompanies($request,$broker_id);
           
             // Transform the data collection
             $result['data'] = CompanyResource::collection($result['data']);

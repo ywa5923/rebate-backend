@@ -20,9 +20,9 @@ class PromotionRepository
     /**
      * Get paginated promotions with filters
      */
-    public function getPromotions(Request $request): LengthAwarePaginator|Collection
+    public function getPromotions(Request $request,int $broker_id): LengthAwarePaginator|Collection
     {
-        $query = $this->model->newQuery();
+        $query = $this->model->newQuery()->where('broker_id', $broker_id);
         
         // Apply filters
         $this->applyFilters($query, $request);
@@ -72,9 +72,9 @@ class PromotionRepository
     protected function applyFilters($query, Request $request): void
     {
         // Filter by broker ID
-        if ($request->has('broker_id')) {
-            $query->where('broker_id', $request->broker_id);
-        }
+        // if ($request->has('broker_id')) {
+        //     $query->where('broker_id', $request->broker_id);
+        // }
 
         if ($request->has('promotion_id')) {
             $query->where('id', $request->promotion_id);
