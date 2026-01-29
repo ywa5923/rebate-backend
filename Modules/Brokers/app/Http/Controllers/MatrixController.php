@@ -19,15 +19,15 @@ use Illuminate\Support\Facades\Validator;
 
 class MatrixController extends Controller
 {
-    protected bool $isAdmin;
+    
   
     public function __construct(
         protected MatrixService $matrixService
     ) {
-        $this->isAdmin = app('isAdmin');
+        
     }
 
-    public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep)
+    public function getHeaders(MatrixHeadearsQueryParser $queryParser, Request $request, MatrixHeaderRepository $rep,$broker_id)
     {
        
        try {
@@ -41,7 +41,8 @@ class MatrixController extends Controller
         $columnHeaders = $rep->getColumnHeadearsByType(
             'column',
             $queryParser->getWhereParam("matrix_id") ?? null,
-            $queryParser->getWhereParam("broker_id") ?? null,
+            // $queryParser->getWhereParam("broker_id") ?? null,
+            ['broker_id','=',$broker_id],
             $queryParser->getWhereParam("col_group") ?? null,
             $queryParser->getWhereParam("language") ?? null,
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
@@ -52,12 +53,20 @@ class MatrixController extends Controller
         $rowHeaders = $rep->getColumnHeadearsByType(
             'row',
             $queryParser->getWhereParam("matrix_id") ?? null,
-            $queryParser->getWhereParam("broker_id") ?? null,
+            // $queryParser->getWhereParam("broker_id") ?? null,
+            ['broker_id','=',$broker_id],
             $queryParser->getWhereParam("row_group") ?? null,
             $queryParser->getWhereParam("language") ?? null,
             $queryParser->getWhereParam("broker_id_strict")[2] ?? false
         );
 
+        // return response()->json([
+        //     'success'=>true,
+        //     'data'=>[
+        //         'columnHeaders' => $columnHeaders,
+        //         'rowHeaders' => $rowHeaders
+        //     ]
+        // ]);
 
         return response()->json([
             'success'=>true,
@@ -78,15 +87,15 @@ class MatrixController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(Request $request,$broker_id)
     {
         $startTime = microtime(true);
         $validator = Validator::make($request->all(), [
             'matrix' => 'array',
-            'broker_id' => 'required|integer',
+           // 'broker_id' => 'required|integer',
             'matrix_name' => 'required|string',
             'zone_id' => 'sometimes|nullable|integer',
-            'is_admin' => 'sometimes|nullable|boolean',
+           // 'is_admin' => 'sometimes|nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -101,10 +110,10 @@ class MatrixController extends Controller
             ]);
         }
         $matrixName = $data['matrix_name'];
-        $brokerId = $data['broker_id'];
+        //$brokerId = $data['broker_id'];
         $zoneId = $data['zone_id'] ?? null;
-        $isAdmin = $data['is_admin'] ?? null;
-        $isAdmin=$this->isAdmin;
+       // $isAdmin = $data['is_admin'] ?? null;
+        $isAdmin=app('isAdmin');
 
         try {
 
@@ -115,13 +124,13 @@ class MatrixController extends Controller
                 ], 404);
             }
 
-            $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
+            $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $broker_id, $zoneId);
             if (!empty($previousMatrixData) && !$isAdmin) {
                 //set the previous value in the matrix data only if the admin is not true.
                 //admin save in public_value, so we don't need to set the previous value.
                 $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
             }
-            $result = DB::transaction(function () use ($data, $brokerId, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
+            $result = DB::transaction(function () use ($data, $broker_id, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
 
             
                 //matrix cell's is_updated_entry is used to identify the updated entries and previous values in the matrix data.
@@ -130,7 +139,7 @@ class MatrixController extends Controller
 
                 $this->matrixService->saveMatrixData(
                     $data['matrix'],
-                    $brokerId,
+                    $broker_id,
                     $matrixName,
                     $matrixId,
                     $zoneId,
@@ -179,42 +188,44 @@ class MatrixController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request,$broker_id)
     {
 
-        if ($request->has('is_admin')) {
-            $request->merge([
-                'is_admin' => filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
-            ]);
-        }
+        // if ($request->has('is_admin')) {
+        //     $request->merge([
+        //         'is_admin' => filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+        //     ]);
+        // }
+
+        $isAdmin=app('isAdmin');
 
         $validator = Validator::make($request->all(), [
             'zone_id' => 'sometimes|nullable|integer',
-            'broker_id' => 'required|integer',
+            //'broker_id' => 'required|integer',
             'matrix_name' => 'required|string',
-            'is_admin' => 'sometimes|nullable|boolean',
+            //'is_admin' => 'sometimes|nullable|boolean',
         ]);
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
         $data = $validator->validated();
         $zoneId = $data['zone_id'] ?? null;
-        $is_admin = $data['is_admin'] ?? null;
-        $brokerId = $data['broker_id'];
+       // $is_admin = $data['is_admin'] ?? null;
+        //$brokerId = $data['broker_id'];
         $matrixName = $data['matrix_name'];
 
 
-        if (!$matrixName || !$brokerId) {
+        if (!$matrixName || !$broker_id) {
             return response()->json(['error' => 'matrix_id and broker_id are required'], 400);
         }
 
         try {
 
-            $matrixData = $this->matrixService->getFormattedMatrix($matrixName, $brokerId, $zoneId);
+            $matrixData = $this->matrixService->getFormattedMatrix($matrixName, $broker_id, $zoneId);
 
             return response()->json([
                 'matrix' => $matrixData,
-                'broker_id' => $brokerId,
+                'broker_id' => $broker_id,
                 'matrix_name' => $matrixName
             ]);
         } catch (\Exception $e) {

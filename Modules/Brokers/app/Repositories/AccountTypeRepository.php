@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\Url;
+use Modules\Brokers\DTOs\AccountTypeFilters;
 class AccountTypeRepository
 {
     protected AccountType $model;
@@ -20,20 +21,20 @@ class AccountTypeRepository
     /**
      * Get paginated account types with filters
      */
-    public function getAccountTypes(Request $request): LengthAwarePaginator|Collection
+    public function getAccountTypes(AccountTypeFilters $filters, int $broker_id): LengthAwarePaginator|Collection
     {
         $query = $this->model->newQuery();
-        
+        $query->where('broker_id', $broker_id);
         // Apply filters
-        $this->applyFilters($query, $request);
+        $this->applyFilters($query, $filters);
 
         // Apply sorting
-        $this->applySorting($query, $request);
+        $this->applySorting($query, $filters);
 
-        if ($request->has('per_page') || $request->has('page')) {
+        if ($filters->base->perPage || $filters->base->page) {
             // Paginate with specific page
-            $perPage = $request->get('per_page', 15);
-            $page = $request->get('page', 1);
+            $perPage = $filters->base->perPage;
+            $page = $filters->base->page ;
             return $query->paginate($perPage, ['*'], 'page', $page);
         } else {
             return $query->get();
@@ -222,43 +223,43 @@ class AccountTypeRepository
     /**
      * Apply filters to query
      */
-    private function applyFilters($query, Request $request): void
+    private function applyFilters($query, AccountTypeFilters $filters): void
     {
-        if ($request->has('broker_id')) {
-            $query->where('broker_id', $request->broker_id);
-        }
+        // if ($request->has('broker_id')) {
+        //     $query->where('broker_id', $request->broker_id);
+        // }
 
-        if ($request->has('account_type_id')) {
-            $query->where('id', $request->account_type_id);
+        if ($filters->accountTypeId) {
+            $query->where('id', $filters->accountTypeId);
         }
 
         $withArray = [];
 
-        if ($request->has('zone_code')) {
-            $withArray['optionValues'] = function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
+        if ($filters->base->zoneCode) {
+            $withArray['optionValues'] = function ($q) use ($filters) {
+                $q->where(function ($subQ) use ($filters) {
                     $subQ->where('is_invariant', 1)
-                        ->orWhere('zone_code', $request->zone_code);
+                        ->orWhere('zone_code', $filters->base->zoneCode);
                 });
             };
         }else{
             //if zone_code is not provided, we need to get the option values 
             //for the account type that have no zone_code and zone_id, i.e original data submitted by broker
-            $withArray['optionValues'] = function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
+            $withArray['optionValues'] = function ($q)  {
+                $q->where(function ($subQ)  {
                     $subQ->where('zone_code', null)->where('zone_id',null);
                 });
             };
         }
 
-        if ($request->has('language_code')) {
+        if ($filters->base->languageCode) {
             if (isset($withArray['optionValues'])) {
-                $withArray['optionValues.translations'] = function ($q) use ($request) {
-                    $q->where('language_code', $request->language_code);
+                $withArray['optionValues.translations'] = function ($q) use ($filters) {
+                    $q->where('language_code', $filters->base->languageCode);
                 };
             } else {
-                $withArray['optionValues.translations'] = function ($q) use ($request) {
-                    $q->where('language_code', $request->language_code);
+                $withArray['optionValues.translations'] = function ($q) use ($filters) {
+                    $q->where('language_code', $filters->base->languageCode);
                 };
             }
         }
@@ -269,11 +270,11 @@ class AccountTypeRepository
             $query->with(['broker', 'urls','optionValues']);
         }
 
-        if ($request->has('broker_type')) {
-            $query->whereHas('broker.brokerType', function($q) use ($request) {
-                $q->where('name', $request->broker_type);
-            });
-        }
+        // if ($request->has('broker_type')) {
+        //     $query->whereHas('broker.brokerType', function($q) use ($request) {
+        //         $q->where('name', $request->broker_type);
+        //     });
+        // }
 
         // if ($request->has('is_active')) {
         //     $query->where('is_active', $request->boolean('is_active'));
@@ -287,16 +288,12 @@ class AccountTypeRepository
     /**
      * Apply sorting to query
      */
-    private function applySorting($query, Request $request): void
+    private function applySorting($query, AccountTypeFilters $filters): void
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'asc');
-
-        $allowedSortFields = ['name', 'broker_type', 'is_active', 'order', 'created_at', 'updated_at'];
-
-        if (in_array($sortBy, $allowedSortFields)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $sortBy = $filters->sortBy ?? 'created_at';
+        $sortDirection = $filters->sortDirection ?? 'asc';
+        $query->orderBy($sortBy, $sortDirection);
+        
     }
 
     public function getAccountTypeName(int $accountTypeId): string

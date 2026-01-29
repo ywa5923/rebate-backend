@@ -3,9 +3,7 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Services\AccountTypeService;
@@ -14,17 +12,17 @@ use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Url;
 use Modules\Brokers\Transformers\URLResource;
 use Modules\Brokers\Services\UrlService;
-use App\Utilities\ModelHelper;
 
+use Modules\Brokers\DTOs\AccountTypeFilters;
 
 class AccountTypeController extends Controller
 {
     protected AccountTypeService $accountTypeService;
-    protected bool $isAdmin;
+  
     public function __construct(AccountTypeService $accountTypeService)
     {
         $this->accountTypeService = $accountTypeService;
-        $this->isAdmin = app('isAdmin');
+      
     }
 
     /**
@@ -96,12 +94,22 @@ class AccountTypeController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request, int $broker_id)
     {
         try {
             //get ac types by query params: broker_id, zone_id, broker_type, sort_by, sort_direction, per_page,language_code
-            //
-            $result = $this->accountTypeService->getAccountTypes($request);
+           
+            $validatedFilters = $request->validate([
+                'zone_code' => 'sometimes|string|exists:zones,code',
+                'sort_by' => 'sometimes|string|in:name,is_active,order,created_at,updated_at',
+                'sort_direction' => 'sometimes|string|in:asc,desc',
+                'per_page' => 'sometimes|integer',
+                'language_code' => 'sometimes|string',
+                'account_type_id' => 'sometimes|integer|exists:account_types,id',
+                'page' => 'sometimes|integer|min:1',
+            ]);
+            $filters = AccountTypeFilters::from($validatedFilters);
+            $result = $this->accountTypeService->getAccountTypes($filters, $broker_id);
 
             // Transform the data collection
             $result['data'] = AccountTypeResource::collection($result['data']);
@@ -250,7 +258,7 @@ class AccountTypeController extends Controller
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
-        $isAdmin=$this->isAdmin;
+        $isAdmin=app('isAdmin');
         $id = ($id === 'null' || $id === '') ? null : $id;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required');
@@ -362,7 +370,7 @@ class AccountTypeController extends Controller
         //or is admin
         $broker_id = $request->broker_id;
         
-            $isAdmin=$this->isAdmin;
+            $isAdmin=app('isAdmin');
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }

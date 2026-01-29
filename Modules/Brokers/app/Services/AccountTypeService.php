@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Repositories\MatrixHeaderRepository;
-
+use Modules\Brokers\DTOs\AccountTypeFilters;
 class AccountTypeService
 {
     protected AccountTypeRepository $repository;
@@ -23,17 +23,17 @@ class AccountTypeService
     /**
      * Get paginated account types with filters
      */
-    public function getAccountTypes(Request $request): array
+    public function getAccountTypes(AccountTypeFilters $filters, int $broker_id): array
     {
         try {
-            $accountTypes = $this->repository->getAccountTypes($request);
+            $accountTypes = $this->repository->getAccountTypes($filters, $broker_id);
 
             $response = [
                 'success' => true,
                 'data' => $accountTypes,
             ];
 
-            if ($request->has('per_page')) {
+            if ($filters->base->perPage || $filters->base->page) {
                 $response['pagination'] = [
                     'current_page' => $accountTypes->currentPage(),
                     'last_page' => $accountTypes->lastPage(),

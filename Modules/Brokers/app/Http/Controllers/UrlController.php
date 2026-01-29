@@ -20,13 +20,7 @@ class UrlController extends Controller
     {
         $this->urlService = $urlService;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('brokers::index');
-    }
+   
 
     public function getGroupedUrls($broker_id, $entity_type, $entity_id, Request $request)
     {
@@ -58,9 +52,11 @@ class UrlController extends Controller
 
         return response()->json([
             'success' => true,
-            'links_grouped_by_account_id' =>  $grouped,
-            'master_links_grouped_by_type' => $masterLinks,
-            'links_groups' => ['mobile', 'webplatform', 'swap', 'commission']
+            'data'=>[
+                'links_grouped_by_account_id' =>  $grouped,
+                'master_links_grouped_by_type' => $masterLinks,
+                'links_groups' => ['mobile', 'webplatform', 'swap', 'commission']
+            ]
 
         ]);
         }catch(\Exception $e){
@@ -73,45 +69,6 @@ class UrlController extends Controller
 
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('brokers::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('brokers::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('brokers::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.

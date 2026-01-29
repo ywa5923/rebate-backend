@@ -10,7 +10,7 @@ class MatrixHeadearsQueryParser extends BaseQueryParser
     protected $querySafeParams = [
         "language"=>['eq'],
        // "type"=>['eq'],
-        "broker_id"=>['eq'],
+       // "broker_id"=>['eq'],
         "matrix_id"=>['eq'],
         "broker_id_strict"=>['eq'],
         "col_group"=>['eq'],
@@ -22,7 +22,7 @@ class MatrixHeadearsQueryParser extends BaseQueryParser
         
         "language" => "string|min:2|max:5",
        // "type" => "string|min:3|max:10",
-        "broker_id"=>"string|min:1|max:45",
+        //"broker_id"=>"string|min:1|max:45",
         "matrix_id"=>"string|min:1|max:45",
         "broker_id_strict"=>"boolean",
         "col_group"=>"string|min:1|max:45",
