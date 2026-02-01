@@ -181,6 +181,8 @@ class MatrixHeaderRepository
         //     1 => "="
         //     2 => "Group 1"-
         //   ]
+
+        
         $languageCode = $language ?? 'en';
         //$withArray = ['formType.items.dropdown.dropdownOptions'];
         $withArray = [
@@ -196,8 +198,8 @@ class MatrixHeaderRepository
         }
 
         if($groupName){
-            //return MatrixHeader::with($withArray)
-            return MatrixHeader::query()->where('group_name', $groupName)
+            return MatrixHeader::with($withArray)
+            ->where('group_name', $groupName)
             ->where('type', $type)
             ->orderBy('order','asc')
             ->orderBy('id','asc')
