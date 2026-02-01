@@ -34,7 +34,9 @@ class MatrixService
     public function saveMatrixData(array $matrixData, int $brokerId, string $matrixName, int $matrixId, ?int $zoneId = null, ?bool $isAdmin = null): void
     {
         $this->matrixHeaderRepository->flushMatrix($matrixId, $brokerId,$zoneId);
+        
         $headersSlugsWithOptions=$this->matrixHeaderRepository->insertHeadears($matrixData, $brokerId, $matrixName, $matrixId);
+       
         $allHeaders = $this->matrixHeaderRepository->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
         [$rowDimIds, $colDimIds]= $this->matrixHeaderRepository->insertMatrixDimensions($matrixData, $brokerId, $matrixName, $matrixId,$allHeaders);
         $this->matrixHeaderRepository->insertMatrixValues($matrixData, $brokerId, $matrixName, $matrixId,$rowDimIds,$colDimIds,$zoneId,$isAdmin);
@@ -238,7 +240,8 @@ class MatrixService
                     'public_value' => $value ? json_decode($value->public_value, true) : null,
                     'is_updated_entry' => $value ? $value->is_updated_entry : false,
                     'rowHeader' => $rowDim->matrixHeader->slug,
-                    'colHeader' => $colDim->matrixHeader->slug,
+                    //'colHeader' => $colDim->matrixHeader->slug,
+                    'colHeader' => $colDim->account_type_id,
                     'type' => $colDim->matrixHeader->formType->name ?? 'undefined'
                     //'selectedRowHeaderSubOptions' => $subOptions->toArray()
                 ];

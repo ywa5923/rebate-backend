@@ -25,5 +25,10 @@ class FormType extends Model
         return $this->hasMany(MatrixHeader::class);
     }
 
+    public function getFormTypeWithItems($name){
+        return $this->where('name', $name)->with('items.dropdown.dropdownOptions'
+        )->firstOrFail();
+    }
+
 
 }

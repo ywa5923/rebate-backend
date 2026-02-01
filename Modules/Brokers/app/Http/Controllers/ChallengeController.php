@@ -20,18 +20,16 @@ class ChallengeController extends Controller
     protected ChallengeCategoryService $challengeCategoryService;
     protected ChallengeService $challengeService;
 
-    protected bool $isAdmin;
     public function __construct(ChallengeCategoryService $challengeCategoryService, ChallengeService $challengeService)
     {
         $this->challengeCategoryService = $challengeCategoryService;
         $this->challengeService = $challengeService;
-        $this->isAdmin = app('isAdmin');
     }
 
     /**
      * Refactored show method using helper methods from ChallengeService
      */
-    public function show(Request $request): JsonResponse
+    public function show(Request $request, int $broker_id): JsonResponse
     {
         //to do
         //check if the logged in user can view broker challenge data
@@ -42,8 +40,8 @@ class ChallengeController extends Controller
             'category_id' => 'required|integer|exists:challenge_categories,id',
             'step_id' => 'required|integer|exists:challenge_steps,id',
             'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-            'is_placeholder' => 'required|boolean',
-            'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
+            //'is_placeholder' => 'required|boolean',
+            //'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
         ]);
             
@@ -51,30 +49,28 @@ class ChallengeController extends Controller
            //  affiliate link and affiliate master link
            //so in placeholder mode we return only placeholder data useful for admin only to add/edit placeholders
            //these placeholders are shown in broker's dashboard  challenge page when data is empty
-           $isPlaceholder=$validatedData['is_placeholder']?true:false;
-           $amountId= $isPlaceholder ?null:$validatedData['amount_id'];
-           $brokerId=$validatedData['broker_id'] ?? null;
+           //$isPlaceholder=$validatedData['is_placeholder']?true:false;
+           //$amountId= $isPlaceholder ?null:$validatedData['amount_id'];
+           $amountId= $validatedData['amount_id'];
+           //$brokerId=$validatedData['broker_id'] ?? null;
            $zoneId = $validatedData['zone_id'] ?? null;
            $categoryId=$validatedData['category_id'];
            $stepId=$validatedData['step_id'];
 
            //the chalenge row for the current parameters
            $challenge=  $this->challengeService->findChallengeByParams(
-            $isPlaceholder,
+            false,
             $categoryId,
             $stepId,
             $amountId,
-            $brokerId,
+            $broker_id,
             $zoneId
         );
         $chId=$challenge?->id??null;
         
-        $responseData=$this->challengeService->getChallengeData($chId, $brokerId, $isPlaceholder, $zoneId);
-        
-        if(!$isPlaceholder){
-            //if not placeholder mode, add the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
-            $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
-        }
+        $responseData=$this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
+        //if not placeholder mode, add the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+        $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
         
         return response()->json([
             'success' => true,
@@ -95,6 +91,66 @@ class ChallengeController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function showPlaceholders(Request $request): JsonResponse
+    {
+        //to do
+        //check if the logged in user can view broker challenge data
+        try {
+            // $validatedData = $this->challengeService->validateGetRequestData($request);
+             
+            $validatedData=$request->validate([
+             'category_id' => 'required|integer|exists:challenge_categories,id',
+             'step_id' => 'required|integer|exists:challenge_steps,id',
+            
+             //'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
+             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+         ]);
+             
+            // for placeholder mode, the amount id is null,we return the matrix placeholders array and placeholder data for evaluation cost discount,
+            //  affiliate link and affiliate master link
+            //so in placeholder mode we return only placeholder data useful for admin only to add/edit placeholders
+            //these placeholders are shown in broker's dashboard  challenge page when data is empty
+           
+            $amountId= null;//for placeholders, the amount id is null
+            //$brokerId=$validatedData['broker_id'] ?? null;
+            $zoneId = $validatedData['zone_id'] ?? null;
+            $categoryId=$validatedData['category_id'];
+            $stepId=$validatedData['step_id'];
+ 
+            //the chalenge row for the current parameters
+            $challenge=  $this->challengeService->findChallengeByParams(
+             true,
+             $categoryId,
+             $stepId,
+             $amountId,
+             null,
+             $zoneId
+         );
+         $chId=$challenge?->id??null;
+         
+         $responseData=$this->challengeService->getChallengeData($chId, null, true, $zoneId);
+          
+         return response()->json([
+             'success' => true,
+             'data' => array_filter($responseData, fn($v) => $v !== null)
+         ]);
+         
+ 
+         } catch (ValidationException $e) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Validation failed',
+                 'errors' => $e->errors()
+             ], 422);
+         } catch (\Throwable $e) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Failed to retrieve challenge data',
+                 'error' => $e->getMessage()
+             ], 500);
+         }
     }
 
     
@@ -205,35 +261,27 @@ class ChallengeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, int $broker_id): JsonResponse
     {
         try { 
             $validatedData = $this->challengeService->validatePostRequestData($request);
-            $brokerId = $validatedData['broker_id']??null;
+           // $brokerId = $validatedData['broker_id']??null;
             $zoneId = $validatedData['zone_id'] ?? null;
-            $isAdmin = $validatedData['is_admin'] ?? null;
+            //$isAdmin = $validatedData['is_admin'] ?? null;
             $isPlaceholder = $validatedData['is_placeholder'];
           
-            $isAdmin = $this->isAdmin;
+            $isAdmin = app('isAdmin');
          
             //process the request and update the challenge matrix and extra data using transaction
-            $processResult = $this->challengeService->processRequest($validatedData, $brokerId, $isPlaceholder, $isAdmin,$zoneId);
-
-            $responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $brokerId, $isPlaceholder, $zoneId);
             
-            $responseData['category_id']=$validatedData['category_id'];
-            $responseData['step_id']=$validatedData['step_id'];
-            $responseData['amount_id']=$validatedData['amount_id']??null;
-            $resposeData['broker_id']=$brokerId;
-            $resposeData['zone_id']=$zoneId;
-            $resposeData['is_placeholder']=$isPlaceholder;
-            $resposeData['is_admin']=$isAdmin;
-           
+           ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, $broker_id, $isPlaceholder, $isAdmin,$zoneId);
+
+            //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
            
             return response()->json([
                 'success' => true,
-                'message' => 'Challenge matrix created successfully',
-                'data' => $responseData
+                'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
+                //'data' => $responseData
             ], 201);
 
         } catch (\Throwable $e) {

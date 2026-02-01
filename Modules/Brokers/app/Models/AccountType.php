@@ -75,6 +75,9 @@ use Modules\Translations\Models\Zone;
 
 class AccountType extends Model
 {
+    //these constants are used to return the account type's options value or options public values
+    const RETURN_TYPE_VALUE = 'value';
+    const RETURN_TYPE_PUBLIC_VALUE = 'public_value';
     /**
      * The attributes that are mass assignable.
      *
@@ -145,5 +148,40 @@ class AccountType extends Model
             // Delete all related optionValues (polymorphic)
             $accountType->optionValues()->delete();
         });
+    }
+
+    public function translations():MorphMany
+    {
+        return $this->morphMany(Translation::class, 'translationable');
+    }
+
+    public function getAccountTypesNames($broker_id, $return_type=self::RETURN_TYPE_VALUE,$language_code = 'en'):array
+    {
+        $with = [
+            'optionValues' => function ($q) {
+                $q->whereHas('option', fn($oq) => $oq->where('option_slug', 'account_type_name'));
+            },
+        ];
+    
+        if ($language_code !== 'en') {
+            $with['optionValues.translations'] = function ($q) use ($language_code) {
+                $q->where('language_code', $language_code);
+            };
+        }
+    
+        $accountTypes = $this->newQuery()
+            ->with($with)
+            ->where('broker_id', $broker_id)
+            ->get();
+
+            return $accountTypes->map(function($accountType) use ($return_type){
+                $name = $return_type === self::RETURN_TYPE_VALUE ? $accountType->optionValues->first()->value : $accountType->optionValues->first()->public_value;
+                return [
+                    'id' => $accountType->id,
+                    'name' => $name,
+                    'slug' => strtolower(str_replace(' ', '-', $name)),
+                ];
+            })->toArray();
+
     }
 }

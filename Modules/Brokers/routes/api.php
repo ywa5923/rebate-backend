@@ -36,10 +36,6 @@ use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 Route::prefix('v1')->group( function () {
 
 
-    // Route::middleware(['auth:sanctum'])->group(function () {
-    // });
-
-      
        
     // Specific routes MUST come before apiResource to avoid conflicts
     Route::middleware('auth:sanctum')->post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
@@ -102,10 +98,11 @@ Route::prefix('v1')->group( function () {
 
      // Challenges table routes
      Route::get('challenges/categories', [ChallengeController::class, 'getChallengeCategories']);
-     Route::post('challenges', [ChallengeController::class, 'store']);
+     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{broker_id}', [ChallengeController::class, 'store']);
     // Route::get('challenges', [ChallengeController::class, 'index']);
-    Route::get('challenges', [ChallengeController::class, 'show']);
-     Route::get('challenges/show', [ChallengeController::class, 'show']);
+    Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);
+    Route::get('challenges/placeholders', [ChallengeController::class, 'showPlaceholders']);
+    // Route::get('challenges/show', [ChallengeController::class, 'show']);
      
      //=================================SUPERADMIN ONLY ROUTES======================================
      Route::middleware(['auth:sanctum', 'superadmin-only'])->get('zones/form-config', [ZoneController::class, 'getFormConfig']);
@@ -118,7 +115,5 @@ Route::prefix('v1')->group( function () {
     // Country REST API routes
      Route::middleware(['auth:sanctum', 'superadmin-only'])->get('dropdown-lists/form-config', [DropdownListController::class, 'getFormConfig']);
      Route::middleware(['auth:sanctum', 'superadmin-only'])->apiResource('dropdown-lists', DropdownListController::class)->names('dropdown-lists');
-     
-   
-
+    
 });

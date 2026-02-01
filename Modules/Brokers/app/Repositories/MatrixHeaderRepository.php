@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\MatrixDimension;
 use Modules\Brokers\Models\MatrixValue;
 use Modules\Brokers\Models\MatrixDimensionOption;
-
+use Modules\Brokers\Models\AccountType;
+use Modules\Brokers\Models\FormType;
+use Modules\Brokers\Transformers\FormTypeResource;
+use Modules\Translations\Models\Translation;
 class MatrixHeaderRepository
 {
     // /**
@@ -90,7 +93,7 @@ class MatrixHeaderRepository
      * @param bool $withChildren Whether to include the children of the row headers
      * @return Collection
      */
-    public function getColumnHeadearsByType(string $type, ?array $matrixNameCondition, ?array $brokerIdCondition, ?array $groupNameCondition, ?array $languageCode, ?bool $broker_id_strict = false): Collection
+    public function getColumnHeadearsByTypeOld(string $type, ?array $matrixNameCondition, ?array $brokerIdCondition, ?array $groupNameCondition, ?array $languageCode, ?bool $broker_id_strict = false): Collection
     {
          //$matrixNameCondition is an array of 3 elements:
         // array:3 [ 
@@ -157,25 +160,73 @@ class MatrixHeaderRepository
         
     }
 
-    // public function getRowHeaders(array $matrixNameCondition, ?array $brokerIdCondition, $broker_id_strict = false): Collection
-    // {
-    //     return MatrixHeader::where(function ($query) use ($brokerIdCondition, $broker_id_strict) {
-    //         if ($broker_id_strict &&  !empty($brokerIdCondition)) {
-    //             $query->where(...$brokerIdCondition);
-    //         } else {
-    //             $query->whereNull('broker_id');
-    //             if ($brokerIdCondition)
-    //                 $query->orWhere(...$brokerIdCondition);
-    //         }
-    //     })
-    //         ->where('type', 'row')
-    //         ->whereNull('parent_id')
-    //         ->whereHas('matrix', function ($query) use ($matrixNameCondition) {
-    //             $query->where(...$matrixNameCondition);
-    //         })
-    //         ->with('children')
-    //         ->get();
-    // }
+    public function getHeadearsByType(string $type, ?string $matrixName, ?int $brokerId, ?string $groupName, ?string  $language, ?bool $broker_id_strict = false): Collection
+    {
+         //$matrixNameCondition is an array of 3 elements:
+        // array:3 [ 
+        //     0 => "name"
+        //     1 => "="
+        //     2 => "Matrix-1"
+        //   ]
+        // $brokerIdCondition is an array of 3 elements:
+        // array:3 [ 
+        //     0 => "broker_id"
+        //     1 => "="
+        //     2 => "1"
+        //   ]
+        // $broker_id_strict is a boolean value
+        // $groupNameCondition is an array of 3 elements:
+        // array:3 [ 
+        //     0 => "group_name"
+        //     1 => "="
+        //     2 => "Group 1"-
+        //   ]
+        $languageCode = $language ?? 'en';
+        //$withArray = ['formType.items.dropdown.dropdownOptions'];
+        $withArray = [
+            'formType.items' => function($query) {
+                $query->orderBy('form_type_form_item.id','asc');
+            },
+            'formType.items.dropdown.dropdownOptions'
+        ];
+        if( $languageCode!='en'){
+            $withArray['translations']= function($query) use ($languageCode) {
+                $query->where('language_code', $languageCode); // or any specific language
+            };
+        }
+
+        if($groupName){
+            return MatrixHeader::with($withArray)
+            ->where('group_name', $groupName)
+            ->where('type', $type)
+            ->get();
+        }else{
+        $qb= MatrixHeader::with($withArray)
+            ->where(function ($query) use ($brokerId, $broker_id_strict) {
+                if ($broker_id_strict && $brokerId) {
+                    $query->where('broker_id', $brokerId);
+                } else {
+                    $query->whereNull('broker_id');
+                    if ($brokerId)
+                        $query->orWhere('broker_id', $brokerId);
+                }
+            })
+            ->where('type', $type);
+
+            if($type=='row'){
+                $qb->whereNull('parent_id')->with('children');
+            }
+
+            //->where(...$matrixIdCondition)
+           return  $qb->whereHas('matrix', function ($query) use ($matrixName) {
+                $query->where('name', $matrixName);
+            })
+            ->get();
+        }
+        
+    }
+
+    
 
     public function getAllHeaders(array $matrixNameCondition, ?array $brokerIdCondition, $broker_id_strict = false): Collection
     {
@@ -196,14 +247,31 @@ class MatrixHeaderRepository
     }
     public function flushMatrix(int $matrixId,int $brokerId,?int $zoneId=null)
     {
+        //remove matrix value translations
+        $ids = MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->pluck('id');
+        if($ids->count() > 0)
+        {
+            Translation::where('translationable_type', MatrixValue::class)
+            ->whereIn('translationable_id', $ids)
+            ->delete();
+        }
         MatrixDimensionOption::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         MatrixDimension::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
+        //remove matrix header translations
+        $ids = MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->pluck('id');
+        if($ids->count() > 0)
+        {
+            Translation::where('translationable_type', MatrixHeader::class)
+            ->whereIn('translationable_id', $ids)
+            ->delete();
+        }
         MatrixHeader::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'type'=>'row'])->delete();
         if($zoneId){
             MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId,'zone_id'=>$zoneId])->delete();
         }else{
             MatrixValue::where(['matrix_id'=>$matrixId,'broker_id'=>$brokerId])->delete();
         }
+
        
     }
     public function insertSelectedSubOptions(array $headearSelectedSubOptions, Collection $allHeaders,int $matrixId,int $brokerId)
@@ -399,23 +467,26 @@ class MatrixHeaderRepository
                 'type' => 'row'
             ];
 
+            //Modified: column header slug represent the id of the account type
+            //so we don't need to find the header id
             foreach ($row as $cellIndex => $cell) {
                 $colHeaderSlug = $cell['colHeader'];
-                $colHeaderId = $this->findHeaderIdBySlugAndParent($colHeaderSlug, $allHeaders,true);
-
+               // $colHeaderId = $this->findHeaderIdBySlugAndParent($colHeaderSlug, $allHeaders,true);
+               //Coll headear slug represent the id of the account type
                 if (!isset($columnDimensions[$cellIndex])) {
                     $columnDimensions[$cellIndex] = [
                         'matrix_id' => $matrixId,
                         'broker_id' => $brokerId,
                         'order' => $cellIndex,
-                        'matrix_header_id' => $colHeaderId,
+                        //'matrix_header_id' => $colHeaderId,
+                        'account_type_id' =>  $colHeaderSlug,
                         'type' => 'column'
                     ];
                 }
 
-                if ($colHeaderId == null) {
-                    throw new \Exception("Column header not found");
-                }
+                // if ($colHeaderId == null) {
+                //     throw new \Exception("Column header not found");
+                // }
 
                
             }
@@ -510,6 +581,23 @@ class MatrixHeaderRepository
     public function deleteById(int $id): bool
     {
         return MatrixHeader::where('id', $id)->delete();
+    }
+
+    public function getAccountTypesColumnHeaders(int $broker_id,string $form_type_name='NumberWithUnitWithCurrency'): array
+    {
+        //we don t need translation for headears.These column headears are only for editable matrix in dashboard
+        $accountTypes = (new AccountType)->getAccountTypesNames($broker_id);
+        $formType = (new FormType())->getFormTypeWithItems($form_type_name);
+        $formattedFormType=FormTypeResource::make($formType);
+        return array_map(function($accountType) use ($formattedFormType){
+            return [
+                //'id' => $accountType['id'],
+                'name' => $accountType['name'],
+                //'slug' => $accountType['slug'].'-'.$accountType['id'],
+                'slug' => $accountType['id'],
+                'form_type' =>  $formattedFormType,
+            ];
+        }, $accountTypes);
     }
 
 }

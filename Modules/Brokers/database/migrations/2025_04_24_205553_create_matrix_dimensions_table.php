@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('broker_id')->constrained('brokers')->onDelete('cascade');
             $table->foreignId('matrix_id')->constrained('matrices')->onDelete('cascade');
-            $table->foreignId('matrix_header_id')->constrained('matrix_headers')->onDelete('cascade');
+            $table->foreignId('matrix_header_id')->nullable()->constrained('matrix_headers')->onDelete('cascade');
+            $table->foreignId('account_type_id')->nullable()->constrained('account_types')->onDelete('cascade');
             $table->timestamps();
         });
     }
