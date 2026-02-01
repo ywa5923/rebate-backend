@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug');
             $table->string('group_name')->nullable();
+            $table->integer('order')->default(0);
             $table->text('description')->nullable();
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('parent_id')->nullable()->constrained('matrix_headers')->nullOnDelete();

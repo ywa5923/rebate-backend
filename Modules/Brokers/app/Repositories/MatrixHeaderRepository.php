@@ -196,9 +196,11 @@ class MatrixHeaderRepository
         }
 
         if($groupName){
-            return MatrixHeader::with($withArray)
-            ->where('group_name', $groupName)
+            //return MatrixHeader::with($withArray)
+            return MatrixHeader::query()->where('group_name', $groupName)
             ->where('type', $type)
+            ->orderBy('order','asc')
+            ->orderBy('id','asc')
             ->get();
         }else{
         $qb= MatrixHeader::with($withArray)
@@ -221,6 +223,8 @@ class MatrixHeaderRepository
            return  $qb->whereHas('matrix', function ($query) use ($matrixName) {
                 $query->where('name', $matrixName);
             })
+            ->orderBy('order','asc')
+            ->orderBy('id','asc')
             ->get();
         }
         
