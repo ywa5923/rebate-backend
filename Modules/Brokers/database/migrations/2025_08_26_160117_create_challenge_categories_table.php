@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('image')->nullable();
             $table->string('slug');
+            $table->integer('order')->default(0);
+            $table->foreignId('broker_id')->nullable()->constrained('brokers')->onDelete('cascade');
             $table->timestamps();
         });
     }

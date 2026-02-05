@@ -13,6 +13,7 @@ use Modules\Brokers\Transformers\CostDiscountResource;
 use Modules\Brokers\Transformers\AffiliateLinkResource;
 
 
+
 class ChallengeService
 {
     protected ChallengeRepository $challengeRepository;
@@ -43,11 +44,11 @@ class ChallengeService
             'matrix' => 'required|array',
             'broker_id' => 'nullable|integer|exists:brokers,id',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-            'is_admin' => 'sometimes|nullable|boolean',
+            
             'evaluation_cost_discount' => 'sometimes|nullable|string',
             'affiliate_link' => 'sometimes|nullable|string',
             'affiliate_master_link' => 'sometimes|nullable|string',
-           
+
         ]);
     }
 
@@ -74,18 +75,18 @@ class ChallengeService
     public function processRequest(array $validatedData, ?int $brokerId, bool $isPlaceholder, bool $isAdmin, ?int $zoneId = null): array
     {
 
-       // $brokerId = $validatedData['broker_id']??null;
-       // $zoneId = $validatedData['zone_id'] ?? null;
-       // $isAdmin = $validatedData['is_admin'] ?? null;
-       // $isPlaceholder = $validatedData['is_placeholder'];
+        // $brokerId = $validatedData['broker_id']??null;
+        // $zoneId = $validatedData['zone_id'] ?? null;
+        // $isAdmin = $validatedData['is_admin'] ?? null;
+        // $isPlaceholder = $validatedData['is_placeholder'];
 
         DB::beginTransaction();
 
         try {
             //check if challenge already exists
             //if it exist delete it
-            $challenge = $this->challengeRepository->exists((int)$validatedData['is_placeholder'], $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
-           
+            $challenge = $this->challengeRepository->exists((int)$isPlaceholder, $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
+
             if (!$challenge) {
 
                 //create a new challenge if it does not exist even in placeholder mode
@@ -102,12 +103,10 @@ class ChallengeService
                 // Save matrix data
                 $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
 
-                $this->saveNewMatrixExtraData($validatedData, $challenge->id, $brokerId, $isPlaceholder, $isAdmin,$zoneId );
-
-
+                $this->saveNewMatrixExtraData($validatedData, $challenge->id, $brokerId, $isPlaceholder, $isAdmin, $zoneId);
             } else {
-                 //if a challenge exist for this matrix,udate,delete or create the matrix and the extra data
-               
+                //if a challenge exist for this matrix,udate,delete or create the matrix and the extra data
+
                 //how matrix save works in frontend
                 //1. if the admin is true and the matrix cell public_value is empty, 
                 //the cell's value will be injected in matrix's cell's public_value
@@ -119,7 +118,7 @@ class ChallengeService
                 //to the backend as the new matrix data containing cell's public_values,and values.
                 //6. When the extra data is saved from the frontend, the extra data data is sent 
                 //to the backend : for admin will be sent only public_values of the links and discounts, for placeholder and user will be sent only their values.
-               
+
                 //if a user is updating the matrix, set cell's previous_value to the cell's value
                 $newMatrix = ($isPlaceholder || $isAdmin) ? $validatedData['matrix'] : $this->setPreviousValueInMatrixData(
                     $this->getChallengeMatrixData($challenge->id, $zoneId),
@@ -127,12 +126,11 @@ class ChallengeService
                 );
                 //remove old chalenge's matrix values
                 $this->challengeRepository->deleteChallengeMatrixValues($challenge->id); // Save matrix data
-               //save the new matrix data
+                //save the new matrix data
                 $this->saveMatrixData($newMatrix, $challenge->id, $brokerId, $zoneId, $isAdmin);
-             
+
                 //Compare and update the existing matrix and extra data(affiliate link, affiliate master link, evaluation cost discount)
                 $this->updateMatrixAndExtraData($validatedData, $challenge->id, $brokerId, $isPlaceholder, $isAdmin, $zoneId);
-                
             }
 
             // Create challenge
@@ -144,14 +142,14 @@ class ChallengeService
             throw $e;
         }
     }
-    
-    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, ?int $brokerId, bool $isPlaceholder,bool $isAdmin, ?int $zoneId = null): void
+
+    public function updateMatrixAndExtraData(array $validatedData, int $challengeId, ?int $brokerId, bool $isPlaceholder, bool $isAdmin, ?int $zoneId = null): void
     {
-        $this->costDiscountRepository->upsertCostDiscount($challengeId, $validatedData['evaluation_cost_discount']??null, $brokerId, $isAdmin, $isPlaceholder, $zoneId);
-        $this->urlRepository->upsertAffiliateLink($challengeId, $validatedData['affiliate_link']??null, 'Affiliate Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
-        $this->urlRepository->upsertAffiliateLink(null, $validatedData['affiliate_master_link']??null, 'Affiliate Master Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+        $this->costDiscountRepository->upsertCostDiscount($challengeId, $validatedData['evaluation_cost_discount'] ?? null, $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+        $this->urlRepository->upsertAffiliateLink($challengeId, $validatedData['affiliate_link'] ?? null, 'Affiliate Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
+        $this->urlRepository->upsertAffiliateLink(null, $validatedData['affiliate_master_link'] ?? null, 'Affiliate Master Link', $brokerId, $isAdmin, $isPlaceholder, $zoneId);
     }
-  
+
 
     /**
      * Save new matrix extra data:affiliate link, affiliate master link, evaluation cost discount
@@ -164,7 +162,7 @@ class ChallengeService
      * @return void
      * @throws \Exception
      */
-    public function saveNewMatrixExtraData(array $validatedData, int $challengeId, ?int $brokerId,bool $isPlaceholder, ?bool $isAdmin = null, ?int $zoneId = null): void
+    public function saveNewMatrixExtraData(array $validatedData, int $challengeId, ?int $brokerId, bool $isPlaceholder, ?bool $isAdmin = null, ?int $zoneId = null): void
     {
         //broker id is nullable for placeholder data
         if (!empty($validatedData['affiliate_link'])) {
@@ -190,9 +188,9 @@ class ChallengeService
                 $zoneId,
             );
         }
-         //save the evaluation cost discount
-         if (!empty($validatedData['evaluation_cost_discount'])) {
-             $this->costDiscountRepository->createCostDiscount(
+        //save the evaluation cost discount
+        if (!empty($validatedData['evaluation_cost_discount'])) {
+            $this->costDiscountRepository->createCostDiscount(
                 $challengeId,
                 $validatedData['evaluation_cost_discount'],
                 $brokerId,
@@ -200,7 +198,7 @@ class ChallengeService
                 $isPlaceholder,
                 $zoneId,
             );
-         }
+        }
     }
 
     /**
@@ -234,7 +232,7 @@ class ChallengeService
                     'previous_value' => !empty($cellData['previous_value']) ? json_encode($cellData['previous_value']) : null,
                     'value' => !empty($cellData['value']) ? json_encode($cellData['value']) : null,
                     'public_value' => !empty($cellData['public_value']) ? json_encode($cellData['public_value']) : null,
-                   // 'is_updated_entry' => $isAdmin ? 0 : (int)($cellData['is_updated_entry'] ?? 0),
+                    // 'is_updated_entry' => $isAdmin ? 0 : (int)($cellData['is_updated_entry'] ?? 0),
                     'is_updated_entry' => $cellData['is_updated_entry'] ?? 0,
                     'is_invariant' => isset($zoneId) ? false : true,
                     'zone_id' => $zoneId,
@@ -260,24 +258,23 @@ class ChallengeService
      */
     public function findUrlByUrlableTypeAndId(string $urlableType, ?int $urlableId, ?int $brokerId, bool $isPlaceholder = false, ?int $zoneId = null): ?AffiliateLinkResource
     {
-       $chalengeObject=$this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $isPlaceholder, $zoneId);
-       if($chalengeObject){
-        return AffiliateLinkResource::make($chalengeObject);
-       }
-       return null;
+        $chalengeObject = $this->urlRepository->findByUrlableTypeAndId($urlableType, $urlableId, $brokerId, $isPlaceholder, $zoneId);
+        if ($chalengeObject) {
+            return AffiliateLinkResource::make($chalengeObject);
+        }
+        return null;
     }
 
 
     public function findDiscountByChallengeId(int $challengeId, ?int $brokerId): ?CostDiscountResource
     {
-        $discountObject=$this->costDiscountRepository->findByChallengeId($challengeId, $brokerId);
-       
-       
-        if($discountObject){
+        $discountObject = $this->costDiscountRepository->findByChallengeId($challengeId, $brokerId);
+
+
+        if ($discountObject) {
             return CostDiscountResource::make($discountObject);
         }
         return null;
-       
     }
 
     /**
@@ -291,8 +288,9 @@ class ChallengeService
     /**
      * Find challenge by parameters
      */
-    public function findChallengeByParams(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null,?int $zoneId = null): ?Challenge
+    public function findChallengeByParams(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null, ?int $zoneId = null): ?Challenge
     {
+        
         return $this->challengeRepository->exists($isPlaceholder, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
     }
 
@@ -326,7 +324,7 @@ class ChallengeService
 
             foreach ($rowValues as $value) {
                 $row[] = [
-                    'id'=>$value->id,
+                    'id' => $value->id,
                     'previous_value' => json_decode($value->previous_value, true) ?: [],
                     'value' => json_decode($value->value, true) ?: [],
                     'public_value' => json_decode($value->public_value, true) ?: [],
@@ -378,7 +376,7 @@ class ChallengeService
                         $cell['is_updated_entry'] = true;
                     }
                     //NEW
-                    if($previousByKey[$key]['is_updated_entry']){
+                    if ($previousByKey[$key]['is_updated_entry']) {
                         $cell['is_updated_entry'] = true;
                     }
                 }
@@ -524,7 +522,7 @@ class ChallengeService
      * @param array $validatedData
      * @return array
      */
-    public function old_handleMissingChallenge(int $brokerId,$categoryId, $stepId, ?int $zoneId): array
+    public function old_handleMissingChallenge(int $brokerId, $categoryId, $stepId, ?int $zoneId): array
     {
         $affiliateMasterLinkObject = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
         //$affiliateMasterLinkPlaceholder = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
@@ -583,6 +581,7 @@ class ChallengeService
      */
     public function addPlaceholderData(array &$responseArray, int $categoryId, int $stepId, ?int $zoneId): void
     {
+       
         $placeholderChallenge = $this->findChallengeByParams(
             true,
             $categoryId,
@@ -592,6 +591,7 @@ class ChallengeService
             $zoneId
         );
 
+     
         if (!$placeholderChallenge?->id) {
             return;
         }
@@ -599,8 +599,7 @@ class ChallengeService
         $responseArray['matrix_placeholders_array'] = $this->getMatrixPlaceholderArray($placeholderChallenge->id);
         $responseArray['evaluation_cost_discount_placeholder'] = $this->findDiscountByChallengeId($placeholderChallenge->id, null, $zoneId)?->value;
         $responseArray['affiliate_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, null, true, $zoneId)?->url;
-        $responseArray['affiliate_master_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, null, null, true, $zoneId)?->url; 
-       
+        $responseArray['affiliate_master_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, null, null, true, $zoneId)?->url;
     }
 
     /**
@@ -662,9 +661,9 @@ class ChallengeService
 
     public function getChallengeData(?int $chId, ?int $brokerId, bool $isPlaceholder, ?int $zoneId): array
     {
-        $matrix = $chId?$this->getChallengeMatrixData($chId):null;
-        $discount = $chId?$this->findDiscountByChallengeId($chId, $brokerId):null;
-        $affiliateLink = $chId?$this->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, $isPlaceholder,  $zoneId):null;
+        $matrix = $chId ? $this->getChallengeMatrixData($chId) : null;
+        $discount = $chId ? $this->findDiscountByChallengeId($chId, $brokerId) : null;
+        $affiliateLink = $chId ? $this->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, $isPlaceholder,  $zoneId) : null;
         $affiliateMasterLink = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, $isPlaceholder, $zoneId);
         return [
             'challenge_id' => $chId,
@@ -673,5 +672,105 @@ class ChallengeService
             'affiliate_link' => $affiliateLink,
             'affiliate_master_link' => $affiliateMasterLink
         ];
+    }
+
+    /**
+     * Clone default challenges to broker
+     * @param int $brokerId
+     * @return array
+     */
+    public function cloneDefaultChallengesToBroker(int $brokerId): array
+    {
+       
+            $now = now();
+
+            // 1) Fetch global categories (templates)
+            $defaultCategories = DB::table('challenge_categories')
+                ->whereNull('broker_id')
+                ->get(['id', 'name', 'description', 'image', 'slug']);
+
+            if ($defaultCategories->isEmpty()) {
+                return ['categories' => 0, 'steps' => 0, 'amounts' => 0];
+            }
+
+            // 2) Insert broker categories, keep old->new id map
+            $catRows = [];
+            foreach ($defaultCategories as $cat) {
+                $catRows[] = [
+                    'name'        => $cat->name,
+                    'description' => $cat->description,
+                    'image'       => $cat->image,
+                    // ensure slug uniqueness per broker (adjust if you already enforce unique)
+                    'slug'        => $cat->slug, // or "{$cat->slug}-b{$brokerId}"
+                    'broker_id'   => $brokerId,
+                    'created_at'  => $now,
+                    'updated_at'  => $now,
+                ];
+            }
+            DB::table('challenge_categories')->insert($catRows);
+
+            $newCategories = DB::table('challenge_categories')
+                ->where('broker_id', $brokerId)
+                ->whereIn('slug', $defaultCategories->pluck('slug'))
+                ->get(['id', 'slug']);
+
+            // Map by slug (or map by (name, slug) if needed)
+            $slugToNewId = $newCategories->pluck('id', 'slug');
+
+            // Build oldId -> newId map
+            $oldToNewCatId = [];
+            foreach ($defaultCategories as $cat) {
+                $newId = $slugToNewId[$cat->slug] ?? null;
+                if ($newId) {
+                    $oldToNewCatId[$cat->id] = $newId;
+                }
+            }
+
+            // 3) Clone steps
+            $defaultSteps = DB::table('challenge_steps')
+                ->whereIn('challenge_category_id', array_keys($oldToNewCatId))
+                ->get(['id', 'name', 'description', 'image', 'slug', 'challenge_category_id']);
+
+            $stepRows = [];
+            foreach ($defaultSteps as $s) {
+                $stepRows[] = [
+                    'name'                  => $s->name,
+                    'description'           => $s->description,
+                    'image'                 => $s->image,
+                    'slug'                  => $s->slug,
+                    'challenge_category_id' => $oldToNewCatId[$s->challenge_category_id] ?? null,
+                    'created_at'            => $now,
+                    'updated_at'            => $now,
+                ];
+            }
+            if (!empty($stepRows)) {
+                DB::table('challenge_steps')->insert($stepRows);
+            }
+
+            // 4) Clone amounts
+            $defaultAmounts = DB::table('challenge_amounts')
+                ->whereIn('challenge_category_id', array_keys($oldToNewCatId))
+                ->get(['amount', 'currency', 'challenge_category_id']);
+
+            $amountRows = [];
+            foreach ($defaultAmounts as $a) {
+                $amountRows[] = [
+                    'amount'                => $a->amount,
+                    'currency'              => $a->currency,
+                    'challenge_category_id' => $oldToNewCatId[$a->challenge_category_id] ?? null,
+                    'created_at'            => $now,
+                    'updated_at'            => $now,
+                ];
+            }
+            if (!empty($amountRows)) {
+                DB::table('challenge_amounts')->insert($amountRows);
+            }
+
+            return [
+                'categories' => count($catRows),
+                'steps'      => count($stepRows),
+                'amounts'    => count($amountRows),
+            ];
+       
     }
 }

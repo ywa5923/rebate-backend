@@ -20,27 +20,20 @@ class ChallengeCategoryRepository
     /**
      * Get paginated challenge categories with filters
      */
-    public function getChallengeCategories(Request $request): LengthAwarePaginator|Collection
+    public function getChallengeCategories(?int $broker_id=null): Collection
     {
         $query = $this->model->newQuery();
-        
-        // Apply filters
-        $this->applyFilters($query, $request);
-
-        // Apply sorting
-        $this->applySorting($query, $request);
-
+        if(isset($broker_id)){
+            $query->where('broker_id', $broker_id);
+        }else{
+            $query->whereNull('broker_id');
+        }
+       
         // Always load relationships
         $query->with(['steps', 'amounts']);
 
-        if ($request->has('per_page') || $request->has('page')) {
-            // Paginate with specific page
-            $perPage = $request->get('per_page', 15);
-            $page = $request->get('page', 1);
-            return $query->paginate($perPage, ['*'], 'page', $page);
-        } else {
-            return $query->get();
-        }
+        
+        return $query->get();
     }
 
     /**
@@ -54,9 +47,15 @@ class ChallengeCategoryRepository
     /**
      * Get challenge category by ID without relations
      */
-    public function findByIdWithoutRelations(int $id): ?ChallengeCategory
+    public function findByIdWithoutRelations(int $id,?int $broker_id=null): ?ChallengeCategory
     {
-        return $this->model->find($id);
+        $query = $this->model->newQuery();
+        if(isset($broker_id)){
+            $query->where('id', $id)->where('broker_id', $broker_id);
+        }else{
+            $query->where('id', $id);
+        }
+        return $query->first();
     }
 
     /**
@@ -84,52 +83,35 @@ class ChallengeCategoryRepository
     }
 
     /**
-     * Apply filters to the query
+     * Find default challenge category by slug
+     * @param string $slug
+     * @return ?ChallengeCategory
      */
-    protected function applyFilters($query, Request $request): void
+    public function findDefaultCategoryBySlug(string $slug): ?ChallengeCategory
     {
-        // Filter by name
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
-        }
-
-        // Filter by is_active
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
-        }
-
-        // Filter by created date
-        if ($request->has('created_from')) {
-            $query->where('created_at', '>=', $request->created_from);
-        }
-
-        if ($request->has('created_to')) {
-            $query->where('created_at', '<=', $request->created_to);
-        }
+        return $this->model->where('slug', $slug)->whereNull('broker_id')->first();
     }
 
     /**
-     * Apply sorting to the query
+     * Add a challenge category
+     * @param string $slug
+     * @param int $order
+     * @param int $broker_id
+     * @return ChallengeCategory
      */
-    protected function applySorting($query, Request $request): void
+    public function cloneCategory(int $default_category_id, int $order, int $broker_id): ChallengeCategory
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-
-        // Validate sort direction
-        if (!in_array($sortDirection, ['asc', 'desc'])) {
-            $sortDirection = 'desc';
+        $defaultCategory = $this->findByIdWithoutRelations($default_category_id);
+        if(!$defaultCategory){
+            throw new \Exception('Default category not found');
         }
-
-        // Validate sort by field
-        $allowedSortFields = [
-            'id', 'name', 'is_active', 'created_at', 'updated_at'
-        ];
-
-        if (in_array($sortBy, $allowedSortFields)) {
-            $query->orderBy($sortBy, $sortDirection);
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
+        return $this->model->create([
+            'slug' => $defaultCategory->slug,
+            'name'=>$defaultCategory->name,
+            'description'=>$defaultCategory->description,
+            'image'=>$defaultCategory->image,
+            'order' => $order,
+            'broker_id' => $broker_id,
+        ]);
     }
 }

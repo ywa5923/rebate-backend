@@ -3,43 +3,49 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\DynamicOptionsCategory;
-use App\Models\DynamicOption;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Modules\Brokers\Models\Broker;
-use Modules\Brokers\Models\BrokerOption;
-use Modules\Brokers\Models\BrokerOptionsCategory;
-use Modules\Brokers\Models\BrokerOptionsValue;
 use Modules\Brokers\Models\BrokerType;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Modules\Brokers\Services\BrokersQueryParser;
 use Modules\Brokers\Services\BrokerService;
-use Modules\Brokers\Services\BrokerQueryParser;
 use Modules\Translations\Models\Zone;
 use Modules\Brokers\Models\Setting;
 use Modules\Brokers\Transformers\BrokerListResource;
 use Modules\Brokers\Http\Requests\BrokerListRequest;
 use Modules\Brokers\Transformers\BrokerTypeResource;
-use Modules\Brokers\Transformers\CountryResource;
 use Modules\Brokers\Transformers\CountryCollection;
 use Modules\Brokers\Models\Country;
 use Modules\Brokers\Tables\BrokerTableConfig;
 use Modules\Brokers\Forms\BrokerForm;
 use Modules\Brokers\Http\Requests\BrokerToggleActiveRequest;
-
+use Modules\Brokers\Services\ChallengeService;
+use Modules\Auth\Services\BrokerTeamService;
+use Modules\Auth\Services\UserPermissionService;
+use Modules\Auth\Services\MagicLinkService;
+use Illuminate\Support\Facades\Mail;
+use Modules\Auth\Models\BrokerTeamUser;
+use Modules\Auth\Mail\MagicLinkMail;
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Enums\AuthAction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Modules\Brokers\Http\Requests\RegisterBrokerRequest;
+use Modules\Brokers\Enums\BrokerType as BrokerTypeEnum;
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
 class BrokerController extends Controller
 {
 
-
     public function __construct(
         protected BrokerService $brokerService,
         private readonly BrokerTableConfig $tableConfig,
-        private readonly BrokerForm $formConfig
+        private readonly BrokerForm $formConfig,
+        protected ChallengeService $challengeService,
+        protected BrokerTeamService $teamService,
+        protected UserPermissionService $permissionService,
+        protected MagicLinkService $magicLinkService,
+        protected Mail $mailService,
     ) {}
 
     public function index(BrokersQueryParser $queryParser, Request $request)
@@ -47,6 +53,81 @@ class BrokerController extends Controller
         return $this->brokerService->process($queryParser->parse($request));
 
         //tested with http://localhost:8000/api/v1/brokers?language[eq]=ro&page=1&columns[in]=trading_name,trading_fees,account_type,jurisdictions,promotion_title,fixed_spreads,support_options&order_by[eq]=+account_type
+    }
+
+     /**
+     * OK
+     * Register a new broker
+     */
+    public function registerBroker(RegisterBrokerRequest $request)
+    {
+        try {
+            // Create the broker
+            $broker = DB::transaction(function () use ($request) {
+                $data = $request->validated();
+                $broker = $this->brokerService->registerBroker($data['trading_name'], $data['broker_type_id'], $data['country_id']);
+                //create a default team for the broker and add a user in that team
+                $team = $this->teamService->createTeam([
+                    'broker_id' => $broker->id,
+                    'name' => 'Default Team',
+                    'description' => 'Default team for the broker',
+                    'permissions' => [],
+                ]);
+                $user = $this->teamService->createTeamUser([
+                    'broker_team_id' => $team->id,
+                    'name' => 'Broker Admin',
+                    'email' => $data['email'],
+                    'is_active' => true,
+                ]);
+
+                //generate user permission for the user
+                $this->permissionService->createPermission([
+                    'subject_type' => BrokerTeamUser::class,
+                    'subject_id' => $user->id,
+                    'resource_id' => $broker->id,
+                    'resource_value' => $data['trading_name'],
+                ],AuthPermission::BROKER,AuthAction::MANAGE);
+
+                //load default challenge categories for the broker
+                if($broker->brokerType->name == BrokerTypeEnum::PROP_FIRM->value) {
+                    $this->challengeService->cloneDefaultChallengesToBroker($broker->id);
+                }
+
+
+                //generate magic link for broker
+                $magicLink = $this->magicLinkService->generateForTeamUser(
+                    $user,
+                    'registration',
+                    ['requested_at' => now()],
+                    96 // 96 hours = 4 days
+                );
+
+                //send email with magic link
+               $this->mailService->to($user->email)->send(new MagicLinkMail($magicLink));
+
+                return $broker;
+            });
+
+            // Load the broker type relationship
+            //$broker->load('brokerType', 'dynamicOptionsValues');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Broker registered successfully',
+                'data' => [
+                    'broker' => $broker,
+                    'broker_type' => $broker->brokerType->name
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Broker registration failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to register broker',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 

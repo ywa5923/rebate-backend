@@ -4,7 +4,7 @@ namespace Modules\Brokers\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-
+use Modules\Brokers\Enums\BrokerType;
 class BrokerTypesSeeder extends Seeder
 {
     /**
@@ -16,16 +16,16 @@ class BrokerTypesSeeder extends Seeder
         DB::table('broker_types')->insert([
             [
                 "id" => 1,
-                "name" => "Brokers"
+                "name" => BrokerType::BROKER->value
                
             ],
             [
                 "id" => 2,
-                "name" => "Crypto"
+                "name" => BrokerType::CRYPTO->value
             ],
             [
                 "id" => 3,
-                "name" => "Prop Firms"
+                "name" => BrokerType::PROP_FIRM->value
             ]
         ]);
     }

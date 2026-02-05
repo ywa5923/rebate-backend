@@ -1,12 +1,10 @@
 <?php
 
-namespace Modules\Auth\Http\Requests;
+namespace Modules\Brokers\Http\Requests;
 
 use App\Http\Requests\BaseRequest;
-use Illuminate\Validation\Rule;
 use Modules\Brokers\Forms\BrokerForm;
 
-//Deprecated. To be removed.
 class RegisterBrokerRequest extends BaseRequest
 {
     protected function formConfigClass(): ?string

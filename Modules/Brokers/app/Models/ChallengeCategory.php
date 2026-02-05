@@ -14,7 +14,14 @@ class ChallengeCategory extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'description',
+        'image',
+        'slug',
+        'order',
+        'broker_id',
+    ];
 
     public function steps(): HasMany
     {

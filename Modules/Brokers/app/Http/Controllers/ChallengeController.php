@@ -14,6 +14,9 @@ use Modules\Brokers\Transformers\ChallengeCategoryResource;
 
 use Modules\Brokers\Services\ChallengeService;
 use Illuminate\Validation\ValidationException;
+use Modules\Brokers\Repositories\MatrixHeaderRepository;
+use Modules\Brokers\Transformers\MatrixHeaderResource;
+use Modules\Brokers\Enums\ChallengeTabEnum;
 
 class ChallengeController extends Controller
 {
@@ -31,8 +34,7 @@ class ChallengeController extends Controller
      */
     public function show(Request $request, int $broker_id): JsonResponse
     {
-        //to do
-        //check if the logged in user can view broker challenge data
+      
         try {
            // $validatedData = $this->challengeService->validateGetRequestData($request);
             
@@ -52,7 +54,7 @@ class ChallengeController extends Controller
            //$isPlaceholder=$validatedData['is_placeholder']?true:false;
            //$amountId= $isPlaceholder ?null:$validatedData['amount_id'];
            $amountId= $validatedData['amount_id'];
-           //$brokerId=$validatedData['broker_id'] ?? null;
+           //$brokerId=$validatedData['broker_id'] ?? null
            $zoneId = $validatedData['zone_id'] ?? null;
            $categoryId=$validatedData['category_id'];
            $stepId=$validatedData['step_id'];
@@ -70,6 +72,8 @@ class ChallengeController extends Controller
         
         $responseData=$this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
         //if not placeholder mode, add the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
+        //TO DO :add placeholders by categories slug not by id
+        
         $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
         
         return response()->json([
@@ -211,42 +215,16 @@ class ChallengeController extends Controller
      *     )
      * )
      */
-    public function getChallengeCategories(Request $request)
+    public function getChallengeCategories(int $broker_id): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'name' =>  'sometimes|string|max:255',
-                'created_from' => 'sometimes|date',
-                'created_to' => 'sometimes|date',
-                'is_active' => 'sometimes|boolean',
-                'sort_by' => 'sometimes|string|in:id,name,is_active,created_at,updated_at',
-                'sort_direction' => 'sometimes|string|in:asc,desc',
-                'per_page' => 'sometimes|integer|min:1|max:100',
-            ]);
-
-            $challengeCategories = $this->challengeCategoryService->getChallengeCategories($request);
-
+            $challengeCategories = $this->challengeCategoryService->getChallengeCategories($broker_id);
             $response = [
                 'success' => true,
                 'data' => ChallengeCategoryResource::collection($challengeCategories),
             ];
 
-            if ($request->has('per_page')) {
-                $response['pagination'] = [
-                    'current_page' => $challengeCategories->currentPage(),
-                    'last_page' => $challengeCategories->lastPage(),
-                    'per_page' => $challengeCategories->perPage(),
-                    'total' => $challengeCategories->total(),
-                ];
-            }
-
             return response()->json($response);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -255,6 +233,8 @@ class ChallengeController extends Controller
             ], 500);
         }
     }
+
+
 
    
 
@@ -293,6 +273,198 @@ class ChallengeController extends Controller
         }
     }
 
+    public function storeMatrixPlaceholders(Request $request): JsonResponse
+    {
 
-    
+       
+        try { 
+       
+        $validatedData=$request->validate([
+            'category_id' => 'required|integer|exists:challenge_categories,id',
+            'step_id' => 'required|integer|exists:challenge_steps,id',
+            //'step_slug' => 'nullable|string',
+            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
+            'matrix' => 'required|array',
+            'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+        ]);
+            $zoneId = $validatedData['zone_id'] ?? null;
+           
+            //process the request and update the challenge matrix and extra data using transaction
+            
+           ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, null, true,true,$zoneId);
+
+            //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
+           
+            return response()->json([
+                'success' => true,
+                'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
+               
+            ], 201);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create challenge matrix',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getDefaultChallengeCategories()
+    {
+        try {
+            
+            $challengeCategories = $this->challengeCategoryService->getChallengeCategories(null);
+
+            $response = [
+                'success' => true,
+                'data' => ChallengeCategoryResource::collection($challengeCategories),
+            ];
+
+            return response()->json($response);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve challenge categories',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+    /**
+     * Get the challenge matrix headers for a broker
+     * @param Request $request
+     * @param MatrixHeaderRepository $rep
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function getChallengeMatrixHeaders(Request $request, MatrixHeaderRepository $rep): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate([
+                'col_group' => 'sometimes|string|max:145',
+                'row_group' => 'sometimes|string|max:145',
+                'language' => 'sometimes|string|max:15',
+            ]);
+
+
+            $columnHeaders =  MatrixHeaderResource::collection($rep->getHeadearsByType(
+                'column',
+                null,
+                null,
+                $validatedData['col_group'] ?? null,
+                $validatedData['language'],
+                false
+            ));
+
+
+            $rowHeaders = $rep->getHeadearsByType(
+                'row',
+                null,
+                null,
+                $validatedData['row_group'] ?? null,
+                $validatedData['language'],
+                false
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'columnHeaders' => $columnHeaders,
+                    'rowHeaders' => MatrixHeaderResource::collection($rowHeaders)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get headers',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove a challenge category, step or amount
+     * @param int $broker_id
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function removeChallengeTab(string $tab_type, int $broker_id, Request $request): JsonResponse
+    {
+        
+        try {
+            $validatedData = $request->validate([
+                'category_id' => 'sometimes|integer|exists:challenge_categories,id',
+                'step_id' => 'sometimes|integer|exists:challenge_steps,id',
+                'amount_id' => 'sometimes|integer|exists:challenge_amounts,id',
+            ]);
+            $category_id = $validatedData['category_id']??null;
+            $step_id = $validatedData['step_id']??null;
+            $amount_id = $validatedData['amount_id']??null;
+
+            $tab_type = ChallengeTabEnum::tryFrom($tab_type);
+            if($tab_type === null){
+                return response()->json(['success' => false, 'message' => 'Invalid tab type'], 400);
+            }
+
+            if($tab_type === ChallengeTabEnum::CATEGORY && $category_id){
+                $this->challengeCategoryService->deleteChallengeCategory( $category_id,$broker_id);
+            }
+            if($tab_type === ChallengeTabEnum::STEP && $step_id){
+                    $this->challengeCategoryService->deleteChallengeCategoryStep( $step_id,$broker_id);
+                }
+            if($tab_type === ChallengeTabEnum::AMOUNT && $amount_id){
+                $this->challengeCategoryService->deleteChallengeCategoryAmount( $amount_id,$broker_id);
+            }
+            //  $this->challengeCategoryService->removeChallengeCategory($broker_id, $category_id);
+            return response()->json(['success' => true, 'message' => 'Challenge tab of type '.$tab_type->value.' removed successfully']);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Failed to remove challenge tab of type ', 
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Add a challenge tab
+     * @param int $broker_id
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function addChallengeTab(string $tab_type, int $broker_id, Request $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate([
+                'default_tab_id_to_clone' => 'required|string|max:145',
+                'tab_order' => 'sometimes|integer',
+                'broker_challenge_category_id' => 'sometimes|string|max:145',
+            ]);
+            $tab_type = ChallengeTabEnum::tryFrom($tab_type);
+            if($tab_type === null){
+                return response()->json(['success' => false, 'message' => 'Invalid tab type'], 400);
+            }
+            $default_tab_id_to_clone = $validatedData['default_tab_id_to_clone'];
+            
+            $tab_order = $validatedData['tab_order']??0;
+
+            $broker_challenge_category_id = $validatedData['broker_challenge_category_id']??null;
+
+            if($broker_challenge_category_id){
+                $broker_challenge_category = $this->challengeCategoryService->getChallengeCategoryByIdAndBroker($broker_challenge_category_id, $broker_id);
+                if(!$broker_challenge_category){
+                    return response()->json(['success' => false, 'message' => 'Broker challenge category not found'], 404);
+                }
+            }
+            $this->challengeCategoryService->addChallengeTabToBroker($tab_type, $default_tab_id_to_clone, $tab_order, $broker_id, $broker_challenge_category_id);
+            return response()->json(['success' => true, 'message' => 'Challenge tab added successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to add challenge tab', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

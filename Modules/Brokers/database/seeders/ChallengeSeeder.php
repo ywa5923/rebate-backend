@@ -33,11 +33,11 @@ class ChallengeSeeder extends Seeder
     public function seedChallengeSteps(): void
     {
         $steps = [
-            ['name' => '1 Step Evaluation','slug'=>'1-step-evaluation','challenge_category_id'=>1],
-            ['name' => '2 Step Evaluation','slug'=>'2-step-evaluation','challenge_category_id'=>1],
-            ['name' => '1 Step Evaluation','slug'=>'1-step-evaluation','challenge_category_id'=>2],
-            ['name' => '2 Step Evaluation','slug'=>'2-step-evaluation','challenge_category_id'=>2],
-            ['name'=>'0 Step Evaluation','slug'=>'0-step-evaluation','challenge_category_id'=>3],
+            ['id' => 1, 'name' => '1 Step Evaluation','slug'=>'step-1','challenge_category_id'=>1],
+            ['id' => 2, 'name' => '2 Step Evaluation','slug'=>'step-2','challenge_category_id'=>1],
+            ['id' => 3, 'name' => '1 Step Evaluation','slug'=>'step-1','challenge_category_id'=>2],
+            ['id' => 4, 'name' => '2 Step Evaluation','slug'=>'step-2','challenge_category_id'=>2],
+            ['id' => 5, 'name'=>'No Step Evaluation','slug'=>'step-0','challenge_category_id'=>3],
 
         ];
 
@@ -47,24 +47,24 @@ class ChallengeSeeder extends Seeder
     public function seedChallengeAmounts(): void
     {
         $amounts = [
-            ['amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '50', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '150', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '250', 'currency' => 'USD', 'challenge_category_id' => 1],
-            ['amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '300', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '400', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '500', 'currency' => 'USD', 'challenge_category_id' => 2],
-            ['amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 3],
-            ['amount' => '50', 'currency' => 'USD', 'challenge_category_id' => 3],
-            ['amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 3],
-            ['amount' => '150', 'currency' => 'USD', 'challenge_category_id' => 3],
-            ['amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 3],
-            ['amount' => '250', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 1, 'amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 2, 'amount' => '50', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 3, 'amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 4, 'amount' => '150', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 5, 'amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 6, 'amount' => '250', 'currency' => 'USD', 'challenge_category_id' => 1],
+            ['id' => 7, 'amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 8, 'amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 9, 'amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 10, 'amount' => '300', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 11, 'amount' => '400', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 12, 'amount' => '500', 'currency' => 'USD', 'challenge_category_id' => 2],
+            ['id' => 13, 'amount' => '10', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 14, 'amount' => '50', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 15, 'amount' => '100', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 16, 'amount' => '150', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 17, 'amount' => '200', 'currency' => 'USD', 'challenge_category_id' => 3],
+            ['id' => 18, 'amount' => '250', 'currency' => 'USD', 'challenge_category_id' => 3],
         ];
         ChallengeAmount::insert($amounts);
     }

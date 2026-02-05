@@ -33,20 +33,12 @@ use Modules\Auth\Enums\AuthUser;
 class ApiAuthController extends Controller
 {
     protected MagicLinkService $magicLinkService;
-        // protected BrokerTeamService $teamService;
-        // protected UserPermissionService $permissionService;
-        // protected SuperAdminService $superAdminService;
+      
 
     public function __construct(
-        MagicLinkService $magicLinkService,
-       // BrokerTeamService $teamService,
-       // UserPermissionService $permissionService,
-       // SuperAdminService $superAdminService
+        MagicLinkService $magicLinkService, 
     ) {
         $this->magicLinkService = $magicLinkService;
-        //$this->teamService = $teamService;
-        //$this->permissionService = $permissionService;
-        //$this->superAdminService = $superAdminService;
     }
 
 
@@ -58,11 +50,8 @@ class ApiAuthController extends Controller
     public function verifyMagicLinkToken(VerifyMagicLinkTokenRequest $request)
     {
         try {
-
             // Validate the magic link token
             $magicLink = $this->magicLinkService->validateToken($request->token);
-
-
             if (!$magicLink) {
                 return response()->json([
                     'success' => false,
@@ -203,99 +192,99 @@ class ApiAuthController extends Controller
         }
     }
 
-    /**
-     * ?
-     * Decode JWT token and return user data (for frontend authentication)
-     */
-    public function decodeToken(DecodeTokenRequest $request)
-    {
-        try {
-            // Find the Sanctum token
-            $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($request->token);
+    // /**
+    //  * ?
+    //  * Decode JWT token and return user data (for frontend authentication)
+    //  */
+    // public function decodeToken(DecodeTokenRequest $request)
+    // {
+    //     try {
+    //         // Find the Sanctum token
+    //         $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($request->token);
 
-            if (!$personalAccessToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid token',
-                    'error' => 'Token not found'
-                ], 401);
-            }
+    //         if (!$personalAccessToken) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid token',
+    //                 'error' => 'Token not found'
+    //             ], 401);
+    //         }
 
-            // Check if token is expired
-            if ($personalAccessToken->expires_at && $personalAccessToken->expires_at->isPast()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token expired',
-                    'error' => 'Token has expired'
-                ], 401);
-            }
+    //         // Check if token is expired
+    //         if ($personalAccessToken->expires_at && $personalAccessToken->expires_at->isPast()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Token expired',
+    //                 'error' => 'Token has expired'
+    //             ], 401);
+    //         }
 
-            // Get the user from the token
-            $user = $personalAccessToken->tokenable;
+    //         // Get the user from the token
+    //         $user = $personalAccessToken->tokenable;
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found',
-                    'error' => 'User associated with token not found'
-                ], 401);
-            }
+    //         if (!$user) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'User not found',
+    //                 'error' => 'User associated with token not found'
+    //             ], 401);
+    //         }
 
-            // Prepare user data based on type
-            $userData = [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'user_type' => null,
-                'permissions' => [],
-                'broker_context' => null,
-            ];
+    //         // Prepare user data based on type
+    //         $userData = [
+    //             'id' => $user->id,
+    //             'name' => $user->name,
+    //             'email' => $user->email,
+    //             'user_type' => null,
+    //             'permissions' => [],
+    //             'broker_context' => null,
+    //         ];
 
-            if ($user instanceof \Modules\Auth\Models\BrokerTeamUser) {
-                $userData['user_type'] = 'team_user';
-                $userData['broker_context'] = [
-                    'broker_id' => $user->team->broker_id,
-                    'broker_name' => $user->team->broker->trading_name ?? $user->team->broker->name,
-                    'team_id' => $user->broker_team_id,
-                    'team_name' => $user->team->name,
-                ];
-                $userData['permissions'] = $user->resourcePermissions->map(function ($permission) {
-                    return [
-                        'type' => $permission->permission_type,
-                        'resource_id' => $permission->resource_id,
-                        'resource_value' => $permission->resource_value,
-                        'action' => $permission->action,
-                    ];
-                })->toArray();
-            } elseif ($user instanceof \Modules\Auth\Models\PlatformUser) {
-                $userData['user_type'] = 'platform_user';
-                $userData['role'] = $user->role;
-                $userData['broker_context'] = $user->broker_id ? [
-                    'broker_id' => $user->broker_id,
-                ] : null;
-                $userData['permissions'] = $user->resourcePermissions->map(function ($permission) {
-                    return [
-                        'type' => $permission->permission_type,
-                        'resource_id' => $permission->resource_id,
-                        'resource_value' => $permission->resource_value,
-                        'action' => $permission->action,
-                    ];
-                })->toArray();
-            }
+    //         if ($user instanceof \Modules\Auth\Models\BrokerTeamUser) {
+    //             $userData['user_type'] = 'team_user';
+    //             $userData['broker_context'] = [
+    //                 'broker_id' => $user->team->broker_id,
+    //                 'broker_name' => $user->team->broker->trading_name ?? $user->team->broker->name,
+    //                 'team_id' => $user->broker_team_id,
+    //                 'team_name' => $user->team->name,
+    //             ];
+    //             $userData['permissions'] = $user->resourcePermissions->map(function ($permission) {
+    //                 return [
+    //                     'type' => $permission->permission_type,
+    //                     'resource_id' => $permission->resource_id,
+    //                     'resource_value' => $permission->resource_value,
+    //                     'action' => $permission->action,
+    //                 ];
+    //             })->toArray();
+    //         } elseif ($user instanceof \Modules\Auth\Models\PlatformUser) {
+    //             $userData['user_type'] = 'platform_user';
+    //             $userData['role'] = $user->role;
+    //             $userData['broker_context'] = $user->broker_id ? [
+    //                 'broker_id' => $user->broker_id,
+    //             ] : null;
+    //             $userData['permissions'] = $user->resourcePermissions->map(function ($permission) {
+    //                 return [
+    //                     'type' => $permission->permission_type,
+    //                     'resource_id' => $permission->resource_id,
+    //                     'resource_value' => $permission->resource_value,
+    //                     'action' => $permission->action,
+    //                 ];
+    //             })->toArray();
+    //         }
 
-            return response()->json([
-                'success' => true,
-                'user' => $userData,
-                'token_expires_at' => $personalAccessToken->expires_at?->toISOString(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Token decoding failed: ' . $e->getMessage());
+    //         return response()->json([
+    //             'success' => true,
+    //             'user' => $userData,
+    //             'token_expires_at' => $personalAccessToken->expires_at?->toISOString(),
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Token decoding failed: ' . $e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Token validation failed',
-                'error' => 'An error occurred while validating the token'
-            ], 401);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Token validation failed',
+    //             'error' => 'An error occurred while validating the token'
+    //         ], 401);
+    //     }
+    // }
 }

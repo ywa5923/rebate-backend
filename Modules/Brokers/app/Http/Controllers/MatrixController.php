@@ -27,34 +27,24 @@ class MatrixController extends Controller
      */
     public function getHeaders(Request $request, MatrixHeaderRepository $rep, $broker_id)
     {
+        
         //when broker_strict_id is true, the action return the broker's matrix headers only.
         //when broker_strict_id is false, the action return the matrix headers where broker_id is null or the broker_id is the same as the broker_id in the request
         try {
             $validatedData = $request->validate([
                 'matrix_id' => 'sometimes|string|max:145',
-                'with_account_type_columns' => 'sometimes|boolean',
-                'col_group' => 'sometimes|string|max:145',
-                'row_group' => 'sometimes|string|max:145',
                 'broker_id_strict' => 'sometimes|boolean',
                 'language' => 'sometimes|string|max:15',
             ]);
-            $withAccountTypeColumns=(bool)($validatedData['with_account_type_columns'] ?? false);
-
-            $columnHeaders = $withAccountTypeColumns ?
-                $rep->getAccountTypesColumnHeaders($broker_id) :
-                MatrixHeaderResource::collection($rep->getHeadearsByType(
-                    'column', 
-                    $validatedData['matrix_id'] ?? null, 
-                    $broker_id,
-                    $validatedData['col_group'] ?? null,
-                    $validatedData['language'], 
-                    $validatedData['broker_id_strict']??false));
-
+          
+            
+            $columnHeaders =  $rep->getAccountTypesColumnHeaders($broker_id);
+                
             $rowHeaders = $rep->getHeadearsByType(
                 'row',
                 $validatedData['matrix_id'] ?? null,
                 $broker_id,
-                $validatedData['row_group'] ?? null,
+                 null,
                 $validatedData['language'],
                 $validatedData['broker_id_strict']??false
             );

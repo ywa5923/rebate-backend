@@ -184,13 +184,14 @@ class MatrixHeaderRepository
 
         
         $languageCode = $language ?? 'en';
-        //$withArray = ['formType.items.dropdown.dropdownOptions'];
-        $withArray = [
-            'formType.items' => function($query) {
-                $query->orderBy('form_type_form_item.id','asc');
-            },
-            'formType.items.dropdown.dropdownOptions'
-        ];
+        $withArray = [];
+        // $withArray = [
+        //     'formType.items' => function($query) {
+        //         $query->orderBy('form_type_form_item.id','asc');
+        //     },
+        //     'formType.items.dropdown.dropdownOptions'
+        // ];
+        
         if( $languageCode!='en'){
             $withArray['translations']= function($query) use ($languageCode) {
                 $query->where('language_code', $languageCode); // or any specific language
@@ -205,13 +206,19 @@ class MatrixHeaderRepository
             ->orderBy('id','asc')
             ->get();
         }else{
+            
+            $withArray['formType.items']=function($query) {
+                $query->orderBy('form_type_form_item.id','asc');
+            };
+            $withArray[]='formType.items.dropdown.dropdownOptions';
+            
         $qb= MatrixHeader::with($withArray)
             ->where(function ($query) use ($brokerId, $broker_id_strict) {
                 if ($broker_id_strict && $brokerId) {
                     $query->where('broker_id', $brokerId);
                 } else {
                     $query->whereNull('broker_id');
-                    if ($brokerId)
+                    if ((bool)$brokerId)
                         $query->orWhere('broker_id', $brokerId);
                 }
             })
@@ -221,13 +228,14 @@ class MatrixHeaderRepository
                 $qb->whereNull('parent_id')->with('children');
             }
 
-            //->where(...$matrixIdCondition)
-           return  $qb->whereHas('matrix', function ($query) use ($matrixName) {
+           if($matrixName){
+            $qb->whereHas('matrix', function ($query) use ($matrixName) {
                 $query->where('name', $matrixName);
-            })
-            ->orderBy('order','asc')
-            ->orderBy('id','asc')
-            ->get();
+            });
+           }
+           return  $qb->orderBy('order','asc')
+           ->orderBy('id','asc')
+           ->get();
         }
         
     }

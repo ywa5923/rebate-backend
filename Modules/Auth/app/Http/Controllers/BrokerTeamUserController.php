@@ -13,16 +13,12 @@ use Modules\Auth\Models\BrokerTeamUser;
 use Modules\Auth\Services\BrokerTeamService;
 use Modules\Auth\Services\UserPermissionService;
 use Modules\Auth\Services\MagicLinkService;
-use Modules\Auth\Http\Requests\RegisterBrokerRequest;
-use Modules\Brokers\Models\Broker;
-use Modules\Brokers\Models\BrokerOption;
-use Modules\Brokers\Models\OptionValue;
 use Illuminate\Support\Facades\Mail;
-
 use Modules\Auth\Mail\MagicLinkMail;
 use Modules\Auth\Forms\UserPermissionForm;
 use Modules\Auth\Enums\AuthPermission;
 use Modules\Auth\Enums\AuthAction;
+
 
 class BrokerTeamUserController extends Controller
 {
@@ -36,110 +32,115 @@ class BrokerTeamUserController extends Controller
     protected UserPermissionService $permissionService, 
     protected MagicLinkService $magicLinkService,
     protected Mail $mailService
+
     )
     {
        
     }
     /**
-     * OK
+     * DEPRECATED
      * Register a new broker
      */
-    public function registerBroker(RegisterBrokerRequest $request)
-    {
+    // public function registerBroker(RegisterBrokerRequest $request)
+    // {
 
         
-        try {
+    //     try {
 
-            // Create the broker
-            $broker = DB::transaction(function () use ($request) {
+    //         // Create the broker
+    //         $broker = DB::transaction(function () use ($request) {
 
-                $data = $request->validated();
+    //             $data = $request->validated();
                
 
-                //insert broker option value trading_name
-                //get the trading name option
+    //             //insert broker option value trading_name
+    //             //get the trading name option
                
-                $exists = OptionValue::where('optionable_type', Broker::class)
-                ->where('option_slug', 'trading_name')
-                ->where('value', $data['trading_name'])
-                ->first();
-                if($exists) {
-                    throw new \Exception('Trading name already exists');
-                }
+    //             $exists = OptionValue::where('optionable_type', Broker::class)
+    //             ->where('option_slug', 'trading_name')
+    //             ->where('value', $data['trading_name'])
+    //             ->first();
+    //             if($exists) {
+    //                 throw new \Exception('Trading name already exists');
+    //             }
 
-                $broker = Broker::create([
-                    'broker_type_id' => $data['broker_type_id'],
-                    'country_id' => $data['country_id'],
-                ]);
-                $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
-                //check if the trading name exists in the option values
+    //             $broker = Broker::create([
+    //                 'broker_type_id' => $data['broker_type_id'],
+    //                 'country_id' => $data['country_id'],
+    //             ]);
+    //             $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
+    //             //check if the trading name exists in the option values
                 
-                OptionValue::create([
-                    'optionable_type' => Broker::class,
-                    'optionable_id' => $broker->id,
-                    'option_slug' => 'trading_name',
-                    'value' => $data['trading_name'],
-                    'broker_id' => $broker->id,
-                    'broker_option_id' => $tradingNameOption->id,
-                ]);
+    //             OptionValue::create([
+    //                 'optionable_type' => Broker::class,
+    //                 'optionable_id' => $broker->id,
+    //                 'option_slug' => 'trading_name',
+    //                 'value' => $data['trading_name'],
+    //                 'broker_id' => $broker->id,
+    //                 'broker_option_id' => $tradingNameOption->id,
+    //             ]);
 
-                //create a default team for the broker and add a user in that team
-                $team = $this->teamService->createTeam([
-                    'broker_id' => $broker->id,
-                    'name' => 'Default Team',
-                    'description' => 'Default team for the broker',
-                    'permissions' => [],
-                ]);
-                $user = $this->teamService->createTeamUser([
-                    'broker_team_id' => $team->id,
-                    'name' => 'Broker Admin',
-                    'email' => $data['email'],
-                    'is_active' => true,
-                ]);
+    //             //create a default team for the broker and add a user in that team
+    //             $team = $this->teamService->createTeam([
+    //                 'broker_id' => $broker->id,
+    //                 'name' => 'Default Team',
+    //                 'description' => 'Default team for the broker',
+    //                 'permissions' => [],
+    //             ]);
+    //             $user = $this->teamService->createTeamUser([
+    //                 'broker_team_id' => $team->id,
+    //                 'name' => 'Broker Admin',
+    //                 'email' => $data['email'],
+    //                 'is_active' => true,
+    //             ]);
 
-                //generate user permission for the user
-                $this->permissionService->createPermission([
-                    'subject_type' => BrokerTeamUser::class,
-                    'subject_id' => $user->id,
-                    'resource_id' => $broker->id,
-                    'resource_value' => $data['trading_name'],
-                ],AuthPermission::BROKER,AuthAction::MANAGE);
+    //             //generate user permission for the user
+    //             $this->permissionService->createPermission([
+    //                 'subject_type' => BrokerTeamUser::class,
+    //                 'subject_id' => $user->id,
+    //                 'resource_id' => $broker->id,
+    //                 'resource_value' => $data['trading_name'],
+    //             ],AuthPermission::BROKER,AuthAction::MANAGE);
 
-                //generate magic link for broker
-                $magicLink = $this->magicLinkService->generateForTeamUser(
-                    $user,
-                    'registration',
-                    ['requested_at' => now()],
-                    96 // 96 hours = 4 days
-                );
+    //             //load default challenge categories for the broker
+    //             $this->challengeService->cloneDefaultChallengesToBroker($broker->id);
 
-                //send email with magic link
-               $this->mailService->to($user->email)->send(new MagicLinkMail($magicLink));
 
-                return $broker;
-            });
+    //             //generate magic link for broker
+    //             $magicLink = $this->magicLinkService->generateForTeamUser(
+    //                 $user,
+    //                 'registration',
+    //                 ['requested_at' => now()],
+    //                 96 // 96 hours = 4 days
+    //             );
 
-            // Load the broker type relationship
-            $broker->load('brokerType', 'dynamicOptionsValues');
+    //             //send email with magic link
+    //            $this->mailService->to($user->email)->send(new MagicLinkMail($magicLink));
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Broker registered successfully',
-                'data' => [
-                    'broker' => $broker,
-                    'broker_type' => $broker->brokerType
-                ]
-            ], 201);
-        } catch (\Exception $e) {
-            Log::error('Broker registration failed: ' . $e->getMessage());
+    //             return $broker;
+    //         });
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to register broker',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    //         // Load the broker type relationship
+    //         $broker->load('brokerType', 'dynamicOptionsValues');
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Broker registered successfully',
+    //             'data' => [
+    //                 'broker' => $broker,
+    //                 'broker_type' => $broker->brokerType
+    //             ]
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         Log::error('Broker registration failed: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to register broker',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
     /**
      * ok
      * Register a new user to the broker default team
@@ -262,7 +263,7 @@ class BrokerTeamUserController extends Controller
     }
 
     /**
-     * ok
+     * ok??To check this
      * Update a broker team user's data
      */
     public function updateBrokerTeamUser(Request $request, $userId)

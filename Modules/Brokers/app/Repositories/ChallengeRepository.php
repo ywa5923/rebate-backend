@@ -107,6 +107,7 @@ class ChallengeRepository
      */
     public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null,?int $zoneId = null): ?Challenge
     {
+       
         $qb= $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
             ->where('challenge_category_id', $categoryId)
             ->where('challenge_step_id', $stepId);
@@ -121,6 +122,7 @@ class ChallengeRepository
                 $qb->where('broker_id', $brokerId);
             }
 
+           
             if(isset($amountId) ){
                 $qb->where('challenge_amount_id', $amountId);
             }

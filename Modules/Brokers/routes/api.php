@@ -35,10 +35,8 @@ use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 
 Route::prefix('v1')->group( function () {
 
-
-       
     // Specific routes MUST come before apiResource to avoid conflicts
-    Route::middleware('auth:sanctum')->post('/brokers', [BrokerTeamUserController::class, 'registerBroker']);
+    Route::middleware('auth:sanctum')->post('/brokers', [BrokerController::class, 'registerBroker']);
     Route::middleware('auth:sanctum')->get('brokers/broker-list/{zone_id?}/{country_id?}', [BrokerController::class, 'getBrokerList']);
     Route::middleware('auth:sanctum')->get('brokers/broker-types-and-countries', [BrokerController::class, 'getBrokerTypesAndCountries']);
     Route::middleware('auth:sanctum')->get('brokers/form-config', [BrokerController::class, 'getFormConfig']);
@@ -97,11 +95,18 @@ Route::prefix('v1')->group( function () {
     Route::delete('contests/{id}', [ContestController::class, 'destroy']);
 
      // Challenges table routes
-     Route::get('challenges/categories', [ChallengeController::class, 'getChallengeCategories']);
+     Route::get('challenges/matrix/headers', [ChallengeController::class, 'getChallengeMatrixHeaders']);
+     Route::get('challenges/default-categories', [ChallengeController::class, 'getDefaultChallengeCategories']);       
+     Route::get('challenges/categories/{broker_id}', [ChallengeController::class, 'getChallengeCategories']);
+    
+     Route::middleware(['auth:sanctum', 'superadmin-only'])->post('challenges/matrix/placeholders', [ChallengeController::class, 'storeMatrixPlaceholders']);
      Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{broker_id}', [ChallengeController::class, 'store']);
     // Route::get('challenges', [ChallengeController::class, 'index']);
-    Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);
+ 
     Route::get('challenges/placeholders', [ChallengeController::class, 'showPlaceholders']);
+    Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'removeChallengeTab']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'addChallengeTab']);
     // Route::get('challenges/show', [ChallengeController::class, 'show']);
      
      //=================================SUPERADMIN ONLY ROUTES======================================

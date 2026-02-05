@@ -5,13 +5,9 @@ namespace Modules\Brokers\Services;
 use App\Repositories\RepositoryInterface;
 use App\Utilities\BaseQueryParser;
 use Modules\Brokers\Models\Broker;
-// use Illuminate\Database\Eloquent\Collection;
-// use Modules\Brokers\Models\Zone;
-// use Modules\Brokers\Transformers\BrokerCollection;
-// use Modules\Translations\Repositories\TranslationRepository;
-// use Modules\Translations\Models\Translation;
-// use Modules\Translations\Transformers\TranslationCollection;
-// use Modules\Brokers\Repositories\BrokerRepository;
+use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Models\BrokerOption;
+
 
 class BrokerService
 {
@@ -163,5 +159,33 @@ class BrokerService
         $broker->is_active = !$broker->is_active;
         $broker->save();
         return $broker;
+    }
+
+    public function registerBroker(string $tradingName, int $brokerTypeId, int $countryId): Broker
+    {
+        $exists = OptionValue::where('optionable_type', Broker::class)
+        ->where('option_slug', 'trading_name')
+        ->where('value', $tradingName)
+        ->first();
+        if($exists) {
+            throw new \Exception('Trading name already exists');
+        }
+
+        $broker = Broker::create([
+            'broker_type_id' => $brokerTypeId,
+            'country_id' => $countryId,
+        ]);
+        $tradingNameOption = BrokerOption::where('slug', 'trading_name')->first();
+        //check if the trading name exists in the option values
+        
+        OptionValue::create([
+            'optionable_type' => Broker::class,
+            'optionable_id' => $broker->id,
+            'option_slug' => 'trading_name',
+            'value' => $tradingName,
+            'broker_id' => $broker->id,
+            'broker_option_id' => $tradingNameOption->id,
+        ]);
+        return $broker->load('brokerType');
     }
 }
