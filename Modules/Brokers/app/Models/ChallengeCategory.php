@@ -4,6 +4,7 @@ namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Brokers\Models\Challenge;
 
 
 
@@ -31,6 +32,10 @@ class ChallengeCategory extends Model
     public function amounts(): HasMany
     {
         return $this->hasMany(ChallengeAmount::class,'challenge_category_id');
+    }
+    public function challenges(): HasMany
+    {
+        return $this->hasMany(Challenge::class,'challenge_category_id');
     }
 
    

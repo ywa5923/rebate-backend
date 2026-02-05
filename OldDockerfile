@@ -43,9 +43,10 @@ COPY . /var/www/html
 # Install Laravel PHP dependencies
 RUN composer install --no-scripts --no-interaction --prefer-dist
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Add root to www-data group
+RUN useradd -u 1000 -G www-data john \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html 
 
 # Expose port
 EXPOSE 9000
