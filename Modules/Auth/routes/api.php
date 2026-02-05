@@ -52,13 +52,23 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ];
 
     if ( $user instanceof \Modules\Auth\Models\BrokerTeamUser) {
-        $brokerTradingName=$user->team->broker->dynamicOptionsValues->where('option_slug', 'trading_name')->where('zone_id', null)->first()->value;
+
+        $broker=$user->team->broker;
+        $brokerTradingName=$broker->dynamicOptionsValues->where('option_slug', 'trading_name')->where('zone_id', null)->first()->value;
 
             $userData['user_type'] = 'team_user';
+
+           
+            $brokerType=$broker->brokerType->name;
+            $brokerCountry=$broker->country->country_code;
+            //$brokerZone=$broker->country->zone->name;
+
             $userData['broker_context'] = [
-                'broker_id' => $user->team->broker_id,
+                'broker_id' => $broker->id,
                 //'broker_country' => $user->team->broker->country,
                 'broker_name' => $brokerTradingName,
+                'broker_type' => $brokerType,
+                'broker_country' => $brokerCountry,
                 'team_id' => $user->broker_team_id,
                 'team_name' => $user->team->name,
             ];

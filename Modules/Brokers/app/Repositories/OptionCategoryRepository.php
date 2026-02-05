@@ -177,7 +177,7 @@ class OptionCategoryRepository
         $filterMap = [
             'broker' => 'for_brokers',
             'props' => 'for_props', 
-            'crypto' => 'for_crypto'
+            'prop_firm' => 'for_crypto'
         ];
 
         if (isset($filterMap[$brokerType])) {

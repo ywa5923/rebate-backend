@@ -63,6 +63,7 @@ Route::prefix('v1')->group( function () {
      Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('brokers/{broker_id}/option-values', [OptionValueController::class, 'storeMultiple'])->name('option-values.store-multiple');
      Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('brokers/{broker_id}/option-values', [OptionValueController::class, 'updateMultiple'])->name('option-values.update-multiple');
     Route::get('option-categories/get-list', [OptionCategoryController::class, 'getOptionCategoriesList']);
+    //this route gets the options categories with their values for a given broker type in broker dashboard
     Route::get('option-categories', [OptionCategoryController::class, 'index']);
    // Route::apiResource('option-categories', OptionCategoryController::class)->names('option-categories');
    
