@@ -24,7 +24,7 @@ fi
 # php artisan migrate --force
 
 # Only in local and only when RUN_FRESH=true
-if [ "$APP_ENV" = "production" ] && [ "$RUN_FRESH" = "true" ]; then
+if [ "$RUN_FRESH" = "true" ]; then
    php artisan migrate:fresh --force
    php artisan key:generate
    php artisan config:cache
