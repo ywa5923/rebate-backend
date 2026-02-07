@@ -41,7 +41,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . /var/www/html
 
 # Install Laravel PHP dependencies
-RUN composer install --no-scripts --no-interaction --prefer-dist
+#RUN composer install --no-scripts --no-interaction --prefer-dist
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

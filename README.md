@@ -196,3 +196,19 @@ rm -rf ~/projects/squashfs-root
 # Visit: https://cursor.sh/ or download the AppImage/tar.gz
 
 # 3. Or if you have the AppImage extracted in a different location, create proper symlinks"
+
+Run migrations after fresh install
+php artisan key:generate
+php artisan config:cache
+php artisan migrate --force
+php artisan module:migrate --force # runs all module migrations
+
+docker compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan config:cache
+docker compose exec laravel php artisan migrate:fresh --force
+docker compose exec laravel php artisan app:vps-load-data
+//
+docker compose exec laravel php artisan module:migrate --force 
+docker compose exec laravel php artisan app:vps-load-data
+
+RUN_FRESH=true docker compose up -d

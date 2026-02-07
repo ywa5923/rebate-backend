@@ -46,7 +46,7 @@ class UsersSeeder extends Seeder
 
         $user3 = PlatformUser::create([
             'name' => 'Ion Ivan',
-            'email' => 'ionivan10@gmail.com',
+            'email' => 'ivanion10@gmail.com',
             'role' => 'super-admin',
             'is_active' => true,
         ]);
