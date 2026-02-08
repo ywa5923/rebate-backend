@@ -3,7 +3,7 @@
 services:
   laravel:
     build:
-      context: .
+      context: ./docker
       dockerfile: Dockerfile
     ports:
       - "8000:9000"
