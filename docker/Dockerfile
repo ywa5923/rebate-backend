@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY php/php.ini /usr/local/etc/php/php.ini   
+COPY docker/php/php.ini /usr/local/etc/php/php.ini   
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -50,7 +50,7 @@ RUN chown -R www-data:www-data /var/www/html \
 # Expose port
 EXPOSE 9000
 
-COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
