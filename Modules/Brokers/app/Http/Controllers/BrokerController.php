@@ -23,7 +23,7 @@ use Modules\Brokers\Services\ChallengeService;
 use Modules\Auth\Services\BrokerTeamService;
 use Modules\Auth\Services\UserPermissionService;
 use Modules\Auth\Services\MagicLinkService;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Contracts\Mail\Mailer;
 use Modules\Auth\Models\BrokerTeamUser;
 use Modules\Auth\Mail\MagicLinkMail;
 use Modules\Auth\Enums\AuthPermission;
@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Brokers\Http\Requests\RegisterBrokerRequest;
 use Modules\Brokers\Enums\BrokerType as BrokerTypeEnum;
+
 //{{PATH}}/brokers?language[eq]=ro&page=1&columns[in]=position_list,short_payment_options&filters[in]=a,b,c
 
 class BrokerController extends Controller
@@ -45,7 +46,7 @@ class BrokerController extends Controller
         protected BrokerTeamService $teamService,
         protected UserPermissionService $permissionService,
         protected MagicLinkService $magicLinkService,
-        protected Mail $mailService,
+        protected Mailer $mailService,
     ) {}
 
     public function index(BrokersQueryParser $queryParser, Request $request)
