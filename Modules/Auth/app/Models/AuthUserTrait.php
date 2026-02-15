@@ -38,15 +38,22 @@ trait AuthUserTrait
             return ['*'];
         }
 
-        return $this->resourcePermissions
-            ->filter(fn($p) => $p->is_active)
-            ->map(function ($p) {
-                return $p->permission_type === AuthRole::SUPER_ADMIN->value
-                    ? [$p->permission_type]
-                    : [$p->permission_type . ':' . ($p->action ?? '') . ':' . ($p->resource_id ?? '')];
-            })
+        // return $this->resourcePermissions
+        //     ->filter(fn($p) => $p->is_active)
+        //     ->map(function ($p) {
+        //         return $p->permission_type === AuthRole::SUPER_ADMIN->value
+        //             ? [$p->permission_type]
+        //             : [$p->permission_type . ':' . ($p->action ?? '') . ':' . ($p->resource_id ?? '')];
+        //     })
+        //     ->values()
+        //     ->toArray();
+
+        
+            return $this->resourcePermissions
+            ->filter(fn ($p) => $p->is_active)
+            ->map(fn ($p) => $p->permission_type . ':' . ($p->action ?? '') . ':' . ($p->resource_id ?? ''))
             ->values()
-            ->toArray();
+            ->all(); // flat array of strings
     }
 
     /**
