@@ -36,25 +36,17 @@ class ChallengeController extends Controller
     {
       
         try {
-           // $validatedData = $this->challengeService->validateGetRequestData($request);
+          
             
            $validatedData=$request->validate([
             'category_id' => 'required|integer|exists:challenge_categories,id',
             'step_id' => 'required|integer|exists:challenge_steps,id',
-            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-            //'is_placeholder' => 'required|boolean',
-            //'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
+            'amount_id' => 'required|integer|exists:challenge_amounts,id',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
         ]);
             
-           // for placeholder mode, the amount id is null,we return the matrix placeholders array and placeholder data for evaluation cost discount,
-           //  affiliate link and affiliate master link
-           //so in placeholder mode we return only placeholder data useful for admin only to add/edit placeholders
-           //these placeholders are shown in broker's dashboard  challenge page when data is empty
-           //$isPlaceholder=$validatedData['is_placeholder']?true:false;
-           //$amountId= $isPlaceholder ?null:$validatedData['amount_id'];
+
            $amountId= $validatedData['amount_id'];
-           //$brokerId=$validatedData['broker_id'] ?? null
            $zoneId = $validatedData['zone_id'] ?? null;
            $categoryId=$validatedData['category_id'];
            $stepId=$validatedData['step_id'];
@@ -71,23 +63,14 @@ class ChallengeController extends Controller
         $chId=$challenge?->id??null;
         
         $responseData=$this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
-        //if not placeholder mode, add the placeholder data for matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
-        //TO DO :add placeholders by categories slug not by id
         
-        $this->challengeService->addPlaceholderData($responseData, $categoryId, $stepId, $zoneId);
+        $this->challengeService->addPlaceholderData($responseData, $broker_id,$categoryId, $stepId, $zoneId);
         
         return response()->json([
             'success' => true,
             'data' => array_filter($responseData, fn($v) => $v !== null)
         ]);
         
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -99,26 +82,16 @@ class ChallengeController extends Controller
 
     public function showPlaceholders(Request $request): JsonResponse
     {
-        //to do
-        //check if the logged in user can view broker challenge data
-        try {
-            // $validatedData = $this->challengeService->validateGetRequestData($request);
-             
+    
+        try {             
             $validatedData=$request->validate([
              'category_id' => 'required|integer|exists:challenge_categories,id',
              'step_id' => 'required|integer|exists:challenge_steps,id',
-            
-             //'broker_id' => 'sometimes|nullable|integer|exists:brokers,id',
              'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
          ]);
              
-            // for placeholder mode, the amount id is null,we return the matrix placeholders array and placeholder data for evaluation cost discount,
-            //  affiliate link and affiliate master link
-            //so in placeholder mode we return only placeholder data useful for admin only to add/edit placeholders
-            //these placeholders are shown in broker's dashboard  challenge page when data is empty
-           
             $amountId= null;//for placeholders, the amount id is null
-            //$brokerId=$validatedData['broker_id'] ?? null;
+  
             $zoneId = $validatedData['zone_id'] ?? null;
             $categoryId=$validatedData['category_id'];
             $stepId=$validatedData['step_id'];
@@ -141,13 +114,6 @@ class ChallengeController extends Controller
              'data' => array_filter($responseData, fn($v) => $v !== null)
          ]);
          
- 
-         } catch (ValidationException $e) {
-             return response()->json([
-                 'success' => false,
-                 'message' => 'Validation failed',
-                 'errors' => $e->errors()
-             ], 422);
          } catch (\Throwable $e) {
              return response()->json([
                  'success' => false,

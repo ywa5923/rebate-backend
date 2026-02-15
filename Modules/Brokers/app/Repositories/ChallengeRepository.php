@@ -5,7 +5,8 @@ namespace Modules\Brokers\Repositories;
 use Modules\Brokers\Models\Challenge;
 use Modules\Brokers\Models\ChallengeMatrixValue;
 use Modules\Brokers\Models\MatrixHeader;
-use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Models\ChallengeCategory;
+use Modules\Brokers\Models\ChallengeStep;
 use Illuminate\Database\Eloquent\Collection;
 
 class ChallengeRepository
@@ -88,7 +89,7 @@ class ChallengeRepository
      * @param int $challengeId
      * @return Collection
      */
-    public function getChallengeMatrixValues(int $challengeId,?int $zoneId=null): Collection
+    public function getChallengeMatrixValues(int $challengeId, ?int $zoneId = null): Collection
     {
         return ChallengeMatrixValue::where('challenge_id', $challengeId)->where('zone_id', $zoneId)
             ->with(['row', 'column'])
@@ -105,27 +106,67 @@ class ChallengeRepository
      * @param int $brokerId
      * @return Challenge|null
      */
-    public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null,?int $zoneId = null): ?Challenge
+    public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null, ?int $zoneId = null): ?Challenge
     {
-       
-        $qb= $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
+
+        $qb = $this->model->newQuery()->where('is_placeholder', $isPlaceholder)
             ->where('challenge_category_id', $categoryId)
             ->where('challenge_step_id', $stepId);
 
-            if(isset($zoneId)){
-                $qb->where('zone_id', $zoneId);
-            }else{
-                $qb->whereNull('zone_id');
-            }
+        if (isset($zoneId)) {
+            $qb->where('zone_id', $zoneId);
+        } else {
+            $qb->whereNull('zone_id');
+        }
 
-            if(isset($brokerId) ){
-                $qb->where('broker_id', $brokerId);
-            }
+        if (isset($brokerId)) {
+            $qb->where('broker_id', $brokerId);
+        }
 
-           
-            if(isset($amountId) ){
-                $qb->where('challenge_amount_id', $amountId);
-            }
-            return $qb->first();
+
+        if (isset($amountId)) {
+            $qb->where('challenge_amount_id', $amountId);
+        }
+        return $qb->first();
+    }
+
+    /**
+     * Get category slug by id
+     * @param int $categoryId]
+     * @param int $brokerId
+     * @return int
+     */
+    public function getPlaceholderCategoryId(int $categoryId, int $brokerId): int|null
+    {
+        return ChallengeCategory::query()
+            ->whereNull('broker_id')
+            ->where('slug', function ($q) use ($categoryId, $brokerId) {
+                $q->select('slug')
+                    ->from('challenge_categories')
+                    ->where('id', $categoryId)
+                    ->where('broker_id', $brokerId)
+                    ->limit(1);
+            })->value('id');
+    }
+
+    /**
+     * Get step slug by id
+     * @param int $stepId
+     * @param int $brokerId
+     * @return int
+     */
+    public function getPlaceholderStepId(int $stepId, ?int $brokerId = null): int|null
+    {
+        return ChallengeStep::query()
+            ->whereHas('challengeCategory', fn($q) => $q->whereNull('broker_id'))
+            ->where('slug', function ($q) use ($stepId, $brokerId) {
+                $q->select('cs.slug')
+                    ->from('challenge_steps as cs')
+                    ->join('challenge_categories as cc', 'cc.id', '=', 'cs.challenge_category_id')
+                    ->where('cs.id', $stepId)
+                    ->where('cc.broker_id', $brokerId)
+                    ->limit(1);
+            })
+            ->value('id');
     }
 }

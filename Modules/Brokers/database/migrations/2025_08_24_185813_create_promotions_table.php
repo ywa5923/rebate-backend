@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('broker_id')->constrained('brokers');
+            $table->foreignId("zone_id")->nullable()->constrained();
             $table->timestamps();
            
         });

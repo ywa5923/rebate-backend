@@ -294,6 +294,8 @@ class ChallengeService
         return $this->challengeRepository->exists($isPlaceholder, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
     }
 
+    
+
     /**
      * Get challenge matrix values
      */
@@ -448,125 +450,7 @@ class ChallengeService
         ];
     }
 
-    /**
-     * =======Deprecated method=================
-     * Handle regular challenge request
-     */
-    public function old_handleRegularChallengeRequest(array $validatedData): array
-    {
-        $brokerId = $validatedData['broker_id'] ?? null;
-        $zoneId = $validatedData['zone_id'] ?? null;
-        $categoryId = $validatedData['category_id'];
-        $stepId = $validatedData['step_id'];
-        $amountId = $validatedData['amount_id'];
-
-        $challenge = $this->findChallengeByParams(
-            false,
-            $categoryId,
-            $stepId,
-            $amountId,
-            $brokerId,
-            $zoneId
-        );
-
-
-        if ($challenge?->id) {
-            return $this->handleExistingChallenge($challenge->id, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
-        }
-
-        return $this->handleMissingChallenge($brokerId, $categoryId, $stepId, $zoneId);
-    }
-
-    /**
-     * =======Deprecated method=================
-     * Handle existing challenge
-     * If the challenge is found, return the challenge data for challenge matrix and matrix extradata:affiliate link, affiliate master link, evaluation cost discount
-     * and add placeholder data if needed
-     * @param Challenge $challenge
-     * @param int $brokerId
-     * @param int|null $zoneId
-     * @param array $validatedData
-     * @return array
-     */
-    public function old_handleExistingChallenge(int $challengeId, int $categoryId, int $stepId, int $brokerId, ?int $zoneId): array
-    {
-        $matrix = $this->getChallengeMatrixData($challengeId);
-        $discount = $this->findDiscountByChallengeId($challengeId, $brokerId, $zoneId);
-        $affiliateLink = $this->findUrlByUrlableTypeAndId(Challenge::class, $challengeId, $brokerId, false, $zoneId);
-        $affiliateMasterLink = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-
-        $responseArray = [
-            'challenge_id' => $challengeId,
-            'matrix' => $matrix,
-            'evaluation_cost_discount' => $discount,
-            'affiliate_link' => $affiliateLink,
-            'affiliate_master_link' => $affiliateMasterLink
-        ];
-
-        // Add placeholder data if needed
-        $this->addPlaceholderData($responseArray,  $categoryId, $stepId,  $zoneId);
-
-        return [
-            'success' => true,
-            'data' => $responseArray
-        ];
-    }
-
-    /**
-     * =======Deprecated method=================
-     * Handle missing challenge
-     * If the challenge is not found, return matrix pleaceholders array and placeholder data for evaluation cost discount,
-     *  affiliate link and affiliate master link
-     * @param int $brokerId
-     * @param int|null $zoneId
-     * @param array $validatedData
-     * @return array
-     */
-    public function old_handleMissingChallenge(int $brokerId, $categoryId, $stepId, ?int $zoneId): array
-    {
-        $affiliateMasterLinkObject = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, false, $zoneId);
-        //$affiliateMasterLinkPlaceholder = $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url;
-
-        $responseArray = [
-            'affiliate_master_link' => $affiliateMasterLinkObject
-        ];
-        $this->addPlaceholderData($responseArray,  $categoryId, $stepId,   $zoneId);
-
-        return [
-            'success' => true,
-            'data' => $responseArray
-        ];
-
-        // if (is_null($affiliateMasterLinkObject)) {
-        //     $responseArray['affiliate_master_link_placeholder'] = $affiliateMasterLinkPlaceholder;
-        // }
-
-        // // Add placeholder challenge data if available
-        // $placeholderChallenge = $this->findChallengeByParams(
-        //     true,
-        //     $validatedData['category_id'],
-        //     $validatedData['step_id'],
-        //     null,
-        //     $brokerId
-        // );
-
-        // if ($placeholderChallenge?->id) {
-        //     $responseArray = array_merge($responseArray, [
-        //         'challenge_id' => $placeholderChallenge->id,
-        //         'matrix' => null,
-        //         'matrix_placeholders_array' => $this->getMatrixPlaceholderArray($placeholderChallenge->id, null),
-        //         'evaluation_cost_discount_placeholder' => $this->findDiscountByChallengeId($placeholderChallenge->id, $brokerId, $zoneId)?->value,
-        //         'affiliate_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, $brokerId, true, $zoneId)?->url,
-        //         'affiliate_master_link_placeholder' => $this->findUrlByUrlableTypeAndId(Challenge::class, null, $brokerId, true, $zoneId)?->url,
-        //     ]);
-        // }
-
-        // return [
-        //     'success' => true,
-        //     'data' => $responseArray
-        // ];
-    }
-
+    
     /**
      * Add placeholder data if needed
      * @param array &$responseArray
@@ -579,18 +463,27 @@ class ChallengeService
      * @param array $validatedData
      * @return void
      */
-    public function addPlaceholderData(array &$responseArray, int $categoryId, int $stepId, ?int $zoneId): void
+    public function addPlaceholderData(array &$responseArray, int $brokerId, int $categoryId, int $stepId, ?int $zoneId): void
     {
-       
+       //#When the admin save a challenge matrix data for placeholders, the challenge category id and step id are
+       //the ones defined by admin which have broker_id=null.
+       //#Every broker has its own challenge categories and steps, so here $categoryId and $stepId are the ones cloned for the broker at registration time.
+       //#To get the placeholder challenge row from challenges table, we need to get the  challenge category id and step id which are defined by admin with broker_id=null
+       //1.In repo, get the challenge category id by slug ,then search by that slug the category id with broker_id=null
+       //2. Same logic for challenge steps within one query and inner join
+        $placeholderCatId=$this->challengeRepository->getPlaceholderCategoryId($categoryId,$brokerId);
+        $placeholderStepId=$this->challengeRepository->getPlaceholderStepId($stepId,$brokerId);
+
         $placeholderChallenge = $this->findChallengeByParams(
             true,
-            $categoryId,
-            $stepId,
+            $placeholderCatId,
+            $placeholderStepId,
             ChallengeRepository::AMOUNT_ID_NULL,
             ChallengeRepository::BROKER_ID_NULL,
             $zoneId
         );
 
+       
      
         if (!$placeholderChallenge?->id) {
             return;
