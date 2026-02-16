@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('slug');
             $table->integer('order')->default(0);
+            $table->boolean('default')->default(true);
             $table->foreignId('broker_id')->nullable()->constrained('brokers')->onDelete('cascade');
             $table->foreignId("zone_id")->nullable()->constrained();
             $table->timestamps();

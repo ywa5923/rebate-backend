@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('slug');  
             $table->integer('order')->default(0);
+            $table->boolean('default')->default(true);
             $table->foreignId('challenge_category_id')->constrained('challenge_categories')->onDelete('cascade');
             $table->timestamps();
         });

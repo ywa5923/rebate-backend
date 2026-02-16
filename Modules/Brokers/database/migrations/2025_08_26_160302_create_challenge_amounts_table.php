@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('amount');
             $table->string('currency');
             $table->integer('order')->default(0);
+            $table->boolean('default')->default(true);
             $table->foreignId('challenge_category_id')->constrained('challenge_categories')->onDelete('cascade');
             $table->timestamps();
         });
