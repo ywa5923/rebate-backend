@@ -205,6 +205,103 @@ class ChallengeCategoryService
     }
 
     /**
+     * Save the full ordering of tabs (categories, steps or amounts) for a broker.
+     * $tabIds is the array of entity IDs in the desired final order.
+     *
+     * For 'category', updates challenge_categories.order (scoped by broker_id).
+     * For 'step', updates challenge_steps.order (scoped by broker via category).
+     * For 'amount', updates challenge_amounts.order (scoped by broker via category).
+     *
+     * Ensures items belong to the given broker via their category.
+     *
+     * @param array<int,int> $tabIds
+     * @param int $brokerId
+     * @param ChallengeTabEnum|string $tabType
+     * @return bool
+     */
+    public function saveChallengeTabOrder(array $tabIds, int $brokerId, ChallengeTabEnum|string $tabType): bool
+    {
+        if (empty($tabIds)) {
+            return true;
+        }
+        $tabTypeEnum = $tabType instanceof ChallengeTabEnum ? $tabType : ChallengeTabEnum::from($tabType);
+        // Normalize and deduplicate while preserving order
+        $orderedIds = array_values(array_unique(array_map('intval', $tabIds)));
+
+        return DB::transaction(function () use ($orderedIds, $brokerId, $tabTypeEnum) {
+           
+            if ($tabTypeEnum === ChallengeTabEnum::CATEGORY) {
+                $existingRows = ChallengeCategory::query()
+                    ->whereIn('id', $orderedIds)
+                    ->where('broker_id', $brokerId)
+                    ->get(['id', 'name', 'slug'])
+                    ->keyBy('id');
+                $rows = [];
+                foreach ($orderedIds as $position => $id) {
+                    $row = $existingRows->get($id);
+                    if (!$row) {
+                        throw new \InvalidArgumentException("Category $id not found for broker $brokerId");
+                    }
+                    $rows[] = [
+                        'id' => $id,
+                        'name' => $row->name,
+                        'slug' => $row->slug,
+                        'order' => $position + 1,
+                        'broker_id' => $brokerId,
+                        'updated_at' => now(),
+                    ];
+                }
+                ChallengeCategory::upsert($rows, ['id'], ['order', 'updated_at']);
+            } elseif ($tabTypeEnum === ChallengeTabEnum::STEP) {
+                $existingRows = ChallengeStep::query()
+                    ->whereIn('id', $orderedIds)
+                    ->whereHas('challengeCategory', fn($q) => $q->where('broker_id', $brokerId))
+                    ->get(['id', 'name', 'slug', 'challenge_category_id'])
+                    ->keyBy('id');
+                $rows = [];
+                foreach ($orderedIds as $position => $id) {
+                    $row = $existingRows->get($id);
+                    if (!$row) {
+                        throw new \InvalidArgumentException("Step $id not found for broker $brokerId");
+                    }
+                    $rows[] = [
+                        'id' => $id,
+                        'name' => $row->name,
+                        'slug' => $row->slug,
+                        'challenge_category_id' => $row->challenge_category_id,
+                        'order' => $position + 1,
+                        'updated_at' => now(),
+                    ];
+                }
+                ChallengeStep::upsert($rows, ['id'], ['order', 'updated_at']);
+            } else {
+                $existingRows = ChallengeAmount::query()
+                    ->whereIn('id', $orderedIds)
+                    ->whereHas('challengeCategory', fn($q) => $q->where('broker_id', $brokerId))
+                    ->get(['id', 'amount', 'currency', 'challenge_category_id'])
+                    ->keyBy('id');
+                $rows = [];
+                foreach ($orderedIds as $position => $id) {
+                    $row = $existingRows->get($id);
+                    if (!$row) {
+                        throw new \InvalidArgumentException("Amount $id not found for broker $brokerId");
+                    }
+                    $rows[] = [
+                        'id' => $id,
+                        'amount' => $row->amount,
+                        'currency' => $row->currency,
+                        'challenge_category_id' => $row->challenge_category_id,
+                        'order' => $position + 1,
+                        'updated_at' => now(),
+                    ];
+                }
+                ChallengeAmount::upsert($rows, ['id'], ['order', 'updated_at']);
+            }
+            return true;
+        });
+    }
+
+    /**
      * Validate challenge category data
      */
     public function validateChallengeCategoryData(array $data, bool $isUpdate = false): array

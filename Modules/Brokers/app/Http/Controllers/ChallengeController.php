@@ -124,64 +124,13 @@ class ChallengeController extends Controller
     }
 
     
-    
-
     /**
-     * @OA\Get(
-     *     path="/api/v1/challenge-categories",
-     *     tags={"ChallengeCategory"},
-     *     summary="Get all challenge categories",
-     *     @OA\Parameter(
-     *         name="name",
-     *         in="query",
-     *         description="Filter by name",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="is_active",
-     *         in="query",
-     *         description="Filter by active status",
-     *         required=false,
-     *         @OA\Schema(type="boolean")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_by",
-     *         in="query",
-     *         description="Sort field",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_direction",
-     *         in="query",
-     *         description="Sort direction",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"asc", "desc"})
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Items per page",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/ChallengeCategory")),
-     *             @OA\Property(property="pagination", type="object", @OA\Property(property="current_page", type="integer"), @OA\Property(property="last_page", type="integer"), @OA\Property(property="per_page", type="integer"), @OA\Property(property="total", type="integer"))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
+     * Get the challenge categories for a broker
+     * @param int $broker_id
+     * @return JsonResponse
+     * @throws \Exception
      */
-    public function getChallengeCategories(int $broker_id): JsonResponse
+    public function getChallengeCategories(Request $request, int $broker_id): JsonResponse
     {
         try {
             $challengeCategories = $this->challengeCategoryService->getChallengeCategories($broker_id);
@@ -431,6 +380,37 @@ class ChallengeController extends Controller
             return response()->json(['success' => true, 'message' => 'Challenge tab added successfully']);
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Failed to add challenge tab', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Save the order of the challenge tabs
+     * @param Request $request
+     * @param int $broker_id
+     * @param string $tab_type
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function saveChallengeTabOrder(Request $request, int $broker_id, string $tab_type): JsonResponse
+    {
+       
+        try {
+            $validatedData = $request->validate([
+                'tab_ids' => 'required|array',
+            ]);
+            $tabs = $validatedData['tab_ids'];
+            $tab_type = ChallengeTabEnum::tryFrom($tab_type);
+            if($tab_type === null){
+                return response()->json(['success' => false, 'message' => 'Invalid tab type'], 400);
+            }
+            $result = $this->challengeCategoryService->saveChallengeTabOrder($tabs, $broker_id, $tab_type);
+            if(!$result){
+                return response()->json(['success' => false, 'message' => 'Failed to save challenge tab order'], 500);
+            }
+            return response()->json(['success' => true, 'message' => 'Challenge tab order saved successfully']);
+        }
+        catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to save challenge tab order', 'error' => $e->getMessage()], 500);
         }
     }
 }

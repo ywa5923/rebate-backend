@@ -29,8 +29,15 @@ class ChallengeCategoryRepository
             $query->whereNull('broker_id');
         }
        
-        // Always load relationships
-        $query->with(['steps', 'amounts']);
+        // Always load relationships ordered by 'order' then 'id'
+        $query->with([
+            'steps' => function ($q) {
+                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+            },
+            'amounts' => function ($q) {
+                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+            },
+        ])->orderBy('order', 'asc')->orderBy('id', 'asc');
 
         
         return $query->get();
@@ -41,7 +48,14 @@ class ChallengeCategoryRepository
      */
     public function findById(int $id): ?ChallengeCategory
     {
-        return $this->model->with(['steps', 'amounts'])->find($id);
+        return $this->model->with([
+            'steps' => function ($q) {
+                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+            },
+            'amounts' => function ($q) {
+                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+            },
+        ])->find($id);
     }
 
     /**

@@ -31,55 +31,6 @@ class CompanyController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         description="Filter by status",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"published", "pending", "rejected"})
-     *     ),
-     *     @OA\Parameter(
-     *         name="search",
-     *         in="query",
-     *         description="Search in name and licence_number",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_by",
-     *         in="query",
-     *         description="Sort field",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"name", "status", "year_founded", "created_at", "updated_at"})
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_direction",
-     *         in="query",
-     *         description="Sort direction",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"asc", "desc"})
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Items per page",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         description="Page number",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
-     *         name="language_code",
-     *         in="query",
-     *         description="Language code for translations",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -102,9 +53,13 @@ class CompanyController extends Controller
             $result = $this->companyService->getCompanies($request,$broker_id);
           
             // Transform the data collection
-            $result['data'] = CompanyResource::collection($result['data']);
-            return $result;
-        } catch (\Exception $e) {
+           // $result['data'] = CompanyResource::collection($result['data']);
+            //return $result;
+            return response()->json([
+                'success' => true,
+                'data' => CompanyResource::collection($result['data'])
+            ], 200);
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve companies',
