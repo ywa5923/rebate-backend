@@ -22,7 +22,10 @@ class OptionsCategoriesSeeder extends Seeder
             "id"=>1,
             "name"=>2,
             "slug"=>3,
-            "position"=>4
+            "position"=>4,
+            "for_brokers"=>5,
+            "for_crypto"=>6,
+            "for_props"=>7
         ]);
       
         $importer->import();

@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Modules\Brokers\Models\FormType;
 use Modules\Brokers\Models\FormItem;
 use Illuminate\Support\Facades\DB;
-
+use Modules\Brokers\Models\DropdownCategory;
 class FormTypesSeeder extends Seeder
 {
     /**
@@ -31,6 +31,9 @@ class FormTypesSeeder extends Seeder
         ]);
        
 
+        $numberWithCurrencyWithUnitType = FormType::create([
+            "name" => "NumberWithCurrencyWithUnit"
+        ]);
         // Create FormItems
         $textItem = FormItem::create([
             "name" => "Text",
@@ -42,18 +45,20 @@ class FormTypesSeeder extends Seeder
             "placeholder" => "Enter Number",
             "type" => "number",
         ]);
+      
         $currencyItem = FormItem::create([
             "name" => "Currency",
             "placeholder" => "Select Currency",
             "type" => "single-select",
-            "dropdown_id" => 2,
+            "dropdown_id" => DropdownCategory::where('slug', 'currency')->value('id'),
         ]);
+     
 
         $unitItem = FormItem::create([
-            "name" => "Unit",
+            "name" => "RebateUnit",
             "type" => "single-select",
             "placeholder" => "Select Unit",
-            "dropdown_id" => 1,
+            "dropdown_id" => DropdownCategory::where('slug', 'rebate_unit')->value('id'),
         ]);
 
         // Attach items using relationship
@@ -75,7 +80,11 @@ class FormTypesSeeder extends Seeder
             $unitItem->id
         ]);
 
-        
+        $numberWithCurrencyWithUnitType->items()->attach([
+            $numberItem->id,
+            $currencyItem->id,
+            $unitItem->id
+        ]);
     }
 
     public function loadData()

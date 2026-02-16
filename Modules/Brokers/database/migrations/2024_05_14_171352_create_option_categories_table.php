@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('description',500)->nullable();
             $table->string('icon',100)->nullable();
             $table->integer('position')->default(1);
+            $table->integer('for_brokers')->default(1);
+            $table->integer('for_crypto')->default(1);
+            $table->integer('for_props')->default(1);
+            $table->foreignId('zone_id')->nullable()->constrained('zones');
             $table->timestamps();
-           
         });
     }
-
     /**
      * Reverse the migrations.
      */

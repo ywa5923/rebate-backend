@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libicu-dev \
     libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
@@ -30,6 +31,7 @@ RUN apt-get update && apt-get install -y \
         pcntl \
         opcache \
         pgsql \
+        intl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

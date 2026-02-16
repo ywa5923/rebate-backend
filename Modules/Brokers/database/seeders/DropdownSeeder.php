@@ -5,6 +5,8 @@ namespace Modules\Brokers\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Brokers\Models\DropdownCategory;
 use Modules\Brokers\Models\DropdownOption;
+use Symfony\Component\Intl\Currencies;
+
 class DropdownSeeder extends Seeder
 {
     /**
@@ -18,61 +20,55 @@ class DropdownSeeder extends Seeder
     }
 
     public function loadCurrencyDropdown(){
-        $id=DropdownCategory::insertGetId([
-            "name" => "Currency",
-            "slug" => "currency",
-        ]);
-        DropdownOption::insert([
-           [
-            "label" => "USD",
-            "value" => "usd",
-            "dropdown_category_id" => $id
-           ],
-           [
-            "label" => "EUR",
-            "value" => "eur",
-            "dropdown_category_id" => $id
-           ],
-           [
-            "label" => "GBP",
-            "value" => "gbp",
-            "dropdown_category_id" => $id
-           ],
-           [
-            "label" => "CHF",
-            "value" => "chf",
-            "dropdown_category_id" => $id
-           ],
-           [
-            "label" => "JPY",
-            "value" => "jpy",
-            "dropdown_category_id" => $id
-           ],
-           [
-            "label" => "CAD",
-            "value" => "cad",
-            "dropdown_category_id" => $id
-           ],
-           
-           
-        ]);
+        // Make category idempotent
+        $category = DropdownCategory::firstOrCreate(
+            ['slug' => 'currency'],
+            ['name' => 'Currency']
+        );
+        $id = $category->id;
+
+        $codes = Currencies::getCurrencyCodes();
+
+        $now = now();
+        $rows = collect($codes)->unique()->map(static function (string $code) use ($id, $now) {
+            $code = strtoupper($code);
+            return [
+                'label' => $code,
+                'value' => strtolower($code),
+                'dropdown_category_id' => $id,
+                'updated_at' => $now,
+                'created_at' => $now,
+            ];
+        })->values()->all();
+
+        // Upsert ensures idempotency and avoids duplicates per category+value
+        DropdownOption::upsert(
+            $rows,
+            ['dropdown_category_id', 'value'],
+            ['label', 'updated_at']
+        );
     }
 
 
     public function loadUnitDropdown(){
         $id=DropdownCategory::insertGetId([
-            "name" => "Unit",
-            "slug" => "unit",
+            "name" => "Rebate Unit",
+            "slug" => "rebate_unit",
         ]);
         DropdownOption::insert([
             [
-                "label" => "Unit",
-                "value" => "unit",
+                "label" => "/Pip",
+                "value" => "/pip",
                 "dropdown_category_id" => $id
             ],
             [
-                "label" => "Lots",
-                "value" => "lots",
+                "label" => "/Lot",
+                "value" => "/lot",
+                "dropdown_category_id" => $id
+            ],
+            [
+                "label" => "/%",
+                "value" => "/%",
                 "dropdown_category_id" => $id
             ],
         ]);

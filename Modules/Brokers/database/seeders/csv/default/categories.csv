@@ -1,8 +1,8 @@
-1,General Information,general-information,1
-2,Financial Information,financial-information,2
-3,Promotions,promotions,3
-4,Contests,contests,4
-5,Rebates,rebates,5
-7,Company Profile,company-profile,7
-8,My trading accounts,my-trading-accounts,8
-9,Challenge Matrix,challenge-matrix,10
+1,General Information,general-information,1,1,1,1
+2,Financial Information,financial-information,2,1,1,1
+3,Company Profile,company-profile,3,1,1,1
+4,Promotions,promotions,4,1,1,1
+5,Contests,contests,5,1,1,1
+6,My trading accounts,my-trading-accounts,6,1,1,0
+7,Rebates,rebates,7,1,1,0
+8,Challenge Matrix,challenge-matrix,8,0,0,1

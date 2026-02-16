@@ -597,7 +597,7 @@ class MatrixHeaderRepository
         return MatrixHeader::where('id', $id)->delete();
     }
 
-    public function getAccountTypesColumnHeaders(int $broker_id,string $form_type_name='NumberWithUnitWithCurrency'): array
+    public function getAccountTypesColumnHeaders(int $broker_id,string $form_type_name='NumberWithCurrencyWithUnit'): array
     {
         //we don t need translation for headears.These column headears are only for editable matrix in dashboard
         $accountTypes = (new AccountType)->getAccountTypesNames($broker_id);
