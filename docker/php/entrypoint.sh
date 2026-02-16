@@ -13,22 +13,22 @@ cd /var/www/html
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Install composer dependencies if vendor doesn't exist
-if [ ! -d "vendor" ]; then
-    echo "Installing composer dependencies..."
-    #composer install --no-scripts --no-interaction --prefer-dist
-     runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
-fi
-
-# Run migrations (optional)
-# php artisan migrate --force
-
-# Only in local and only when RUN_FRESH=true
+# Dependency install logic:
+# - If RUN_FRESH=true: remove vendor and install deps
+# - Else: install deps only if vendor/ is missing
 if [ "$RUN_FRESH" = "true" ]; then
-   php artisan migrate:fresh --force
-   php artisan key:generate
-   php artisan config:cache
-   php artisan app:vps-load-data
+    echo "RUN_FRESH=true: removing vendor and reinstalling composer dependencies..."
+    rm -rf vendor
+    runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
+    php artisan migrate:fresh --force
+    php artisan key:generate
+    php artisan config:cache
+    php artisan app:vps-load-data
+else
+    if [ ! -d "vendor" ]; then
+        echo "Installing composer dependencies (vendor/ missing)..."
+        runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
+    fi
 fi
 
 # Start PHP-FPM
