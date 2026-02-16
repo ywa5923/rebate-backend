@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-
+use Modules\Brokers\Enums\BrokerType;
 class OptionCategoryRepository
 {
     protected OptionCategory $model;
@@ -61,6 +61,21 @@ class OptionCategoryRepository
 
         if (!empty($filters['slug'])) {
             $query->where('slug', 'like', "%{$filters['slug']}%");
+        }
+
+        if(isset($filters['broker_type'])) {
+            match ($filters['broker_type']) {
+                BrokerType::BROKER->value => $query->where('for_brokers', 1),
+                BrokerType::CRYPTO->value => $query->where('for_crypto', 1),
+                BrokerType::PROP_FIRM->value => $query->where('for_props', 1),
+                default => null,
+            };
+        }
+
+        if(isset($filters['zone_id'])) {
+            $query->where('zone_id', $filters['zone_id']);
+        }else{
+            $query->whereNull('zone_id');
         }
 
         // Apply sorting

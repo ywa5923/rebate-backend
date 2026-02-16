@@ -33,6 +33,8 @@ class OptionCategoryListRequest extends FormRequest
             
             // Pagination parameter
             'per_page' => 'nullable|integer|min:1|max:100',
+            'broker_type' => 'sometimes|string|max:100',
+            'zone_id' => 'sometimes|exists:zones,id',
         ];
     }
 
@@ -73,7 +75,9 @@ class OptionCategoryListRequest extends FormRequest
                 $filters[$key] = $this->input($key);
             }
         }
-        
+        if($this->has('broker_type') && $this->filled('broker_type')) {
+            $filters['broker_type'] = $this->input('broker_type');
+        }
         return $filters;
     }
 

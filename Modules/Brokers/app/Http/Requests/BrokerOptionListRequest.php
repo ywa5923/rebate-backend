@@ -3,7 +3,7 @@
 namespace Modules\Brokers\Http\Requests;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Tables\BrokerOptionTableConfig;
-
+use Modules\Brokers\Enums\BrokerType;
 class BrokerOptionListRequest extends BaseRequest
 {
    
@@ -45,6 +45,7 @@ class BrokerOptionListRequest extends BaseRequest
             'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
             // Pagination parameter
             'per_page' => 'nullable|integer|min:1|max:100',
+           
         ];
        
         return $rules;
@@ -87,6 +88,7 @@ class BrokerOptionListRequest extends BaseRequest
             }
         }
        
+       
         return $filters;
     }
 
@@ -122,4 +124,5 @@ class BrokerOptionListRequest extends BaseRequest
     {
         return (int) $this->input('per_page', $default);
     }
+  
 }

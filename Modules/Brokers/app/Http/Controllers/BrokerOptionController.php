@@ -148,10 +148,10 @@ class BrokerOptionController extends Controller
             
             $orderDirection = $request->getOrderDirection();
             $perPage = $request->getPerPage();
-            
+           
             $brokerOptions = $this->brokerOptionService->getAllBrokerOptions($filters, $orderBy, $orderDirection, $perPage);
             
-         
+           
             
             return new Response(json_encode([
                 'success' => true,

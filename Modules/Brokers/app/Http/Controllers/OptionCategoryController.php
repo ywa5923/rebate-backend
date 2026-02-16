@@ -182,7 +182,7 @@ class OptionCategoryController extends Controller
             $perPage = $request->getPerPage();
             
             $optionCategories = $this->service->getOptionCategoriesList($filters, $orderBy, $orderDirection, $perPage);
-            
+           
             return new Response(json_encode([
                 'success' => true,
                 'data' => $optionCategories->items(),
