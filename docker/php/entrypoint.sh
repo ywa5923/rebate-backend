@@ -1,17 +1,34 @@
 #!/bin/bash
+set -euo pipefail
 
 # Fix Laravel permissions (for mounted volumes)
 #chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 #chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Start PHP-FPM
-
-
 # Navigate to the working directory
 cd /var/www/html
+
 # Set proper permissions
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+wait_for_mysql() {
+  DB_HOST="${DB_HOST:-mysql}"
+  DB_PORT="${DB_PORT:-3306}"
+  DB_DATABASE="${DB_DATABASE:-forge}"
+  DB_USERNAME="${DB_USERNAME:-forge}"
+  DB_PASSWORD="${DB_PASSWORD:-}"
+
+  echo "Waiting for MySQL at ${DB_HOST}:${DB_PORT}..."
+  until php -r 'try{
+    new PDO("mysql:host=".getenv("DB_HOST").";port=".getenv("DB_PORT").";dbname=".getenv("DB_DATABASE"),
+            getenv("DB_USERNAME"), getenv("DB_PASSWORD"),
+            [PDO::ATTR_TIMEOUT=>2]);
+  } catch (Throwable $e) { exit(1); }'; do
+    sleep 2
+  done
+  echo "MySQL is up."
+}
 
 # Dependency install logic:
 # - If RUN_FRESH=true: remove vendor and install deps
@@ -20,12 +37,14 @@ if [ "$RUN_FRESH" = "true" ]; then
     echo "RUN_FRESH=true: removing vendor and reinstalling composer dependencies..."
     rm -rf vendor
     runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
+
+    wait_for_mysql
     php artisan migrate:fresh --force
     php artisan key:generate
     php artisan config:cache
     php artisan app:vps-load-data
 else
-    if [ ! -d "vendor" ]; then
+    if [[ ! -d "vendor" ]]; then
         echo "Installing composer dependencies (vendor/ missing)..."
         runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
     fi
