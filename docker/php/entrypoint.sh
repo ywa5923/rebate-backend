@@ -12,6 +12,13 @@ cd /var/www/html
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Ensure DB env vars are exported (defaults if missing)
+export DB_HOST="${DB_HOST:-mysql}"
+export DB_PORT="${DB_PORT:-3306}"
+export DB_DATABASE="${DB_DATABASE:-forge}"
+export DB_USERNAME="${DB_USERNAME:-forge}"
+export DB_PASSWORD="${DB_PASSWORD:-}"
+
 wait_for_mysql() {
   DB_HOST="${DB_HOST:-mysql}"
   DB_PORT="${DB_PORT:-3306}"
@@ -30,6 +37,9 @@ wait_for_mysql() {
   echo "MySQL is up."
 }
 
+# Always wait for DB before running composer/migrations/seeding
+wait_for_mysql
+
 # Dependency install logic:
 # - If RUN_FRESH=true: remove vendor and install deps
 # - Else: install deps only if vendor/ is missing
@@ -38,7 +48,6 @@ if [ "$RUN_FRESH" = "true" ]; then
     rm -rf vendor
     runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
 
-    wait_for_mysql
     php artisan migrate:fresh --force
     php artisan key:generate
     php artisan config:cache
