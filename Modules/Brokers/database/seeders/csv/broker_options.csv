@@ -44,47 +44,47 @@ id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_c
 43,Trading Bots,trading_bots,,boolean,checkbox,1,NULL,NULL,1,0,0,0,1,en,2,NULL,NULL,NULL
 44,Challenge Payment Fee Options,payment_fee_option,,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
 45,Payment Options for Profit Share (Funded Accounts),payment_options_for_profit_share,,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
-46,Promotion Title,promotion_title,promotion,string,text,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
-47,Promotion Details,promotion_details,promotion,text,textarea,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
-48,Promotion Banner,promotion_banner,promotion,text,image,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
-49,*Promotion Link,promotion_link,promotion,text,text,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
-50,Contest Title,contest_title,contest,string,text,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
-51,Contest Details,contest_details,contest,text,textarea,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
-52,Contest Banner,contest_banner,contest,text,image,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
-53,*Contest Link,contest_link,contest,text,text,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
+46,Promotion Title,promotion_title,promotion,string,text,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
+47,Promotion Details,promotion_details,promotion,text,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
+48,Promotion Banner,promotion_banner,promotion,text,image,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
+49,*Promotion Link,promotion_link,promotion,text,text,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
+50,Contest Title,contest_title,contest,string,text,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
+51,Contest Details,contest_details,contest,text,textarea,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
+52,Contest Banner,contest_banner,contest,text,image,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
+53,*Contest Link,contest_link,contest,text,text,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
 54,IB Commission Structure,ib_comission_structure,,text,text,0,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
 55,Cashback Payment Options,cashback_payment_options,,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
 56,Rebate Notes,rebate_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
 57,General Account Setup Notes,general_ac_setup_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
 58,Transfer an Existing Account Notes,transfer_ac_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
 59,Become a SUB-IB Notes,sub_ib_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-60,Account Type Name,account_type_name,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-61,Commission,commission_value,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-62,Commission URL,commission_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-63,Swap rates,swap_rates,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-64,Swap rates URL,swap_rates_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-65,Orders Execution Model,execution_model,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-66,Order Types,order_types,account_type,string,string,1,NULL,NULL,0,0,1,0,1,en,6,NULL,NULL,NULL
-67,Maximum Leverage,max_leverage,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-68,Spread Type,spread_type,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-69,Spread URL,spread_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-70,Minimum Deposit,min_deposit,account_type,int,numberWithUnit,1,NULL,NULL,1,1,0,0,1,en,6,NULL,NULL,NULL
-71,Minimum Trade Size,min_trade_size,account_type,numeric,numberWithUnit,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-72,Stop Out Level,stop_out_level,account_type,numeric,numberWithUnit,1,NULL,NULL,1,1,0,0,1,en,6,NULL,NULL,NULL
-73,Minimum Challenge Fee,min_challenge_fee,account_type,numeric,numberWithUnit,1,NULL,NULL,0,0,1,0,1,en,6,NULL,NULL,NULL
-74,Minimum Profit Split,min_profit_split,account_type,numeric,numberWithUnit,1,NULL,NULL,0,0,1,0,1,en,6,NULL,NULL,NULL
-75,Trailing stops,trailing_stops,account_type,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,6,NULL,NULL,NULL
-76,Scalping Allowed,allow_scalping,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-77,Hedging Allowed,allow_hedging,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-78,News Trading Allowed,allow_news_trading,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-79,Cent Accounts,cent_accounts,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
-80,Islamic Accounts,islamic_accounts,account_type,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,6,NULL,NULL,NULL
-81,Company Name,company_name,company,string,string,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-82,Short Description,company_description,company,text,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-83,Categories,company_categories,company,text,multiple_select,1,NULL,NULL,0,0,1,1,1,EN,3,NULL,NULL,NULL
-84,Primary Category,primary_category,company,string,single_select,1,NULL,NULL,0,0,1,1,1,EN,3,NULL,NULL,NULL
-85,Highlights,highlights,company,text,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-86,Year Founded,year_funded,company,string,string,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-87,Headquarters,head_quarters,company,string,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-88,Offices Location,offices_location,company,string,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
-89,Employees,employees,company,string,string,1,NULL,NULL,1,1,1,0,1,en,3,NULL,NULL,NULL
+60,Account Type Name,account_type_name,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+61,Commission,commission_value,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+62,Commission URL,commission_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+63,Swap rates,swap_rates,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+64,Swap rates URL,swap_rates_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+65,Orders Execution Model,execution_model,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+66,Order Types,order_types,account_type,string,string,1,NULL,NULL,0,0,1,0,1,en,8,NULL,NULL,NULL
+67,Maximum Leverage,max_leverage,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+68,Spread Type,spread_type,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+69,Spread URL,spread_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+70,Minimum Deposit,min_deposit,account_type,int,numberWithUnit,1,NULL,NULL,1,1,0,0,1,en,8,NULL,NULL,NULL
+71,Minimum Trade Size,min_trade_size,account_type,numeric,numberWithUnit,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+72,Stop Out Level,stop_out_level,account_type,numeric,numberWithUnit,1,NULL,NULL,1,1,0,0,1,en,8,NULL,NULL,NULL
+73,Minimum Challenge Fee,min_challenge_fee,account_type,numeric,numberWithUnit,1,NULL,NULL,0,0,1,0,1,en,8,NULL,NULL,NULL
+74,Minimum Profit Split,min_profit_split,account_type,numeric,numberWithUnit,1,NULL,NULL,0,0,1,0,1,en,8,NULL,NULL,NULL
+75,Trailing stops,trailing_stops,account_type,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,8,NULL,NULL,NULL
+76,Scalping Allowed,allow_scalping,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+77,Hedging Allowed,allow_hedging,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+78,News Trading Allowed,allow_news_trading,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+79,Cent Accounts,cent_accounts,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,8,NULL,NULL,NULL
+80,Islamic Accounts,islamic_accounts,account_type,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,8,NULL,NULL,NULL
+81,Company Name,company_name,company,string,string,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+82,Short Description,company_description,company,text,textarea,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+83,Categories,company_categories,company,text,multiple_select,1,NULL,NULL,0,0,1,1,1,EN,7,NULL,NULL,NULL
+84,Primary Category,primary_category,company,string,single_select,1,NULL,NULL,0,0,1,1,1,EN,7,NULL,NULL,NULL
+85,Highlights,highlights,company,text,textarea,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+86,Year Founded,year_funded,company,string,string,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+87,Headquarters,head_quarters,company,string,textarea,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+88,Offices Location,offices_location,company,string,textarea,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
+89,Employees,employees,company,string,string,1,NULL,NULL,1,1,1,0,1,en,7,NULL,NULL,NULL
