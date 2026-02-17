@@ -104,9 +104,11 @@ Route::prefix('v1')->group( function () {
  
     Route::get('challenges/placeholders', [ChallengeController::class, 'showPlaceholders']);
     Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);
+    Route::post('challenges/{broker_id}/publish', [ChallengeController::class, 'toggleChallengePublish']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'removeChallengeTab']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'addChallengeTab']);
     Route::put('challenges/{broker_id}/tabs/{tab_type}/order', [ChallengeController::class, 'saveChallengeTabOrder']);
+   
      
      //=================================SUPERADMIN ONLY ROUTES======================================
      Route::middleware(['auth:sanctum', 'superadmin-only'])->get('zones/form-config', [ZoneController::class, 'getFormConfig']);

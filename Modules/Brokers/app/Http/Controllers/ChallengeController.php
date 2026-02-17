@@ -51,6 +51,7 @@ class ChallengeController extends Controller
            $categoryId=$validatedData['category_id'];
            $stepId=$validatedData['step_id'];
 
+          
            //the chalenge row for the current parameters
            $challenge=  $this->challengeService->findChallengeByParams(
             false,
@@ -63,6 +64,9 @@ class ChallengeController extends Controller
         $chId=$challenge?->id??null;
         
         $responseData=$this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
+
+        //if the challenge is not found, set the publish state to true which de default value for non-placeholder challenges at database level
+        $responseData['is_published'] = $challenge?->is_published?$challenge->is_published:true;
         
         $this->challengeService->addPlaceholderData($responseData, $broker_id,$categoryId, $stepId, $zoneId);
         
@@ -411,6 +415,36 @@ class ChallengeController extends Controller
         }
         catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Failed to save challenge tab order', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    /**
+     * Toggle the publish state of a challenge
+     * @param Request $request
+     * @param int $broker_id
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function toggleChallengePublish(Request $request, int $broker_id): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate([
+                'category_id' => 'required|integer|exists:challenge_categories,id',
+                'step_id' => 'required|integer|exists:challenge_steps,id',
+                'amount_id' => 'required|integer|exists:challenge_amounts,id',
+                'is_published' => 'required|boolean',
+            ]);
+            $category_id = $validatedData['category_id'];
+            $step_id = $validatedData['step_id'];
+            $amount_id = $validatedData['amount_id'];
+            $is_published = $validatedData['is_published'];
+            $this->challengeService->toggleChallengePublish($is_published, $category_id, $step_id, $amount_id, $broker_id);
+            return response()->json(['success' => true, 'message' => 'Challenge publish toggled successfully']);
+        }
+    
+        catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to toggle challenge publish', 'error' => $e->getMessage()], 500);
         }
     }
 }

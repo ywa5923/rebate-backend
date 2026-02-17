@@ -468,16 +468,22 @@ class ChallengeService
        //#When the admin save a challenge matrix data for placeholders, the challenge category id and step id are
        //the ones defined by admin which have broker_id=null.
        //#Every broker has its own challenge categories and steps, so here $categoryId and $stepId are the ones cloned for the broker at registration time.
-       //#To get the placeholder challenge row from challenges table, we need to get the  challenge category id and step id which are defined by admin with broker_id=null
+       //#To get the placeholder challenge row from challenges table, we need to get the   category id and step id which are defined by admin with broker_id=null
        //1.In repo, get the challenge category id by slug ,then search by that slug the category id with broker_id=null
        //2. Same logic for challenge steps within one query and inner join
-        $placeholderCatId=$this->challengeRepository->getPlaceholderCategoryId($categoryId,$brokerId);
-        $placeholderStepId=$this->challengeRepository->getPlaceholderStepId($stepId,$brokerId);
+        //So originalCatId and originalStepId are the ones defined by admin with broker_id=null that have same slugs with the ones cloned for the broker at registration time.
+       
+       $originalCatId=$this->challengeRepository->getPlaceholderCategoryId($categoryId,$brokerId);
+        $originalStepId=$this->challengeRepository->getPlaceholderStepId($stepId,$brokerId);
+
+         if(!$originalCatId || !$originalStepId){
+            throw new \Exception('Original Category id or step id not found');
+         }
 
         $placeholderChallenge = $this->findChallengeByParams(
             true,
-            $placeholderCatId,
-            $placeholderStepId,
+            $originalCatId,
+            $originalStepId,
             ChallengeRepository::AMOUNT_ID_NULL,
             ChallengeRepository::BROKER_ID_NULL,
             $zoneId
@@ -665,5 +671,46 @@ class ChallengeService
                 'amounts'    => count($amountRows),
             ];
        
+    }
+
+    /**
+     * Set publish state for a non-placeholder challenge identified by tuple.
+     * Uses pessimistic locking to avoid races.
+     *
+     * @param bool $isPublished
+     * @param int $categoryId
+     * @param int $stepId
+     * @param int $amountId
+     * @param int $brokerId
+     * @param int|null $zoneId
+     * @return bool Final published state
+     */
+    public function toggleChallengePublish(bool $isPublished, int $categoryId, int $stepId, int $amountId, int $brokerId, ?int $zoneId = null): bool
+    {
+        return DB::transaction(function () use ($categoryId, $stepId, $amountId, $brokerId, $zoneId, $isPublished) {
+            $query = Challenge::where([
+                'is_placeholder' => false,
+                'challenge_category_id' => $categoryId,
+                'challenge_step_id' => $stepId,
+                'challenge_amount_id' => $amountId,
+                'broker_id' => $brokerId,
+            ]);
+            if ($zoneId !== null) {
+                $query->where('zone_id', $zoneId);
+            } else {
+                $query->whereNull('zone_id');
+            }
+
+            // Lock the row to avoid race conditions
+            $challenge = $query->lockForUpdate()->first();
+            if (!$challenge) {
+                throw new \RuntimeException('Challenge not found');
+            }
+
+            $challenge->is_published = $isPublished;
+            $challenge->save();
+
+            return (bool) $challenge->is_published;
+        });
     }
 }

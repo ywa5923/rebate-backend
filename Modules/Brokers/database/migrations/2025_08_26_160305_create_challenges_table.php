@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->boolean('is_placeholder')->default(false);
+            $table->boolean('is_published')->default(true);
            
            // $table->foreignId('matrix_id')->constrained('matrices');
             $table->foreignId('challenge_category_id')->nullable()->constrained('challenge_categories')->nullOnDelete();
