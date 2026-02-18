@@ -492,12 +492,12 @@ class OptionValueController extends Controller
 
             
          
-            $optionValues = $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType,  $validatedData);
+             $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType,  $validatedData);
           
             return response()->json([
                 'success' => true,
-                'message' => 'Option values updated successfully',
-                'data' => $optionValues
+                'message' => 'Option values updated successfully'
+                
             ]);
         } catch (\Throwable $e) {
             return response()->json([

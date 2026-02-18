@@ -358,27 +358,28 @@ class OptionValueService
                     $this->repository->bulkCreate($inserts);
                 }
 
-                // Get all affected option values (updated + inserted)
-                $updatedIds = array_keys($updatesByCondition);
-                $inserted = collect();
-                if (!empty($inserts)) {
-                    // Optionally, fetch the newly inserted records if you need to return them
-                    // This assumes you have enough info in $inserts to re-query them
-                    // For example, by unique fields or by created_at timestamp
-                    $inserted = OptionValue::where('broker_id', $brokerId)
-                        ->where('created_at', $now)
-                        ->get();
+                // // Get all affected option values (updated + inserted)
+                // $updatedIds = array_keys($updatesByCondition);
+                // $inserted = collect();
+                // if (!empty($inserts)) {
+                //     // Optionally, fetch the newly inserted records if you need to return them
+                //     // This assumes you have enough info in $inserts to re-query them
+                //     // For example, by unique fields or by created_at timestamp
+                //     $inserted = OptionValue::where('broker_id', $brokerId)
+                //         ->where('created_at', $now)
+                //         ->get();
                        
-                }
-                $updated = !empty($updatedIds)
-                    ? $this->repository->getByBrokerIdAndIds($brokerId, $updatedIds)
-                    : collect();
+                // }
+                // $updated = !empty($updatedIds)
+                //     ? $this->repository->getByBrokerIdAndIds($brokerId, $updatedIds)
+                //     : collect();
 
-                $all = $updated->merge($inserted)->load(['broker', 'option', 'zone', 'translations']);
+                // $all = $updated->merge($inserted)->load(['broker', 'option', 'zone', 'translations']);
 
-                return $all->map(function ($optionValue) {
-                    return $optionValue->toArray();
-                })->toArray();
+                // return $all->map(function ($optionValue) {
+                //     return $optionValue->toArray();
+                // })->toArray();
+                return true;
 
             } catch (\Exception $e) {
                 Log::error('OptionValueService updateMultipleOptionValues error: ' . $e->getMessage());
