@@ -1,49 +1,49 @@
 id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_crypto,for_brokers,for_props,required,position,default_language,option_category_id,dropdown_category_id,created_at,updated_at
-1,Position Home,position_home,,int,number,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-2,Position List,position_list,,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
-3,Position Grid ,position_grid,,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
-4,Position Table,position_table,,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
-5,Website Demo Registration Link,demo_registration_link,,string,url,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-6,Logo,logo,,string,string,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-7,Trading Name,trading_name,,string,string,1,NULL,NULL,1,1,0,1,1,en,1,NULL,NULL,NULL
-8,Website Homepage Link,home_url,,string,string,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-9,Sign-up IB/ Affiliate Link,affiliate_url,,string,string,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
-10,1-Click Trading,1_click_trading,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-11,Allow Expert Advisors (EAs),allow_expert_advisors,,boolean,checkbox,1,NULL,NULL,0,1,1,0,1,en,2,NULL,NULL,NULL
-12,Social Trading,social_trading,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-13,Copy Trading,copy_trading,,text,textarea,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-14, Bonuses,trading_bonuses,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-15,Contests,trading_contests,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-16,Trading API,trading_api,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-17,MAM/ PAMM Platforms,mam_pamm_platforms,,boolean,checkbox,1,NULL,NULL,0,1,0,0,1,en,2,NULL,NULL,NULL
-18,Managed Accounts,managed_accounts,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-19,Free VPS,free_vps,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-20,Non-expiring Demo Accounts,non-expiring_demo_accounts,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-21,Funding Methods,deposit_methods,,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-22,*Covered Markets,covered_markets,,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-23,Interest on Free Margin,interest_on_free_margin,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-24,Regulatory Deposit Insurance,regulatory_deposit_insurance,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-25,Negative Balance Protection,negative_balance_protection,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-26,Segregated Accounts,segregated_accounts,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-27,Crypto Rebates,crypto_rebates,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-28,Supported Languages,support_languages ,,string,string,1,NULL,NULL,1,1,1,1,1,en,2,NULL,NULL,NULL
-29,24h Support,24h_support,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-30,Accept American clients,accept_american_clients,,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
-31,Accept Japanese Clients,accept_japanese_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-32,Accept European Clients,accept_european_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-33,Accept Canadian Clients,accept_canadian_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-34,Accept Asian Clients,accept_asian_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-35,Accept British Clients,accept_british_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-36,Accept Russian Clients,accept_russian_clients,,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-37,Account Currencies,account_currencies,,string,string,1,NULL,NULL,0,1,1,0,1,en,2,NULL,NULL,NULL
-38,Supported Options,support_options,,string,string,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-39,Financial Instruments,trading_instruments,,string,string,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-40,*Prohibited Countries,prohibited_countries,,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-41,Prohibited Countries Acronyms,prohibited_countries_acronyms,,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
-42,Fiat Account Currencies,fiat_account_currencies,,string,multiple_select,1,NULL,NULL,1,0,0,0,1,en,2,NULL,NULL,NULL
-43,Trading Bots,trading_bots,,boolean,checkbox,1,NULL,NULL,1,0,0,0,1,en,2,NULL,NULL,NULL
-44,Challenge Payment Fee Options,payment_fee_option,,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
-45,Payment Options for Profit Share (Funded Accounts),payment_options_for_profit_share,,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
+1,Position Home,position_home,broker,int,number,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+2,Position List,position_list,broker,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
+3,Position Grid ,position_grid,broker,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
+4,Position Table,position_table,broker,int,number,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
+5,Website Demo Registration Link,demo_registration_link,broker,string,url,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+6,Logo,logo,broker,string,string,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+7,Trading Name,trading_name,broker,string,string,1,NULL,NULL,1,1,0,1,1,en,1,NULL,NULL,NULL
+8,Website Homepage Link,home_url,broker,string,string,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+9,Sign-up IB/ Affiliate Link,affiliate_url,broker,string,string,1,NULL,NULL,0,1,0,0,1,en,1,NULL,NULL,NULL
+10,1-Click Trading,1_click_trading,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+11,Allow Expert Advisors (EAs),allow_expert_advisors,broker,boolean,checkbox,1,NULL,NULL,0,1,1,0,1,en,2,NULL,NULL,NULL
+12,Social Trading,social_trading,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+13,Copy Trading,copy_trading,broker,text,textarea,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+14, Bonuses,trading_bonuses,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+15,Contests,trading_contests,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+16,Trading API,trading_api,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+17,MAM/ PAMM Platforms,mam_pamm_platforms,broker,boolean,checkbox,1,NULL,NULL,0,1,0,0,1,en,2,NULL,NULL,NULL
+18,Managed Accounts,managed_accounts,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+19,Free VPS,free_vps,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+20,Non-expiring Demo Accounts,non-expiring_demo_accounts,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+21,Funding Methods,deposit_methods,broker,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+22,*Covered Markets,covered_markets,broker,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+23,Interest on Free Margin,interest_on_free_margin,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+24,Regulatory Deposit Insurance,regulatory_deposit_insurance,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+25,Negative Balance Protection,negative_balance_protection,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+26,Segregated Accounts,segregated_accounts,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+27,Crypto Rebates,crypto_rebates,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+28,Supported Languages,support_languages ,broker,string,string,1,NULL,NULL,1,1,1,1,1,en,2,NULL,NULL,NULL
+29,24h Support,24h_support,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+30,Accept American clients,accept_american_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,NULL,NULL
+31,Accept Japanese Clients,accept_japanese_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+32,Accept European Clients,accept_european_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+33,Accept Canadian Clients,accept_canadian_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+34,Accept Asian Clients,accept_asian_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+35,Accept British Clients,accept_british_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+36,Accept Russian Clients,accept_russian_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+37,Account Currencies,account_currencies,broker,string,string,1,NULL,NULL,0,1,1,0,1,en,2,NULL,NULL,NULL
+38,Supported Options,support_options,broker,string,string,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+39,Financial Instruments,trading_instruments,broker,string,string,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+40,*Prohibited Countries,prohibited_countries,broker,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+41,Prohibited Countries Acronyms,prohibited_countries_acronyms,broker,string,multiple_select,1,NULL,NULL,1,1,1,0,1,en,2,NULL,NULL,NULL
+42,Fiat Account Currencies,fiat_account_currencies,broker,string,multiple_select,1,NULL,NULL,1,0,0,0,1,en,2,NULL,NULL,NULL
+43,Trading Bots,trading_bots,broker,boolean,checkbox,1,NULL,NULL,1,0,0,0,1,en,2,NULL,NULL,NULL
+44,Challenge Payment Fee Options,payment_fee_option,broker,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
+45,Payment Options for Profit Share (Funded Accounts),payment_options_for_profit_share,broker,text,multiple_select,1,NULL,NULL,0,0,1,0,1,en,2,NULL,NULL,NULL
 46,Promotion Title,promotion_title,promotion,string,text,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
 47,Promotion Details,promotion_details,promotion,text,textarea,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
 48,Promotion Banner,promotion_banner,promotion,text,image,1,NULL,NULL,1,1,1,0,1,en,4,NULL,NULL,NULL
@@ -52,12 +52,12 @@ id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_c
 51,Contest Details,contest_details,contest,text,textarea,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
 52,Contest Banner,contest_banner,contest,text,image,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
 53,*Contest Link,contest_link,contest,text,text,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
-54,IB Commission Structure,ib_comission_structure,,text,text,0,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-55,Cashback Payment Options,cashback_payment_options,,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-56,Rebate Notes,rebate_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-57,General Account Setup Notes,general_ac_setup_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-58,Transfer an Existing Account Notes,transfer_ac_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
-59,Become a SUB-IB Notes,sub_ib_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+54,IB Commission Structure,ib_comission_structure,broker,text,text,0,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+55,Cashback Payment Options,cashback_payment_options,broker,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+56,Rebate Notes,rebate_notes,broker,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+57,General Account Setup Notes,general_ac_setup_notes,broker,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+58,Transfer an Existing Account Notes,transfer_ac_notes,broker,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+59,Become a SUB-IB Notes,sub_ib_notes,broker,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
 60,Account Type Name,account_type_name,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
 61,Commission,commission_value,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
 62,Commission URL,commission_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
