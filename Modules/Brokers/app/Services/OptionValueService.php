@@ -208,7 +208,7 @@ class OptionValueService
     /**
      * Update multiple option values for a broker
      */
-    public function updateMultipleOptionValues(bool $isAdmin,int $brokerId,int $entity_id, string $entity_type, array $optionValuesData): array
+    public function updateMultipleOptionValues(bool $isAdmin,int $brokerId,int $entity_id, string $entity_type, array $optionValuesData): true
     {
         //dd($optionValuesData);
 
