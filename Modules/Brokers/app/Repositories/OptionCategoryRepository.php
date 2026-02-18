@@ -190,9 +190,9 @@ class OptionCategoryRepository
         }
 
         $filterMap = [
-            'broker' => 'for_brokers',
-            'props' => 'for_props', 
-            'prop_firm' => 'for_crypto'
+            BrokerType::BROKER->value => 'for_brokers',
+            BrokerType::CRYPTO->value => 'for_crypto', 
+            BrokerType::PROP_FIRM->value => 'for_props', 
         ];
 
         if (isset($filterMap[$brokerType])) {
