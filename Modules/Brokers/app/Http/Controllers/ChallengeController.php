@@ -65,8 +65,8 @@ class ChallengeController extends Controller
         
         $responseData=$this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
 
-        //if the challenge is not found, set the publish state to true which de default value for non-placeholder challenges at database level
-        $responseData['is_published'] = $challenge?->is_published?$challenge->is_published:true;
+        $isPublished = ($chId) ? $challenge->is_published : true;
+        $responseData['is_published'] = $isPublished;
         
         $this->challengeService->addPlaceholderData($responseData, $broker_id,$categoryId, $stepId, $zoneId);
         

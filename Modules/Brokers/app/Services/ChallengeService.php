@@ -706,11 +706,11 @@ class ChallengeService
             if (!$challenge) {
                 throw new \RuntimeException('Challenge not found');
             }
-
+            
             $challenge->is_published = $isPublished;
             $challenge->save();
 
-            return (bool) $challenge->is_published;
+            return true;
         });
     }
 }
