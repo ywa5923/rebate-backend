@@ -124,53 +124,53 @@ final class BrokerOptionTableConfig extends TableConfig
                     'label' => 'Yes',
                 ]]
             ],
-            'load_in_dropdown' => [
-                'type' => 'select',
-                'label' => 'Load in Dropdown',
-                'tooltip' => 'This filter shows options that are loaded in dropdown list which is opened when the user click Select Columns button in a dynamic table',
-                'options' => [[
-                    'value' => 0,
-                    'label' => 'No',
-                ], [
-                    'value' => 1,
-                    'label' => 'Yes',
-                ]]
-            ],
-            'default_loading' => [
-                'type' => 'select',
-                'label' => 'Default Loading',
-                'tooltip' => 'This filter shows options that are loaded by default in brokers dynamic table',
-                'options' => [[
-                    'value' => 0,
-                    'label' => 'No'
-                ], [
-                    'value' => 1,
-                    'label' => 'Yes'
+            // 'load_in_dropdown' => [
+            //     'type' => 'select',
+            //     'label' => 'Load in Dropdown',
+            //     'tooltip' => 'This filter shows options that are loaded in dropdown list which is opened when the user click Select Columns button in a dynamic table',
+            //     'options' => [[
+            //         'value' => 0,
+            //         'label' => 'No',
+            //     ], [
+            //         'value' => 1,
+            //         'label' => 'Yes',
+            //     ]]
+            // ],
+            // 'default_loading' => [
+            //     'type' => 'select',
+            //     'label' => 'Default Loading',
+            //     'tooltip' => 'This filter shows options that are loaded by default in brokers dynamic table',
+            //     'options' => [[
+            //         'value' => 0,
+            //         'label' => 'No'
+            //     ], [
+            //         'value' => 1,
+            //         'label' => 'Yes'
                     
-                ]]
-            ],
-            'category_name' => [
-                'type' => 'select',
-                'label' => 'Category Name',
-                'tooltip' => 'Filter by option category name',
-                'options' => OptionCategory::all()->map(function($category) {
-                    return [
-                        'value' => $category->id,
-                        'label' => $category->name,
-                    ];
-                })->toArray()
-            ],
-            'dropdown_list_attached' => [
-                'type' => 'select',
-                'label' => 'Dropdown List Attached',
-                'tooltip' => 'Filter by dropdown list attached',
-                'options' => DropdownCategory::all()->map(function($dropdownCategory) {
-                    return [
-                        'value' => $dropdownCategory->id,
-                        'label' => $dropdownCategory->name,
-                    ];
-                })->toArray()
-            ]
+            //     ]]
+            // ],
+            // 'category_name' => [
+            //     'type' => 'select',
+            //     'label' => 'Category Name',
+            //     'tooltip' => 'Filter by option category name',
+            //     'options' => OptionCategory::all()->map(function($category) {
+            //         return [
+            //             'value' => $category->id,
+            //             'label' => $category->name,
+            //         ];
+            //     })->toArray()
+            // ],
+            // 'dropdown_list_attached' => [
+            //     'type' => 'select',
+            //     'label' => 'Dropdown List Attached',
+            //     'tooltip' => 'Filter by dropdown list attached',
+            //     'options' => DropdownCategory::all()->map(function($dropdownCategory) {
+            //         return [
+            //             'value' => $dropdownCategory->id,
+            //             'label' => $dropdownCategory->name,
+            //         ];
+            //     })->toArray()
+            // ]
         ];
     }
 
