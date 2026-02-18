@@ -150,6 +150,7 @@ class OptionCategoryRepository
         // Add options relationship with broker type filtering
         $withArray['options'] = function($q) use ($request) {
             $this->applyBrokerTypeFilter($q, $request->broker_type ?? null);
+            $q->orderBy('category_position', 'asc')->orderBy('id', 'asc');
         };
         
         // Add translations if language_code is provided
