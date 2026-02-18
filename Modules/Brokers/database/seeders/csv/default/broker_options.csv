@@ -52,12 +52,12 @@ id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_c
 51,Contest Details,contest_details,contest,text,textarea,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
 52,Contest Banner,contest_banner,contest,text,image,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
 53,*Contest Link,contest_link,contest,text,text,1,NULL,NULL,1,1,1,0,1,en,5,NULL,NULL,NULL
-54,IB Commission Structure,ib_comission_structure,,text,text,0,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-55,Cashback Payment Options,cashback_payment_options,,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-56,Rebate Notes,rebate_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-57,General Account Setup Notes,general_ac_setup_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-58,Transfer an Existing Account Notes,transfer_ac_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
-59,Become a SUB-IB Notes,sub_ib_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,5,NULL,NULL,NULL
+54,IB Commission Structure,ib_comission_structure,,text,text,0,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+55,Cashback Payment Options,cashback_payment_options,,string,multiple_select,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+56,Rebate Notes,rebate_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+57,General Account Setup Notes,general_ac_setup_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+58,Transfer an Existing Account Notes,transfer_ac_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
+59,Become a SUB-IB Notes,sub_ib_notes,,text,notes,1,NULL,NULL,1,1,0,0,1,en,1,NULL,NULL,NULL
 60,Account Type Name,account_type_name,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
 61,Commission,commission_value,account_type,string,string,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
 62,Commission URL,commission_url,account_type,string,url,1,NULL,NULL,1,1,1,0,1,en,6,NULL,NULL,NULL
