@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Fix Laravel permissions (for mounted volumes)
-#chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-#chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
 # Navigate to the working directory
 cd /var/www/html
 
@@ -20,37 +16,64 @@ export DB_USERNAME="${DB_USERNAME:-forge}"
 export DB_PASSWORD="${DB_PASSWORD:-}"
 
 wait_for_mysql() {
-  DB_HOST="${DB_HOST:-mysql}"
-  DB_PORT="${DB_PORT:-3306}"
-  DB_DATABASE="${DB_DATABASE:-forge}"
-  DB_USERNAME="${DB_USERNAME:-forge}"
-  DB_PASSWORD="${DB_PASSWORD:-}"
-
-  echo "Waiting for MySQL at ${DB_HOST}:${DB_PORT}..."
-  until php -r 'try{
-    new PDO("mysql:host=".getenv("DB_HOST").";port=".getenv("DB_PORT").";dbname=".getenv("DB_DATABASE"),
-            getenv("DB_USERNAME"), getenv("DB_PASSWORD"),
-            [PDO::ATTR_TIMEOUT=>2]);
-  } catch (Throwable $e) { exit(1); }'; do
-    sleep 2
-  done
-  echo "MySQL is up."
+    local max_attempts=30
+    local attempt=1
+    
+    echo "Waiting for MySQL at ${DB_HOST}:${DB_PORT}..."
+    
+    while [ $attempt -le $max_attempts ]; do
+        echo "Attempt $attempt/$max_attempts..."
+        
+        if php -r "
+            try {
+                \$pdo = new PDO(
+                    'mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT'),
+                    getenv('DB_USERNAME'),
+                    getenv('DB_PASSWORD'),
+                    [PDO::ATTR_TIMEOUT => 5, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+                );
+                
+                // Also check if the specific database exists
+                \$stmt = \$pdo->query(\"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '\" . getenv('DB_DATABASE') . \"'\");
+                if (\$stmt->fetch()) {
+                    exit(0); // Success
+                }
+                exit(1); // DB doesn't exist yet
+            } catch (Throwable \$e) {
+                exit(1); // Connection failed
+            }
+        "; then
+            echo "✅ MySQL is ready!"
+            return 0
+        fi
+        
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    
+    echo "❌ MySQL failed to become ready after $max_attempts attempts"
+    exit 1
 }
 
 # Always wait for DB before running composer/migrations/seeding
 wait_for_mysql
 
-# Dependency install logic:
-# - If RUN_FRESH=true: remove vendor and install deps
-# - Else: install deps only if vendor/ is missing
+# Dependency install logic
 if [ "$RUN_FRESH" = "true" ]; then
     echo "RUN_FRESH=true: removing vendor and reinstalling composer dependencies..."
     rm -rf vendor
     runuser -u www-data -- composer install --no-scripts --no-interaction --prefer-dist
-
+    
+    echo "Running migrations..."
     php artisan migrate:fresh --force
-    php artisan key:generate
+    
+    echo "Generating key..."
+    php artisan key:generate --force
+    
+    echo "Caching config..."
     php artisan config:cache
+    
+    echo "Loading data..."
     php artisan app:vps-load-data
 else
     if [[ ! -d "vendor" ]]; then
@@ -60,4 +83,5 @@ else
 fi
 
 # Start PHP-FPM
-exec php-fpm 
+echo "Starting PHP-FPM..."
+exec php-fpm
