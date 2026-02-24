@@ -529,13 +529,16 @@ class MatrixHeaderRepository
 
     }
 
-    public function insertMatrixValues(array $matrixData,int $brokerId,string $matrixName,int $matrixId,$rowDimIds,$colDimIds,?int $zoneId=null, ?bool $isAdmin = null)
+    public function insertMatrixValues(array $matrixData,int $brokerId,string $matrixName,int $matrixId,$rowDimIds,$colDimIds,bool $previousMatrixExists,?int $zoneId=null, ?bool $isAdmin = null)
     {
       
-
+         //when the admin save the matrix, all cells will have is_updated_entry=0.
+        //when user enter the matrix for the first time, all cells will have is_updated_entry=1.
+        
         $matrixValues = [];
         foreach ($matrixData as $rowIndex => $row) {
             foreach ($row as $cellIndex => $cell) {
+                $isUpdatedEntry=$previousMatrixExists ? ($cell['is_updated_entry'] ?? false) : 1;
                 $matrixValues[] = [
                     'matrix_id' => $matrixId,
                     'broker_id' => $brokerId,
@@ -545,8 +548,9 @@ class MatrixHeaderRepository
                     'public_value' =>$cell['public_value'] ? json_encode($cell['public_value']) : null,
                     'previous_value' => isset($cell['previous_value']) ? json_encode($cell['previous_value']) : null,
                     //deprecated: if isAdmin is true, set is_updated_entry is set in frontend correctly
-                   // 'is_updated_entry' => $isAdmin ? 0 :$cell['is_updated_entry'] ?? false,
-                    'is_updated_entry' => $cell['is_updated_entry'] ?? false,
+                   //'is_updated_entry' => $isAdmin ? 0 :$cell['is_updated_entry'] ?? false,
+                    //'is_updated_entry' => $cell['is_updated_entry'] ?? false,
+                    'is_updated_entry' => $isAdmin ? 0 : $isUpdatedEntry,
                     'zone_id' => $zoneId
                 ];
             }

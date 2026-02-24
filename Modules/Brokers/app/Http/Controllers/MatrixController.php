@@ -111,12 +111,14 @@ class MatrixController extends Controller
             }
 
             $previousMatrixData = $this->matrixService->getFormattedMatrix($matrixName, $broker_id, $zoneId);
-            if (!empty($previousMatrixData) && !$isAdmin) {
+            $previousMatrixExists = !empty($previousMatrixData);
+            if ($previousMatrixExists && !$isAdmin) {
                 //set the previous value in the matrix data only if the admin is not true.
                 //admin save in public_value, so we don't need to set the previous value.
+                //and also the public value to avoid the data inconsistency if admin update the public value during the update.
                 $this->matrixService->setPreviousValueInMatrixData($previousMatrixData, $data['matrix']);
             }
-            $result = DB::transaction(function () use ($data, $broker_id, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin) {
+            $result = DB::transaction(function () use ($data, $broker_id, $matrixName, $matrixId, $startTime, $zoneId, $isAdmin, $previousMatrixExists) {
 
 
                 //matrix cell's is_updated_entry is used to identify the updated entries and previous values in the matrix data.
@@ -128,8 +130,10 @@ class MatrixController extends Controller
                     $broker_id,
                     $matrixName,
                     $matrixId,
+                    $previousMatrixExists,
                     $zoneId,
                     $isAdmin
+                   
                 );
 
                 $endTime = microtime(true);

@@ -31,7 +31,7 @@ class MatrixService
     * @return void
     * @throws \Exception
     */
-    public function saveMatrixData(array $matrixData, int $brokerId, string $matrixName, int $matrixId, ?int $zoneId = null, ?bool $isAdmin = null): void
+    public function saveMatrixData(array $matrixData, int $brokerId, string $matrixName, int $matrixId, bool $previousMatrixExists, ?int $zoneId = null, ?bool $isAdmin = null): void
     {
         $this->matrixHeaderRepository->flushMatrix($matrixId, $brokerId,$zoneId);
         
@@ -39,7 +39,7 @@ class MatrixService
        
         $allHeaders = $this->matrixHeaderRepository->getAllHeaders(["name", "=", $matrixName], ['broker_id', '=', $brokerId], false);
         [$rowDimIds, $colDimIds]= $this->matrixHeaderRepository->insertMatrixDimensions($matrixData, $brokerId, $matrixName, $matrixId,$allHeaders);
-        $this->matrixHeaderRepository->insertMatrixValues($matrixData, $brokerId, $matrixName, $matrixId,$rowDimIds,$colDimIds,$zoneId,$isAdmin);
+        $this->matrixHeaderRepository->insertMatrixValues($matrixData, $brokerId, $matrixName, $matrixId,$rowDimIds,$colDimIds,$previousMatrixExists,$zoneId,$isAdmin);
         $this->matrixHeaderRepository->insertDimensionOptions($headersSlugsWithOptions, $rowDimIds, $matrixId, $matrixName, $brokerId,$allHeaders);
 
     }
@@ -116,7 +116,7 @@ class MatrixService
                  && $cell['colHeader'] == $colSlug 
                
                  && $this->compareSelectedRowHeaderSubOptions($previousRowSubOptions, $rowSubOptions)){
-                     return [$cell['value'],$cell['is_updated_entry']];
+                     return [$cell['value'],$cell['is_updated_entry'],$cell['public_value']];
                  }
              }
             // $index++;
@@ -143,7 +143,7 @@ class MatrixService
                 $colSlug=$cell['colHeader'];
                 $rowSubOptions = $cell['selectedRowHeaderSubOptions'] ?? null;
              
-                [$previousCellValueArray,$isUpdatedEntry]=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
+                [$previousCellValueArray,$isUpdatedEntry,$previousPublicValue]=$this->getPrevCellValue($previousMatrixData, $rowSlug, $colSlug,$rowSubOptions);
 
                // $index=2 && dd($previousCellValueArray,$cellValueArray,(array_diff_assoc($previousCellValueArray, $cellValueArray)));
                 
@@ -155,10 +155,20 @@ class MatrixService
 
                 }
                 //if the was updated in the previous matrix data, set the is_updated_entry to true.
-                if($isUpdatedEntry){
+                if($previousCellValueArray && $isUpdatedEntry){
                     $cell["is_updated_entry"]=true;
                 }
-                
+                //if the public value is different from the previous public value, set the public value to the previous public value.
+                if($previousPublicValue && $previousPublicValue != $cell['public_value']){
+                    $cell["public_value"]=$previousPublicValue;
+                }
+
+                //to be tested
+                //this condition mean that the user added a new row option or switch a column headear in the new matrix data.
+                //$this->getPrevCellValue will return null in this case.It cannot find a matching cell in the previous matrix data.
+                if(empty($previousCellValueArray)){
+                    $cell["is_updated_entry"]=true;
+                }
             }
             $index++;
            
