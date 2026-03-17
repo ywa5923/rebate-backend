@@ -18,6 +18,7 @@ class MatrixHeaderResource extends JsonResource
            
             'slug' => $this->slug,
             'name' => $this->translateProp('title'),
+            'is_percentage' => (bool)$this->is_percentage,
             //'description' => $this->description,
         ];
 
