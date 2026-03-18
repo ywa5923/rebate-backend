@@ -17,7 +17,7 @@ abstract class Form implements FormConfigInterface
         foreach ($this->getFormData()['sections'] as $section) {
             foreach ($section['fields'] as $key => $field) {
 
-                if ($field['type'] == 'array_fields') {
+                if (isset($field['type']) && $field['type'] == 'array_fields') {
 
                     //Example of array fields validation
                     //'options' => 'required|array|min:1',

@@ -18,6 +18,7 @@ use Modules\Brokers\Http\Controllers\ZoneController;
 use Modules\Brokers\Http\Controllers\CountryController;
 use Modules\Brokers\Http\Controllers\DropdownListController;
 use Modules\Auth\Http\Controllers\BrokerTeamUserController;
+use Modules\Brokers\Http\Controllers\EvaluationController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -91,6 +92,14 @@ Route::prefix('v1')->group( function () {
     //=================================== Contest routes =================================
     Route::get('contests/{broker_id}', [ContestController::class, 'index']);
     Route::delete('contests/{id}', [ContestController::class, 'destroy']);
+
+    //=================================== Evaluation routes =================================
+    Route::get('evaluation-rules/form-config', [EvaluationController::class, 'getFormConfig']);
+    Route::post('evaluation-rules/{broker_id}', [EvaluationController::class, 'store']);
+    Route::get('evaluation-rules/{broker_id}', [EvaluationController::class, 'index']);
+    Route::get('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'show']);
+    Route::put('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'update']);
+    Route::delete('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'destroy']);
 
      //=================================== Challenges table routes =================================
      Route::get('challenges/matrix/headers', [ChallengeController::class, 'getChallengeMatrixHeaders']);
