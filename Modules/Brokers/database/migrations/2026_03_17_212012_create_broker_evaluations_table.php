@@ -15,11 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('broker_id')->constrained();
             $table->foreignId('evaluation_rule_id')->constrained();
-            $table->foreignId('broker_evaluation_option_id')->nullable()->constrained('evaluation_options'); 
+            $table->unique(['broker_id','evaluation_rule_id','zone_id']);
+            $table->foreignId('evaluation_option_id')->nullable()->constrained('evaluation_options'); 
             $table->foreignId('public_evaluation_option_id')->nullable()->constrained('evaluation_options');
             $table->foreignId('previous_evaluation_option_id')->nullable()->constrained('evaluation_options');
             $table->text('details')->nullable();
+            $table->text('public_details')->nullable();
+            $table->text('previous_details')->nullable();
+            $table->boolean('is_updated_entry')->default(false);
             $table->foreignId('zone_id')->nullable()->constrained('zones');
+
             $table->timestamps();
         });
     }

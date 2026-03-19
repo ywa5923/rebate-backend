@@ -95,10 +95,8 @@ Route::prefix('v1')->group( function () {
 
     //=================================== Evaluation routes =================================
     Route::get('evaluation-rules/form-config', [EvaluationController::class, 'getFormConfig']);
-    Route::post('evaluation-rules/{broker_id}', [EvaluationController::class, 'store']);
+    Route::match(['post','put'], 'evaluation-rules/{broker_id}', [EvaluationController::class, 'storeOrUpdate']);
     Route::get('evaluation-rules/{broker_id}', [EvaluationController::class, 'index']);
-    Route::get('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'show']);
-    Route::put('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'update']);
     Route::delete('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'destroy']);
 
      //=================================== Challenges table routes =================================
