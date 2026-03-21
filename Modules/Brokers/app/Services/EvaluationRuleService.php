@@ -6,7 +6,6 @@ use Modules\Brokers\Repositories\EvaluationRuleRepository;
 use Modules\Brokers\Repositories\BrokerEvaluationRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
-use Modules\Brokers\Models\BrokerEvaluation;
 use Illuminate\Support\Collection;
 
 class EvaluationRuleService
@@ -16,7 +15,7 @@ class EvaluationRuleService
         protected BrokerEvaluationRepository $brokerEvaluationRepository
     ) {}
 
-    public function upsertEvaluationRule(array $data, $broker_id, $is_admin, ?int $zone_id = null)
+    public function insertOrUpdate(array $data, $broker_id, $is_admin, ?int $zone_id = null)
     {
         //Incoming data format:
         // array:8 [ /
@@ -79,7 +78,12 @@ class EvaluationRuleService
                         $item['previous_evaluation_option_id'] = $existingEntry->evaluation_option_id;
                         $item['is_updated_entry'] = true;
                     }
-                    if($existingEntry->details != $row['details']){
+                    if(isset($row['details']) && $existingEntry->details != $row['details']){
+                        $item['previous_details'] = $existingEntry->details;
+                        $item['is_updated_entry'] = true;
+                    }
+                    //if the details is not set in the new data, set the previous details to the existing details
+                    if(!isset($row['details']) && $existingEntry->details != null){
                         $item['previous_details'] = $existingEntry->details;
                         $item['is_updated_entry'] = true;
                     }

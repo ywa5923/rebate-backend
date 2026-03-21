@@ -44,14 +44,25 @@ class EvaluationController extends Controller
         ]);
     }
 
-    /**
+   
+
+    public function create(StoreEvaluationRuleRequest $request,$broker_id): JsonResponse
+    {
+        $is_admin=true;
+        $data = $request->validated();
+        $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+     /**
      * Store a new evaluation rule
      */
-    public function storeOrUpdate(StoreEvaluationRuleRequest $request,$broker_id): JsonResponse
+    public function update(StoreEvaluationRuleRequest $request,$broker_id): JsonResponse
     {
         $is_admin=false;
         $data = $request->validated();
-        $this->evaluationRuleService->upsertEvaluationRule($data, $broker_id, $is_admin);
+        $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
         return response()->json([
             'success' => true,
         ]);

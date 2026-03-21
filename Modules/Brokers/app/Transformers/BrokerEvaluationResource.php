@@ -14,10 +14,10 @@ class BrokerEvaluationResource extends JsonResource
      */
     public function toArray($request): array
     {
-
         $previous_evaluation_option_value = EvaluationOption::find($this->previous_evaluation_option_id)->option_value ?? null;
        
-      
+        $public_is_getter = EvaluationOption::find($this->public_evaluation_option_id)->is_getter ?? null;
+        
         return [
             'id' => $this->id,
             'broker_id' => $this->broker_id,
@@ -41,6 +41,21 @@ class BrokerEvaluationResource extends JsonResource
             'evaluation_option_value' => $this->whenLoaded('evaluationOption', function () {
                 return $this->evaluationOption->option_value ?? null;
             }),
+            'is_getter' => $this->whenLoaded('evaluationOption', function () {
+                return $this->evaluationOption->is_getter ;
+            }),
+            'is_getter_for_admin'=>$public_is_getter ?? false,
+            // 'evaluation_option' => $this->whenLoaded('evaluationOption', function () {
+            //     return [
+            //         'id' => $this->evaluationOption->id,
+            //         'option_value' => $this->evaluationOption->option_value,
+            //         'option_label' => $this->evaluationOption->option_label,
+            //         'is_getter' => $this->evaluationOption->is_getter,
+            //         'description' => $this->evaluationOption->description,
+            //     ];
+            // }),
+            'is_updated_entry' => $this->is_updated_entry,
+
             'created_at' => optional($this->created_at)->toISOString(),
             'updated_at' => optional($this->updated_at)->toISOString(),
         ];
