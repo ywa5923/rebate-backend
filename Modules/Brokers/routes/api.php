@@ -19,6 +19,7 @@ use Modules\Brokers\Http\Controllers\CountryController;
 use Modules\Brokers\Http\Controllers\DropdownListController;
 use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 use Modules\Brokers\Http\Controllers\EvaluationController;
+use Modules\Brokers\Http\Controllers\DynamicTableController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -85,6 +86,8 @@ Route::prefix('v1')->group( function () {
     //=================================== Company routes =================================
     Route::get('companies/{broker_id}', [CompanyController::class, 'index']);
  
+    //=================================== Dynamic Tables routes =================================
+    Route::get('dynamic-tables/{broker_id}/{model}', [DynamicTableController::class, 'index']);
     //=================================== Promotion routes =================================
     Route::get('promotions/{broker_id}', [PromotionController::class, 'index']);
     Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);

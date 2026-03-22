@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('broker_id')->constrained();
             $table->boolean('approved')->default(false);
+            $table->foreignId('zone_id')->nullable()->constrained('zones');
             $table->timestamps();
         });
     }
