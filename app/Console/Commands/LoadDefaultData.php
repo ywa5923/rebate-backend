@@ -61,5 +61,8 @@ class LoadDefaultData extends Command
         $this->info("\\\\///...importing challenge categories");
         $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ChallengeSeeder"]);
 
+        $this->info("\\\\///...importing evaluation rules");
+        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\EvaluationRulesSeeder"]);
+
     }
 }
