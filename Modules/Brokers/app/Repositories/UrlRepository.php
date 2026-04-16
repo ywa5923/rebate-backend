@@ -24,7 +24,7 @@ class UrlRepository
         return $this->model->create($data);
     }
 
-    /**
+    /**s
      * Update url
      * @param Url $url
      * @param array $data

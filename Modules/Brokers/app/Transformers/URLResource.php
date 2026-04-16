@@ -4,8 +4,8 @@ namespace Modules\Brokers\Transformers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Translations\Transformers\TranslationResource;
 use App\Utilities\TranslateTrait;
+use Modules\Brokers\Models\AccountType;
 
 class URLResource extends JsonResource
 {
@@ -15,8 +15,9 @@ class URLResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+       
         
-        return [
+       $result = [
             // Basic Information
             "id" => $this->id,
             "url_type" => $this->url_type,
@@ -39,8 +40,10 @@ class URLResource extends JsonResource
             "category_position" => $this->category_position,
             
             // Polymorphic Relationship
-            "urlable_type" => $this->urlable_type,
-            "urlable_id" => $this->urlable_id,
+            //"urlable_type" => $this->urlable_type,
+            //"urlable_id" => $this->urlable_id,
+           
+            "is_master_link" => $this->urlable_id===null,
 
             
             // Foreign Keys
@@ -54,5 +57,13 @@ class URLResource extends JsonResource
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];
+        
+        if ($this->urlable_type==AccountType::class) {
+            $result["account_type_id"] = $this->urlable_id;
+        }
+        if($this->account_type_name){
+            $result["account_type_name"] = $this->account_type_name;
+        }
+        return $result;
     }
 }

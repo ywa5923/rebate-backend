@@ -19,7 +19,8 @@ use Modules\Brokers\Http\Controllers\CountryController;
 use Modules\Brokers\Http\Controllers\DropdownListController;
 use Modules\Auth\Http\Controllers\BrokerTeamUserController;
 use Modules\Brokers\Http\Controllers\EvaluationController;
-use Modules\Brokers\Http\Controllers\DynamicTableController;
+
+use Modules\Brokers\Http\Controllers\EvaluationStepController;
 /*
  *--------------------------------------------------------------------------
  * API Routes
@@ -81,14 +82,22 @@ Route::prefix('v1')->group( function () {
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->post('account-types/{id?}/urls', [AccountTypeController::class, 'createUrls']);
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,accountTypeId'])->delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteAccountTypeUrl']);
-    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
    
+   //=================================== Url routes =================================
+   Route::get('urls/broker/{broker_id}/affiliate-links', [UrlController::class, 'getBrokerAffiliateLinks']);
+   Route::post('urls/broker/{broker_id}/affiliate-link', [UrlController::class, 'createBrokerAffiliateLink']);
+   Route::put('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'updateBrokerAffiliateLink']);
+   Route::delete('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'deleteBrokerAffiliateLink']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
+    Route::get('urls/account-type/{account_type_id}/affiliate-links/{broker_id}', [UrlController::class, 'getAccountTypeAffiliateLinks']);
+   
+    
     //=================================== Company routes =================================
     Route::get('companies/{broker_id}', [CompanyController::class, 'index']);
  
     //=================================== Dynamic Tables routes =================================
-    Route::get('dynamic-tables/{broker_id}/{model}', [DynamicTableController::class, 'index']);
-    //=================================== Promotion routes =================================
+    Route::get('evaluation-steps/{broker_id}', [EvaluationStepController::class, 'index']);
+    //=================================== Promotion routes =================================    
     Route::get('promotions/{broker_id}', [PromotionController::class, 'index']);
     Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);
     

@@ -4,7 +4,7 @@ namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DynamicTableIndexRequest extends FormRequest
+class EvaluationStepIndexRequest extends FormRequest
 {
     public function authorize(): bool
     {

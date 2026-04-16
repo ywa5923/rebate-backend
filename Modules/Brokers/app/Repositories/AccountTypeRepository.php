@@ -9,6 +9,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\Url;
 use Modules\Brokers\DTOs\AccountTypeFilters;
+use Modules\Brokers\Enums\UrlTypeEnum;
+use Modules\Brokers\Models\OptionValue;
 class AccountTypeRepository
 {
     protected AccountType $model;
@@ -301,5 +303,44 @@ class AccountTypeRepository
         return $this->model->where('id', $accountTypeId)->with('optionValues',function($q){
             $q->where('option_slug', 'account_type_name');
         })->first()->optionValues->first()->value;
+    }
+
+    public function getAccountTypesWithIBLinks(int $broker_id, string $lang, ?string $zone=null): Collection
+    {
+        $query = $this->model->newQuery();
+       return $query->where('broker_id', $broker_id)
+            ->with([
+                // affiliate URLs + their translations in chosen language
+                'urls' => fn($q) => $q
+                    ->whereIn('url_type', [
+                        UrlTypeEnum::IB_AFFILIATE_LINK->value, 
+                        UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
+                        UrlTypeEnum::WEBPLATFORM->value,
+                        ])
+                    ->orderBy('url_type', 'asc')
+                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
+        
+                // option_values where option.slug = 'account_name' and zone_code matches (or is null)
+                'optionValues' => fn($q) => $q
+                    ->where(function ($op) use ($zone) {
+                        if($zone === null){
+                            $op->whereNull('zone_code');
+                        }else{
+                            $op->where('zone_code', $zone);
+                        }         
+                    })
+                    ->where('option_slug', 'account_type_name')
+                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
+            ])
+            ->orderBy(
+                OptionValue::select('value')
+                    ->whereColumn('option_values.optionable_id', 'account_types.id')
+                    ->where('option_values.optionable_type', AccountType::class)
+                    ->where('option_slug', 'account_type_name')
+                    ->when($zone === null, fn($q) => $q->whereNull('zone_code'),
+                                      fn($q) => $q->where('zone_code', $zone))
+                    ->limit(1),'asc'
+            )
+            ->get();
     }
 } 
