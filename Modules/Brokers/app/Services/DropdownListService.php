@@ -23,7 +23,7 @@ class DropdownListService
     public function getLists(array $filters = [], string $orderBy = 'name', string $orderDirection = 'asc', int $perPage = 15)
     {
         $query = $this->repository->getLists($filters, $orderBy, $orderDirection);
-        
+
         return $query->paginate($perPage);
     }
 
@@ -33,6 +33,19 @@ class DropdownListService
     public function getListById(int $id): ?DropdownCategory
     {
         return $this->repository->findCategoryById($id);
+    }
+
+    public function getCurrencyListOptions(): array
+    {
+        $currencyDropdownCategory = $this->repository->getDropdownCategoryBySlug('currency');
+
+        if (! $currencyDropdownCategory) {
+            return [];
+        }
+        return $currencyDropdownCategory->dropdownOptions()
+            ->orderBy('order')
+            ->get(['label', 'value'])
+            ->toArray();
     }
 
     /**
@@ -52,7 +65,7 @@ class DropdownListService
             try {
                 // Generate slug from list_name
                 $slug = \Illuminate\Support\Str::slug($data['name']);
-                
+
                 // Ensure unique slug
                 $originalSlug = $slug;
                 $counter = 1;
@@ -87,10 +100,9 @@ class DropdownListService
                     DropdownOption::insert($optionsData);
                 }
 
-                return $category->load(['dropdownOptions' => function($query) {
+                return $category->load(['dropdownOptions' => function ($query) {
                     $query->orderBy('order', 'asc');
                 }]);
-
             } catch (\Exception $e) {
                 Log::error('DropdownListService createList error: ' . $e->getMessage());
                 throw $e;
@@ -106,7 +118,7 @@ class DropdownListService
         return DB::transaction(function () use ($id, $data) {
             try {
                 $category = $this->repository->findCategoryByIdWithoutRelations($id);
-                
+
                 if (!$category) {
                     throw new \Exception('Dropdown category not found');
                 }
@@ -132,7 +144,7 @@ class DropdownListService
                 }
 
                 $category->save();
-                
+
                 // Refresh to get fresh data
                 $category->refresh();
 
@@ -140,12 +152,12 @@ class DropdownListService
                 if (isset($data['options']) && is_array($data['options'])) {
                     // Get existing option IDs
                     $existingOptionIds = $category->dropdownOptions->pluck('id')->toArray();
-                    
+
                     // Track processed option IDs
                     $processedOptionIds = [];
                     $optionsToInsert = [];
                     $optionsToUpdate = [];
-                    
+
                     // Get the highest existing order to start new inserts from
                     $maxExistingOrder = $category->dropdownOptions->max('order') ?? 0;
                     $nextOrder = $maxExistingOrder + 1;
@@ -177,31 +189,31 @@ class DropdownListService
                     // Bulk update existing options using CASE statements
                     if (!empty($optionsToUpdate)) {
                         $updateIds = array_column($optionsToUpdate, 'id');
-                        
+
                         $bindings = [];
                         $caseStatements = [];
                         $columns = ['label', 'value', 'order'];
-                        
+
                         foreach ($columns as $column) {
                             $caseStatement = "CASE id ";
                             $hasValues = false;
-                            
+
                             foreach ($optionsToUpdate as $optionData) {
                                 $caseStatement .= "WHEN ? THEN ? ";
                                 $bindings[] = $optionData['id'];
                                 $bindings[] = $optionData[$column];
                                 $hasValues = true;
                             }
-                            
+
                             $caseStatement .= "END";
                             if ($hasValues) {
                                 $caseStatements[] = "{$column} = {$caseStatement}";
                             }
                         }
-                        
+
                         $sql = "UPDATE dropdown_options SET " . implode(', ', $caseStatements) . " WHERE id IN (" . implode(',', array_fill(0, count($updateIds), '?')) . ")";
                         $bindings = array_merge($bindings, $updateIds);
-                        
+
                         DB::update($sql, $bindings);
                     }
 
@@ -217,16 +229,13 @@ class DropdownListService
                     }
                 }
 
-                return $category->load(['dropdownOptions' => function($query) {
+                return $category->load(['dropdownOptions' => function ($query) {
                     $query->orderBy('order', 'asc');
                 }]);
-
             } catch (\Exception $e) {
                 Log::error('DropdownListService updateList error: ' . $e->getMessage());
                 throw $e;
             }
         });
     }
-
 }
-

@@ -2,27 +2,28 @@
 
 namespace Modules\Brokers\Services;
 
-use Modules\Brokers\Repositories\UrlRepository;
+use App\Exceptions\ApiException;
+use App\Utilities\ModelHelper;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Repositories\AccountTypeRepository;
-use App\Utilities\ModelHelper;
-use Modules\Brokers\Enums\UrlTypeEnum;
+use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Transformers\AccountTypeUrlsResource;
-use Illuminate\Support\Str;
 use Modules\Brokers\Transformers\URLResource;
-use Illuminate\Support\Collection;
 
 class UrlService
 {
     protected $repository;
+
     protected $accountTypeRepository;
+
     public function __construct(UrlRepository $repository, AccountTypeRepository $accountTypeRepository)
     {
         $this->repository = $repository;
         $this->accountTypeRepository = $accountTypeRepository;
     }
-
-
 
     public function createMany($urlableTypeObject, string $entityType, array $urls, $isAdmin = false)
     {
@@ -39,13 +40,14 @@ class UrlService
             $modelClass = ModelHelper::getModelClassFromSlug($entityType);
             $urlData['urlable_type'] = $modelClass;
             $urlData['urlable_id'] = $urlableTypeObject ? $urlableTypeObject->id : null;
-            $urlData['slug'] = !empty($urlData['slug']) ? $urlData['slug'] : Str::slug($urlData['name']);
+            $urlData['slug'] = ! empty($urlData['slug']) ? $urlData['slug'] : Str::slug($urlData['name']);
             $urlData['created_at'] = now();
             $urlData['updated_at'] = now();
         }
         unset($urlData);
 
         $this->repository->bulkCreate($urls);
+
         return true;
     }
 
@@ -69,8 +71,8 @@ class UrlService
                 } else {
 
                     $urlData['is_updated_entry'] = 1;
-                    trim($urlData['url']) !== trim($existingUrl->url) && $urlData['previous_url'] =  $existingUrl->url;
-                    trim($urlData['name']) !== trim($existingUrl->name) &&  $urlData['previous_name'] = $existingUrl->name;
+                    trim($urlData['url']) !== trim($existingUrl->url) && $urlData['previous_url'] = $existingUrl->url;
+                    trim($urlData['name']) !== trim($existingUrl->name) && $urlData['previous_name'] = $existingUrl->name;
                 }
 
                 //dd($urlData);
@@ -79,18 +81,19 @@ class UrlService
                 }
             }
         }
+
         return $updated;
     }
 
     public function getGroupedByType(AccountType $accountType)
     {
         $urls = $this->repository->findByAccountType($accountType->id);
-        return $urls->groupBy('url_type')->map(fn($items) => $items->values());
+
+        return $urls->groupBy('url_type')->map(fn ($items) => $items->values());
     }
 
     public function getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code)
     {
-
 
         $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
 
@@ -113,15 +116,15 @@ class UrlService
             'language_code' => 'sometimes|string',
         ]);
 
-        if (!is_numeric($entity_id) && $entity_id != 'all') {
-            throw new \Exception('Invalid entity ID:Entity ID must be a number or "all"');
+        if (! is_numeric($entity_id) && $entity_id != 'all') {
+            throw new ApiException('Entity ID must be a number or "all"', 422);
         }
-        if (!is_numeric($broker_id)) {
-            throw new \Exception('Invalid broker ID:Broker ID must be a number');
+        if (! is_numeric($broker_id)) {
+            throw new ApiException('Broker ID must be a number', 422);
         }
         $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
-        if (!class_exists($modelClass)) {
-            throw new \Exception('Invalid entity type:Entity type must be a valid model class');
+        if (! class_exists($modelClass)) {
+            throw new ApiException('Entity type must be a valid model class', 422);
         }
     }
 
@@ -147,6 +150,7 @@ class UrlService
         }
 
         $url = $this->repository->create($urldata);
+
         return $url;
     }
 
@@ -155,8 +159,8 @@ class UrlService
         //first find the url by id and set previous url and name
         $newUrlData = [];
         $url = $this->repository->find($url_id);
-        if (!$url || $url->broker_id != $broker_id) {
-            throw new \Exception('URL not found');
+        if (! $url || $url->broker_id != $broker_id) {
+            throw new ApiException('URL not found', 404);
         }
         $isMasterLink = $data['is_master_link'] ?? false;
         $newUrlData['id'] = $url_id;
@@ -166,11 +170,11 @@ class UrlService
         $newUrlData['urlable_type'] = AccountType::class;
         $newUrlData['slug'] = Str::slug($data['name']);
         //add previous values and is_updated_entry for brokers who are not admin
-        if (!$isAdmin) {
-            
+        if (! $isAdmin) {
+
             $newUrlData['url'] = trim($data['url']);
             $newUrlData['name'] = trim($data['name']);
-           
+
             if ($url->url !== trim($data['url'])) {
                 $newUrlData['previous_url'] = $url->url;
                 $newUrlData['is_updated_entry'] = true;
@@ -182,63 +186,64 @@ class UrlService
             //detect if it is am updated entry
 
             if ($url->url_type !== trim($data['url_type'])) {
-                
-                $newUrlData['metadata'] =  [
+
+                $newUrlData['metadata'] = [
                     'previous_url_type' => $url->url_type,
                 ];
                 $newUrlData['is_updated_entry'] = true;
             }
 
             if ($url->urlable_id !== $data['account_type_id']) {
-               
-                $newUrlData['metadata'] = array_merge($newUrlData['metadata']??[], [
+
+                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
                     'previous_account_type_id' => $url->urlable_id,
-                  
+
                 ]);
                 $newUrlData['is_updated_entry'] = true;
             }
-            if($data['is_master_link']){
-                $newUrlData['metadata'] = array_merge($newUrlData['metadata']??[], [
+            if ($data['is_master_link']) {
+                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
                     'previous_account_type_id' => $url->urlable_id,
                 ]);
             }
-        }else{
+        } else {
             $newUrlData['is_updated_entry'] = false;
             $newUrlData['public_url'] = trim($data['url']);
             $newUrlData['public_name'] = trim($data['name']);
         }
 
         $url = $this->repository->update($url, $newUrlData);
+
         return $url;
     }
-
-
 
     public function deleteBrokerAffiliateLink($broker_id, $url_id)
     {
         $url = $this->repository->find($url_id);
-        if (!$url || $url->broker_id != $broker_id) {
-            throw new \Exception('URL not found');
+        if (! $url || $url->broker_id != $broker_id) {
+            throw new ApiException('URL not found', 404);
         }
         $url->delete();
+
         return true;
     }
 
-    public function getBrokerAffiliateLinks($broker_id, string $lang, ?string $zone=null):array
+    public function getBrokerAffiliateLinks($broker_id, string $lang, ?string $zone = null): array
     {
+
         $accountTypes = $this->accountTypeRepository->getAccountTypesWithIBLinks($broker_id, $lang, $zone);
-        
- 
-        $ibAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes,UrlTypeEnum::IB_AFFILIATE_LINK);
-        $subIbAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes,UrlTypeEnum::SUB_IB_AFFILIATE_LINK);
+
+        $ibAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::IB_AFFILIATE_LINK);
+        $subIbAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::SUB_IB_AFFILIATE_LINK);
+
         return [
             'account_types' => AccountTypeUrlsResource::collection($accountTypes),
             'ib_affiliate_urls' => URLResource::collection($ibAffiliateUrls),
-            'sub_ib_affiliate_urls' => URLResource::collection($subIbAffiliateUrls)
+            'sub_ib_affiliate_urls' => URLResource::collection($subIbAffiliateUrls),
         ];
     }
 
-    public function extractUrlsFromAccountTypes($accountTypes,UrlTypeEnum $urlType): Collection
+    public function extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum $urlType): Collection
     {
         return $accountTypes->flatMap(function ($accountType) use ($urlType) {
 
@@ -247,13 +252,15 @@ class UrlService
             // only the option value containing the account type is selected
 
             $accountTypeName = $accountType->optionValues->first()?->translations?->first()?->value
-            ??$accountType->optionValues->first()?->value
-            ??'unknown';
+            ?? $accountType->optionValues->first()?->value
+            ?? 'unknown';
+
             //first get the account type name translated first,if not found, use the default value
             return $accountType->urls->whereIn('url_type', [
-                $urlType->value
+                $urlType->value,
             ])->values()->map(function ($url) use ($accountTypeName) {
                 $url->account_type_name = $accountTypeName;
+
                 return $url;
             });
         });

@@ -89,5 +89,12 @@ class DropdownListRepository
         });
     }
 
+    public function getDropdownCategoryBySlug(string $slug): ?DropdownCategory
+    {
+        return $this->categoryModel->where('slug', $slug)->with(['dropdownOptions' => function($query) {
+            $query->orderBy('order', 'asc');
+        }])->first();
+    }
+
 }
 

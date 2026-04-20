@@ -2,15 +2,15 @@
 
 namespace Modules\Brokers\Repositories;
 
-use Modules\Brokers\Models\AccountType;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Brokers\Models\Url;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Modules\Brokers\DTOs\AccountTypeFilters;
 use Modules\Brokers\Enums\UrlTypeEnum;
+use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\OptionValue;
+use Modules\Brokers\Models\Url;
+
 class AccountTypeRepository
 {
     protected AccountType $model;
@@ -36,7 +36,8 @@ class AccountTypeRepository
         if ($filters->base->perPage || $filters->base->page) {
             // Paginate with specific page
             $perPage = $filters->base->perPage;
-            $page = $filters->base->page ;
+            $page = $filters->base->page;
+
             return $query->paginate($perPage, ['*'], 'page', $page);
         } else {
             return $query->get();
@@ -86,13 +87,13 @@ class AccountTypeRepository
     /**
      * Delete URLs for account type
      */
-    public function deleteAccountTypeUrls(AccountType $accountType,$broker_id): bool
+    public function deleteAccountTypeUrls(AccountType $accountType, $broker_id): bool
     {
         return Url::where('urlable_type', AccountType::class)
-        
-        ->where('broker_id', $broker_id)
-        ->delete();
+            ->where('broker_id', $broker_id)
+            ->delete();
     }
+
     /**
      * Create URLs for account type
      */
@@ -103,7 +104,7 @@ class AccountTypeRepository
             // Validate required fields
             $requiredFields = ['url_type', 'url', 'name', 'slug'];
             foreach ($requiredFields as $field) {
-                if (!isset($urlData[$field]) || empty($urlData[$field])) {
+                if (! isset($urlData[$field]) || empty($urlData[$field])) {
                     throw new \InvalidArgumentException("Missing required field '{$field}' for URL at index {$index}");
                 }
             }
@@ -126,8 +127,8 @@ class AccountTypeRepository
                 'updated_at' => now(),
             ];
         }
-        
-        if (!empty($urlModels)) {
+
+        if (! empty($urlModels)) {
             DB::table('urls')->insert($urlModels);
         }
     }
@@ -138,12 +139,12 @@ class AccountTypeRepository
     public function handleUrlUpdates(AccountType $accountType, array $urls, array $urlsToDelete): void
     {
         // Delete URLs if specified
-        if (!empty($urlsToDelete)) {
+        if (! empty($urlsToDelete)) {
             DB::table('urls')->whereIn('id', $urlsToDelete)->delete();
         }
 
         // Update/Create URLs if provided
-        if (!empty($urls)) {
+        if (! empty($urls)) {
             foreach ($urls as $urlData) {
                 $urlModelData = [
                     'url' => $urlData['url'],
@@ -203,7 +204,7 @@ class AccountTypeRepository
      */
     public function searchByName(string $search): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->model->where('name', 'like', '%' . $search . '%')->get();
+        return $this->model->where('name', 'like', '%'.$search.'%')->get();
     }
 
     /**
@@ -244,12 +245,12 @@ class AccountTypeRepository
                         ->orWhere('zone_code', $filters->base->zoneCode);
                 });
             };
-        }else{
-            //if zone_code is not provided, we need to get the option values 
+        } else {
+            //if zone_code is not provided, we need to get the option values
             //for the account type that have no zone_code and zone_id, i.e original data submitted by broker
-            $withArray['optionValues'] = function ($q)  {
-                $q->where(function ($subQ)  {
-                    $subQ->where('zone_code', null)->where('zone_id',null);
+            $withArray['optionValues'] = function ($q) {
+                $q->where(function ($subQ) {
+                    $subQ->where('zone_code', null)->where('zone_id', null);
                 });
             };
         }
@@ -266,10 +267,10 @@ class AccountTypeRepository
             }
         }
 
-        if (!empty($withArray)) {
+        if (! empty($withArray)) {
             $query->with($withArray);
         } else {
-            $query->with(['broker', 'urls','optionValues']);
+            $query->with(['broker', 'urls', 'optionValues']);
         }
 
         // if ($request->has('broker_type')) {
@@ -295,52 +296,63 @@ class AccountTypeRepository
         $sortBy = $filters->sortBy ?? 'created_at';
         $sortDirection = $filters->sortDirection ?? 'asc';
         $query->orderBy($sortBy, $sortDirection);
-        
+
     }
 
     public function getAccountTypeName(int $accountTypeId): string
     {
-        return $this->model->where('id', $accountTypeId)->with('optionValues',function($q){
+        return $this->model->where('id', $accountTypeId)->with('optionValues', function ($q) {
             $q->where('option_slug', 'account_type_name');
         })->first()->optionValues->first()->value;
     }
 
-    public function getAccountTypesWithIBLinks(int $broker_id, string $lang, ?string $zone=null): Collection
+    public function getAccountTypesWithIBLinks(int $broker_id, string $lang, ?string $zone = null): Collection
     {
         $query = $this->model->newQuery();
-       return $query->where('broker_id', $broker_id)
+
+        return $query->where('broker_id', $broker_id)
             ->with([
                 // affiliate URLs + their translations in chosen language
-                'urls' => fn($q) => $q
+                'urls' => fn ($q) => $q
                     ->whereIn('url_type', [
-                        UrlTypeEnum::IB_AFFILIATE_LINK->value, 
+                        UrlTypeEnum::IB_AFFILIATE_LINK->value,
                         UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
                         UrlTypeEnum::WEBPLATFORM->value,
-                        ])
+                    ])
+                    ->where(function ($q) use ($zone) {
+                        if ($zone === null) {
+                            $q->whereNull('zone_id');
+                        } else {
+                            $q->where('zone_id', $zone);
+                        }
+                    })
                     ->orderBy('url_type', 'asc')
-                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
-        
+                    ->with(['translations' => fn ($t) => $t->where('language_code', $lang)]),
+                'urls.associatedUrls' => fn ($q) => $zone === null
+                    ? $q->wherePivotNull('zone_id')
+                    : $q->wherePivot('zone_id', $zone),
+
                 // option_values where option.slug = 'account_name' and zone_code matches (or is null)
-                'optionValues' => fn($q) => $q
+                'optionValues' => fn ($q) => $q
                     ->where(function ($op) use ($zone) {
-                        if($zone === null){
+                        if ($zone === null) {
                             $op->whereNull('zone_code');
-                        }else{
+                        } else {
                             $op->where('zone_code', $zone);
-                        }         
+                        }
                     })
                     ->where('option_slug', 'account_type_name')
-                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
+                    ->with(['translations' => fn ($t) => $t->where('language_code', $lang)]),
             ])
             ->orderBy(
                 OptionValue::select('value')
                     ->whereColumn('option_values.optionable_id', 'account_types.id')
                     ->where('option_values.optionable_type', AccountType::class)
                     ->where('option_slug', 'account_type_name')
-                    ->when($zone === null, fn($q) => $q->whereNull('zone_code'),
-                                      fn($q) => $q->where('zone_code', $zone))
-                    ->limit(1),'asc'
+                    ->when($zone === null, fn ($q) => $q->whereNull('zone_code'),
+                        fn ($q) => $q->where('zone_code', $zone))
+                    ->limit(1), 'asc'
             )
             ->get();
     }
-} 
+}

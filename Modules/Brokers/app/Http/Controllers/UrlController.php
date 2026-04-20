@@ -3,15 +3,16 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
-
-use Modules\Brokers\Transformers\URLResource;
-use Modules\Brokers\Services\UrlService;
-use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
-use Modules\Brokers\Http\Requests\UpdateAffiliateLinkRequest;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
+use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
+use Modules\Brokers\Http\Requests\UpdateAffiliateLinkRequest;
+use Modules\Brokers\Services\UrlService;
+use Modules\Brokers\Transformers\URLResource;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Modules\Brokers\Services\DropdownListService;
+
 class UrlController extends Controller
 {
     protected UrlService $urlService;
@@ -20,7 +21,6 @@ class UrlController extends Controller
     {
         $this->urlService = $urlService;
     }
-   
 
     public function getGroupedUrls($broker_id, $entity_type, $entity_id, Request $request)
     {
@@ -28,48 +28,35 @@ class UrlController extends Controller
         //go get urls for all account types $entity_id is "all"
         //ex for all http://localhost:8080/api/v1/urls/2/account-type/all?zone_code=eu&language_code=en
 
-        try{
-            $this->urlService->validateData($broker_id, $entity_type, $entity_id, $request);
-            $zone_code = $request->query('zone_code') ?? null;
-            $language_code = $request->query('language_code') ?? 'en';
-       
-            $isAdmin = app('isAdmin');
-            
-    
-          $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code);
-          $transformed = URLResource::collection($urls);
+        $this->urlService->validateData($broker_id, $entity_type, $entity_id, $request);
+        $zone_code = $request->query('zone_code') ?? null;
+        $language_code = $request->query('language_code') ?? 'en';
 
-         $grouped = $transformed->groupBy([
+        $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code);
+        $transformed = URLResource::collection($urls);
+
+        $grouped = $transformed->groupBy([
             function ($item) {
-                return $item['urlable_id'] ? $item['urlable_id'] : "master-links";
+                return $item['urlable_id'] ? $item['urlable_id'] : 'master-links';
             },
             function ($item) {
                 return $item['url_type'];
-            }
+            },
         ]);
         $masterLinks = $grouped['master-links'] ?? [];
         unset($grouped['master-links']);
 
-       
-
         return response()->json([
             'success' => true,
-            'data'=>[
-                'links_grouped_by_account_id' =>  $grouped,
+            'data' => [
+                'links_grouped_by_account_id' => $grouped,
                 'master_links_grouped_by_type' => $masterLinks,
                 'links_groups' => [UrlTypeEnum::MOBILE->value, UrlTypeEnum::WEBPLATFORM->value, UrlTypeEnum::SWAP->value, UrlTypeEnum::COMMISSION->value],
                 //'links_groups' => ['mobile', 'webplatform', 'swap', 'commission']
-            ]
+            ],
 
         ]);
-        }catch(\Exception $e){
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
     }
-
 
     // //To do
     // public function getAccountTypeAffiliateLinks( Request $request,int $account_type_id,int $broker_id)
@@ -90,75 +77,70 @@ class UrlController extends Controller
     // }
 
     //to check if this works
-    public function createBrokerAffiliateLink( StoreAffiliateLinkRequest $request,int $broker_id)
+    public function createBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id)
     {
-       
+
         $data = $request->validated();
         //$isAdmin = app('isAdmin');
-        $isAdmin=false;
-        try{
-        $url = $this->urlService->createBrokerAffiliateLink($broker_id, $data,$isAdmin);
-        return response()->json([
-                'success' => true,
-                'data' => $url
-            ]);
-        }catch(\Exception $e){
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
+        $isAdmin = false;
+        $url = $this->urlService->createBrokerAffiliateLink($broker_id, $data, $isAdmin);
 
-    public function updateBrokerAffiliateLink( UpdateAffiliateLinkRequest $request,int $broker_id,$url_id)
-    {
-         //$isAdmin = app('isAdmin');
-         $isAdmin=false;
-        $data = $request->validated();
-       
-        try{
-        $url = $this->urlService->updateBrokerAffiliateLink($broker_id, $url_id, $data,$isAdmin);
-        return response()->json([
-                'success' => true,
-                'data' => $url
-            ]);
-        }catch(\Exception $e){
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
-
-    public function deleteBrokerAffiliateLink( Request $request,int $broker_id,int $url_id)
-    {
-         //$isAdmin = app('isAdmin');
-         $isAdmin=false;
-       // $data = $request->all();
-        try{
-        $url = $this->urlService->deleteBrokerAffiliateLink($broker_id, $url_id);
         return response()->json([
             'success' => true,
-            'data' => $url
+            'data' => $url,
         ]);
-        }catch(\Exception $e){
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
     }
 
-    public function getBrokerAffiliateLinks( IndexAffiliateLinkRequest $request,int $broker_id)
+    public function updateBrokerAffiliateLink(UpdateAffiliateLinkRequest $request, int $broker_id, $url_id)
+    {
+        //$isAdmin = app('isAdmin');
+        $isAdmin = false;
+        $data = $request->validated();
+
+        $url = $this->urlService->updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin);
+
+        return response()->json([
+            'success' => true,
+            'data' => $url,
+        ]);
+    }
+
+    public function deleteBrokerAffiliateLink(int $broker_id, int $url_id)
+    {
+        $url = $this->urlService->deleteBrokerAffiliateLink($broker_id, $url_id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $url,
+        ]);
+    }
+
+    /**
+     * Get all affiliate links for a given broker
+     *
+     * @return JsonResponse<array{
+     *     "success": bool,
+     *     "data": array{
+     *         "account_types": array<AccountType>,
+     *         "ib_affiliate_urls"?: array<URL>,
+     *         "sub_ib_affiliate_urls"?: array<URL>
+     *        "currency_list": array<array{label: string, value: string}>
+     *     }
+     * }>
+     */
+    public function getBrokerAffiliateLinks(IndexAffiliateLinkRequest $request, DropdownListService $dropdownListService, int $broker_id): JsonResponse
     {
         $lang = $request->validated('language_code');
         $zone = $request->validated('zone_code');
-        
-       return response()->json([
-        'success' => true,
-        'data' =>  $this->urlService->getBrokerAffiliateLinks($broker_id, $lang, $zone)
-      
-       ]);
+
+        $currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
+
+       
+        return response()->json([
+            'success' => true,
+            'data' => array_merge($this->urlService->getBrokerAffiliateLinks($broker_id, $lang, $zone), ['currency_list' => $currencyList]),
+
+        ], JsonResponse::HTTP_OK);
     }
 
     /**
