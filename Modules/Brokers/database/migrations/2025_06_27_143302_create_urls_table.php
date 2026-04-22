@@ -14,26 +14,27 @@ return new class extends Migration
         Schema::create('urls', function (Blueprint $table) {
             $table->id();
             $table->nullableMorphs('urlable');
-            $table->string("url_type");
-            $table->string("url",500)->nullable();
-            $table->string("public_url",500)->nullable();
-            $table->string("previous_url",500)->nullable();
-            $table->boolean("is_updated_entry")->default(false);
-            $table->boolean("is_placeholder")->default(false);
-            $table->string("name",500);
-            $table->string("public_name",500)->nullable();
-            $table->string("previous_name",500)->nullable();
-            $table->string("slug",500);
-            $table->boolean("is_invariant")->default(true);
-            $table->integer("category_position")->nullable();
-            $table->string("description",500)->nullable(); 
-            $table->enum("status",["published","pending","rejected"])->default("published");
-            $table->text("status_reason",1000)->nullable();
-            $table->foreignId("option_category_id")->nullable()->constrained("option_categories");
-            $table->text("metadata")->nullable();
+            $table->string('url_type');
+            $table->string('url', 500)->nullable();
+            $table->string('public_url', 500)->nullable();
+            $table->string('previous_url', 500)->nullable();
+
+            $table->boolean('is_updated_entry')->default(false);
+            $table->boolean('is_placeholder')->default(false);
+            $table->string('name', 500);
+            $table->string('public_name', 500)->nullable();
+            $table->string('previous_name', 500)->nullable();
+            $table->string('slug', 500);
+            $table->boolean('is_invariant')->default(true);
+            $table->integer('category_position')->nullable();
+            $table->string('currency', 500)->nullable();
+            $table->string('description', 500)->nullable();
+
+            $table->foreignId('option_category_id')->nullable()->constrained('option_categories');
+            $table->text('metadata')->nullable();
             //placeholder entry can have no broker id
-            $table->foreignId("broker_id")->nullable()->constrained();
-            $table->foreignId("zone_id")->nullable()->constrained();
+            $table->foreignId('broker_id')->nullable()->constrained();
+            $table->foreignId('zone_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

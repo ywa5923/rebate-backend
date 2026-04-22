@@ -28,6 +28,10 @@ class UpdateAffiliateLinkRequest extends FormRequest
             'url' => 'sometimes|url',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
             'is_master_link' => 'sometimes|nullable|boolean',
+            'platform_urls' => 'sometimes|array',
+            'platform_urls.*.id' => 'required_with:platform_urls|integer|exists:urls,id',
+            'platform_urls.*.name' => 'required_with:platform_urls|string|max:500',
+            'currency' => 'required|string|max:10',
         ];
     }
 }

@@ -5,13 +5,16 @@ namespace Modules\Brokers\Services;
 use App\Exceptions\ApiException;
 use App\Utilities\ModelHelper;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
+use Modules\Brokers\Models\UrlAssociations;
 use Modules\Brokers\Repositories\AccountTypeRepository;
 use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Transformers\AccountTypeUrlsResource;
 use Modules\Brokers\Transformers\URLResource;
+use Modules\Brokers\Models\Url;
 
 class UrlService
 {
@@ -89,7 +92,7 @@ class UrlService
     {
         $urls = $this->repository->findByAccountType($accountType->id);
 
-        return $urls->groupBy('url_type')->map(fn ($items) => $items->values());
+        return $urls->groupBy('url_type')->map(fn($items) => $items->values());
     }
 
     public function getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code)
@@ -128,8 +131,9 @@ class UrlService
         }
     }
 
-    public function createBrokerAffiliateLink($broker_id, $data, $isAdmin)
+    public function createBrokerAffiliateLink(int $broker_id, array $data, bool $isAdmin, ?int $zone_id = null): Url
     {
+
         $isMasterLink = $data['is_master_link'] ?? false;
         $urldata = [
             'broker_id' => $broker_id,
@@ -137,6 +141,7 @@ class UrlService
             'urlable_id' => $isMasterLink ? null : $data['account_type_id'],
             'url_type' => $data['url_type'],
             'slug' => Str::slug($data['name']),
+            'currency' => $data['currency'] ?? null,
 
         ];
         if ($isAdmin) {
@@ -149,9 +154,35 @@ class UrlService
             $urldata['name'] = trim($data['name']);
         }
 
-        $url = $this->repository->create($urldata);
+        if (!$isMasterLink) {
+            //the associatedUrls are inserted only for non master links
+            return DB::transaction(function () use ($urldata, $data, $isAdmin, $zone_id) {
+                $url = $this->repository->create($urldata);
 
-        return $url;
+                $platformUrlsData = $data['platform_urls'] ?? [];
+                $syncAssociatedUrlsData = [];
+
+                foreach ($platformUrlsData as $platformUrl) {
+                    $pivotData = [
+                        'is_public' => $isAdmin,
+                        'is_updated_entry' => ! $isAdmin,
+                        'association_type' => 'platform_url',
+                    ];
+
+                    if ($zone_id) {
+                        $pivotData['zone_id'] = $zone_id;
+                    }
+
+                    $syncAssociatedUrlsData[$platformUrl['id']] = $pivotData;
+                }
+
+                $url->associatedUrls()->sync($syncAssociatedUrlsData);
+
+                return $url;
+            });
+        } else {
+            return $this->repository->create($urldata);
+        }
     }
 
     public function updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin)
@@ -212,9 +243,64 @@ class UrlService
             $newUrlData['public_name'] = trim($data['name']);
         }
 
-        $url = $this->repository->update($url, $newUrlData);
 
-        return $url;
+
+        $newPlatforms = collect($data['platform_urls'] ?? [])->pluck('id')->toArray();
+        $oldPlatforms = $url->associatedUrls()->pluck('urls.id')->toArray();
+
+        $platformUrlsDifference = $this->checkPlatformUrlsDifference($newPlatforms, $oldPlatforms);
+
+        
+
+            //if there is a difference in platform urls, we need to update the pivot table with the new platform urls and set the is_updated_entry to true for non admin users
+            //first add previous platform urls to metadata if it is not already there
+            if (! $isAdmin && $platformUrlsDifference) {
+
+                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
+                    'previous_platform_urls' => $url->associatedUrls()->pluck('urls.name')->toArray(),
+                ]);
+            }
+            $syncAssociatedUrlsData = [];
+
+            foreach ($newPlatforms as $platformUrl) {
+                $pivotData = [
+                    'is_public' => $isAdmin,
+                    'is_updated_entry' => !$isAdmin && $platformUrlsDifference ? true : false,
+                    'association_type' => 'platform_url',
+                ];
+
+                
+                $syncAssociatedUrlsData[$platformUrl] = $pivotData;
+                
+            }
+
+            $url->associatedUrls()->sync($syncAssociatedUrlsData);
+
+            $this->repository->update($url, $newUrlData);
+
+        
+
+       
+    }
+
+
+
+    public function checkPlatformUrlsDifference($newPlatforms, $oldPlatforms)
+    {
+
+
+        $added = array_diff($newPlatforms, $oldPlatforms);
+        $removed = array_diff($oldPlatforms, $newPlatforms);
+
+        if (empty($added) && empty($removed)) {
+            return null; // No changes
+        }
+        if (!empty($added) && empty($removed)) {
+            return ['added' => $added];
+        }
+        if (empty($added) && !empty($removed)) {
+            return ['removed' => $removed];
+        }
     }
 
     public function deleteBrokerAffiliateLink($broker_id, $url_id)
@@ -223,7 +309,16 @@ class UrlService
         if (! $url || $url->broker_id != $broker_id) {
             throw new ApiException('URL not found', 404);
         }
-        $url->delete();
+
+        DB::transaction(function () use ($url) {
+            $url->associatedUrls()->detach();
+
+            UrlAssociations::query()
+                ->where('associated_url_id', $url->id)
+                ->delete();
+
+            $url->delete();
+        });
 
         return true;
     }
@@ -236,11 +331,20 @@ class UrlService
         $ibAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::IB_AFFILIATE_LINK);
         $subIbAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::SUB_IB_AFFILIATE_LINK);
 
+        $masterLinks=$this->repository->getMasterAccountTypeLinks($broker_id, $lang, $zone);
+
+        $ibAffiliateUrls = $ibAffiliateUrls->merge($masterLinks->where('url_type', UrlTypeEnum::IB_AFFILIATE_LINK->value));
+       $subIbAffiliateUrls = $subIbAffiliateUrls->merge($masterLinks->where('url_type', UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value));
         return [
             'account_types' => AccountTypeUrlsResource::collection($accountTypes),
             'ib_affiliate_urls' => URLResource::collection($ibAffiliateUrls),
             'sub_ib_affiliate_urls' => URLResource::collection($subIbAffiliateUrls),
         ];
+    }
+
+    public function getUrlsByType($urls, UrlTypeEnum $urlType): Collection
+    {
+        return $urls->where('url_type', $urlType->value)->values();
     }
 
     public function extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum $urlType): Collection
@@ -252,8 +356,8 @@ class UrlService
             // only the option value containing the account type is selected
 
             $accountTypeName = $accountType->optionValues->first()?->translations?->first()?->value
-            ?? $accountType->optionValues->first()?->value
-            ?? 'unknown';
+                ?? $accountType->optionValues->first()?->value
+                ?? 'unknown';
 
             //first get the account type name translated first,if not found, use the default value
             return $accountType->urls->whereIn('url_type', [

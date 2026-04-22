@@ -204,7 +204,7 @@ class AccountTypeRepository
      */
     public function searchByName(string $search): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->model->where('name', 'like', '%'.$search.'%')->get();
+        return $this->model->where('name', 'like', '%' . $search . '%')->get();
     }
 
     /**
@@ -296,7 +296,6 @@ class AccountTypeRepository
         $sortBy = $filters->sortBy ?? 'created_at';
         $sortDirection = $filters->sortDirection ?? 'asc';
         $query->orderBy($sortBy, $sortDirection);
-
     }
 
     public function getAccountTypeName(int $accountTypeId): string
@@ -313,7 +312,7 @@ class AccountTypeRepository
         return $query->where('broker_id', $broker_id)
             ->with([
                 // affiliate URLs + their translations in chosen language
-                'urls' => fn ($q) => $q
+                'urls' => fn($q) => $q
                     ->whereIn('url_type', [
                         UrlTypeEnum::IB_AFFILIATE_LINK->value,
                         UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
@@ -327,13 +326,13 @@ class AccountTypeRepository
                         }
                     })
                     ->orderBy('url_type', 'asc')
-                    ->with(['translations' => fn ($t) => $t->where('language_code', $lang)]),
-                'urls.associatedUrls' => fn ($q) => $zone === null
+                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
+                'urls.associatedUrls' => fn($q) => $zone === null
                     ? $q->wherePivotNull('zone_id')
                     : $q->wherePivot('zone_id', $zone),
 
                 // option_values where option.slug = 'account_name' and zone_code matches (or is null)
-                'optionValues' => fn ($q) => $q
+                'optionValues' => fn($q) => $q
                     ->where(function ($op) use ($zone) {
                         if ($zone === null) {
                             $op->whereNull('zone_code');
@@ -342,17 +341,23 @@ class AccountTypeRepository
                         }
                     })
                     ->where('option_slug', 'account_type_name')
-                    ->with(['translations' => fn ($t) => $t->where('language_code', $lang)]),
+                    ->with(['translations' => fn($t) => $t->where('language_code', $lang)]),
             ])
             ->orderBy(
                 OptionValue::select('value')
                     ->whereColumn('option_values.optionable_id', 'account_types.id')
                     ->where('option_values.optionable_type', AccountType::class)
                     ->where('option_slug', 'account_type_name')
-                    ->when($zone === null, fn ($q) => $q->whereNull('zone_code'),
-                        fn ($q) => $q->where('zone_code', $zone))
-                    ->limit(1), 'asc'
+                    ->when(
+                        $zone === null,
+                        fn($q) => $q->whereNull('zone_code'),
+                        fn($q) => $q->where('zone_code', $zone)
+                    )
+                    ->limit(1),
+                'asc'
             )
             ->get();
     }
+
+    
 }

@@ -8,10 +8,10 @@ use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
 use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
 use Modules\Brokers\Http\Requests\UpdateAffiliateLinkRequest;
+use Modules\Brokers\Services\DropdownListService;
 use Modules\Brokers\Services\UrlService;
 use Modules\Brokers\Transformers\URLResource;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Modules\Brokers\Services\DropdownListService;
 
 class UrlController extends Controller
 {
@@ -82,8 +82,10 @@ class UrlController extends Controller
 
         $data = $request->validated();
         //$isAdmin = app('isAdmin');
+
         $isAdmin = false;
-        $url = $this->urlService->createBrokerAffiliateLink($broker_id, $data, $isAdmin);
+        $zone_id = $request->validated('zone_id');
+        $url = $this->urlService->createBrokerAffiliateLink($broker_id, $data, $isAdmin, $zone_id);
 
         return response()->json([
             'success' => true,
@@ -135,7 +137,6 @@ class UrlController extends Controller
 
         $currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
 
-       
         return response()->json([
             'success' => true,
             'data' => array_merge($this->urlService->getBrokerAffiliateLinks($broker_id, $lang, $zone), ['currency_list' => $currencyList]),

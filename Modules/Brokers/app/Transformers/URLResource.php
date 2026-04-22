@@ -59,8 +59,10 @@ class URLResource extends JsonResource
 
         if ($this->urlable_type == AccountType::class) {
             $result['account_type_id'] = $this->urlable_id;
-            $result['platform_urls'] = $this->whenLoaded('associatedUrls');
+            //platforms url for each url is stored in url_associated_urls table and loaded as associatedUrls relationship
+            $result['platform_urls'] = AssociatedUrlResource::collection($this->whenLoaded('associatedUrls'));
             $result['account_type_name'] = $this->account_type_name ?? 'unknown';
+            $result['currency'] = $this->currency;
         }
 
         return $result;
