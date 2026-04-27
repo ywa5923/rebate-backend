@@ -2,16 +2,14 @@
 
 namespace Modules\Brokers\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Modules\Brokers\Database\Factories\BrokerFactory;
-use Modules\Translations\Models\Translation;
 use Modules\Translations\Models\Country;
+use Modules\Translations\Models\Translation;
 use Modules\Translations\Models\Zone;
 
 /**
@@ -19,6 +17,7 @@ use Modules\Translations\Models\Zone;
  *   schema="Broker",
  *   type="object",
  *   required={"broker_type_id"},
+ *
  *   @OA\Property(property="id",type="integer", format="int64"),
  *   @OA\Property(property="registration_language",type="string",nullable=true,example="en"),
  *   @OA\Property(property="registration_zone",type="string",nullable=true,example="US"),
@@ -27,7 +26,6 @@ use Modules\Translations\Models\Zone;
  *   @OA\Property(property="updated_at",type="string",format="date-time")
  * )
  * Class Broker
- * @package Modules\Brokers\Models
  */
 class Broker extends Model
 {
@@ -40,7 +38,6 @@ class Broker extends Model
      */
     protected $table = 'brokers';
 
-
     /**
      * The attributes that are mass assignable.
      */
@@ -52,9 +49,6 @@ class Broker extends Model
         'zone_id',
         'is_active',
     ];
-
-
-
 
     public function translations(): MorphMany
     {
@@ -71,22 +65,28 @@ class Broker extends Model
         return $this->hasMany(Company::class);
     }
 
-    public function regulators():BelongsToMany
+    public function regulators(): BelongsToMany
     {
         return $this->belongsToMany(Regulator::class);
     }
-    public function brokerType():BelongsTo
+
+    public function brokerType(): BelongsTo
     {
         return $this->belongsTo(BrokerType::class);
     }
 
-    public function country():BelongsTo
+    public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function zone():BelongsTo
+    public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
+    }
+
+    public function brokerGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(BrokerGroup::class, 'broker_group_broker');
     }
 }

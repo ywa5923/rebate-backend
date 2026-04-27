@@ -1,28 +1,20 @@
 <?php
 
-
-
 namespace Modules\Auth\Forms;
 
-use App\Forms\Form;
 use App\Forms\Field;
-use InvalidArgumentException;
-
-use Modules\Auth\Models\PlatformUser;
-use Modules\Brokers\Models\Broker;
-use Modules\Translations\Models\Country;
-use Modules\Brokers\Models\Zone;
-use Modules\Auth\Enums\AuthPermission;
-use Modules\Auth\Services\UserPermissionService;
+use App\Forms\Form;
 use Modules\Auth\Enums\AuthAction;
-
+use Modules\Auth\Enums\AuthPermission;
+use Modules\Auth\Models\PlatformUser;
+use Modules\Auth\Services\UserPermissionService;
+use Modules\Brokers\Models\Broker;
 
 class UserPermissionForm extends Form
 {
-  
     public function __construct(private AuthPermission $permissionType,
-    private UserPermissionService $permissionService)
-    {   
+        private UserPermissionService $permissionService)
+    {
     }
 
     public function getFormData(): array
@@ -30,24 +22,23 @@ class UserPermissionForm extends Form
         if ($this->permissionType == AuthPermission::BROKER) {
             $resourceList = $this->permissionService->getOrderedBrokersList();
         } else {
-             $resourceList = $this->getOptionsList($this->permissionType->resourceModel(), 'name');
+            $resourceList = $this->getOptionsList($this->permissionType->resourceModel(), 'name');
         }
 
-        if($this->permissionType == AuthPermission::SEO || $this->permissionType == AuthPermission::TRANSLATOR) {
+        if ($this->permissionType == AuthPermission::SEO || $this->permissionType == AuthPermission::TRANSLATOR) {
             $resourceIdLabel = 'Select Country';
         } else {
-            $resourceIdLabel = 'Select '.ucfirst($this->permissionType->value);
+            $resourceIdLabel = 'Select '.$this->permissionTypeLabel();
         }
- 
-       
+
         return [
             'name' => 'User Permission',
-            'description' => "User permission form configuration",
+            'description' => 'User permission form configuration',
             'sections' => [
                 'definitions' => [
-                    'label' => ucfirst($this->permissionType->value) . " Permission Type",
+                    'label' => $this->permissionTypeLabel().' Permission Type',
                     'fields' => [
-                       
+
                         'subject_id' => Field::select('Select Platform User', $this->getOptionsList(PlatformUser::class, 'name'), ['required' => true]),
                         //'permission_type' => Field::select('Permission Type', $this->getPermissionTypes(),['required'=>true]),
                         'resource_id' => Field::select($resourceIdLabel, $resourceList, ['required' => true]),
@@ -55,12 +46,17 @@ class UserPermissionForm extends Form
                         //resource value is obtained in the service layer
                         'action' => Field::select('Action', $this->getActions(), ['required' => true]),
                         'is_active' => Field::select('Is Active', $this->booleanOptions(), ['required' => true]),
-                    ]
+                    ],
 
-                ]
+                ],
 
-            ]
+            ],
         ];
+    }
+
+    private function permissionTypeLabel(): string
+    {
+        return ucwords(str_replace('_', ' ', $this->permissionType->value));
     }
 
     private function booleanOptions(): array
@@ -71,31 +67,27 @@ class UserPermissionForm extends Form
         ];
     }
 
-   
-   
-
     private function getActions(): array
     {
         $actions = AuthAction::cases();
+
         return array_map(function ($action) {
             return ['value' => $action->value, 'label' => ucfirst($action->value.' Action')];
         }, $actions);
 
-        
     }
 
     private function getBrokersList(): array
     {
         $brokers = Broker::query()
-        ->join('option_values as ov', function ($j) {
-          $j->on('ov.broker_id', 'brokers.id')->where('ov.option_slug', 'trading_name');
-        })
-        ->orderBy('ov.value')
-        ->get(['brokers.id', 'ov.value as trading_name'])
-        ->map(fn ($b) => ['value' => $b->id, 'label' => $b->trading_name])
-        ->values()
-        ->all();
-
+            ->join('option_values as ov', function ($j) {
+                $j->on('ov.broker_id', 'brokers.id')->where('ov.option_slug', 'trading_name');
+            })
+            ->orderBy('ov.value')
+            ->get(['brokers.id', 'ov.value as trading_name'])
+            ->map(fn ($b) => ['value' => $b->id, 'label' => $b->trading_name])
+            ->values()
+            ->all();
 
         // $brokers = Broker::with(['dynamicOptionsValues' => fn($q) =>
         // $q->where('option_slug', 'trading_name')->latest('id')->limit(1)])

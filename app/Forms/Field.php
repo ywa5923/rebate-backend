@@ -15,12 +15,25 @@ class Field
         ];
     }
 
-    public static function select(string $label,array $options, array $rules = []): array
+    public static function select(string $label, array $options, array $rules = []): array
     {
         return [
             'type' => 'select',
             'label' => $label,
             'options' => $options,
+            'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
+            'validation' => $rules,
+        ];
+    }
+
+    public static function multiselect(string $label, string $searchUrl, string $searchParamName, ?array $options, array $rules = []): array
+    {
+        return [
+            'type' => 'multiselect',
+            'label' => $label,
+            'options' => $options ?? [],
+            'searchUrl' => $searchUrl,
+            'searchParamName' => $searchParamName,
             'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
             'validation' => $rules,
         ];
@@ -56,7 +69,7 @@ class Field
         ];
     }
 
-    public static function array_fields(string $label,array $fields, array $rules = []): array
+    public static function array_fields(string $label, array $fields, array $rules = []): array
     {
         return [
             'type' => 'array_fields',

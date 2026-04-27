@@ -2,11 +2,8 @@
 
 namespace Modules\Brokers\Repositories;
 
-use Modules\Brokers\Models\ChallengeCategory;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Brokers\Models\ChallengeCategory;
 
 class ChallengeCategoryRepository
 {
@@ -20,26 +17,25 @@ class ChallengeCategoryRepository
     /**
      * Get paginated challenge categories with filters
      */
-    public function getChallengeCategories(?int $broker_id=null): Collection
+    public function getChallengeCategories(?int $broker_id = null): Collection
     {
         $query = $this->model->newQuery();
-        if(isset($broker_id)){
+        if (isset($broker_id)) {
             $query->where('broker_id', $broker_id);
-        }else{
+        } else {
             $query->whereNull('broker_id');
         }
-       
+
         // Always load relationships ordered by 'order' then 'id'
         $query->with([
             'steps' => function ($q) {
-                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+                $q->orderBy('order', 'asc')->orderBy('name', 'asc');
             },
             'amounts' => function ($q) {
-                $q->orderBy('order', 'asc')->orderBy('id', 'asc');
+                $q->orderBy('order', 'asc')->orderBy('amount', 'asc');
             },
-        ])->orderBy('order', 'asc')->orderBy('id', 'asc');
+        ])->orderBy('order', 'asc')->orderBy('name', 'asc');
 
-        
         return $query->get();
     }
 
@@ -61,14 +57,15 @@ class ChallengeCategoryRepository
     /**
      * Get challenge category by ID without relations
      */
-    public function findByIdWithoutRelations(int $id,?int $broker_id=null): ?ChallengeCategory
+    public function findByIdWithoutRelations(int $id, ?int $broker_id = null): ?ChallengeCategory
     {
         $query = $this->model->newQuery();
-        if(isset($broker_id)){
+        if (isset($broker_id)) {
             $query->where('id', $id)->where('broker_id', $broker_id);
-        }else{
+        } else {
             $query->where('id', $id);
         }
+
         return $query->first();
     }
 
@@ -98,7 +95,7 @@ class ChallengeCategoryRepository
 
     /**
      * Find default challenge category by slug
-     * @param string $slug
+     *
      * @return ?ChallengeCategory
      */
     public function findDefaultCategoryBySlug(string $slug): ?ChallengeCategory
@@ -108,22 +105,21 @@ class ChallengeCategoryRepository
 
     /**
      * Add a challenge category
-     * @param string $slug
-     * @param int $order
-     * @param int $broker_id
-     * @return ChallengeCategory
+     *
+     * @param  string  $slug
      */
     public function cloneCategory(int $default_category_id, int $order, int $broker_id): ChallengeCategory
     {
         $defaultCategory = $this->findByIdWithoutRelations($default_category_id);
-        if(!$defaultCategory){
+        if (! $defaultCategory) {
             throw new \Exception('Default category not found');
         }
+
         return $this->model->create([
             'slug' => $defaultCategory->slug,
-            'name'=>$defaultCategory->name,
-            'description'=>$defaultCategory->description,
-            'image'=>$defaultCategory->image,
+            'name' => $defaultCategory->name,
+            'description' => $defaultCategory->description,
+            'image' => $defaultCategory->image,
             'order' => $order,
             'broker_id' => $broker_id,
         ]);

@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Modules\Brokers\Forms;
 
-use App\Forms\Form;
 use App\Forms\Field;
-
+use App\Forms\Form;
 use Modules\Brokers\Models\Zone;
+
 class CountryForm extends Form
 {
     public function getFormData(): array
@@ -18,15 +17,15 @@ class CountryForm extends Form
                 'definitions' => [
                     'label' => 'CountryDefinitions',
                     'fields' => [
-                        'name' => Field::text('Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        'country_code' => Field::text('Country Code', ['required'=>true, 'min'=>2, 'max'=>10,'unique'=>'countries,country_code']),
-                        'zone_id' => Field::select('Zone', $this->getZones(),['required'=>true,'exists'=>'zones,id']),
-                    ]
-                    
-                    ]
-                
-                
-            ]
+                        'name' => Field::text('Name', ['required' => true, 'min' => 3, 'max' => 100]),
+                        'country_code' => Field::text('Country Code', ['required' => true, 'min' => 2, 'max' => 10, 'unique' => 'countries,country_code']),
+                        //'zone_id' => Field::select('Zone', $this->getZones(),['required'=>true,'exists'=>'zones,id']),
+                        'zone_id' => Field::select('Zone', $this->getOptionsList(Zone::class, 'name'), ['required' => true, 'exists' => 'zones,id']),
+                    ],
+
+                ],
+
+            ],
         ];
     }
 
@@ -39,5 +38,4 @@ class CountryForm extends Form
             ->values()
             ->all();
     }
-
 }

@@ -2,10 +2,10 @@
 
 namespace Modules\Auth\Repositories;
 
-use Modules\Auth\Models\UserPermission;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\Auth\Models\UserPermission;
 use Modules\Brokers\Models\Broker;
+use Modules\Brokers\Models\BrokerGroup;
 
 class UserPermissionRepository
 {
@@ -31,6 +31,7 @@ class UserPermissionRepository
     {
         $permission = $this->model->findOrFail($id);
         $permission->update($data);
+
         return $permission->fresh();
     }
 
@@ -58,15 +59,15 @@ class UserPermissionRepository
         $query = $this->model->newQuery()->with('subject');
 
         // Apply filters
-        if (!empty($filters['subject_type'])) {
-            $query->where('subject_type', 'like', '%' . $filters['subject_type'] . '%');
+        if (! empty($filters['subject_type'])) {
+            $query->where('subject_type', 'like', '%'.$filters['subject_type'].'%');
         }
 
-        if (!empty($filters['subject_id'])) {
+        if (! empty($filters['subject_id'])) {
             $query->where('subject_id', $filters['subject_id']);
         }
 
-        if (!empty($filters['permission_type'])) {
+        if (! empty($filters['permission_type'])) {
             $query->where('permission_type', $filters['permission_type']);
         }
 
@@ -74,11 +75,11 @@ class UserPermissionRepository
             $query->where('resource_id', $filters['resource_id']);
         }
 
-        if (!empty($filters['resource_value'])) {
-            $query->where('resource_value', 'like', '%' . $filters['resource_value'] . '%');
+        if (! empty($filters['resource_value'])) {
+            $query->where('resource_value', 'like', '%'.$filters['resource_value'].'%');
         }
 
-        if (!empty($filters['action'])) {
+        if (! empty($filters['action'])) {
             $query->where('action', $filters['action']);
         }
 
@@ -87,11 +88,11 @@ class UserPermissionRepository
         }
 
         // Filter by subject name or email
-        if (!empty($filters['subject'])) {
+        if (! empty($filters['subject'])) {
             $searchTerm = $filters['subject'];
             $query->whereHasMorph('subject', ['Modules\Auth\Models\BrokerTeamUser', 'Modules\Auth\Models\PlatformUser'], function ($q) use ($searchTerm) {
-                $q->where('name', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('email', 'like', '%' . $searchTerm . '%');
+                $q->where('name', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('email', 'like', '%'.$searchTerm.'%');
             });
         }
 
@@ -107,20 +108,25 @@ class UserPermissionRepository
     public function getByTeamUserId(int $teamUserId): Collection
     {
         return $this->model->where('subject_type', 'Modules\\Auth\\Models\\BrokerTeamUser')
-                           ->where('subject_id', $teamUserId)
-                           ->get();
+            ->where('subject_id', $teamUserId)
+            ->get();
     }
 
     public function getOrderedBrokersList(): array
     {
         return Broker::query()
-        ->join('option_values as ov', function ($j) {
-          $j->on('ov.broker_id', 'brokers.id')->where('ov.option_slug', 'trading_name');
-        })
-        ->orderBy('ov.value')
-        ->get(['brokers.id', 'ov.value as trading_name'])
-        ->map(fn ($b) => ['value' => $b->id, 'label' => $b->trading_name])
-        ->values()
-        ->all();
+            ->join('option_values as ov', function ($j) {
+                $j->on('ov.broker_id', 'brokers.id')->where('ov.option_slug', 'trading_name');
+            })
+            ->orderBy('ov.value')
+            ->get(['brokers.id', 'ov.value as trading_name'])
+            ->map(fn ($b) => ['value' => $b->id, 'label' => $b->trading_name])
+            ->values()
+            ->all();
+    }
+
+    public function getBrokerGroupsList(): array
+    {
+        return BrokerGroup::all()->map(fn ($b) => ['value' => $b->id, 'label' => $b->name])->values()->all();
     }
 }

@@ -1,14 +1,12 @@
 <?php
 
-
 namespace Modules\Brokers\Forms;
 
-use App\Forms\Form;
 use App\Forms\Field;
-
-use Modules\Brokers\Models\Zone;
+use App\Forms\Form;
 use Modules\Brokers\Models\BrokerType;
 use Modules\Translations\Models\Country;
+
 class BrokerForm extends Form
 {
     public function getFormData(): array
@@ -21,19 +19,19 @@ class BrokerForm extends Form
                     'label' => 'Broker Definitions',
                     'fields' => [
                         //'broker_type' => Field::select('Broker Type', $this->getBrokerTypes(),['required'=>true,'exists'=>'broker_types,id']),
-                        'broker_type_id' => Field::select('Broker Type', $this->getOptionsList(BrokerType::class, 'name'),['required'=>true,'exists'=>'broker_types,id']),
-                       
-                        'trading_name' => Field::text('Trading Name', ['required'=>true, 'min'=>3, 'max'=>100]),
-                    
-                        'email' => Field::text('Email', ['required'=>true, 'min'=>3, 'max'=>100]),
-                        
-                        'country_id' => Field::select('Country', $this->getOptionsList(Country::class, 'name'),['required'=>true,'exists'=>'countries,id']),   
-                       
-                    ]
-                    
-                    ]
-                
-            ]
+                        'broker_type_id' => Field::select('Broker Type', $this->getOptionsList(BrokerType::class, 'name'), ['required' => true, 'exists' => 'broker_types,id']),
+
+                        'trading_name' => Field::text('Trading Name', ['required' => true, 'min' => 3, 'max' => 100]),
+
+                        'email' => Field::text('Email', ['required' => true, 'min' => 3, 'max' => 100]),
+
+                        'country_id' => Field::select('Country', $this->getOptionsList(Country::class, 'name'), ['required' => true, 'exists' => 'countries,id']),
+
+                    ],
+
+                ],
+
+            ],
         ];
     }
 
@@ -57,4 +55,3 @@ class BrokerForm extends Form
     //         ->all();
     // }
 }
-

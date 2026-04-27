@@ -8,10 +8,12 @@ use InvalidArgumentException;
 abstract class Form implements FormConfigInterface
 {
     abstract public function getFormData(): array;
+
     public const MODE_CREATE = 'create';
+
     public const MODE_UPDATE = 'update';
 
-    public function getFormConstraints($mode = self::MODE_CREATE,?int $itemId = null): array
+    public function getFormConstraints($mode = self::MODE_CREATE, ?int $itemId = null): array
     {
         $constraints = [];
         foreach ($this->getFormData()['sections'] as $section) {
@@ -28,30 +30,33 @@ abstract class Form implements FormConfigInterface
 
                     $constraints[$key] = $this->getValidationString($field, $mode, $itemId);
                     foreach ($field['fields'] as $subFieldKey => $subField) {
-                        $constraints[$key . '.*.' . $subFieldKey] = $this->getValidationString($subField, $mode, $itemId);
+                        $constraints[$key.'.*.'.$subFieldKey] = $this->getValidationString($subField, $mode, $itemId);
                     }
                 } else {
                     $constraints[$key] = $this->getValidationString($field, $mode, $itemId);
                 }
             } //end foreach
         } //end foreach
+
         return $constraints;
     }
 
-    public function getValidationString(array $field,$mode,?int $itemId = null): string
+    public function getValidationString(array $field, $mode, ?int $itemId = null): string
     {
 
-        $validationString = "";
+        $validationString = '';
         if ($field['type'] == 'array' || $field['type'] == 'array_fields') {
-            $validationString .= "array|";
-        } else if ($field['type'] == 'number') {
-            $validationString .= "numeric|";
-        } else if ($field['type'] == 'boolean') {
-            $validationString .= "boolean|";
-        } else if ($field['type'] == 'select') {
-            $validationString .= "string|";
-        } else if ($field['type'] == 'text' || $field['type'] == 'string') {
-            $validationString .= "string|";
+            $validationString .= 'array|';
+        } elseif ($field['type'] == 'number') {
+            $validationString .= 'numeric|';
+        } elseif ($field['type'] == 'boolean') {
+            $validationString .= 'boolean|';
+        } elseif ($field['type'] == 'select') {
+            $validationString .= 'string|';
+        } elseif ($field['type'] == 'text' || $field['type'] == 'string') {
+            $validationString .= 'string|';
+        } elseif ($field['type'] == 'multiselect') {
+            $validationString .= 'array|';
         }
 
         $validationRules = $field['validation'];
@@ -59,48 +64,46 @@ abstract class Form implements FormConfigInterface
         foreach ($validationRules as $rule => $value) {
 
             if ($rule == 'required' && $value == true) {
-                $validationString .= "required|";
-            }else if($rule == 'required' && $value == false) {
-                $validationString .= "nullable|";
+                $validationString .= 'required|';
+            } elseif ($rule == 'required' && $value == false) {
+                $validationString .= 'nullable|';
             }
 
-            if($rule == 'sometimes' && $value == true) {
-                $validationString .= "sometimes|";
+            if ($rule == 'sometimes' && $value == true) {
+                $validationString .= 'sometimes|';
             }
 
             if ($rule == 'nullable' && $value == true) {
-                $validationString .= "nullable|";
+                $validationString .= 'nullable|';
             }
             //add filter type
-
 
             //ADD RULSES CONSTRAINTS
 
             if ($rule == 'min' && is_numeric($value)) {
-                $validationString .= "min:" . $value . "|";
-            } else if ($rule == 'max' && is_numeric($value)) {
-                $validationString .= "max:" . $value . "|";
-            } else if ($rule == 'in' && is_array(explode(',', $value))) {
-                $validationString .= "in:" . $value . "|";
-            } else if ($rule == 'exists' && is_string($value)) {
-                $validationString .= "exists:" . $value . "|";
-            } else if ($rule == 'unique' && is_string($value)) {
-                if($itemId && is_numeric($itemId) && self::MODE_UPDATE == $mode) {
-                    $validationString .= "unique:" . $value . "," . $itemId . ",id|";
+                $validationString .= 'min:'.$value.'|';
+            } elseif ($rule == 'max' && is_numeric($value)) {
+                $validationString .= 'max:'.$value.'|';
+            } elseif ($rule == 'in' && is_array(explode(',', $value))) {
+                $validationString .= 'in:'.$value.'|';
+            } elseif ($rule == 'exists' && is_string($value)) {
+                $validationString .= 'exists:'.$value.'|';
+            } elseif ($rule == 'unique' && is_string($value)) {
+                if ($itemId && is_numeric($itemId) && $mode == self::MODE_UPDATE) {
+                    $validationString .= 'unique:'.$value.','.$itemId.',id|';
                 } else {
-                    $validationString .= "unique:" . $value . "|";
+                    $validationString .= 'unique:'.$value.'|';
                 }
-               // $validationString .= "unique:" . $value . "|";
+                // $validationString .= "unique:" . $value . "|";
             }
         }
-        return rtrim($validationString, "|");
+
+        return rtrim($validationString, '|');
     }
-
-
 
     public function getDistinctOptions(string $modelClass, string $column): array
     {
-        if (!is_subclass_of($modelClass, Model::class)) {
+        if (! is_subclass_of($modelClass, Model::class)) {
             throw new InvalidArgumentException(sprintf(
                 'Expected a model class-string. Got [%s].',
                 $modelClass
@@ -141,14 +144,12 @@ abstract class Form implements FormConfigInterface
 
     //get options list for a model used in a dropdown list
     /**
-     * @param string $modelClass
-     * @param string $column
      * @return array
-     * [
-     *     ['value' => '1', 'label' => 'Option 1'],
-     *     ['value' => '2', 'label' => 'Option 2'],
-     *     ['value' => '3', 'label' => 'Option 3'],
-     * ]
+     *               [
+     *               ['value' => '1', 'label' => 'Option 1'],
+     *               ['value' => '2', 'label' => 'Option 2'],
+     *               ['value' => '3', 'label' => 'Option 3'],
+     *               ]
      */
     public function getOptionsList(string $modelClass, string $column): array
     {
