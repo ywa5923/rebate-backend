@@ -45,7 +45,7 @@ class BrokerGroupTableConfig extends TableConfig
             ],
             'broker' => [
                 'type' => 'text',
-                'label' => 'Broker Name',
+                'label' => 'Group by broker name',
                 'tooltip' => 'Filter by brokers',
                 'placeholder' => 'Search by broker name',
             ],

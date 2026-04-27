@@ -26,17 +26,28 @@ class Field
         ];
     }
 
-    public static function multiselect(string $label, string $searchUrl, string $searchParamName, ?array $options, array $rules = []): array
+    public static function multiselect(string $label, ?string $searchUrl, ?string $searchParamName, ?array $options, array $rules = []): array
     {
-        return [
+        $field = [
             'type' => 'multiselect',
             'label' => $label,
-            'options' => $options ?? [],
-            'searchUrl' => $searchUrl,
-            'searchParamName' => $searchParamName,
             'required' => in_array('required', array_keys($rules)) && $rules['required'] == true,
             'validation' => $rules,
         ];
+
+        if ($options !== null) {
+            $field['options'] = $options;
+        }
+
+        if ($searchUrl !== null) {
+            $field['searchUrl'] = $searchUrl;
+        }
+
+        if ($searchParamName !== null) {
+            $field['searchParamName'] = $searchParamName;
+        }
+
+        return $field;
     }
 
     public static function checkbox(string $label, array $rules = []): array
