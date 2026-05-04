@@ -27,8 +27,8 @@ class BrokerGroupForm extends Form
 
                         'is_active' => Field::select('Is Active', $this->booleanOptions(), ['required' => true]),
 
-                        'brokers' => Field::multiselect('Brokers', '/broker-groups/search-by-broker-trading-name', 'trading_name', null, ['required' => true]),
-                        //'brokers' => Field::multiselect('Brokers', null, null, $this->getBrokersList(), ['required' => true]),
+                        //'brokers' => Field::multiselect('Brokers', '/broker-groups/search-by-broker-trading-name', 'trading_name', null, ['required' => true]),
+                        'brokers' => Field::multiselect('Brokers', null, null, $this->getBrokersList(), ['required' => true]),
                     ],
                 ],
             ],
