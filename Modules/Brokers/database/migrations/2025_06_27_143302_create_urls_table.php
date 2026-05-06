@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('slug', 500);
             $table->boolean('is_invariant')->default(true);
             $table->integer('category_position')->nullable();
-            $table->string('currency', 500)->nullable();
+            //  $table->string('currency', 500)->nullable();
             $table->string('description', 500)->nullable();
 
             $table->foreignId('option_category_id')->nullable()->constrained('option_categories');

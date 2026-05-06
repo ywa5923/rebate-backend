@@ -4,10 +4,10 @@ namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
 use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
-use Modules\Brokers\Http\Requests\UpdateAffiliateLinkRequest;
 use Modules\Brokers\Services\DropdownListService;
 use Modules\Brokers\Services\UrlService;
 use Modules\Brokers\Transformers\URLResource;
@@ -22,17 +22,17 @@ class UrlController extends Controller
         $this->urlService = $urlService;
     }
 
-    public function getGroupedUrls($broker_id, $entity_type, $entity_id, Request $request)
+    public function getGroupedUrls(int $broker_id, string $entity_type, int|string $entity_id, Request $request)
     {
         //http://localhost:8080/api/v1/urls/2/account-type/1?zone_code=eu&language_code=en
         //go get urls for all account types $entity_id is "all"
         //ex for all http://localhost:8080/api/v1/urls/2/account-type/all?zone_code=eu&language_code=en
 
-        $this->urlService->validateData($broker_id, $entity_type, $entity_id, $request);
+        $this->urlService->validateData($broker_id, $entity_type, (int)$entity_id, $request);
         $zone_code = $request->query('zone_code') ?? null;
         $language_code = $request->query('language_code') ?? 'en';
 
-        $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code);
+        $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, (int)$entity_id, $zone_code, $language_code);
         $transformed = URLResource::collection($urls);
 
         $grouped = $transformed->groupBy([
@@ -81,11 +81,13 @@ class UrlController extends Controller
     {
 
         $data = $request->validated();
+        $storeAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
         //$isAdmin = app('isAdmin');
 
-        $isAdmin = false;
+        $isAdmin = true;
         $zone_id = $request->validated('zone_id');
-        $url = $this->urlService->createBrokerAffiliateLink($broker_id, $data, $isAdmin, $zone_id);
+       
+        $url = $this->urlService->createAffiliateLink($storeAffiliateLinkDto, $broker_id, $isAdmin);
 
         return response()->json([
             'success' => true,
@@ -93,13 +95,14 @@ class UrlController extends Controller
         ]);
     }
 
-    public function updateBrokerAffiliateLink(UpdateAffiliateLinkRequest $request, int $broker_id, $url_id)
+    public function updateBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id, int $url_id)
     {
         //$isAdmin = app('isAdmin');
-        $isAdmin = false;
+        $isAdmin = true;
         $data = $request->validated();
-
-        $url = $this->urlService->updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin);
+        $updateAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
+        //$url = $this->urlService->updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin);
+        $url = $this->urlService->updateAffiliateLink($updateAffiliateLinkDto, $url_id, $broker_id, $isAdmin);
 
         return response()->json([
             'success' => true,
@@ -107,9 +110,17 @@ class UrlController extends Controller
         ]);
     }
 
-    public function deleteBrokerAffiliateLink(int $broker_id, int $url_id)
+    public function deleteBrokerAffiliateLink(Request $request, int $broker_id, int $url_id)
     {
-        $url = $this->urlService->deleteBrokerAffiliateLink($broker_id, $url_id);
+        $brokerId = (int) $request->validate([
+            'broker_id' => ['required', 'integer'],
+        ])['broker_id'];
+
+        $urlId = (int) $request->validate([
+            'url_id' => ['required', 'integer'],
+        ])['url_id'];
+
+        $url = $this->urlService->deleteAffiliateLink($brokerId, $urlId);
 
         return response()->json([
             'success' => true,
@@ -118,15 +129,15 @@ class UrlController extends Controller
     }
 
     /**
-     * Get all affiliate links for a given broker
+     * Broker affiliate links (IB / sub-IB) plus account types with merged platform URLs and currency dropdown options.
      *
-     * @return JsonResponse<array{
-     *     "success": bool,
-     *     "data": array{
-     *         "account_types": array<AccountType>,
-     *         "ib_affiliate_urls"?: array<URL>,
-     *         "sub_ib_affiliate_urls"?: array<URL>
-     *        "currency_list": array<array{label: string, value: string}>
+     * @phpstan-return JsonResponse<array{
+     *     success: bool,
+     *     data: array{
+     *         account_types: \Modules\Brokers\Transformers\AccountTypeUrlsCollection,
+     *         ib_affiliate_urls: \Modules\Brokers\Transformers\AffiliateLinkCollection,
+     *         sub_ib_affiliate_urls: \Modules\Brokers\Transformers\AffiliateLinkCollection,
+     *         currency_list: list<array{label: string, value: string}>
      *     }
      * }>
      */
@@ -134,21 +145,27 @@ class UrlController extends Controller
     {
         $lang = $request->validated('language_code');
         $zone = $request->validated('zone_code');
+        $accountTypes = $this->urlService->getAccountTypesWithPlatformLinks($broker_id, $lang, $zone);
 
         $currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
+        $affliateLinksDTO = $this->urlService->getAffiliateLinks($broker_id, $lang, $zone);
 
         return response()->json([
             'success' => true,
-            'data' => array_merge($this->urlService->getBrokerAffiliateLinks($broker_id, $lang, $zone), ['currency_list' => $currencyList]),
-
+            'data' => [
+                'account_types' => $accountTypes,
+                'ib_affiliate_urls' => $affliateLinksDTO->ibAffiliateUrls,
+                'sub_ib_affiliate_urls' => $affliateLinksDTO->subIbAffiliateUrls,
+                'currency_list' => $currencyList,
+            ],
         ], JsonResponse::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, int $id)
     {
-        //
+       
     }
 }

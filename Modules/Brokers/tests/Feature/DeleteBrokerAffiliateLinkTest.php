@@ -3,18 +3,19 @@
 namespace Modules\Brokers\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Brokers\Models\AffliliateLink;
 use Modules\Brokers\Models\Broker;
 use Modules\Brokers\Models\BrokerType;
 use Modules\Brokers\Models\Url;
-use Modules\Brokers\Models\UrlAssociations;
 use Modules\Brokers\Services\UrlService;
+use Modules\Translations\Models\Translation;
 use Tests\TestCase;
 
 class DeleteBrokerAffiliateLinkTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_deletes_affiliate_link_and_clears_all_url_associations(): void
+    public function test_it_deletes_affiliate_link_and_clears_related_pivot_and_translations(): void
     {
         $brokerType = BrokerType::query()->create([
             'name' => 'Broker',
@@ -22,14 +23,6 @@ class DeleteBrokerAffiliateLinkTest extends TestCase
 
         $broker = Broker::query()->create([
             'broker_type_id' => $brokerType->id,
-        ]);
-
-        $affiliateUrl = Url::query()->create([
-            'broker_id' => $broker->id,
-            'url_type' => 'ib-affiliate-link',
-            'url' => 'https://example.com/affiliate',
-            'name' => 'Affiliate Link',
-            'slug' => 'affiliate-link',
         ]);
 
         $platformUrl = Url::query()->create([
@@ -40,35 +33,55 @@ class DeleteBrokerAffiliateLinkTest extends TestCase
             'slug' => 'platform-link',
         ]);
 
-        $referrerUrl = Url::query()->create([
+        $affiliateLink = AffliliateLink::query()->create([
             'broker_id' => $broker->id,
-            'url_type' => 'sub-ib-affiliate-link',
-            'url' => 'https://example.com/referrer',
-            'name' => 'Referrer Link',
-            'slug' => 'referrer-link',
+            'affiliate_type' => 'ib-affiliate-link',
+            'name' => 'Affiliate Link',
+            'url' => 'https://example.com/affiliate',
+            'currency' => 'USD',
+            'is_master_link' => false,
         ]);
 
-        $affiliateUrl->associatedUrls()->attach($platformUrl->id, [
+        $affiliateLink->platformUrls()->attach($platformUrl->id, [
             'is_public' => true,
             'is_updated_entry' => false,
         ]);
 
-        $referrerUrl->associatedUrls()->attach($affiliateUrl->id, [
-            'is_public' => false,
-            'is_updated_entry' => true,
+        Translation::query()->insert([
+            'translationable_type' => AffliliateLink::class,
+            'translationable_id' => $affiliateLink->id,
+            'language_code' => 'en',
+            'property' => 'name',
+            'value' => 'Affiliate Link',
+            'translation_type' => 'property',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $service = app(UrlService::class);
 
-        $this->assertSame(2, UrlAssociations::query()->count());
+        $this->assertDatabaseHas('affliliate_link_url', [
+            'affliliate_link_id' => $affiliateLink->id,
+            'url_id' => $platformUrl->id,
+        ]);
+        $this->assertDatabaseHas('translations', [
+            'translationable_type' => AffliliateLink::class,
+            'translationable_id' => $affiliateLink->id,
+        ]);
 
-        $this->assertTrue($service->deleteBrokerAffiliateLink($broker->id, $affiliateUrl->id));
+        $this->assertTrue($service->deleteBrokerAffiliateLink($broker->id, $affiliateLink->id));
 
-        $this->assertDatabaseMissing('urls', [
-            'id' => $affiliateUrl->id,
+        $this->assertDatabaseMissing('affliliate_links', [
+            'id' => $affiliateLink->id,
         ]);
         $this->assertModelExists($platformUrl->fresh());
-        $this->assertModelExists($referrerUrl->fresh());
-        $this->assertSame(0, UrlAssociations::query()->count());
+        $this->assertDatabaseMissing('affliliate_link_url', [
+            'affliliate_link_id' => $affiliateLink->id,
+            'url_id' => $platformUrl->id,
+        ]);
+        $this->assertDatabaseMissing('translations', [
+            'translationable_type' => AffliliateLink::class,
+            'translationable_id' => $affiliateLink->id,
+        ]);
     }
 }

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('url_id')
                 ->constrained('urls')
                 ->cascadeOnDelete();
+            $table->boolean('is_public')->default(false);
+            $table->boolean('is_updated_entry')->default(false);
             $table->unique(['affliliate_link_id', 'url_id']);
             $table->timestamps();
         });

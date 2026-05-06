@@ -180,6 +180,7 @@ docker exec -it backend-laravel-1 php artisan app:magic-import
 docker exec -it backend-laravel-1 php artisan migrate:rollback --step=2
 
 docker exec -it backend-laravel-1 php artisan module:migrate-status Brokers
+ docker compose exec laravel php artisan module:migrate-status Brokers
 
 docker exec -it backend-laravel-1 php artisan migrate --path=Modules/Auth/database/migrations
 run migrations locally docker exec -it backend-laravel-1 php artisan migrate --path=Modules/Brokers/database/migrations

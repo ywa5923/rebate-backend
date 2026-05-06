@@ -3,81 +3,17 @@
 namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Translations\Models\Translation;
-use Modules\Translations\Models\Zone;
-
-/**
- * @OA\Schema(
- *   schema="AcountType",
- *   type="object",
- *   required={"name", "broker_type", "broker_id"},
- *   @OA\Property(property="id", type="integer", format="int64"),
- *   @OA\Property(property="name", type="string", example="Standard Account"),
- *   @OA\Property(property="broker_type", type="string", enum={"broker", "crypto", "prop_firm"}, example="broker"),
- *   @OA\Property(property="commission_value", type="number", format="float", example=1.5),
- *   @OA\Property(property="commission_value_p", type="number", format="float", example=1.5),
- *   @OA\Property(property="commission_unit", type="string", example="pips"),
- *   @OA\Property(property="commission_unit_p", type="string", example="pips"),
- *   @OA\Property(property="execution_model", type="string", example="STP"),
- *   @OA\Property(property="execution_model_p", type="string", example="STP"),
- *   @OA\Property(property="max_leverage", type="string", example="1:500"),
- *   @OA\Property(property="max_leverage_p", type="string", example="1:500"),
- *   @OA\Property(property="spread_type", type="string", example="Fixed"),
- *   @OA\Property(property="spread_type_p", type="string", example="Fixed"),
- *   @OA\Property(property="min_deposit_value", type="string", example="100"),
- *   @OA\Property(property="min_deposit_unit", type="string", example="USD"),
- *   @OA\Property(property="min_deposit_value_p", type="string", example="100"),
- *   @OA\Property(property="min_deposit_unit_p", type="string", example="USD"),
- *   @OA\Property(property="min_trade_size_value", type="string", example="0.01"),
- *   @OA\Property(property="min_trade_size_unit", type="string", example="lots"),
- *   @OA\Property(property="min_trade_size_value_p", type="string", example="0.01"),
- *   @OA\Property(property="min_trade_size_unit_p", type="string", example="lots"),
- *   @OA\Property(property="stopout_level_value", type="string", example="20"),
- *   @OA\Property(property="stopout_level_unit", type="string", example="%"),
- *   @OA\Property(property="stopout_level_value_p", type="string", example="20"),
- *   @OA\Property(property="stopout_level_unit_p", type="string", example="%"),
- *   @OA\Property(property="trailing_stops", type="boolean", example=true),
- *   @OA\Property(property="trailing_stops_p", type="boolean", example=true),
- *   @OA\Property(property="allow_scalping", type="boolean", example=true),
- *   @OA\Property(property="allow_scalping_p", type="boolean", example=true),
- *   @OA\Property(property="allow_hedging", type="boolean", example=true),
- *   @OA\Property(property="allow_hedging_p", type="boolean", example=true),
- *   @OA\Property(property="allow_news_trading", type="boolean", example=true),
- *   @OA\Property(property="allow_news_trading_p", type="boolean", example=true),
- *   @OA\Property(property="allow_cent_accounts", type="boolean", example=false),
- *   @OA\Property(property="allow_cent_accounts_p", type="boolean", example=false),
- *   @OA\Property(property="allow_islamic_accounts", type="boolean", example=false),
- *   @OA\Property(property="allow_islamic_accounts_p", type="boolean", example=false),
- *   @OA\Property(property="mobile_url_id", type="integer", example=1),
- *   @OA\Property(property="mobile_url_id_p", type="integer", example=1),
- *   @OA\Property(property="webplaform_url_id", type="integer", example=1),
- *   @OA\Property(property="webplaform_url_id_p", type="integer", example=1),
- *   @OA\Property(property="swap_url_id", type="integer", example=1),
- *   @OA\Property(property="swap_url_id_p", type="integer", example=1),
- *   @OA\Property(property="comission_url_id", type="integer", example=1),
- *   @OA\Property(property="comission_url_id_p", type="integer", example=1),
- *   @OA\Property(property="broker_id", type="integer", example=1),
- *   @OA\Property(property="zone_id", type="integer", example=1),
- *   @OA\Property(property="created_at", type="string", format="date-time"),
- *   @OA\Property(property="updated_at", type="string", format="date-time"),
- *   @OA\Property(property="broker", type="object"),
- *   @OA\Property(property="zone", type="object"),
- *   @OA\Property(property="urls", type="array", @OA\Items(type="object")),
- *   @OA\Property(property="translations", type="array", @OA\Items(type="object"))
- * )
- * Class AccountType
- * @package Modules\Brokers\Models
- */
 
 class AccountType extends Model
 {
     //these constants are used to return the account type's options value or options public values
     const RETURN_TYPE_VALUE = 'value';
+
     const RETURN_TYPE_PUBLIC_VALUE = 'public_value';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -85,26 +21,20 @@ class AccountType extends Model
      */
     protected $fillable = ['broker_id', 'name'];
 
-
     public function broker(): BelongsTo
     {
         return $this->belongsTo(Broker::class);
     }
-
-
 
     public function urls(): MorphMany
     {
         return $this->morphMany(Url::class, 'urlable');
     }
 
-
     public function mobileUrls(): MorphMany
     {
         return $this->urls()->where('url_type', 'mobile');
     }
-
-
 
     public function webplatformUrls(): MorphMany
     {
@@ -116,11 +46,11 @@ class AccountType extends Model
         return $this->urls()->where('url_type', 'swap');
     }
 
-
     public function commissionUrls(): MorphMany
     {
         return $this->urls()->where('url_type', 'commission');
     }
+
     public function optionValues(): MorphMany
     {
         return $this->morphMany(OptionValue::class, 'optionable');
@@ -129,13 +59,14 @@ class AccountType extends Model
     public function getAllAccountTypeUrls()
     {
         $class = self::class;
+
         return Url::where(function ($query) use ($class) {
             $query->where(function ($q) {
                 $q->where('urlable_type', self::class)
-                  ->where('urlable_id', $this->id);
+                    ->where('urlable_id', $this->id);
             })->orWhere(function ($q) use ($class) {
                 $q->where('urlable_type', $class)
-                  ->whereNull('urlable_id');
+                    ->whereNull('urlable_id');
             });
         });
     }
@@ -150,38 +81,38 @@ class AccountType extends Model
         });
     }
 
-    public function translations():MorphMany
+    public function translations(): MorphMany
     {
         return $this->morphMany(Translation::class, 'translationable');
     }
 
-    public function getAccountTypesNames($broker_id, $return_type=self::RETURN_TYPE_VALUE,$language_code = 'en'):array
+    public function getAccountTypesNames($broker_id, $return_type = self::RETURN_TYPE_VALUE, $language_code = 'en'): array
     {
         $with = [
             'optionValues' => function ($q) {
-                $q->whereHas('option', fn($oq) => $oq->where('option_slug', 'account_type_name'));
+                $q->whereHas('option', fn ($oq) => $oq->where('option_slug', 'account_type_name'));
             },
         ];
-    
+
         if ($language_code !== 'en') {
             $with['optionValues.translations'] = function ($q) use ($language_code) {
                 $q->where('language_code', $language_code);
             };
         }
-    
+
         $accountTypes = $this->newQuery()
             ->with($with)
             ->where('broker_id', $broker_id)
             ->get();
 
-            return $accountTypes->map(function($accountType) use ($return_type){
-                $name = $return_type === self::RETURN_TYPE_VALUE ? $accountType->optionValues->first()->value : $accountType->optionValues->first()->public_value;
-                return [
-                    'id' => $accountType->id,
-                    'name' => $name,
-                    'slug' => strtolower(str_replace(' ', '-', $name)),
-                ];
-            })->toArray();
+        return $accountTypes->map(function ($accountType) use ($return_type) {
+            $name = $return_type === self::RETURN_TYPE_VALUE ? $accountType->optionValues->first()->value : $accountType->optionValues->first()->public_value;
 
+            return [
+                'id' => $accountType->id,
+                'name' => $name,
+                'slug' => strtolower(str_replace(' ', '-', $name)),
+            ];
+        })->toArray();
     }
 }

@@ -57,13 +57,13 @@ class URLResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
 
-        if ($this->urlable_type == AccountType::class) {
-            $result['account_type_id'] = $this->urlable_id;
-            //platforms url for each url is stored in url_associated_urls table and loaded as associatedUrls relationship
-            $result['platform_urls'] = AssociatedUrlResource::collection($this->whenLoaded('associatedUrls'));
-            $result['account_type_name'] = $this->account_type_name ?? 'unknown';
-            $result['currency'] = $this->currency;
-        }
+        // if ($this->urlable_type == AccountType::class) {
+        //     $result['account_type_id'] = $this->urlable_id;
+        //     //platforms url for each url is stored in url_associated_urls table and loaded as associatedUrls relationship
+        //     $result['platform_urls'] = AssociatedUrlResource::collection($this->whenLoaded('associatedUrls'));
+        //     $result['account_type_name'] = $this->account_type_name ?? 'unknown';
+        //     $result['currency'] = $this->currency;
+        // }
 
         return $result;
     }

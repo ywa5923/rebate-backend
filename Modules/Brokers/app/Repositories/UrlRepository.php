@@ -2,11 +2,12 @@
 
 namespace Modules\Brokers\Repositories;
 
+use Illuminate\Support\Collection;
+use Modules\Brokers\Enums\UrlTypeEnum;
+use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Challenge;
 use Modules\Brokers\Models\Url;
-use Modules\Brokers\Models\AccountType;
-use Modules\Brokers\Enums\UrlTypeEnum;
-use Illuminate\Support\Collection;
+
 class UrlRepository
 {
     protected Url $model;
@@ -285,12 +286,26 @@ class UrlRepository
                 }
             })
             ->with([
-                'translations' => fn($t) => $t->where('language_code', $lang),
-                'associatedUrls' => fn($q) => $zone === null
+                'translations' => fn ($t) => $t->where('language_code', $lang),
+                'associatedUrls' => fn ($q) => $zone === null
                     ? $q->wherePivotNull('zone_id')
                     : $q->wherePivot('zone_id', $zone),
             ])
             ->orderBy('url_type', 'asc')
             ->get();
+    }
+
+    public function getMasterLinks(int $broker_id, string $lang, array $linkTypes, ?string $zone = null): Collection
+    {
+
+        return Url::query()
+            ->where('urlable_type', AccountType::class)
+            ->whereNull('urlable_id')
+            ->where('broker_id', $broker_id)
+            ->when($zone === null, fn ($q) => $q->whereNull('zone_id'), fn ($q) => $q->where('zone_id', $zone))
+            ->whereIn('url_type', $linkTypes)
+            ->with(['translations' => fn ($t) => $t->where('language_code', $lang)])
+            ->get();
+
     }
 }

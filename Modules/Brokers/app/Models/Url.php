@@ -45,7 +45,7 @@ class Url extends Model
      *
      * @var array
      */
-    protected $fillable = ['id', 'urlable_type', 'urlable_id', 'url_type', 'url', 'public_url', 'previous_url', 'name', 'public_name', 'previous_name', 'is_updated_entry', 'is_placeholder', 'name', 'slug', 'description', 'category_position', 'option_category_id', 'broker_id', 'zone_id', 'metadata','currency'];
+    protected $fillable = ['id', 'urlable_type', 'urlable_id', 'url_type', 'url', 'public_url', 'previous_url', 'name', 'public_name', 'previous_name', 'is_updated_entry', 'is_placeholder', 'name', 'slug', 'description', 'category_position', 'option_category_id', 'broker_id', 'zone_id', 'metadata'];
 
     public function zone(): BelongsTo
     {
@@ -91,5 +91,15 @@ class Url extends Model
             'is_updated_entry',
             'zone_id',
         ])->withTimestamps();
+    }
+
+    public function affliliateLinks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            AffliliateLink::class,
+            'affliliate_link_url',
+            'url_id',
+            'affliliate_link_id'
+        )->withTimestamps();
     }
 }

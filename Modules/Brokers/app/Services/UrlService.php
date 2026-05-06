@@ -4,28 +4,37 @@ namespace Modules\Brokers\Services;
 
 use App\Exceptions\ApiException;
 use App\Utilities\ModelHelper;
-use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Modules\Brokers\DTOs\IbAffiliateLinksDTO;
+use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
-use Modules\Brokers\Models\UrlAssociations;
-use Modules\Brokers\Repositories\AccountTypeRepository;
-use Modules\Brokers\Repositories\UrlRepository;
-use Modules\Brokers\Transformers\AccountTypeUrlsResource;
-use Modules\Brokers\Transformers\URLResource;
+use Modules\Brokers\Models\AffliliateLink;
 use Modules\Brokers\Models\Url;
+use Modules\Brokers\Repositories\AccountTypeRepository;
+use Modules\Brokers\Repositories\AffiliateLinkRepository;
+use Modules\Brokers\Repositories\UrlRepository;
+use Modules\Brokers\Transformers\AccountTypeUrlsCollection;
+use Modules\Brokers\Transformers\AffiliateLinkCollection;
 
 class UrlService
 {
-    protected $repository;
+    protected UrlRepository $repository;
 
-    protected $accountTypeRepository;
+    protected AccountTypeRepository $accountTypeRepository;
 
-    public function __construct(UrlRepository $repository, AccountTypeRepository $accountTypeRepository)
-    {
+    protected AffiliateLinkRepository $affiliateLinkRepository;
+
+    public function __construct(
+        UrlRepository $repository,
+        AccountTypeRepository $accountTypeRepository,
+        AffiliateLinkRepository $affiliateLinkRepository
+    ) {
         $this->repository = $repository;
         $this->accountTypeRepository = $accountTypeRepository;
+        $this->affiliateLinkRepository = $affiliateLinkRepository;
     }
 
     public function createMany($urlableTypeObject, string $entityType, array $urls, $isAdmin = false)
@@ -54,7 +63,7 @@ class UrlService
         return true;
     }
 
-    public function updateMany(string $entityType, array $urls, $broker_id, $isAdmin = false)
+    public function updateMany(string $entityType, array $urls, int $broker_id, bool $isAdmin = false)
     {
         $updated = [];
         $modelClass = ModelHelper::getModelClassFromSlug($entityType);
@@ -92,10 +101,10 @@ class UrlService
     {
         $urls = $this->repository->findByAccountType($accountType->id);
 
-        return $urls->groupBy('url_type')->map(fn($items) => $items->values());
+        return $urls->groupBy('url_type')->map(fn ($items) => $items->values());
     }
 
-    public function getUrlsByEntity($broker_id, $entity_type, $entity_id, $zone_code, $language_code)
+    public function getUrlsByEntity(int $broker_id, string $entity_type, int $entity_id, ?string $zone_code, ?string $language_code)
     {
 
         $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
@@ -104,15 +113,9 @@ class UrlService
 
         return $urls;
 
-        // $builder = Url::with('translations')->where('broker_id', $broker_id)
-        // ->where('urlable_type', $modelClass);
-        // if(is_numeric($entity_id)){
-        //     $builder->where('urlable_id', $entity_id);
-        // }
-        // $urls = $builder->get();
     }
 
-    public function validateData($broker_id, $entity_type, $entity_id, $request)
+    public function validateData(int $broker_id, string $entity_type, int $entity_id, Request $request)
     {
         $validated = $request->validate([
             'zone_code' => 'sometimes|string',
@@ -120,7 +123,7 @@ class UrlService
         ]);
 
         if (! is_numeric($entity_id) && $entity_id != 'all') {
-            throw new ApiException('Entity ID must be a number or "all"', 422);
+          //  throw new ApiException('Entity ID must be a number or "all"', 422);
         }
         if (! is_numeric($broker_id)) {
             throw new ApiException('Broker ID must be a number', 422);
@@ -131,163 +134,129 @@ class UrlService
         }
     }
 
-    public function createBrokerAffiliateLink(int $broker_id, array $data, bool $isAdmin, ?int $zone_id = null): Url
+    public function createAffiliateLink(StoreAffiliateLinkDTO $storeAffiliateLinkDto, int $broker_id, bool $isAdmin): AffliliateLink
     {
-
-        $isMasterLink = $data['is_master_link'] ?? false;
-        $urldata = [
+        $affiliateLinkRow = [
+            'affiliate_type' => $storeAffiliateLinkDto->urlType,
             'broker_id' => $broker_id,
-            'urlable_type' => AccountType::class,
-            'urlable_id' => $isMasterLink ? null : $data['account_type_id'],
-            'url_type' => $data['url_type'],
-            'slug' => Str::slug($data['name']),
-            'currency' => $data['currency'] ?? null,
-
+            'is_master_link' => $storeAffiliateLinkDto->isMasterLink,
+            'account_type_id' => $storeAffiliateLinkDto->accountTypeId,
+            'zone_id' => $storeAffiliateLinkDto->zoneId,
         ];
+
         if ($isAdmin) {
-            $urldata['public_url'] = trim($data['url']);
-            $urldata['public_name'] = trim($data['name']);
-            $urldata['url'] = trim($data['url']);
-            $urldata['name'] = trim($data['name']);
+            //if the admin create the link set also the broker values i.e: name, url, currency
+            $affiliateLinkRow['public_name'] = $storeAffiliateLinkDto->name;
+            $affiliateLinkRow['public_url'] = $storeAffiliateLinkDto->url;
+            $affiliateLinkRow['public_currency'] = $storeAffiliateLinkDto->currency;
+            $affiliateLinkRow['name'] = $storeAffiliateLinkDto->name;
+            $affiliateLinkRow['url'] = $storeAffiliateLinkDto->url;
+            $affiliateLinkRow['currency'] = $storeAffiliateLinkDto->currency;
         } else {
-            $urldata['url'] = trim($data['url']);
-            $urldata['name'] = trim($data['name']);
+            $affiliateLinkRow['name'] = $storeAffiliateLinkDto->name;
+            $affiliateLinkRow['url'] = $storeAffiliateLinkDto->url;
+            $affiliateLinkRow['currency'] = $storeAffiliateLinkDto->currency;
+            $affiliateLinkRow['is_updated_entry'] = true;
         }
 
-        if (!$isMasterLink) {
-            //the associatedUrls are inserted only for non master links
-            return DB::transaction(function () use ($urldata, $data, $isAdmin, $zone_id) {
-                $url = $this->repository->create($urldata);
+        return DB::transaction(function () use ($affiliateLinkRow, $storeAffiliateLinkDto) {
+            $affiliateLink = $this->affiliateLinkRepository->create($affiliateLinkRow);
 
-                $platformUrlsData = $data['platform_urls'] ?? [];
-                $syncAssociatedUrlsData = [];
+            if (! $storeAffiliateLinkDto->isMasterLink) {
+                // Non-master: attach platform URLs on the pivot table.
+                $platformUrlIds = collect($storeAffiliateLinkDto->platformUrls->items)->pluck('id')->all();
+                $affiliateLink->platformUrls()->sync($platformUrlIds);
+            }
 
-                foreach ($platformUrlsData as $platformUrl) {
-                    $pivotData = [
-                        'is_public' => $isAdmin,
-                        'is_updated_entry' => ! $isAdmin,
-                        'association_type' => 'platform_url',
-                    ];
-
-                    if ($zone_id) {
-                        $pivotData['zone_id'] = $zone_id;
-                    }
-
-                    $syncAssociatedUrlsData[$platformUrl['id']] = $pivotData;
-                }
-
-                $url->associatedUrls()->sync($syncAssociatedUrlsData);
-
-                return $url;
-            });
-        } else {
-            return $this->repository->create($urldata);
-        }
+            return $affiliateLink;
+        });
     }
 
-    public function updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin)
+    public function updateAffiliateLink(StoreAffiliateLinkDTO $updateAffiliateLinkDto, int $affiliateLinkId, int $broker_id, bool $isAdmin): AffliliateLink
     {
-        //first find the url by id and set previous url and name
-        $newUrlData = [];
-        $url = $this->repository->find($url_id);
-        if (! $url || $url->broker_id != $broker_id) {
-            throw new ApiException('URL not found', 404);
+        $oldAffiliateLink = $this->affiliateLinkRepository->find($affiliateLinkId);
+        if (! $oldAffiliateLink || $oldAffiliateLink->broker_id != $broker_id) {
+            throw new ApiException('Affiliate link not found', 404);
         }
-        $isMasterLink = $data['is_master_link'] ?? false;
-        $newUrlData['id'] = $url_id;
-        $newUrlData['broker_id'] = $broker_id;
-        $newUrlData['url_type'] = trim($data['url_type']);
-        $newUrlData['urlable_id'] = $isMasterLink ? null : $data['account_type_id'];
-        $newUrlData['urlable_type'] = AccountType::class;
-        $newUrlData['slug'] = Str::slug($data['name']);
-        //add previous values and is_updated_entry for brokers who are not admin
-        if (! $isAdmin) {
+        $affiliateLinkRow = [
+            'affiliate_type' => $updateAffiliateLinkDto->urlType,
+            'broker_id' => $broker_id,
+            'is_master_link' => $updateAffiliateLinkDto->isMasterLink,
+            'account_type_id' => $updateAffiliateLinkDto->accountTypeId,
+            'zone_id' => $updateAffiliateLinkDto->zoneId,
+        ];
 
-            $newUrlData['url'] = trim($data['url']);
-            $newUrlData['name'] = trim($data['name']);
+        if ($isAdmin) {
+            $affiliateLinkRow['public_name'] = $updateAffiliateLinkDto->name;
+            $affiliateLinkRow['public_url'] = $updateAffiliateLinkDto->url;
+            $affiliateLinkRow['public_currency'] = $updateAffiliateLinkDto->currency;
+            $affiliateLinkRow['is_updated_entry'] = false;
+            //override metadata updated values
+            $affiliateLinkRow['metadata'] = array_merge($oldAffiliateLink['metadata'] ?? [], [
+                'updated_fields' => [],
+            ]);
 
-            if ($url->url !== trim($data['url'])) {
-                $newUrlData['previous_url'] = $url->url;
-                $newUrlData['is_updated_entry'] = true;
-            }
-            if ($url->name !== trim($data['name'])) {
-                $newUrlData['previous_name'] = $url->name;
-                $newUrlData['is_updated_entry'] = true;
-            }
-            //detect if it is am updated entry
-
-            if ($url->url_type !== trim($data['url_type'])) {
-
-                $newUrlData['metadata'] = [
-                    'previous_url_type' => $url->url_type,
-                ];
-                $newUrlData['is_updated_entry'] = true;
-            }
-
-            if ($url->urlable_id !== $data['account_type_id']) {
-
-                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
-                    'previous_account_type_id' => $url->urlable_id,
-
-                ]);
-                $newUrlData['is_updated_entry'] = true;
-            }
-            if ($data['is_master_link']) {
-                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
-                    'previous_account_type_id' => $url->urlable_id,
-                ]);
-            }
         } else {
-            $newUrlData['is_updated_entry'] = false;
-            $newUrlData['public_url'] = trim($data['url']);
-            $newUrlData['public_name'] = trim($data['name']);
-        }
+            $updatedFields = [];
 
+            //check if is master check was changed
+            if ((bool)$updateAffiliateLinkDto->isMasterLink !== (bool)$oldAffiliateLink->is_master_link) {
+                $affiliateLinkRow['is_updated_entry'] = true;
+                $updatedFields[] = 'is_master_link';
+            }
 
+            $affiliateLinkRow['name'] = $updateAffiliateLinkDto->name;
+            if (trim($oldAffiliateLink->name) !== trim($updateAffiliateLinkDto->name)) {
+                $affiliateLinkRow['previous_name'] = $oldAffiliateLink->name;
+                $affiliateLinkRow['is_updated_entry'] = true;
+                $updatedFields[] = 'name';
+            }
+            $affiliateLinkRow['url'] = $updateAffiliateLinkDto->url;
+            if (trim($oldAffiliateLink->url) !== trim($updateAffiliateLinkDto->url)) {
+                $affiliateLinkRow['previous_url'] = $oldAffiliateLink->url;
+                $affiliateLinkRow['is_updated_entry'] = true;
+                $updatedFields[] = 'url';
+            }
+            $affiliateLinkRow['currency'] = $updateAffiliateLinkDto->currency;
+            if (trim($oldAffiliateLink->currency) !== trim($updateAffiliateLinkDto->currency)) {
+                $affiliateLinkRow['previous_currency'] = $oldAffiliateLink->currency;
+                $affiliateLinkRow['is_updated_entry'] = true;
+                $updatedFields[] = 'currency';
+            }
 
-        $newPlatforms = collect($data['platform_urls'] ?? [])->pluck('id')->toArray();
-        $oldPlatforms = $url->associatedUrls()->pluck('urls.id')->toArray();
-
-        $platformUrlsDifference = $this->checkPlatformUrlsDifference($newPlatforms, $oldPlatforms);
-
-        
-
-            //if there is a difference in platform urls, we need to update the pivot table with the new platform urls and set the is_updated_entry to true for non admin users
-            //first add previous platform urls to metadata if it is not already there
-            if (! $isAdmin && $platformUrlsDifference) {
-
-                $newUrlData['metadata'] = array_merge($newUrlData['metadata'] ?? [], [
-                    'previous_platform_urls' => $url->associatedUrls()->pluck('urls.name')->toArray(),
+            $oldPlatforms = $oldAffiliateLink->platformUrls()->pluck('id')->toArray();
+            $newPlatforms = collect($updateAffiliateLinkDto->platformUrls->items)->pluck('id')->toArray();
+            $platformUrlsDifference = $this->checkPlatformUrlsDifference($newPlatforms, $oldPlatforms);
+            $previousValues = [];
+            if ($platformUrlsDifference) {
+                $previousValues['previous_platform_urls'] = $oldAffiliateLink->platformUrls()->pluck('name')->toArray();
+                $updatedFields[] = 'platform_urls';
+                $affiliateLinkRow['is_updated_entry'] = true;
+            }
+            if ($updateAffiliateLinkDto->accountTypeId !== $oldAffiliateLink->account_type_id) {
+                $updatedFields[] = 'account_type_id';
+                $previousValues['previous_account_type_name'] = $oldAffiliateLink->accountType?->optionValues?->first()?->value ?? 'unknown';
+                $previousValues['previous_account_type_id'] = $oldAffiliateLink->account_type_id;
+                $affiliateLinkRow['is_updated_entry'] = true;
+            }
+            if (! empty($updatedFields)) {
+                $affiliateLinkRow['metadata'] = array_merge($affiliateLinkRow['metadata'] ?? [], [
+                    'updated_fields' => $updatedFields,
+                    'previous_relations_values' => $previousValues,
                 ]);
             }
-            $syncAssociatedUrlsData = [];
+        }
 
-            foreach ($newPlatforms as $platformUrl) {
-                $pivotData = [
-                    'is_public' => $isAdmin,
-                    'is_updated_entry' => !$isAdmin && $platformUrlsDifference ? true : false,
-                    'association_type' => 'platform_url',
-                ];
+        $affiliateLink = $this->affiliateLinkRepository->update($oldAffiliateLink, $affiliateLinkRow);
 
-                
-                $syncAssociatedUrlsData[$platformUrl] = $pivotData;
-                
-            }
+        $platformUrlIds = collect($updateAffiliateLinkDto->platformUrls->items)->pluck('id')->all();
+        $affiliateLink->platformUrls()->sync($platformUrlIds);
 
-            $url->associatedUrls()->sync($syncAssociatedUrlsData);
-
-            $this->repository->update($url, $newUrlData);
-
-        
-
-       
+        return $affiliateLink;
     }
 
-
-
-    public function checkPlatformUrlsDifference($newPlatforms, $oldPlatforms)
+    public function checkPlatformUrlsDifference(array $newPlatforms, array $oldPlatforms): ?array
     {
-
 
         $added = array_diff($newPlatforms, $oldPlatforms);
         $removed = array_diff($oldPlatforms, $newPlatforms);
@@ -295,78 +264,58 @@ class UrlService
         if (empty($added) && empty($removed)) {
             return null; // No changes
         }
-        if (!empty($added) && empty($removed)) {
+        if (! empty($added) && empty($removed)) {
             return ['added' => $added];
         }
-        if (empty($added) && !empty($removed)) {
+        if (empty($added) && ! empty($removed)) {
             return ['removed' => $removed];
         }
+
+        return null;
     }
 
-    public function deleteBrokerAffiliateLink($broker_id, $url_id)
+   
+
+    public function deleteAffiliateLink(int $brokerId, int $affiliateLinkId): bool
     {
-        $url = $this->repository->find($url_id);
-        if (! $url || $url->broker_id != $broker_id) {
-            throw new ApiException('URL not found', 404);
+        $affiliateLink = $this->affiliateLinkRepository->find($affiliateLinkId);
+
+        if (! $affiliateLink || $affiliateLink->broker_id !== $brokerId) {
+            throw new ApiException('Affiliate link not found', 404);
         }
 
-        DB::transaction(function () use ($url) {
-            $url->associatedUrls()->detach();
+        return DB::transaction(function () use ($affiliateLink) {
+            return $this->affiliateLinkRepository->delete($affiliateLink);
+        });
+    }
 
-            UrlAssociations::query()
-                ->where('associated_url_id', $url->id)
-                ->delete();
+    public function getAccountTypesWithPlatformLinks(int $broker_id, string $lang, ?string $zone = null): AccountTypeUrlsCollection
+    {
+        $accountTypes = $this->accountTypeRepository->getAccountTypesWithPlatformLinks($broker_id, $lang, $zone);
+        $masterLinks = $this->repository->getMasterLinks($broker_id, $lang, [UrlTypeEnum::WEBPLATFORM->value], $zone);
 
-            $url->delete();
+        //attach master links to each account type platform urls
+        $accountTypes->each(function ($accountType) use ($masterLinks) {
+            $mergedUrls = $accountType->urls
+                ->concat($masterLinks)
+                ->unique('id')
+                ->values();
+            $accountType->setRelation('urls', $mergedUrls);
         });
 
-        return true;
+        return new AccountTypeUrlsCollection($accountTypes);
     }
 
-    public function getBrokerAffiliateLinks($broker_id, string $lang, ?string $zone = null): array
+    public function getAffiliateLinks(int $broker_id, string $lang, ?string $zone = null): IbAffiliateLinksDTO
     {
+        $affiliateLinks = $this->affiliateLinkRepository->getBrokerAffiliateLinks($broker_id, $lang, $zone);
+        $ibAffiliateUrls = $affiliateLinks->where('affiliate_type', UrlTypeEnum::IB_AFFILIATE_LINK->value);
+        $subIbAffiliateUrls = $affiliateLinks->where('affiliate_type', UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value);
 
-        $accountTypes = $this->accountTypeRepository->getAccountTypesWithIBLinks($broker_id, $lang, $zone);
+        return new IbAffiliateLinksDTO(
+            ibAffiliateUrls: new AffiliateLinkCollection($ibAffiliateUrls->values()),
+            subIbAffiliateUrls: new AffiliateLinkCollection($subIbAffiliateUrls->values()),
+        );
 
-        $ibAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::IB_AFFILIATE_LINK);
-        $subIbAffiliateUrls = $this->extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum::SUB_IB_AFFILIATE_LINK);
-
-        $masterLinks=$this->repository->getMasterAccountTypeLinks($broker_id, $lang, $zone);
-
-        $ibAffiliateUrls = $ibAffiliateUrls->merge($masterLinks->where('url_type', UrlTypeEnum::IB_AFFILIATE_LINK->value));
-       $subIbAffiliateUrls = $subIbAffiliateUrls->merge($masterLinks->where('url_type', UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value));
-        return [
-            'account_types' => AccountTypeUrlsResource::collection($accountTypes),
-            'ib_affiliate_urls' => URLResource::collection($ibAffiliateUrls),
-            'sub_ib_affiliate_urls' => URLResource::collection($subIbAffiliateUrls),
-        ];
-    }
-
-    public function getUrlsByType($urls, UrlTypeEnum $urlType): Collection
-    {
-        return $urls->where('url_type', $urlType->value)->values();
-    }
-
-    public function extractUrlsFromAccountTypes($accountTypes, UrlTypeEnum $urlType): Collection
-    {
-        return $accountTypes->flatMap(function ($accountType) use ($urlType) {
-
-            //check for account type name in first translations then in option values
-            //we know from the AccountTypeRepository::getAccountTypesWithIBLinks that
-            // only the option value containing the account type is selected
-
-            $accountTypeName = $accountType->optionValues->first()?->translations?->first()?->value
-                ?? $accountType->optionValues->first()?->value
-                ?? 'unknown';
-
-            //first get the account type name translated first,if not found, use the default value
-            return $accountType->urls->whereIn('url_type', [
-                $urlType->value,
-            ])->values()->map(function ($url) use ($accountTypeName) {
-                $url->account_type_name = $accountTypeName;
-
-                return $url;
-            });
-        });
     }
 }
