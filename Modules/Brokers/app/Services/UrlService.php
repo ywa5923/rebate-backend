@@ -152,6 +152,7 @@ class UrlService
             $affiliateLinkRow['name'] = $storeAffiliateLinkDto->name;
             $affiliateLinkRow['url'] = $storeAffiliateLinkDto->url;
             $affiliateLinkRow['currency'] = $storeAffiliateLinkDto->currency;
+            $affiliateLinkRow['is_updated_entry'] = false;
         } else {
             $affiliateLinkRow['name'] = $storeAffiliateLinkDto->name;
             $affiliateLinkRow['url'] = $storeAffiliateLinkDto->url;

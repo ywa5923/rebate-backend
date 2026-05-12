@@ -30,7 +30,7 @@ class StoreAffiliateLinkRequest extends FormRequest
             'platform_urls' => 'sometimes|array',
             'platform_urls.*.name' => 'required_with:platform_urls|string|max:500',
             'platform_urls.*.id' => 'required_with:platform_urls|integer|exists:urls,id',
-            'currency' => 'sometimes|nullable|string|max:10',
+            'currency' => 'sometimes|nullable|string|max:20',
         ];
     }
 }

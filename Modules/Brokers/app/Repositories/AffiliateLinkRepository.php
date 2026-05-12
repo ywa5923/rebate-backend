@@ -48,8 +48,8 @@ class AffiliateLinkRepository
                 ]),
                 'accountType' => fn ($query) => $query->with(['optionValues' => fn ($optionValueQuery) => $optionValueQuery->where('option_slug', 'account_type_name')]),
             ])
-            ->orderBy('affiliate_type')
-            ->orderBy('name')
+            //->orderBy('affiliate_type')
+            ->orderBy('id', 'desc')
             ->get();
     }
 
