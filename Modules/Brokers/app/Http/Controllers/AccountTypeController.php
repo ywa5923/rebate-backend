@@ -3,26 +3,25 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Brokers\Services\AccountTypeService;
-use Modules\Brokers\Transformers\AccountTypeResource;
+use Modules\Brokers\DTOs\AccountTypeFilters;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Url;
-use Modules\Brokers\Transformers\URLResource;
+use Modules\Brokers\Services\AccountTypeService;
 use Modules\Brokers\Services\UrlService;
-
-use Modules\Brokers\DTOs\AccountTypeFilters;
+use Modules\Brokers\Transformers\AccountTypeResource;
+use Modules\Brokers\Transformers\URLResource;
 
 class AccountTypeController extends Controller
 {
     protected AccountTypeService $accountTypeService;
-  
+
     public function __construct(AccountTypeService $accountTypeService)
     {
         $this->accountTypeService = $accountTypeService;
-      
+
     }
 
     /**
@@ -30,64 +29,82 @@ class AccountTypeController extends Controller
      *     path="/api/v1/account-types",
      *     tags={"AccountType"},
      *     summary="Get all account types",
+     *
      *     @OA\Parameter(
      *         name="broker_id",
      *         in="query",
      *         description="Filter by broker ID",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="zone_id",
      *         in="query",
      *         description="Filter by zone ID",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="broker_type",
      *         in="query",
      *         description="Filter by broker type",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"broker", "crypto", "prop_firm"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort_by",
      *         in="query",
      *         description="Sort field",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort_direction",
      *         in="query",
      *         description="Sort direction",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"asc", "desc"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Items per page",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="language_code",
      *         in="query",
      *         description="Language code for translations",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/AcountType")),
      *             @OA\Property(property="pagination", type="object", @OA\Property(property="current_page", type="integer"), @OA\Property(property="last_page", type="integer"), @OA\Property(property="per_page", type="integer"), @OA\Property(property="total", type="integer"))
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Server error"
@@ -98,7 +115,7 @@ class AccountTypeController extends Controller
     {
         try {
             //get ac types by query params: broker_id, zone_id, broker_type, sort_by, sort_direction, per_page,language_code
-           
+
             $validatedFilters = $request->validate([
                 'zone_code' => 'sometimes|string|exists:zones,code',
                 'sort_by' => 'sometimes|string|in:name,is_active,order,created_at,updated_at',
@@ -113,38 +130,43 @@ class AccountTypeController extends Controller
 
             // Transform the data collection
             $result['data'] = AccountTypeResource::collection($result['data']);
+
             return $result;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve account types',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-
-
 
     /**
      * @OA\Get(
      *     path="/api/v1/account-types/{id}/urls",
      *     tags={"AccountType"},
      *     summary="Get all URLs for an account type, grouped by url_type",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Account type ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="object", additionalProperties={"type": "array", "items": {"type": "object"}})
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="Account type not found")
      * )
      */
@@ -152,10 +174,10 @@ class AccountTypeController extends Controller
     {
 
         $accountType = AccountType::find($id);
-        if (!$accountType) {
+        if (! $accountType) {
             return response()->json([
                 'success' => false,
-                'message' => 'Account type not found'
+                'message' => 'Account type not found',
             ], 404);
         }
 
@@ -172,28 +194,31 @@ class AccountTypeController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $grouped
+            'data' => $grouped,
         ]);
     }
-
-
 
     /**
      * @OA\Post(
      *     path="/api/v1/account-types/{id}/urls",
      *     tags={"AccountType"},
      *     summary="Create one or many URLs for an account type",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Account type ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             oneOf={
+     *
      *                 @OA\Schema(
      *                     type="object",
      *                     example={
@@ -217,6 +242,7 @@ class AccountTypeController extends Controller
      *             }
      *         )
      *     ),
+     *
      *     @OA\Response(response=201, description="URLs created"),
      *     @OA\Response(response=404, description="Account type not found")
      * )
@@ -253,39 +279,35 @@ class AccountTypeController extends Controller
     //     "slug": "mobile",
     //     "broker_id":1
     //   }
-    public function createUrls(Request $request, $id=null)
+    public function createUrls(Request $request, $id = null)
     {
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
-        $isAdmin=app('isAdmin');
+        $isAdmin = app('isAdmin');
         $id = ($id === 'null' || $id === '') ? null : $id;
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required');
         }
 
-
-        //if urlable_id is  null which is the id for AccountType, it means that is a master url that has urlable_id null 
+        //if urlable_id is  null which is the id for AccountType, it means that is a master url that has urlable_id null
         //it is avaialble for all broker account types
         if ($id) {
             //if account type id is not null, it means that is a broker account type
             $accountType = AccountType::find($id);
 
-            if (!$accountType) {
+            if (! $accountType) {
                 return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
             }
         } else {
             $accountType = null;
         }
 
-
         $data = $request->all();
 
         $urls = $this->flattenUrlInput($data);
 
-
-        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls,$isAdmin);
-
+        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls, $isAdmin);
 
         // Optionally, fetch the created URLs for response
         if ($accountType) {
@@ -294,11 +316,10 @@ class AccountTypeController extends Controller
             $fetched = Url::where('urlable_type', AccountType::class)->where('broker_id', $broker_id)->latest('id')->take(count($urls))->get();
         }
 
-
         return response()->json([
             'success' => true,
             // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
-            'data' => $fetched
+            'data' => $fetched,
         ], 201);
     }
 
@@ -307,17 +328,22 @@ class AccountTypeController extends Controller
      *     path="/api/v1/account-types/{id}/urls",
      *     tags={"AccountType"},
      *     summary="Update one or many URLs for an account type",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Account type ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             oneOf={
+     *
      *                 @OA\Schema(
      *                     type="object",
      *                     example={
@@ -339,6 +365,7 @@ class AccountTypeController extends Controller
      *             }
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="URLs updated"),
      *     @OA\Response(response=404, description="Account type not found")
      * )
@@ -361,7 +388,7 @@ class AccountTypeController extends Controller
     //       }
     //     ]
     //   }
-    public function updateUrls(Request $request, $id=null)
+    public function updateUrls(Request $request, $id = null)
     {
         // Convert string "null" to actual null
         $id = ($id === 'null' || $id === '') ? null : $id;
@@ -369,18 +396,18 @@ class AccountTypeController extends Controller
         // TO DO verify that the logged in broker id is the same as the broker_id in the request
         //or is admin
         $broker_id = $request->broker_id;
-        
-            $isAdmin=app('isAdmin');
+
+        $isAdmin = app('isAdmin');
         if ($broker_id == null) {
             throw new \Exception('Broker ID is required as a search parameter');
         }
 
-       // dd($id);
+        // dd($id);
         if ($id) {
             //if account type id is not null, it means that is a broker account type
             $accountType = AccountType::find($id);
 
-            if (!$accountType) {
+            if (! $accountType) {
                 return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
             }
         } else {
@@ -390,13 +417,11 @@ class AccountTypeController extends Controller
         $data = $request->all();
         $urls = $this->flattenUrlInput($data);
 
-        
-
-        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id,$isAdmin);
+        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id, $isAdmin);
 
         return response()->json([
             'success' => true,
-            'data' => URLResource::collection(collect($updated))
+            'data' => URLResource::collection(collect($updated)),
         ]);
     }
 
@@ -430,7 +455,7 @@ class AccountTypeController extends Controller
      *      ...
      *    ]
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     private function flattenUrlInput($data)
@@ -449,32 +474,35 @@ class AccountTypeController extends Controller
             }
         }
 
-
         return $urls;
     }
-
-
 
     /**
      * @OA\Delete(
      *     path="/api/v1/account-types/{id}",
      *     tags={"AccountType"},
      *     summary="Delete account type",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="Account type ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Account type deleted successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Account type deleted successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Account type not found"
@@ -491,10 +519,10 @@ class AccountTypeController extends Controller
         // TODO: Check if account type broker id is the same as the logged in broker id or is admin
         $brokerId = $request->input('broker_id');
 
-        if (!$brokerId) {
+        if (! $brokerId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Broker ID is required as a search parameter'
+                'message' => 'Broker ID is required as a search parameter',
             ], 400);
         }
 
@@ -507,13 +535,13 @@ class AccountTypeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Account type deleted successfully'
+                'message' => 'Account type deleted successfully',
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete account type',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -523,28 +551,36 @@ class AccountTypeController extends Controller
      *     path="/api/v1/account-types/{accountTypeId}/urls/{urlId}",
      *     tags={"AccountType"},
      *     summary="Delete a single URL for an account type",
+     *
      *     @OA\Parameter(
      *         name="accountTypeId",
      *         in="path",
      *         description="Account type ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="urlId",
      *         in="path",
      *         description="URL ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="URL deleted successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="URL deleted successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="URL or Account type not found")
      * )
      */
@@ -567,13 +603,13 @@ class AccountTypeController extends Controller
 
         $accountType = AccountType::find($accountTypeId);
 
-        if (!$accountType) {
+        if (! $accountType) {
             return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
         }
 
         $allUrls = $accountType->getAllAccountTypeUrls();
         $url = $allUrls->firstWhere('id', $urlId);
-        if (!$url) {
+        if (! $url) {
             return response()->json(['success' => false, 'message' => 'URL not found'], 404);
         }
 
@@ -582,13 +618,13 @@ class AccountTypeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'URL deleted successfully'
+                'message' => 'URL deleted successfully',
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete URL',
-                'error' => $e->getMessage()  // Add this for debugging
+                'error' => $e->getMessage(),  // Add this for debugging
             ], 500);
         }
     }

@@ -6,12 +6,14 @@ use App\Exceptions\ApiException;
 use App\Utilities\ModelHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Modules\Brokers\DTOs\AccountTypeUrlDTO;
 use Modules\Brokers\DTOs\GroupedUrlsDTO;
 use Modules\Brokers\DTOs\IbAffiliateLinksDTO;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\AffliliateLink;
+use Modules\Brokers\Models\Url;
 use Modules\Brokers\Repositories\AccountTypeRepository;
 use Modules\Brokers\Repositories\AffiliateLinkRepository;
 use Modules\Brokers\Repositories\UrlRepository;
@@ -37,6 +39,7 @@ class UrlService
         $this->affiliateLinkRepository = $affiliateLinkRepository;
     }
 
+    //to be deleted
     public function createMany($urlableTypeObject, string $entityType, array $urls, $isAdmin = false)
     {
 
@@ -63,6 +66,7 @@ class UrlService
         return true;
     }
 
+    //to be deleted
     public function updateMany(string $entityType, array $urls, int $broker_id, bool $isAdmin = false)
     {
         $updated = [];
@@ -128,6 +132,86 @@ class UrlService
             linksGroupedByEntityId: $grouped,
             masterLinksGroupedByType: $masterLinks,
         );
+    }
+
+    /**
+     * Create a single URL row for an account type.
+     */
+    public function createAccountTypeUrl(AccountTypeUrlDTO $dto, int $broker_id, bool $isAdmin): Url
+    {
+        $url = [
+            'url_type' => $dto->url_type,
+            'urlable_type' => AccountType::class,
+            'urlable_id' => $dto->account_type_id ?? null,
+            'url' => $dto->url,
+            'name' => $dto->name,
+            'slug' => Str::slug($dto->name),
+            'broker_id' => $broker_id,
+            'zone_id' => $dto->zone_id ?? null,
+            'is_updated_entry' => $isAdmin ? false : true,
+        ];
+
+        if ($isAdmin) {
+            $url['public_url'] = $dto->url;
+            $url['public_name'] = $dto->name;
+        }
+
+        return $this->repository->create($url);
+
+    }
+
+    public function updateAccountTypeUrl(AccountTypeUrlDTO $dto, int $url_id, bool $isAdmin): Url
+    {
+        $oldUrl = $this->repository->find($url_id);
+        $updatedFields = [];
+        $previousValues = [];
+        $url = [
+            'url_type' => $dto->url_type,
+            'urlable_type' => AccountType::class,
+            'urlable_id' => $dto->account_type_id ?? null,
+            'slug' => Str::slug($dto->name),
+            'broker_id' => $dto->broker_id,
+            'zone_id' => $dto->zone_id ?? null
+        ];
+        if ($isAdmin) {
+            $url['public_url'] = $dto->url;
+            $url['public_name'] = $dto->name;
+            $url['is_updated_entry'] = false;
+            $url['metadata'] = array_merge($oldUrl['metadata'] ?? [], [
+                'updated_fields' => [],
+            ]);
+        }else{
+            $url['name'] = $dto->name;
+            $url['url'] = $dto->url;
+         
+
+            if (trim($oldUrl->name) !== trim($dto->name)) {
+                $url['previous_name'] = $oldUrl->name;
+                $url['is_updated_entry'] = true;
+                $updatedFields[] = 'name';
+            }
+            if (trim($oldUrl->url) !== trim($dto->url)) {
+                $url['previous_url'] = $oldUrl->url;
+                $url['is_updated_entry'] = true;
+                $updatedFields[] = 'url';
+            }
+            if(trim($oldUrl->urlable_id) !== trim($dto->account_type_id)) {
+                $previousValues['previous_account_type_id'] = $oldUrl->urlable_id;
+                $url['is_updated_entry'] = true;
+                $updatedFields[] = 'urlable_id';
+            }
+            if (! empty($updatedFields)) {
+                $url['metadata'] = array_merge($oldUrl['metadata'] ?? [], [
+                    'updated_fields' => $updatedFields,
+                    'previous_relations_values' => $previousValues,
+                ]);
+            }
+        }
+
+        return $this->repository->update($oldUrl, $url);
+
+        //$url->update($dto->toArray());
+        return $url;
     }
 
     public function createAffiliateLink(StoreAffiliateLinkDTO $storeAffiliateLinkDto, int $broker_id, bool $isAdmin): AffliliateLink

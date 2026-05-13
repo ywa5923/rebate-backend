@@ -2,7 +2,7 @@
 
 namespace Modules\Brokers\Repositories;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Challenge;
@@ -22,7 +22,7 @@ class UrlRepository
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $data)
+    public function create(array $data): Url
     {
         return $this->model->create($data);
     }
@@ -33,7 +33,7 @@ class UrlRepository
      * @param array $data
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function update(Url $url, array $data)
+    public function update(Url $url, array $data): Url
     {
         $url->update($data);
 
@@ -46,7 +46,7 @@ class UrlRepository
      * @param  int  $id
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function find($id)
+    public function find($id): ?Url
     {
         return $this->model->find($id);
     }
@@ -55,9 +55,8 @@ class UrlRepository
      * Find urls by account type
      *
      * @param  int  $accountTypeId
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function findByAccountType($accountTypeId)
+    public function findByAccountType($accountTypeId): Collection
     {
         return $this->model->where('urlable_type', 'Modules\\Brokers\\Models\\AccountType')
             ->where('urlable_id', $accountTypeId)
@@ -67,32 +66,23 @@ class UrlRepository
 
     /**
      * Bulk create urls
-     *
-     * @return bool
      */
-    public function bulkCreate(array $data)
+    public function bulkCreate(array $data): bool
     {
         return $this->model->insert($data);
     }
 
     /**
      * Get urls by entity
-     *
-     * @param  int  $broker_id
-     * @param  string  $entity_type
-     * @param  int  $entity_id
-     * @param  string  $zone_code
-     * @param  string  $language_code
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getUrlsByEntity(
-        int $broker_id, 
-        string $entity_type, 
-        ?int $entity_id, 
-        ?string $zone_code = null, 
-        ?string $language_code = null): Collection{
-    
-        
+        int $broker_id,
+        string $entity_type,
+        ?int $entity_id,
+        ?string $zone_code = null,
+        ?string $language_code = null): Collection
+    {
+
         $builder = $this->model->newQuery()
             ->where('broker_id', $broker_id)
             ->where('urlable_type', $entity_type);
@@ -125,16 +115,15 @@ class UrlRepository
      *
      * @param  string  $urlType
      * @param  int  $brokerId
-     * @return bool
      */
-    public function deleteByUrlType($urlType, $brokerId)
+    public function deleteByUrlType($urlType, $brokerId): bool
     {
         return $this->model->newQuery()->where('url_type', $urlType)
             ->where('broker_id', $brokerId)
             ->delete();
     }
 
-    public function deleteByUrlableType($urlableType, $brokerId)
+    public function deleteByUrlableType($urlableType, $brokerId): bool
     {
         return $this->model->newQuery()->where('urlable_type', $urlableType)
             ->where('broker_id', $brokerId)
@@ -205,6 +194,7 @@ class UrlRepository
 
     /**
      * Upsert affiliate link (update or insert)
+     * used in ChallengeService
      */
     public function upsertAffiliateLink(
         ?int $challengeId,
@@ -267,38 +257,33 @@ class UrlRepository
         }
     }
 
-    // public function addAssociatedUrls(Url $url, array $associatedUrls): void
+    // public function getMasterAccountTypeLinks(int $broker_id, string $lang, ?string $zone = null): Collection
     // {
-    //     $url->associatedUrls()->sync($associatedUrls);
+    //     return Url::query()
+    //         ->where('broker_id', $broker_id)
+    //         ->where('urlable_type', AccountType::class)
+    //         ->whereNull('urlable_id')
+    //         ->whereIn('url_type', [
+    //             UrlTypeEnum::IB_AFFILIATE_LINK->value,
+    //             UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
+    //             UrlTypeEnum::WEBPLATFORM->value,
+    //         ])
+    //         ->where(function ($q) use ($zone) {
+    //             if ($zone === null) {
+    //                 $q->whereNull('zone_id');
+    //             } else {
+    //                 $q->where('zone_id', $zone);
+    //             }
+    //         })
+    //         ->with([
+    //             'translations' => fn ($t) => $t->where('language_code', $lang),
+    //             'associatedUrls' => fn ($q) => $zone === null
+    //                 ? $q->wherePivotNull('zone_id')
+    //                 : $q->wherePivot('zone_id', $zone),
+    //         ])
+    //         ->orderBy('url_type', 'asc')
+    //         ->get();
     // }
-
-    public function getMasterAccountTypeLinks(int $broker_id, string $lang, ?string $zone = null): Collection
-    {
-        return Url::query()
-            ->where('broker_id', $broker_id)
-            ->where('urlable_type', AccountType::class)
-            ->whereNull('urlable_id')
-            ->whereIn('url_type', [
-                UrlTypeEnum::IB_AFFILIATE_LINK->value,
-                UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
-                UrlTypeEnum::WEBPLATFORM->value,
-            ])
-            ->where(function ($q) use ($zone) {
-                if ($zone === null) {
-                    $q->whereNull('zone_id');
-                } else {
-                    $q->where('zone_id', $zone);
-                }
-            })
-            ->with([
-                'translations' => fn ($t) => $t->where('language_code', $lang),
-                'associatedUrls' => fn ($q) => $zone === null
-                    ? $q->wherePivotNull('zone_id')
-                    : $q->wherePivot('zone_id', $zone),
-            ])
-            ->orderBy('url_type', 'asc')
-            ->get();
-    }
 
     public function getMasterLinks(int $broker_id, string $lang, array $linkTypes, ?string $zone = null): Collection
     {

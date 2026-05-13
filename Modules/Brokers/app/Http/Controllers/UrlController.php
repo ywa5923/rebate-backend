@@ -4,10 +4,12 @@ namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Brokers\DTOs\AccountTypeUrlDTO;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Http\Requests\GetGroupedUrlsRequest;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
+use Modules\Brokers\Http\Requests\StoreAccountTypeUrlRequest;
 use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
 use Modules\Brokers\Services\DropdownListService;
 use Modules\Brokers\Services\UrlService;
@@ -28,14 +30,13 @@ class UrlController extends Controller
         //go get urls for all account types $entity_id is "all"
         //ex for all http://localhost:8080/api/v1/urls/2/account-type/all?zone_code=eu&language_code=en
 
-
-        $entityId=$request->validated('entity_id');
-
+        $entityId = $request->validated('entity_id');
+        //for master links, entity_id is 'all' so it is converted to null
         $groupedUrlsDTO = $this->urlService->getGroupedUrlsByEntity(
             $request->validated('broker_id'),
             $request->validated('entity_type'),
-            $entityId ==='all' ? null : (int) $entityId, 
-            $request->validated('zone_code'), 
+            $entityId === 'all' ? null : (int) $entityId,
+            $request->validated('zone_code'),
             $request->validated('language_code')
         );
 
@@ -50,9 +51,10 @@ class UrlController extends Controller
         ]);
     }
 
-   
-
-    public function createBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id)
+    /**
+     * Create a broker affiliate link
+     */
+    public function createBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id): JsonResponse
     {
 
         $data = $request->validated();
@@ -60,8 +62,6 @@ class UrlController extends Controller
         //$isAdmin = app('isAdmin');
 
         $isAdmin = true;
-        $zone_id = $request->validated('zone_id');
-
         $url = $this->urlService->createAffiliateLink($storeAffiliateLinkDto, $broker_id, $isAdmin);
 
         return response()->json([
@@ -76,7 +76,7 @@ class UrlController extends Controller
         $isAdmin = true;
         $data = $request->validated();
         $updateAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
-       
+
         $url = $this->urlService->updateAffiliateLink($updateAffiliateLinkDto, $url_id, $broker_id, $isAdmin);
 
         return response()->json([
@@ -123,6 +123,7 @@ class UrlController extends Controller
         $accountTypes = $this->urlService->getAccountTypesWithPlatformLinks($broker_id, $lang, $zone);
 
         $currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
+        //affiliate links are stored in affiliate_links table
         $affliateLinksDTO = $this->urlService->getAffiliateLinks($broker_id, $lang, $zone);
 
         return response()->json([
@@ -136,5 +137,33 @@ class UrlController extends Controller
         ], JsonResponse::HTTP_OK);
     }
 
-    
+    /**
+     * Create a account type url
+     */
+    public function createAccountTypeUrl(StoreAccountTypeUrlRequest $request, int $broker_id): JsonResponse
+    {
+        //$isAdmin = app('isAdmin');
+        $isAdmin = true;
+        $data = $request->validated();
+        $createAccountTypeUrlsDto = AccountTypeUrlDTO::fromValidated($data);
+        $urls = $this->urlService->createAccountTypeUrl($createAccountTypeUrlsDto, $broker_id, $isAdmin);
+
+        return response()->json([
+            'success' => true,
+            'data' => $urls,
+        ]);
+    }
+
+    public function updateAccountTypeUrls(StoreAccountTypeUrlRequest $request, int $broker_id, int $url_id)
+    {
+        //$isAdmin = app('isAdmin');
+        $isAdmin = true;
+        $data = $request->validated();
+        $updateAccountTypeUrlsDto = AccountTypeUrlDTO::fromValidated($data);
+        $url = $this->urlService->updateAccountTypeUrl($updateAccountTypeUrlsDto, $url_id, $isAdmin);
+        return response()->json([
+            'success' => true,
+            'data' => $url,
+        ]);
+    }
 }

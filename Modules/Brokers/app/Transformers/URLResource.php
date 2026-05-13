@@ -40,8 +40,8 @@ class URLResource extends JsonResource
             'category_position' => $this->category_position,
 
             // Polymorphic Relationship
-            //"urlable_type" => $this->urlable_type,
-            //"urlable_id" => $this->urlable_id,
+            'urlable_type' => $this->urlable_type,
+            'urlable_id' => $this->urlable_id,
 
             'is_master_link' => $this->urlable_id === null,
 

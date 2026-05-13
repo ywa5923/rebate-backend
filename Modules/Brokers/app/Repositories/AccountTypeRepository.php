@@ -210,7 +210,7 @@ class AccountTypeRepository
     /**
      * Get brokers for form dropdown
      */
-    public function getBrokersForForm(): Collection
+    public function getBrokersForForm()
     {
         return DB::table('brokers')->select('id', 'registration_language as name')->get();
     }
@@ -218,7 +218,7 @@ class AccountTypeRepository
     /**
      * Get zones for form dropdown
      */
-    public function getZonesForForm(): Collection
+    public function getZonesForForm()
     {
         return DB::table('zones')->select('id', 'name')->get();
     }
@@ -357,5 +357,15 @@ class AccountTypeRepository
                 'asc'
             )
             ->get();
+    }
+
+    public function find(int $id): ?AccountType
+    {
+        return $this->model->find($id);
+    }
+
+    public function findByIdAndBrokerId(int $id, int $broker_id): ?AccountType
+    {
+        return $this->model->where('id', $id)->where('broker_id', $broker_id)->first();
     }
 }

@@ -78,21 +78,27 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('/matrix/headers/{broker_id}', [MatrixController::class, 'getHeaders']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('/matrix/{broker_id}', [MatrixController::class, 'index']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('/matrix/store/{broker_id}', [MatrixController::class, 'store']);
-    //Route::post('account-types', [AccountTypeController::class, 'store']);
+
+    //=================================== Account Type routes =================================
     Route::get('account-types/{broker_id}', [AccountTypeController::class, 'index']);
-    // Route::get('account-types/{id}', [AccountTypeController::class, 'show']);
+
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id}', [AccountTypeController::class, 'update']);
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->delete('account-types/{id}', [AccountTypeController::class, 'destroy']);
-    Route::get('account-types/{id}/urls', [AccountTypeController::class, 'getUrlsGroupedByType']);
-    Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->post('account-types/{id?}/urls', [AccountTypeController::class, 'createUrls']);
-    Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
-    Route::middleware(['auth:sanctum', 'can-admin:AccountType,accountTypeId'])->delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteAccountTypeUrl']);
+    // Route::get('account-types/{id}/urls', [AccountTypeController::class, 'getUrlsGroupedByType']);
+    // Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->post('account-types/{id?}/urls', [AccountTypeController::class, 'createUrls']);
+    //Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
+    // Route::middleware(['auth:sanctum', 'can-admin:AccountType,accountTypeId'])->delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteAccountTypeUrl']);
+    //to do: add middleware to check if the user is admin or not
+    Route::post('account-type/broker/{broker_id}/url', [UrlController::class, 'createAccountTypeUrl']);
+    Route::put('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'updateAccountTypeUrl']);
+    //to do add delete4 acc type url
 
-    //=================================== Url routes =================================
+    //=================================== Url routes ========================================================
     Route::get('urls/broker/{broker_id}/affiliate-links', [UrlController::class, 'getBrokerAffiliateLinks']);
     Route::post('urls/broker/{broker_id}/affiliate-link', [UrlController::class, 'createBrokerAffiliateLink']);
     Route::put('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'updateBrokerAffiliateLink']);
     Route::delete('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'deleteBrokerAffiliateLink']);
+    //grouped urls are used for account types
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
     Route::get('urls/account-type/{account_type_id}/affiliate-links/{broker_id}', [UrlController::class, 'getAccountTypeAffiliateLinks']);
 
