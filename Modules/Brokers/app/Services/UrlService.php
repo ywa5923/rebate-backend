@@ -4,20 +4,20 @@ namespace Modules\Brokers\Services;
 
 use App\Exceptions\ApiException;
 use App\Utilities\ModelHelper;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Modules\Brokers\DTOs\GroupedUrlsDTO;
 use Modules\Brokers\DTOs\IbAffiliateLinksDTO;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\AffliliateLink;
-use Modules\Brokers\Models\Url;
 use Modules\Brokers\Repositories\AccountTypeRepository;
 use Modules\Brokers\Repositories\AffiliateLinkRepository;
 use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Transformers\AccountTypeUrlsCollection;
 use Modules\Brokers\Transformers\AffiliateLinkCollection;
+use Modules\Brokers\Transformers\URLResource;
 
 class UrlService
 {
@@ -104,34 +104,30 @@ class UrlService
         return $urls->groupBy('url_type')->map(fn ($items) => $items->values());
     }
 
-    public function getUrlsByEntity(int $broker_id, string $entity_type, int $entity_id, ?string $zone_code, ?string $language_code)
+    public function getGroupedUrlsByEntity(int $broker_id, string $entity_type, ?int $entity_id, ?string $zone_code, ?string $language_code): GroupedUrlsDTO
     {
-
         $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
 
         $urls = $this->repository->getUrlsByEntity($broker_id, $modelClass, $entity_id, $zone_code, $language_code);
 
-        return $urls;
+        $transformed = URLResource::collection($urls);
 
-    }
-
-    public function validateData(int $broker_id, string $entity_type, int $entity_id, Request $request)
-    {
-        $validated = $request->validate([
-            'zone_code' => 'sometimes|string',
-            'language_code' => 'sometimes|string',
+        $grouped = $transformed->groupBy([
+            function ($item) {
+                return $item['urlable_id'] ? $item['urlable_id'] : 'master-links';
+            },
+            function ($item) {
+                return $item['url_type'];
+            },
         ]);
 
-        if (! is_numeric($entity_id) && $entity_id != 'all') {
-          //  throw new ApiException('Entity ID must be a number or "all"', 422);
-        }
-        if (! is_numeric($broker_id)) {
-            throw new ApiException('Broker ID must be a number', 422);
-        }
-        $modelClass = ModelHelper::getModelClassFromSlug($entity_type);
-        if (! class_exists($modelClass)) {
-            throw new ApiException('Entity type must be a valid model class', 422);
-        }
+        $masterLinks = $grouped->get('master-links', collect());
+        $grouped->forget('master-links');
+
+        return new GroupedUrlsDTO(
+            linksGroupedByEntityId: $grouped,
+            masterLinksGroupedByType: $masterLinks,
+        );
     }
 
     public function createAffiliateLink(StoreAffiliateLinkDTO $storeAffiliateLinkDto, int $broker_id, bool $isAdmin): AffliliateLink
@@ -201,7 +197,7 @@ class UrlService
             $updatedFields = [];
 
             //check if is master check was changed
-            if ((bool)$updateAffiliateLinkDto->isMasterLink !== (bool)$oldAffiliateLink->is_master_link) {
+            if ((bool) $updateAffiliateLinkDto->isMasterLink !== (bool) $oldAffiliateLink->is_master_link) {
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'is_master_link';
             }
@@ -275,8 +271,6 @@ class UrlService
         return null;
     }
 
-   
-
     public function deleteAffiliateLink(int $brokerId, int $affiliateLinkId): bool
     {
         $affiliateLink = $this->affiliateLinkRepository->find($affiliateLinkId);
@@ -293,7 +287,7 @@ class UrlService
     public function getAccountTypesWithPlatformLinks(int $broker_id, string $lang, ?string $zone = null): AccountTypeUrlsCollection
     {
         $accountTypes = $this->accountTypeRepository->getAccountTypesWithPlatformLinks($broker_id, $lang, $zone);
-        $masterLinks = $this->repository->getMasterLinks($broker_id, $lang, [UrlTypeEnum::WEBPLATFORM->value], $zone);
+        $masterLinks = $this->repository->getMasterLinks($broker_id, $lang, [UrlTypeEnum::TRADING_PLATFORM->value], $zone);
 
         //attach master links to each account type platform urls
         $accountTypes->each(function ($accountType) use ($masterLinks) {

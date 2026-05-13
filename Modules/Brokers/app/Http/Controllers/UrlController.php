@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
+use Modules\Brokers\Http\Requests\GetGroupedUrlsRequest;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
 use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
 use Modules\Brokers\Services\DropdownListService;
 use Modules\Brokers\Services\UrlService;
-use Modules\Brokers\Transformers\URLResource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UrlController extends Controller
@@ -22,61 +22,36 @@ class UrlController extends Controller
         $this->urlService = $urlService;
     }
 
-    public function getGroupedUrls(int $broker_id, string $entity_type, int|string $entity_id, Request $request)
+    public function getGroupedUrls(GetGroupedUrlsRequest $request, int $broker_id, string $entity_type, int|string $entity_id)
     {
         //http://localhost:8080/api/v1/urls/2/account-type/1?zone_code=eu&language_code=en
         //go get urls for all account types $entity_id is "all"
         //ex for all http://localhost:8080/api/v1/urls/2/account-type/all?zone_code=eu&language_code=en
 
-        $this->urlService->validateData($broker_id, $entity_type, (int)$entity_id, $request);
-        $zone_code = $request->query('zone_code') ?? null;
-        $language_code = $request->query('language_code') ?? 'en';
 
-        $urls = $this->urlService->getUrlsByEntity($broker_id, $entity_type, (int)$entity_id, $zone_code, $language_code);
-        $transformed = URLResource::collection($urls);
+        $entityId=$request->validated('entity_id');
 
-        $grouped = $transformed->groupBy([
-            function ($item) {
-                return $item['urlable_id'] ? $item['urlable_id'] : 'master-links';
-            },
-            function ($item) {
-                return $item['url_type'];
-            },
-        ]);
-        $masterLinks = $grouped['master-links'] ?? [];
-        unset($grouped['master-links']);
+        $groupedUrlsDTO = $this->urlService->getGroupedUrlsByEntity(
+            $request->validated('broker_id'),
+            $request->validated('entity_type'),
+            $entityId ==='all' ? null : (int) $entityId, 
+            $request->validated('zone_code'), 
+            $request->validated('language_code')
+        );
 
         return response()->json([
             'success' => true,
             'data' => [
-                'links_grouped_by_account_id' => $grouped,
-                'master_links_grouped_by_type' => $masterLinks,
-                'links_groups' => [UrlTypeEnum::MOBILE->value, UrlTypeEnum::WEBPLATFORM->value, UrlTypeEnum::SWAP->value, UrlTypeEnum::COMMISSION->value],
-                //'links_groups' => ['mobile', 'webplatform', 'swap', 'commission']
+                'links_grouped_by_account_id' => $groupedUrlsDTO->linksGroupedByEntityId,
+                'master_links_grouped_by_type' => $groupedUrlsDTO->masterLinksGroupedByType,
+                'links_groups' => [UrlTypeEnum::TRADING_PLATFORM->value, UrlTypeEnum::MOBILE->value, UrlTypeEnum::SPREAD_TYPE->value, UrlTypeEnum::SWAP->value, UrlTypeEnum::COMMISSION->value],
             ],
 
         ]);
     }
 
-    // //To do
-    // public function getAccountTypeAffiliateLinks( Request $request,int $account_type_id,int $broker_id)
-    // {
-    //   $accountType = AccountType::find($account_type_id);
-    //   if (!$accountType) {
-    //     return response()->json([
-    //       'success' => false,
-    //       'message' => 'Account type not found'
-    //     ], 404);
-    //   }
-    //   $urls = $accountType->urls()->where('url_type', 'affiliate1')->orWhere('url_type', 'affiliate2')->orWhere('url_type', 'affiliate3')->with('translations')->get();
-    //   $transformed = URLResource::collection($urls);
-    //   return response()->json([
-    //     'success' => true,
-    //     'data' => $transformed
-    //   ]);
-    // }
+   
 
-    //to check if this works
     public function createBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id)
     {
 
@@ -86,7 +61,7 @@ class UrlController extends Controller
 
         $isAdmin = true;
         $zone_id = $request->validated('zone_id');
-       
+
         $url = $this->urlService->createAffiliateLink($storeAffiliateLinkDto, $broker_id, $isAdmin);
 
         return response()->json([
@@ -101,7 +76,7 @@ class UrlController extends Controller
         $isAdmin = true;
         $data = $request->validated();
         $updateAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
-        //$url = $this->urlService->updateBrokerAffiliateLink($broker_id, $url_id, $data, $isAdmin);
+       
         $url = $this->urlService->updateAffiliateLink($updateAffiliateLinkDto, $url_id, $broker_id, $isAdmin);
 
         return response()->json([
@@ -161,11 +136,5 @@ class UrlController extends Controller
         ], JsonResponse::HTTP_OK);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request, int $id)
-    {
-       
-    }
+    
 }

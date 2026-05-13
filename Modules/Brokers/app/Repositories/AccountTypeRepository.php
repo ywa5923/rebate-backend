@@ -316,7 +316,7 @@ class AccountTypeRepository
                     ->whereIn('url_type', [
                         //UrlTypeEnum::IB_AFFILIATE_LINK->value,
                         // UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
-                        UrlTypeEnum::WEBPLATFORM->value,
+                        UrlTypeEnum::TRADING_PLATFORM->value,
                     ])
                     ->where(function ($q) use ($zone) {
                         if ($zone === null) {

@@ -85,9 +85,14 @@ class UrlRepository
      * @param  string  $language_code
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getUrlsByEntity($broker_id, $entity_type, $entity_id = null, $zone_code = null, $language_code = null)
-    {
-        //dd($broker_id,$entity_type,$entity_id,$zone_code,$language_code);
+    public function getUrlsByEntity(
+        int $broker_id, 
+        string $entity_type, 
+        ?int $entity_id, 
+        ?string $zone_code = null, 
+        ?string $language_code = null): Collection{
+    
+        
         $builder = $this->model->newQuery()
             ->where('broker_id', $broker_id)
             ->where('urlable_type', $entity_type);

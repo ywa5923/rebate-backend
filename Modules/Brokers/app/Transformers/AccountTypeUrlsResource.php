@@ -20,7 +20,7 @@ class AccountTypeUrlsResource extends JsonResource
     {
         //$urls = URLResource::collection($this->whenLoaded('urls'));
 
-        $platformUrls = $this->urls->where('url_type', UrlTypeEnum::WEBPLATFORM->value)->values()->map(
+        $platformUrls = $this->urls->where('url_type', UrlTypeEnum::TRADING_PLATFORM->value)->values()->map(
             fn (Url $url) => Arr::only($url->toArray(), ['id', 'name'])
         );
 
