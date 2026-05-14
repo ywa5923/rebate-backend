@@ -3,9 +3,8 @@
 namespace Modules\Brokers\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class DeleteAccountTypeRequest extends FormRequest
+class DeleteAccountTypeUrlRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,8 +17,8 @@ class DeleteAccountTypeRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'id' => (int) $this->route('id'),
             'broker_id' => (int) $this->route('broker_id'),
+            'url_id' => (int) $this->route('url_id'),
         ]);
     }
 
@@ -31,14 +30,8 @@ class DeleteAccountTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'broker_id' => ['required', 'integer', 'exists:brokers,id'],
-            'id' => [
-                'required',
-                'integer',
-                Rule::exists('account_types', 'id')->where(
-                    fn($query) => $query->where('broker_id', $this->integer('broker_id'))
-                ),
-            ],
+            'broker_id' => 'required|integer|exists:brokers,id',
+            'url_id' => 'required|integer|exists:urls,id',
         ];
     }
 }

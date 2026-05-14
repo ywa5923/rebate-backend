@@ -433,6 +433,11 @@ class UrlService
     }
 
     /**
+     * Delete a URL
+     * 
+     * @param int $brokerId
+     * @param int $urlId
+     * @throws ApiException if URL not found or could not delete URL
      * @return Url
      */
     public function deleteAccountTypeUrl(int $brokerId, int $urlId): Url
@@ -442,15 +447,9 @@ class UrlService
             throw new ApiException('URL not found', 404);
         }
 
-        return DB::transaction(function () use ($url) {
-            //detach platform urls from affiliate links
-            //affiliate_links table is in many to many relations with urls 
-            //table through a pivot table affliliate_link_url with url_id and affliliate_link_id
-            $url->affliliateLinks()->detach();
-            if (! $this->repository->delete($url)) {
-                throw new ApiException('Could not delete URL', 500);
-            }
-            return $url;
-        });
+        if (! $this->repository->delete($url)) {
+            throw new ApiException('Could not delete URL', 500);
+        }
+        return $url;
     }
 }

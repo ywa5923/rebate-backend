@@ -19,7 +19,7 @@ class AccountType extends Model
      *
      * @var array
      */
-    protected $fillable = ['broker_id', 'name'];
+    protected $fillable = ['broker_id'];
 
     public function broker(): BelongsTo
     {
@@ -86,7 +86,11 @@ class AccountType extends Model
         return $this->morphMany(Translation::class, 'translationable');
     }
 
-    public function getAccountTypesNames($broker_id, $return_type = self::RETURN_TYPE_VALUE, $language_code = 'en'): array
+    /**
+     * Get account types names
+     * Used in MatrixHeaderRepository line 607
+     */
+    public function getAccountTypesNames(int $broker_id, string $return_type = self::RETURN_TYPE_VALUE, string $language_code = 'en'): array
     {
         $with = [
             'optionValues' => function ($q) {

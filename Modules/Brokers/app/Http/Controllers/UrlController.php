@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\Brokers\DTOs\AccountTypeUrlDTO;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
-use Modules\Brokers\Http\Requests\DeleteAccountTypeRequest;
+use Modules\Brokers\Http\Requests\DeleteAccountTypeUrlRequest;
 use Modules\Brokers\Http\Requests\DeleteAffiliateLinkRequest;
 use Modules\Brokers\Http\Requests\GetGroupedUrlsRequest;
 use Modules\Brokers\Http\Requests\IndexAffiliateLinkRequest;
@@ -162,9 +162,8 @@ class UrlController extends Controller
         ]);
     }
 
-    public function deleteAccountTypeUrl(DeleteAccountTypeRequest $request, int $broker_id, int $url_id)
+    public function deleteAccountTypeUrl(DeleteAccountTypeUrlRequest $request, int $broker_id, int $url_id)
     {
-
         $url = $this->urlService->deleteAccountTypeUrl($broker_id, $url_id);
 
         return response()->json([

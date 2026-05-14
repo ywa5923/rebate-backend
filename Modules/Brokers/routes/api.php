@@ -83,7 +83,7 @@ Route::prefix('v1')->group(function () {
     Route::get('account-types/{broker_id}', [AccountTypeController::class, 'index']);
 
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id}', [AccountTypeController::class, 'update']);
-    Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->delete('account-types/{id}', [AccountTypeController::class, 'destroy']);
+    Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->delete('account-types/{id}/broker/{broker_id}', [AccountTypeController::class, 'destroy']);
     // Route::get('account-types/{id}/urls', [AccountTypeController::class, 'getUrlsGroupedByType']);
     // Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->post('account-types/{id?}/urls', [AccountTypeController::class, 'createUrls']);
     //Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
