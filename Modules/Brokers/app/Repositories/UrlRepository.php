@@ -298,4 +298,9 @@ class UrlRepository
             ->get();
 
     }
+
+    public function delete(Url $url): bool
+    {
+        return $url->delete();
+    }
 }

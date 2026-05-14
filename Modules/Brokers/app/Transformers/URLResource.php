@@ -49,6 +49,7 @@ class URLResource extends JsonResource
             'option_category_id' => $this->option_category_id,
             'broker_id' => $this->broker_id,
             'zone_id' => $this->zone_id,
+            'metadata' => $this->metadata,
 
             // Translations (if loaded)
             //"translations" => TranslationResource::collection($this->whenLoaded('translations')),

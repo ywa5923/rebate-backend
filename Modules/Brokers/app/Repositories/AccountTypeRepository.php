@@ -2,9 +2,9 @@
 
 namespace Modules\Brokers\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Modules\Brokers\DTOs\AccountTypeFilters;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\AccountType;
@@ -87,93 +87,93 @@ class AccountTypeRepository
     /**
      * Delete URLs for account type
      */
-    public function deleteAccountTypeUrls(AccountType $accountType, $broker_id): bool
+    public function deleteAccountTypeUrls(AccountType $accountType, int $broker_id): bool
     {
         return Url::where('urlable_type', AccountType::class)
             ->where('broker_id', $broker_id)
             ->delete();
     }
 
-    /**
-     * Create URLs for account type
-     */
-    public function createUrls(AccountType $accountType, array $urls): void
-    {
-        $urlModels = [];
-        foreach ($urls as $index => $urlData) {
-            // Validate required fields
-            $requiredFields = ['url_type', 'url', 'name', 'slug'];
-            foreach ($requiredFields as $field) {
-                if (! isset($urlData[$field]) || empty($urlData[$field])) {
-                    throw new \InvalidArgumentException("Missing required field '{$field}' for URL at index {$index}");
-                }
-            }
+    // /**
+    //  * Create URLs for account type
+    //  */
+    // public function createUrls(AccountType $accountType, array $urls): void
+    // {
+    //     $urlModels = [];
+    //     foreach ($urls as $index => $urlData) {
+    //         // Validate required fields
+    //         $requiredFields = ['url_type', 'url', 'name', 'slug'];
+    //         foreach ($requiredFields as $field) {
+    //             if (! isset($urlData[$field]) || empty($urlData[$field])) {
+    //                 throw new \InvalidArgumentException("Missing required field '{$field}' for URL at index {$index}");
+    //             }
+    //         }
 
-            $urlModels[] = [
-                'urlable_type' => AccountType::class,
-                'urlable_id' => $accountType->id,
-                'url_type' => $urlData['url_type'],
-                'url' => $urlData['url'],
-                'url_p' => $urlData['url_p'] ?? null,
-                'name' => $urlData['name'],
-                'name_p' => $urlData['name_p'] ?? null,
-                'slug' => $urlData['slug'],
-                'description' => $urlData['description'] ?? null,
-                'category_position' => $urlData['category_position'] ?? null,
-                'option_category_id' => $urlData['option_category_id'],
-                'broker_id' => $accountType->broker_id,
-                'zone_id' => $urlData['zone_id'] ?? null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
+    //         $urlModels[] = [
+    //             'urlable_type' => AccountType::class,
+    //             'urlable_id' => $accountType->id,
+    //             'url_type' => $urlData['url_type'],
+    //             'url' => $urlData['url'],
+    //             'url_p' => $urlData['url_p'] ?? null,
+    //             'name' => $urlData['name'],
+    //             'name_p' => $urlData['name_p'] ?? null,
+    //             'slug' => $urlData['slug'],
+    //             'description' => $urlData['description'] ?? null,
+    //             'category_position' => $urlData['category_position'] ?? null,
+    //             'option_category_id' => $urlData['option_category_id'],
+    //             'broker_id' => $accountType->broker_id,
+    //             'zone_id' => $urlData['zone_id'] ?? null,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ];
+    //     }
 
-        if (! empty($urlModels)) {
-            DB::table('urls')->insert($urlModels);
-        }
-    }
+    //     if (! empty($urlModels)) {
+    //         DB::table('urls')->insert($urlModels);
+    //     }
+    // }
 
-    /**
-     * Handle URL updates and deletions
-     */
-    public function handleUrlUpdates(AccountType $accountType, array $urls, array $urlsToDelete): void
-    {
-        // Delete URLs if specified
-        if (! empty($urlsToDelete)) {
-            DB::table('urls')->whereIn('id', $urlsToDelete)->delete();
-        }
+    // /**
+    //  * Handle URL updates and deletions
+    //  */
+    // public function handleUrlUpdates(AccountType $accountType, array $urls, array $urlsToDelete): void
+    // {
+    //     // Delete URLs if specified
+    //     if (! empty($urlsToDelete)) {
+    //         DB::table('urls')->whereIn('id', $urlsToDelete)->delete();
+    //     }
 
-        // Update/Create URLs if provided
-        if (! empty($urls)) {
-            foreach ($urls as $urlData) {
-                $urlModelData = [
-                    'url' => $urlData['url'],
-                    'url_p' => $urlData['url_p'] ?? null,
-                    'url_type' => $urlData['url_type'],
-                    'name' => $urlData['name'],
-                    'name_p' => $urlData['name_p'] ?? null,
-                    'slug' => $urlData['slug'],
-                    'description' => $urlData['description'] ?? null,
-                    'category_position' => $urlData['category_position'] ?? null,
-                    'option_category_id' => $urlData['option_category_id'],
-                    'broker_id' => $accountType->broker_id,
-                    'zone_id' => $urlData['zone_id'] ?? null,
-                    'updated_at' => now(),
-                ];
+    //     // Update/Create URLs if provided
+    //     if (! empty($urls)) {
+    //         foreach ($urls as $urlData) {
+    //             $urlModelData = [
+    //                 'url' => $urlData['url'],
+    //                 'url_p' => $urlData['url_p'] ?? null,
+    //                 'url_type' => $urlData['url_type'],
+    //                 'name' => $urlData['name'],
+    //                 'name_p' => $urlData['name_p'] ?? null,
+    //                 'slug' => $urlData['slug'],
+    //                 'description' => $urlData['description'] ?? null,
+    //                 'category_position' => $urlData['category_position'] ?? null,
+    //                 'option_category_id' => $urlData['option_category_id'],
+    //                 'broker_id' => $accountType->broker_id,
+    //                 'zone_id' => $urlData['zone_id'] ?? null,
+    //                 'updated_at' => now(),
+    //             ];
 
-                if (isset($urlData['id'])) {
-                    // Update existing URL
-                    DB::table('urls')->where('id', $urlData['id'])->update($urlModelData);
-                } else {
-                    // Create new URL
-                    $urlModelData['urlable_type'] = AccountType::class;
-                    $urlModelData['urlable_id'] = $accountType->id;
-                    $urlModelData['created_at'] = now();
-                    DB::table('urls')->insert($urlModelData);
-                }
-            }
-        }
-    }
+    //             if (isset($urlData['id'])) {
+    //                 // Update existing URL
+    //                 DB::table('urls')->where('id', $urlData['id'])->update($urlModelData);
+    //             } else {
+    //                 // Create new URL
+    //                 $urlModelData['urlable_type'] = AccountType::class;
+    //                 $urlModelData['urlable_id'] = $accountType->id;
+    //                 $urlModelData['created_at'] = now();
+    //                 DB::table('urls')->insert($urlModelData);
+    //             }
+    //         }
+    //     }
+    // }
 
     /**
      * Get account types by broker ID
@@ -183,54 +183,51 @@ class AccountTypeRepository
         return $this->model->where('broker_id', $brokerId)->get();
     }
 
-    /**
-     * Get account types by broker type
-     */
-    public function getByBrokerType(string $brokerType): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->model->where('broker_type', $brokerType)->get();
-    }
+    // /**
+    //  * Get account types by broker type
+    //  */
+    // public function getByBrokerType(string $brokerType): \Illuminate\Database\Eloquent\Collection
+    // {
+    //     return $this->model->where('broker_type', $brokerType)->get();
+    // }
 
-    /**
-     * Get active account types
-     */
-    public function getActive(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->model->where('is_active', true)->get();
-    }
+    // /**
+    //  * Get active account types
+    //  */
+    // public function getActive(): \Illuminate\Database\Eloquent\Collection
+    // {
+    //     return $this->model->where('is_active', true)->get();
+    // }
 
-    /**
-     * Search account types by name
-     */
-    public function searchByName(string $search): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->model->where('name', 'like', '%'.$search.'%')->get();
-    }
+    // /**
+    //  * Search account types by name
+    //  */
+    // public function searchByName(string $search): \Illuminate\Database\Eloquent\Collection
+    // {
+    //     return $this->model->where('name', 'like', '%'.$search.'%')->get();
+    // }
 
-    /**
-     * Get brokers for form dropdown
-     */
-    public function getBrokersForForm()
-    {
-        return DB::table('brokers')->select('id', 'registration_language as name')->get();
-    }
+    // /**
+    //  * Get brokers for form dropdown
+    //  */
+    // public function getBrokersForForm()
+    // {
+    //     return DB::table('brokers')->select('id', 'registration_language as name')->get();
+    // }
 
-    /**
-     * Get zones for form dropdown
-     */
-    public function getZonesForForm()
-    {
-        return DB::table('zones')->select('id', 'name')->get();
-    }
+    // /**
+    //  * Get zones for form dropdown
+    //  */
+    // public function getZonesForForm()
+    // {
+    //     return DB::table('zones')->select('id', 'name')->get();
+    // }
 
     /**
      * Apply filters to query
      */
-    private function applyFilters($query, AccountTypeFilters $filters): void
+    private function applyFilters(Builder $query, AccountTypeFilters $filters): void
     {
-        // if ($request->has('broker_id')) {
-        //     $query->where('broker_id', $request->broker_id);
-        // }
 
         if ($filters->accountTypeId) {
             $query->where('id', $filters->accountTypeId);
@@ -273,31 +270,21 @@ class AccountTypeRepository
             $query->with(['broker', 'urls', 'optionValues']);
         }
 
-        // if ($request->has('broker_type')) {
-        //     $query->whereHas('broker.brokerType', function($q) use ($request) {
-        //         $q->where('name', $request->broker_type);
-        //     });
-        // }
-
-        // if ($request->has('is_active')) {
-        //     $query->where('is_active', $request->boolean('is_active'));
-        // }
-
-        // if ($request->has('search')) {
-        //     $query->where('name', 'like', '%' . $request->search . '%');
-        // }
     }
 
     /**
      * Apply sorting to query
      */
-    private function applySorting($query, AccountTypeFilters $filters): void
+    private function applySorting(Builder $query, AccountTypeFilters $filters): void
     {
         $sortBy = $filters->sortBy ?? 'created_at';
         $sortDirection = $filters->sortDirection ?? 'asc';
         $query->orderBy($sortBy, $sortDirection);
     }
 
+    /**
+     * Get account type name by account type ID
+     */
     public function getAccountTypeName(int $accountTypeId): string
     {
         return $this->model->where('id', $accountTypeId)->with('optionValues', function ($q) {
@@ -305,6 +292,9 @@ class AccountTypeRepository
         })->first()->optionValues->first()->value;
     }
 
+    /**
+     * Get account types with platform links
+     */
     public function getAccountTypesWithPlatformLinks(int $broker_id, string $lang, ?string $zone = null): Collection
     {
         $query = $this->model->newQuery();
@@ -314,8 +304,6 @@ class AccountTypeRepository
                 // affiliate URLs + their translations in chosen language
                 'urls' => fn ($q) => $q
                     ->whereIn('url_type', [
-                        //UrlTypeEnum::IB_AFFILIATE_LINK->value,
-                        // UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
                         UrlTypeEnum::TRADING_PLATFORM->value,
                     ])
                     ->where(function ($q) use ($zone) {
@@ -327,9 +315,6 @@ class AccountTypeRepository
                     })
                     ->orderBy('url_type', 'asc')
                     ->with(['translations' => fn ($t) => $t->where('language_code', $lang)]),
-                // 'urls.associatedUrls' => fn($q) => $zone === null
-                //     ? $q->wherePivotNull('zone_id')
-                //     : $q->wherePivot('zone_id', $zone),
 
                 // option_values where option.slug = 'account_name' and zone_code matches (or is null)
                 'optionValues' => fn ($q) => $q
@@ -359,11 +344,17 @@ class AccountTypeRepository
             ->get();
     }
 
+    /**
+     * Find account type by ID
+     */
     public function find(int $id): ?AccountType
     {
         return $this->model->find($id);
     }
 
+    /**
+     * Find account type by ID and broker ID
+     */
     public function findByIdAndBrokerId(int $id, int $broker_id): ?AccountType
     {
         return $this->model->where('id', $id)->where('broker_id', $broker_id)->first();

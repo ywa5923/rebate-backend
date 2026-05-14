@@ -39,67 +39,67 @@ class UrlService
         $this->affiliateLinkRepository = $affiliateLinkRepository;
     }
 
-    //to be deleted
-    public function createMany($urlableTypeObject, string $entityType, array $urls, $isAdmin = false)
-    {
+    // //to be deleted
+    // public function createMany($urlableTypeObject, string $entityType, array $urls, $isAdmin = false)
+    // {
 
-        foreach ($urls as &$urlData) {
+    //     foreach ($urls as &$urlData) {
 
-            if ($isAdmin) {
-                $urlData['public_url'] = $urlData['url'];
-                $urlData['public_name'] = $urlData['name'];
-            } else {
-                //TO BE DONE
-                $urlData['is_updated_entry'] = 1;
-            }
-            $modelClass = ModelHelper::getModelClassFromSlug($entityType);
-            $urlData['urlable_type'] = $modelClass;
-            $urlData['urlable_id'] = $urlableTypeObject ? $urlableTypeObject->id : null;
-            $urlData['slug'] = ! empty($urlData['slug']) ? $urlData['slug'] : Str::slug($urlData['name']);
-            $urlData['created_at'] = now();
-            $urlData['updated_at'] = now();
-        }
-        unset($urlData);
+    //         if ($isAdmin) {
+    //             $urlData['public_url'] = $urlData['url'];
+    //             $urlData['public_name'] = $urlData['name'];
+    //         } else {
+    //             //TO BE DONE
+    //             $urlData['is_updated_entry'] = 1;
+    //         }
+    //         $modelClass = ModelHelper::getModelClassFromSlug($entityType);
+    //         $urlData['urlable_type'] = $modelClass;
+    //         $urlData['urlable_id'] = $urlableTypeObject ? $urlableTypeObject->id : null;
+    //         $urlData['slug'] = ! empty($urlData['slug']) ? $urlData['slug'] : Str::slug($urlData['name']);
+    //         $urlData['created_at'] = now();
+    //         $urlData['updated_at'] = now();
+    //     }
+    //     unset($urlData);
 
-        $this->repository->bulkCreate($urls);
+    //     $this->repository->bulkCreate($urls);
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    //to be deleted
-    public function updateMany(string $entityType, array $urls, int $broker_id, bool $isAdmin = false)
-    {
-        $updated = [];
-        $modelClass = ModelHelper::getModelClassFromSlug($entityType);
+    // //to be deleted
+    // public function updateMany(string $entityType, array $urls, int $broker_id, bool $isAdmin = false)
+    // {
+    //     $updated = [];
+    //     $modelClass = ModelHelper::getModelClassFromSlug($entityType);
 
-        foreach ($urls as $urlData) {
+    //     foreach ($urls as $urlData) {
 
-            if (isset($urlData['id']) && is_numeric($urlData['id'])) {
-                $existingUrl = $this->repository->find($urlData['id']);
-                // dd($existingUrl);
-                $urlData['urlable_type'] = $modelClass;
-                if ($isAdmin) {
-                    $urlData['public_url'] = $urlData['url'];
-                    $urlData['public_name'] = $urlData['name'];
-                    $urlData['is_updated_entry'] = 0;
-                    unset($urlData['url']);
-                    unset($urlData['name']);
-                } else {
+    //         if (isset($urlData['id']) && is_numeric($urlData['id'])) {
+    //             $existingUrl = $this->repository->find($urlData['id']);
+    //             // dd($existingUrl);
+    //             $urlData['urlable_type'] = $modelClass;
+    //             if ($isAdmin) {
+    //                 $urlData['public_url'] = $urlData['url'];
+    //                 $urlData['public_name'] = $urlData['name'];
+    //                 $urlData['is_updated_entry'] = 0;
+    //                 unset($urlData['url']);
+    //                 unset($urlData['name']);
+    //             } else {
 
-                    $urlData['is_updated_entry'] = 1;
-                    trim($urlData['url']) !== trim($existingUrl->url) && $urlData['previous_url'] = $existingUrl->url;
-                    trim($urlData['name']) !== trim($existingUrl->name) && $urlData['previous_name'] = $existingUrl->name;
-                }
+    //                 $urlData['is_updated_entry'] = 1;
+    //                 trim($urlData['url']) !== trim($existingUrl->url) && $urlData['previous_url'] = $existingUrl->url;
+    //                 trim($urlData['name']) !== trim($existingUrl->name) && $urlData['previous_name'] = $existingUrl->name;
+    //             }
 
-                //dd($urlData);
-                if ($existingUrl && $existingUrl->urlable_type == $modelClass && $existingUrl->broker_id == $broker_id) {
-                    $updated[] = $this->repository->update($existingUrl, $urlData);
-                }
-            }
-        }
+    //             //dd($urlData);
+    //             if ($existingUrl && $existingUrl->urlable_type == $modelClass && $existingUrl->broker_id == $broker_id) {
+    //                 $updated[] = $this->repository->update($existingUrl, $urlData);
+    //             }
+    //         }
+    //     }
 
-        return $updated;
-    }
+    //     return $updated;
+    // }
 
     public function getGroupedByType(AccountType $accountType)
     {
@@ -163,7 +163,9 @@ class UrlService
     public function updateAccountTypeUrl(AccountTypeUrlDTO $dto, int $url_id, bool $isAdmin): Url
     {
         $oldUrl = $this->repository->find($url_id);
+        $oldMeta = $oldUrl->metadata ?? [];
         $updatedFields = [];
+        //previous relations values to keep track of the previous values of the relations in the metadata
         $previousValues = [];
         $url = [
             'url_type' => $dto->url_type,
@@ -171,47 +173,58 @@ class UrlService
             'urlable_id' => $dto->account_type_id ?? null,
             'slug' => Str::slug($dto->name),
             'broker_id' => $dto->broker_id,
-            'zone_id' => $dto->zone_id ?? null
+            'zone_id' => $dto->zone_id ?? null,
         ];
         if ($isAdmin) {
             $url['public_url'] = $dto->url;
             $url['public_name'] = $dto->name;
             $url['is_updated_entry'] = false;
-            $url['metadata'] = array_merge($oldUrl['metadata'] ?? [], [
+            $url['metadata'] = array_merge($oldMeta, [
                 'updated_fields' => [],
             ]);
-        }else{
+        } else {
             $url['name'] = $dto->name;
             $url['url'] = $dto->url;
-         
 
             if (trim($oldUrl->name) !== trim($dto->name)) {
-                $url['previous_name'] = $oldUrl->name;
+                $url['previous_name'] = $oldUrl->name.' -> '.$oldUrl->previous_name;
                 $url['is_updated_entry'] = true;
                 $updatedFields[] = 'name';
             }
             if (trim($oldUrl->url) !== trim($dto->url)) {
-                $url['previous_url'] = $oldUrl->url;
+                $url['previous_url'] = $oldUrl->url.' -> '.$oldUrl->previous_url;
                 $url['is_updated_entry'] = true;
                 $updatedFields[] = 'url';
             }
-            if(trim($oldUrl->urlable_id) !== trim($dto->account_type_id)) {
-                $previousValues['previous_account_type_id'] = $oldUrl->urlable_id;
+            if (trim($oldUrl->urlable_id) !== trim($dto->account_type_id)) {
+                $rels = $metadata['previous_relations_values'] ?? [];
+                $prevRelValue = $rels['previous_account_type'] ?? '';
+                if ($oldUrl->urlable_id) {
+                    $previousValues['previous_account_type'] =
+                    $this->accountTypeRepository->getAccountTypeName($oldUrl->urlable_id).' -> '.$prevRelValue;
+                } else {
+                    $previousValues['previous_account_type'] = 'Master -> '.$prevRelValue;
+                }
                 $url['is_updated_entry'] = true;
                 $updatedFields[] = 'urlable_id';
             }
+
             if (! empty($updatedFields)) {
-                $url['metadata'] = array_merge($oldUrl['metadata'] ?? [], [
-                    'updated_fields' => $updatedFields,
-                    'previous_relations_values' => $previousValues,
+                $url['metadata'] = array_merge($oldMeta, [
+                    'updated_fields' => array_values(array_unique(array_merge(
+                        $oldMeta['updated_fields'] ?? [],
+                        $updatedFields
+                    ))),
+                    'previous_relations_values' => array_merge(
+                        $oldMeta['previous_relations_values'] ?? [],
+                        $previousValues
+                    ),
                 ]);
             }
         }
 
         return $this->repository->update($oldUrl, $url);
 
-        //$url->update($dto->toArray());
-        return $url;
     }
 
     public function createAffiliateLink(StoreAffiliateLinkDTO $storeAffiliateLinkDto, int $broker_id, bool $isAdmin): AffliliateLink
@@ -256,6 +269,8 @@ class UrlService
     public function updateAffiliateLink(StoreAffiliateLinkDTO $updateAffiliateLinkDto, int $affiliateLinkId, int $broker_id, bool $isAdmin): AffliliateLink
     {
         $oldAffiliateLink = $this->affiliateLinkRepository->find($affiliateLinkId);
+        $oldMeta = $oldAffiliateLink->metadata ?? [];
+        $oldMetaRelationsValues = $oldMeta['previous_relations_values'] ?? [];
         if (! $oldAffiliateLink || $oldAffiliateLink->broker_id != $broker_id) {
             throw new ApiException('Affiliate link not found', 404);
         }
@@ -273,34 +288,37 @@ class UrlService
             $affiliateLinkRow['public_currency'] = $updateAffiliateLinkDto->currency;
             $affiliateLinkRow['is_updated_entry'] = false;
             //override metadata updated values
-            $affiliateLinkRow['metadata'] = array_merge($oldAffiliateLink['metadata'] ?? [], [
+            $affiliateLinkRow['metadata'] = array_merge($oldMeta, [
                 'updated_fields' => [],
+               //previous relations values inherited from old metadata
             ]);
 
         } else {
             $updatedFields = [];
+            $previousValues = [];
 
             //check if is master check was changed
             if ((bool) $updateAffiliateLinkDto->isMasterLink !== (bool) $oldAffiliateLink->is_master_link) {
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'is_master_link';
+                $previousValues['previous_is_master_link'] = (String)$oldAffiliateLink->is_master_link.' -> '.($oldMetaRelationsValues['previous_is_master_link']??'');
             }
 
             $affiliateLinkRow['name'] = $updateAffiliateLinkDto->name;
             if (trim($oldAffiliateLink->name) !== trim($updateAffiliateLinkDto->name)) {
-                $affiliateLinkRow['previous_name'] = $oldAffiliateLink->name;
+                $affiliateLinkRow['previous_name'] = $oldAffiliateLink->name.' -> '.$oldAffiliateLink->previous_name;
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'name';
             }
             $affiliateLinkRow['url'] = $updateAffiliateLinkDto->url;
             if (trim($oldAffiliateLink->url) !== trim($updateAffiliateLinkDto->url)) {
-                $affiliateLinkRow['previous_url'] = $oldAffiliateLink->url;
+                $affiliateLinkRow['previous_url'] = $oldAffiliateLink->url.' -> '.$oldAffiliateLink->previous_url;
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'url';
             }
             $affiliateLinkRow['currency'] = $updateAffiliateLinkDto->currency;
             if (trim($oldAffiliateLink->currency) !== trim($updateAffiliateLinkDto->currency)) {
-                $affiliateLinkRow['previous_currency'] = $oldAffiliateLink->currency;
+                $affiliateLinkRow['previous_currency'] = $oldAffiliateLink->currency.' -> '.$oldAffiliateLink->previous_currency;
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'currency';
             }
@@ -308,22 +326,37 @@ class UrlService
             $oldPlatforms = $oldAffiliateLink->platformUrls()->pluck('id')->toArray();
             $newPlatforms = collect($updateAffiliateLinkDto->platformUrls->items)->pluck('id')->toArray();
             $platformUrlsDifference = $this->checkPlatformUrlsDifference($newPlatforms, $oldPlatforms);
-            $previousValues = [];
+            
             if ($platformUrlsDifference) {
-                $previousValues['previous_platform_urls'] = $oldAffiliateLink->platformUrls()->pluck('name')->toArray();
+                $previousValues['previous_platform_urls'] = array_merge(
+                empty($oldAffiliateLink->platformUrls()->pluck('name')->toArray()) ? ['empty'] : $oldAffiliateLink->platformUrls()->pluck('name')->toArray(),
+                ['->'],
+                $oldMetaRelationsValues['previous_platform_urls']??[]
+            );
                 $updatedFields[] = 'platform_urls';
                 $affiliateLinkRow['is_updated_entry'] = true;
             }
             if ($updateAffiliateLinkDto->accountTypeId !== $oldAffiliateLink->account_type_id) {
                 $updatedFields[] = 'account_type_id';
-                $previousValues['previous_account_type_name'] = $oldAffiliateLink->accountType?->optionValues?->first()?->value ?? 'unknown';
-                $previousValues['previous_account_type_id'] = $oldAffiliateLink->account_type_id;
+                $previousValues['previous_account_type_name'] = ($oldAffiliateLink->accountType?->optionValues?->first()?->value ?? 'empty').' -> '.($oldMetaRelationsValues['previous_account_type_name']??'');
+                $previousValues['previous_account_type_id'] = $oldAffiliateLink->account_type_id.' -> '.($oldMetaRelationsValues['previous_account_type_id']??'');
                 $affiliateLinkRow['is_updated_entry'] = true;
             }
             if (! empty($updatedFields)) {
+
+
+               
                 $affiliateLinkRow['metadata'] = array_merge($affiliateLinkRow['metadata'] ?? [], [
-                    'updated_fields' => $updatedFields,
-                    'previous_relations_values' => $previousValues,
+                    'updated_fields' => array_values(array_unique(array_merge(
+                        $oldMeta['updated_fields']??[],
+                        $updatedFields
+                    ))),
+                    //merge and override previous relations values with new values
+                    'previous_relations_values' => array_merge(
+                        $oldMeta['previous_relations_values']??[],
+                        $previousValues
+                    ),
+                    
                 ]);
             }
         }
@@ -355,7 +388,7 @@ class UrlService
         return null;
     }
 
-    public function deleteAffiliateLink(int $brokerId, int $affiliateLinkId): bool
+    public function deleteAffiliateLink(int $brokerId, int $affiliateLinkId): AffliliateLink
     {
         $affiliateLink = $this->affiliateLinkRepository->find($affiliateLinkId);
 
@@ -364,7 +397,8 @@ class UrlService
         }
 
         return DB::transaction(function () use ($affiliateLink) {
-            return $this->affiliateLinkRepository->delete($affiliateLink);
+            $this->affiliateLinkRepository->delete($affiliateLink);
+            return $affiliateLink;
         });
     }
 
@@ -396,5 +430,27 @@ class UrlService
             subIbAffiliateUrls: new AffiliateLinkCollection($subIbAffiliateUrls->values()),
         );
 
+    }
+
+    /**
+     * @return Url
+     */
+    public function deleteAccountTypeUrl(int $brokerId, int $urlId): Url
+    {
+        $url = $this->repository->find($urlId);
+        if (! $url || $url->broker_id !== $brokerId) {
+            throw new ApiException('URL not found', 404);
+        }
+
+        return DB::transaction(function () use ($url) {
+            //detach platform urls from affiliate links
+            //affiliate_links table is in many to many relations with urls 
+            //table through a pivot table affliliate_link_url with url_id and affliliate_link_id
+            $url->affliliateLinks()->detach();
+            if (! $this->repository->delete($url)) {
+                throw new ApiException('Could not delete URL', 500);
+            }
+            return $url;
+        });
     }
 }

@@ -170,33 +170,33 @@ class AccountTypeController extends Controller
      *     @OA\Response(response=404, description="Account type not found")
      * )
      */
-    public function getUrlsGroupedByType($id)
-    {
+    // public function getUrlsGroupedByType($id)
+    // {
 
-        $accountType = AccountType::find($id);
-        if (! $accountType) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Account type not found',
-            ], 404);
-        }
+    //     $accountType = AccountType::find($id);
+    //     if (! $accountType) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Account type not found',
+    //         ], 404);
+    //     }
 
-        // Eager load translations for each URL
-        $urls = $accountType->urls()->with('translations')->get();
+    //     // Eager load translations for each URL
+    //     $urls = $accountType->urls()->with('translations')->get();
 
-        // Transform each URL using UrlResource
-        $transformed = URLResource::collection($urls);
+    //     // Transform each URL using UrlResource
+    //     $transformed = URLResource::collection($urls);
 
-        // Group by url_type
-        $grouped = $transformed->groupBy('url_type')->map(function ($items) {
-            return $items->values();
-        });
+    //     // Group by url_type
+    //     $grouped = $transformed->groupBy('url_type')->map(function ($items) {
+    //         return $items->values();
+    //     });
 
-        return response()->json([
-            'success' => true,
-            'data' => $grouped,
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $grouped,
+    //     ]);
+    // }
 
     /**
      * @OA\Post(
@@ -279,49 +279,49 @@ class AccountTypeController extends Controller
     //     "slug": "mobile",
     //     "broker_id":1
     //   }
-    public function createUrls(Request $request, $id = null)
-    {
-        // TO DO verify that the logged in broker id is the same as the broker_id in the request
-        //or is admin
-        $broker_id = $request->broker_id;
-        $isAdmin = app('isAdmin');
-        $id = ($id === 'null' || $id === '') ? null : $id;
-        if ($broker_id == null) {
-            throw new \Exception('Broker ID is required');
-        }
+    // public function createUrls(Request $request, $id = null)
+    // {
+    //     // TO DO verify that the logged in broker id is the same as the broker_id in the request
+    //     //or is admin
+    //     $broker_id = $request->broker_id;
+    //     $isAdmin = app('isAdmin');
+    //     $id = ($id === 'null' || $id === '') ? null : $id;
+    //     if ($broker_id == null) {
+    //         throw new \Exception('Broker ID is required');
+    //     }
 
-        //if urlable_id is  null which is the id for AccountType, it means that is a master url that has urlable_id null
-        //it is avaialble for all broker account types
-        if ($id) {
-            //if account type id is not null, it means that is a broker account type
-            $accountType = AccountType::find($id);
+    //     //if urlable_id is  null which is the id for AccountType, it means that is a master url that has urlable_id null
+    //     //it is avaialble for all broker account types
+    //     if ($id) {
+    //         //if account type id is not null, it means that is a broker account type
+    //         $accountType = AccountType::find($id);
 
-            if (! $accountType) {
-                return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
-            }
-        } else {
-            $accountType = null;
-        }
+    //         if (! $accountType) {
+    //             return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+    //         }
+    //     } else {
+    //         $accountType = null;
+    //     }
 
-        $data = $request->all();
+    //     $data = $request->all();
 
-        $urls = $this->flattenUrlInput($data);
+    //     $urls = $this->flattenUrlInput($data);
 
-        $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls, $isAdmin);
+    //     $created = app(UrlService::class)->createMany($accountType, 'account_type', $urls, $isAdmin);
 
-        // Optionally, fetch the created URLs for response
-        if ($accountType) {
-            $fetched = $accountType->urls()->latest('id')->take(count($urls))->get();
-        } else {
-            $fetched = Url::where('urlable_type', AccountType::class)->where('broker_id', $broker_id)->latest('id')->take(count($urls))->get();
-        }
+    //     // Optionally, fetch the created URLs for response
+    //     if ($accountType) {
+    //         $fetched = $accountType->urls()->latest('id')->take(count($urls))->get();
+    //     } else {
+    //         $fetched = Url::where('urlable_type', AccountType::class)->where('broker_id', $broker_id)->latest('id')->take(count($urls))->get();
+    //     }
 
-        return response()->json([
-            'success' => true,
-            // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
-            'data' => $fetched,
-        ], 201);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         // 'data' => \Modules\Brokers\Transformers\URLResource::collection($fetched)
+    //         'data' => $fetched,
+    //     ], 201);
+    // }
 
     /**
      * @OA\Put(
@@ -388,42 +388,42 @@ class AccountTypeController extends Controller
     //       }
     //     ]
     //   }
-    public function updateUrls(Request $request, $id = null)
-    {
-        // Convert string "null" to actual null
-        $id = ($id === 'null' || $id === '') ? null : $id;
+    // public function updateUrls(Request $request, $id = null)
+    // {
+    //     // Convert string "null" to actual null
+    //     $id = ($id === 'null' || $id === '') ? null : $id;
 
-        // TO DO verify that the logged in broker id is the same as the broker_id in the request
-        //or is admin
-        $broker_id = $request->broker_id;
+    //     // TO DO verify that the logged in broker id is the same as the broker_id in the request
+    //     //or is admin
+    //     $broker_id = $request->broker_id;
 
-        $isAdmin = app('isAdmin');
-        if ($broker_id == null) {
-            throw new \Exception('Broker ID is required as a search parameter');
-        }
+    //     $isAdmin = app('isAdmin');
+    //     if ($broker_id == null) {
+    //         throw new \Exception('Broker ID is required as a search parameter');
+    //     }
 
-        // dd($id);
-        if ($id) {
-            //if account type id is not null, it means that is a broker account type
-            $accountType = AccountType::find($id);
+    //     // dd($id);
+    //     if ($id) {
+    //         //if account type id is not null, it means that is a broker account type
+    //         $accountType = AccountType::find($id);
 
-            if (! $accountType) {
-                return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
-            }
-        } else {
-            $accountType = null;
-        }
+    //         if (! $accountType) {
+    //             return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+    //         }
+    //     } else {
+    //         $accountType = null;
+    //     }
 
-        $data = $request->all();
-        $urls = $this->flattenUrlInput($data);
+    //     $data = $request->all();
+    //     $urls = $this->flattenUrlInput($data);
 
-        $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id, $isAdmin);
+    //     $updated = app(UrlService::class)->updateMany('account_type', $urls, $broker_id, $isAdmin);
 
-        return response()->json([
-            'success' => true,
-            'data' => URLResource::collection(collect($updated)),
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => URLResource::collection(collect($updated)),
+    //     ]);
+    // }
 
     /**
      * Helper to flatten grouped or single URL input.
@@ -458,24 +458,24 @@ class AccountTypeController extends Controller
      * @param  array  $data
      * @return array
      */
-    private function flattenUrlInput($data)
-    {
-        $urls = [];
-        // If input is a single URL (has url_type), wrap it in an array
-        if (isset($data['url_type'])) {
-            $urls[] = $data;
-        } else {
-            // If input is grouped by url_type, flatten it
-            foreach ($data as $type => $urlArr) {
-                foreach ($urlArr as $url) {
-                    $url['url_type'] = $type;
-                    $urls[] = $url;
-                }
-            }
-        }
+    //  private function flattenUrlInput($data)
+    // {
+    //     $urls = [];
+    //     // If input is a single URL (has url_type), wrap it in an array
+    //     if (isset($data['url_type'])) {
+    //         $urls[] = $data;
+    //     } else {
+    //         // If input is grouped by url_type, flatten it
+    //         foreach ($data as $type => $urlArr) {
+    //             foreach ($urlArr as $url) {
+    //                 $url['url_type'] = $type;
+    //                 $urls[] = $url;
+    //             }
+    //         }
+    //     }
 
-        return $urls;
-    }
+    //     return $urls;
+    // }
 
     /**
      * @OA\Delete(
@@ -513,7 +513,7 @@ class AccountTypeController extends Controller
      *     )
      * )
      */
-    public function destroy(Request $request, $id): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
 
         // TODO: Check if account type broker id is the same as the logged in broker id or is admin
@@ -584,48 +584,48 @@ class AccountTypeController extends Controller
      *     @OA\Response(response=404, description="URL or Account type not found")
      * )
      */
-    public function deleteAccountTypeUrl($accountTypeId, $urlId)
-    {
+    // public function deleteAccountTypeUrl($accountTypeId, $urlId)
+    // {
 
-        // TO DO
-        //check if account type broker id is the same as the logged in broker id
-        //or is admin
+    //     // TO DO
+    //     //check if account type broker id is the same as the logged in broker id
+    //     //or is admin
 
-        // $brokerId = $request->input('broker_id');
-        // if (!$brokerId) {
-        //     return response()->json(['success' => false, 'message' => 'Broker ID required'], 400);
-        // }
+    //     // $brokerId = $request->input('broker_id');
+    //     // if (!$brokerId) {
+    //     //     return response()->json(['success' => false, 'message' => 'Broker ID required'], 400);
+    //     // }
 
-        // // TODO: Verify broker owns this account type
-        // $accountType = AccountType::where('id', $accountTypeId)
-        //     ->where('broker_id', $brokerId)
-        //     ->first();
+    //     // // TODO: Verify broker owns this account type
+    //     // $accountType = AccountType::where('id', $accountTypeId)
+    //     //     ->where('broker_id', $brokerId)
+    //     //     ->first();
 
-        $accountType = AccountType::find($accountTypeId);
+    //     $accountType = AccountType::find($accountTypeId);
 
-        if (! $accountType) {
-            return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
-        }
+    //     if (! $accountType) {
+    //         return response()->json(['success' => false, 'message' => 'Account type not found'], 404);
+    //     }
 
-        $allUrls = $accountType->getAllAccountTypeUrls();
-        $url = $allUrls->firstWhere('id', $urlId);
-        if (! $url) {
-            return response()->json(['success' => false, 'message' => 'URL not found'], 404);
-        }
+    //     $allUrls = $accountType->getAllAccountTypeUrls();
+    //     $url = $allUrls->firstWhere('id', $urlId);
+    //     if (! $url) {
+    //         return response()->json(['success' => false, 'message' => 'URL not found'], 404);
+    //     }
 
-        try {
-            $url->delete();
+    //     try {
+    //         $url->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'URL deleted successfully',
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete URL',
-                'error' => $e->getMessage(),  // Add this for debugging
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'URL deleted successfully',
+    //         ]);
+    //     } catch (\Throwable $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to delete URL',
+    //             'error' => $e->getMessage(),  // Add this for debugging
+    //         ], 500);
+    //     }
+    // }
 }

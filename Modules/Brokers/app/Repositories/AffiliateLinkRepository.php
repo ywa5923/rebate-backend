@@ -2,6 +2,7 @@
 
 namespace Modules\Brokers\Repositories;
 
+use App\Exceptions\ApiException;
 use Illuminate\Support\Collection;
 use Modules\Brokers\Models\AffliliateLink;
 use Modules\Translations\Models\Translation;
@@ -60,7 +61,7 @@ class AffiliateLinkRepository
         ])->find($id);
     }
 
-    public function delete(AffliliateLink $affiliateLink): bool
+    public function delete(AffliliateLink $affiliateLink): void
     {
         Translation::query()
             ->where('translationable_type', AffliliateLink::class)
@@ -69,6 +70,8 @@ class AffiliateLinkRepository
 
         $affiliateLink->platformUrls()->detach();
 
-        return (bool) $affiliateLink->delete();
+        if (! $affiliateLink->delete()) {
+            throw new ApiException('Failed to delete affiliate link.');
+        }
     }
 }

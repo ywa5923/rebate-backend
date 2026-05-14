@@ -91,6 +91,7 @@ Route::prefix('v1')->group(function () {
     //to do: add middleware to check if the user is admin or not
     Route::post('account-type/broker/{broker_id}/url', [UrlController::class, 'createAccountTypeUrl']);
     Route::put('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'updateAccountTypeUrl']);
+    Route::delete('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'deleteAccountTypeUrl']);
     //to do add delete4 acc type url
 
     //=================================== Url routes ========================================================
