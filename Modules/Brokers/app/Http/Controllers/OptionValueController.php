@@ -300,9 +300,9 @@ class OptionValueController extends Controller
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
        
-       $isAdmin=app('isAdmin');
+      // $isAdmin=app('isAdmin');
 
-        
+        $isAdmin=false;
         //Example request
         // {
         //     "option_values": [
@@ -362,6 +362,7 @@ class OptionValueController extends Controller
             ], 201);
 
         } catch (\Throwable $e) {
+            //TO DO: Log the error IN DB
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create option values',
@@ -476,7 +477,8 @@ class OptionValueController extends Controller
      */
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
-        $isAdmin=app('isAdmin');
+        //$isAdmin=app('isAdmin');
+        $isAdmin=false;
 
        
    
@@ -490,8 +492,6 @@ class OptionValueController extends Controller
 
             $validatedData=$this->optionValueService->validateMultipleOptionValuesData($optionValuesData);
 
-            
-         
              $this->optionValueService->updateMultipleOptionValues($isAdmin, $brokerId, $entityId, $entityType,  $validatedData);
           
             return response()->json([
@@ -500,6 +500,7 @@ class OptionValueController extends Controller
                 
             ]);
         } catch (\Throwable $e) {
+            //TO DO: Log the error IN DB
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update option values',

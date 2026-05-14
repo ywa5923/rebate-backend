@@ -218,23 +218,10 @@ class OptionValueRepository
         try {
             $result = DB::update($sql, $bindings);
             
-            // Only log in development or when explicitly enabled
-            if (config('app.debug') || config('app.env') === 'local') {
-                // Log::info('Bulk update completed', [
-                //     'broker_id' => $brokerId,
-                //     'records_updated' => $result,
-                //     'total_records' => count($optionValueIds)
-                // ]);
-            }
-            
             return $result > 0;
         } catch (\Exception $e) {
             // Always log errors
-            Log::error('Bulk update failed', [
-                'broker_id' => $brokerId,
-                'error' => $e->getMessage(),
-                'records_count' => count($optionValueIds)
-            ]);
+            
             throw $e;
         }
     }

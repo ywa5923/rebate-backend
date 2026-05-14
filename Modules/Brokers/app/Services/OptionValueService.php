@@ -124,7 +124,7 @@ class OptionValueService
      */
     public function createMultipleOptionValues(int $brokerId, bool $isAdmin, string $modelClass, int $entityId, array $optionValuesData): void
     {
-            try {
+           
                 // Validate input
                 if (empty($optionValuesData)) {
                     throw new \InvalidArgumentException('Option values data cannot be empty');
@@ -170,14 +170,6 @@ class OptionValueService
                 // Bulk insert all option values in one query
                 $this->repository->bulkCreate($bulkData);
                 
-               
-
-            } catch (\Exception $e) {
-                Log::error('OptionValueService createMultipleOptionValues error: ' . $e->getMessage());
-                Log::error('Stack trace: ' . $e->getTraceAsString());
-                throw $e;
-            }
-        
     }
 
     /**
@@ -261,10 +253,9 @@ class OptionValueService
                     //for empty values,the id is removed from frontend,so reject null values from new inserts
                     //so for a new option value to be inserted: id not null,value or public_value must be set
                     
-                    if (empty($optionValueData['id']) && 
+                    if ($id===null && 
                        (!empty($optionValueData['value']) || !empty($optionValueData['public_value']))) {
-                   
-                       
+                        //these are new inserts
                         unset($optionValueData['id']);
                         $optionValueData['broker_id'] = $brokerId; // Ensure broker_id is set
                         $optionValueData['optionable_id']=$entity_id;
@@ -277,21 +268,20 @@ class OptionValueService
                         }
                        
                         $inserts[] = $optionValueData;
-                    } else if(isset($optionValueData['id']) && !empty($optionValueData['id'])) {
-                       //if(!isset($optionValueData['id'])){ dd($optionValueData);}
+
+                    } else if($id) {
+                      
                         // Check if this is an existing option value that needs comparison
-                        if (!$isAdmin && isset($optionValueData['id'])
-                            && isset($existingOptionValues[$optionValueData['id']])) {
-                        
-                        
+                        if (!$isAdmin && $existingValue) { 
                             $existingAdminMetadata = $existingValue->metadata['public_value']??[];
 
                             //extract the broker value from metadata which is "value" key
-
-
                             //keep only broker metadata to compare with new value by using the hasValueChanged function
                             $existingValue->metadata = $existingValue->metadata['value']??null;
-                            
+                            //$optionValueData come from the clien with metadata  "metadata": {"unit": "eur"}
+                            //and $existingValue->metadata is ["public_value"=>["unit"=>"eur"],"value"=>["unit"=>"eur"]]
+                            //for the comparison, we need to keep only the broker metadata which is "value" key
+            
                             // Compare values to determine if they've changed
                             $valueChanged = $this->hasValueChanged($existingValue, $optionValueData);
                             
@@ -299,20 +289,24 @@ class OptionValueService
                                 //get previous unit from metadata in case the option is a numberWithUnit
                                 $previousUnit = $existingValue->metadata['unit']??null;
                                 // Set previous_value to old value and is_updated_entry to 1
-                                $optionValueData['previous_value'] =  $previousUnit?$existingValue->value.'-'.$previousUnit:$existingValue->value;
-                                $optionValueData['is_updated_entry'] = 1;
+                               $previousValue =  $previousUnit?(($existingValue->value??'empty').'-'.$previousUnit):$existingValue->value??'empty';
+                               $optionValueData['previous_value']=$previousValue.'->'.($existingValue->previous_value ?? '');
+                               $optionValueData['is_updated_entry'] = 1;
 
                                 //reconstruct metadata,add new value and existing admin metadata which has public key
                                 if(isset($optionValueData['metadata'])){
                                     $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']];
                                 }
-
+                               // $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']??[]];
                            
-                           
+            
                             } else {
                                 // Keep existing previous_value and is_updated_entry
                                 $optionValueData['previous_value'] = $existingValue->previous_value;
                                 $optionValueData['is_updated_entry'] = $existingValue->is_updated_entry;
+                                if(isset($optionValueData['metadata'])){
+                                    $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']];
+                                }
                             }
 
 
