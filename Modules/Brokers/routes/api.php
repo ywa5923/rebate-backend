@@ -105,6 +105,7 @@ Route::prefix('v1')->group(function () {
 
     //=================================== Company routes =================================
     Route::get('companies/{broker_id}', [CompanyController::class, 'index']);
+    Route::delete('companies/{id}', [CompanyController::class, 'destroy']);
 
     //=================================== Dynamic Tables routes =================================
     Route::get('evaluation-steps/{broker_id}', [EvaluationStepController::class, 'index']);

@@ -297,8 +297,7 @@ class OptionValueService
                                 if(isset($optionValueData['metadata'])){
                                     $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']];
                                 }
-                               // $optionValueData['metadata'] = ["public_value"=>$existingAdminMetadata,"value"=>$optionValueData['metadata']??[]];
-                           
+                            
             
                             } else {
                                 // Keep existing previous_value and is_updated_entry
@@ -385,11 +384,15 @@ class OptionValueService
 
     public function deleteOptionValuesByOptionableId(int $optionableId, string $optionableType): bool
     {
-        $optionValues = $this->repository->getByOptionableId($optionableId,$optionableType);
-        foreach ($optionValues as $optionValue) {
-            $this->repository->delete($optionValue);
-        }
-        return true;
+        // $optionValues = $this->repository->getByOptionableId($optionableId,$optionableType);
+        // foreach ($optionValues as $optionValue) {
+        //     $this->repository->delete($optionValue);
+        // }
+        // return true;
+      return  OptionValue::query()
+         ->where('optionable_id', $optionableId)
+         ->where('optionable_type', $optionableType)
+         ->delete();
     }
 
     /**
