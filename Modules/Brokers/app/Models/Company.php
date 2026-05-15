@@ -37,6 +37,8 @@ class Company extends Model
 
     public function regulators(): BelongsToMany
     {
-        return $this->belongsToMany(Regulator::class);
+        return $this->belongsToMany(Regulator::class)
+            ->withPivot('zone_id')
+            ->withTimestamps();
     }
 }

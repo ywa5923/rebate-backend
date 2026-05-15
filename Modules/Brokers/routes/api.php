@@ -17,6 +17,7 @@ use Modules\Brokers\Http\Controllers\MatrixController;
 use Modules\Brokers\Http\Controllers\OptionCategoryController;
 use Modules\Brokers\Http\Controllers\OptionValueController;
 use Modules\Brokers\Http\Controllers\PromotionController;
+use Modules\Brokers\Http\Controllers\RegulatorController;
 use Modules\Brokers\Http\Controllers\UrlController;
 use Modules\Brokers\Http\Controllers\ZoneController;
 
@@ -108,6 +109,10 @@ Route::prefix('v1')->group(function () {
     Route::get('companies/{company_id}/broker/{broker_id}/regulators', [CompanyController::class, 'getRegulators']);
     Route::delete('companies/{id}/broker/{broker_id}', [CompanyController::class, 'destroy']);
 
+    //=================================== Regulator routes =================================
+    Route::get('regulators/list', [RegulatorController::class, 'getRegulatorsList']);
+    Route::post('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'attachRegulatorToCompany']);
+    Route::delete('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'detachRegulatorFromCompany']);
     //=================================== Dynamic Tables routes =================================
     Route::get('evaluation-steps/{broker_id}', [EvaluationStepController::class, 'index']);
     //=================================== Promotion routes =================================

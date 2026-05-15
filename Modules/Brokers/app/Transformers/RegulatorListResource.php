@@ -2,9 +2,10 @@
 
 namespace Modules\Brokers\Transformers;
 
+use App\Utilities\TranslateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Utilities\TranslateTrait;
+
 //use Modules\Translations\Transformers\TranslationResource;
 class RegulatorListResource extends JsonResource
 {
@@ -14,7 +15,7 @@ class RegulatorListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name."(".$this->acronym.")-".$this->translateProp("country"),
+            'name' => $this->name.'('.$this->acronym.')-'.$this->translateProp('country').' '.$this->rating.' stars',
             //'translations' => TranslationResource::collection($this->whenLoaded('translations')),
         ];
     }
