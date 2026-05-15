@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broker_regulator', function (Blueprint $table) {
+        Schema::create('company_regulator', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("broker_id")->constrained();
-            $table->foreignId("regulator_id")->constrained();
-            $table->string('zone_code',200)->nullable()->default(null);
-            $table->boolean('is_invariant')->default(1);
+
+            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('regulator_id')->constrained('regulators')->cascadeOnDelete();
+            $table->foreignId('zone_id')->nullable()->constrained('zones');
             $table->timestamps();
+
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('broker_regulator');
+        Schema::dropIfExists('company_regulator');
     }
 };

@@ -3,12 +3,13 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
+use Modules\Brokers\Http\Requests\DeleteCompanyRequest;
+use Modules\Brokers\Http\Requests\GetCompanyRegulatorsRequest;
+use Modules\Brokers\Http\Requests\IndexCompanyRequest;
 use Modules\Brokers\Services\CompanyService;
 use Modules\Brokers\Transformers\CompanyResource;
+use Modules\Brokers\Transformers\RegulatorResource;
 
 class CompanyController extends Controller
 {
@@ -19,102 +20,41 @@ class CompanyController extends Controller
         $this->companyService = $companyService;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/companies",
-     *     tags={"Company"},
-     *     summary="Get all companies",
-     *     @OA\Parameter(
-     *         name="broker_id",
-     *         in="query",
-     *         description="Filter by broker ID",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Company")),
-     *             @OA\Property(property="pagination", type="object", @OA\Property(property="current_page", type="integer"), @OA\Property(property="last_page", type="integer"), @OA\Property(property="per_page", type="integer"), @OA\Property(property="total", type="integer"))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-    public function index(Request $request,int $broker_id)
+    public function index(IndexCompanyRequest $request, int $broker_id): JsonResponse
     {
-        try {
-            //get companies by query params: broker_id, status, search, sort_by, sort_direction, per_page, language_code
-            $result = $this->companyService->getCompanies($request,$broker_id);
-          
-            // Transform the data collection
-           // $result['data'] = CompanyResource::collection($result['data']);
-            //return $result;
-            return response()->json([
-                'success' => true,
-                'data' => CompanyResource::collection($result['data'])
-            ], 200);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve companies',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        $data = $request->validated();
+        $language_code = $data['language_code']; //default to en if not provided
+        $zone_id = $data['zone_id'] ?? null;
+
+        $result = $this->companyService->getCompanies($broker_id, $language_code, $zone_id);
+
+        return response()->json([
+            'success' => true,
+            'data' => CompanyResource::collection($result),
+        ], 200);
     }
 
-   
-    /**
-     * @OA\Delete(
-     *     path="/api/v1/companies/{id}",
-     *     tags={"Company"},
-     *     summary="Delete company",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Company ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Company deleted successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Company deleted successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Company not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-    public function destroy($id): JsonResponse
+    public function destroy(DeleteCompanyRequest $request, int $id, int $broker_id): JsonResponse
     {
-        try {
-            $this->companyService->deleteCompany($id);
+        $this->companyService->deleteCompany($id);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Company deleted successfully'
-            ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Company deleted successfully',
+        ]);
+    }
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete company',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    public function getRegulators(GetCompanyRegulatorsRequest $request, int $company_id, int $broker_id): JsonResponse
+    {
+        $data = $request->validated();
+        $language_code = $data['language_code'];
+        $zone_id = $data['zone_id'] ?? null;
+
+        $result = $this->companyService->getRegulators($data['company_id'], $language_code, $zone_id);
+
+        return response()->json([
+            'success' => true,
+            'data' => RegulatorResource::collection($result),
+        ], 200);
     }
 }

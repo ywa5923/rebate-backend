@@ -3,15 +3,14 @@
 namespace Modules\Brokers\Repositories;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Modules\Brokers\Models\Company;
-use Modules\Brokers\Transformers\CompanyCollection;
-use Modules\Brokers\Repositories\CompanyUniqueListInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Models\Company;
+use Modules\Brokers\Transformers\CompanyCollection;
 
-class Company2Repository
+class OldCompany2Repository
 {
     protected Company $model;
 
@@ -27,22 +26,24 @@ class Company2Repository
             $list = [];
             $companyCollection = new CompanyCollection($companies);
             foreach ($companyCollection->resolve() as $company) {
-                $items = explode(",", $company[$fieldName]);
+                $items = explode(',', $company[$fieldName]);
                 foreach ($items as $item) {
-                    if (!array_key_exists(trim($item), $list) && trim($item) !== "")
+                    if (! array_key_exists(trim($item), $list) && trim($item) !== '') {
                         $list[trim($item)] = trim($item);
+                    }
                 }
             }
 
             $results = array_merge($results, $list);
         });
+
         return array_unique($results);
     }
 
     public function getCompaniesWithTranslationsQB($langaugeCondition)
     {
-        return Company::with(["translations" => function (Builder $query) use ($langaugeCondition) {
-            /** @var Illuminate\Contracts\Database\Eloquent\Builder   $query */
+        return Company::with(['translations' => function (Builder $query) use ($langaugeCondition) {
+            /** @var Illuminate\Contracts\Database\Eloquent\Builder $query */
             $query->where(...$langaugeCondition);
         }]);
     }
@@ -52,7 +53,7 @@ class Company2Repository
     /**
      * Get paginated companies with filters
      */
-    public function getCompanies(Request $request,int $broker_id): LengthAwarePaginator|Collection
+    public function getCompanies(Request $request, int $broker_id): LengthAwarePaginator|Collection
     {
 
         //tested with http://localhost:8080/api/v1/companies?language_code=ro&broker_id=200&company_id=1&zone_code=sua
@@ -60,21 +61,19 @@ class Company2Repository
         //dd(DB::getQueryLog());
 
         $query = $this->model->newQuery()->where('broker_id', $broker_id);
-      
-       
+
         $this->applyFilters($query, $request);
-       
 
         if ($request->has('per_page') || $request->has('page')) {
             // Paginate with specific page
             $perPage = $request->get('per_page', 15);
             $page = $request->get('page', 1);
+
             return $query->paginate($perPage, ['*'], 'page', $page);
         } else {
             return $query->get();
         }
     }
-    
 
     /**
      * Get company by ID with relations
@@ -162,7 +161,6 @@ class Company2Repository
     private function applyFilters($query, Request $request): void
     {
 
-
         // if ($request->has('broker_id')) {
         //     $query->where('broker_id', $request->broker_id);
         // }
@@ -171,7 +169,6 @@ class Company2Repository
             $query->where('id', $request->company_id);
         }
 
-      
         if ($request->has('zone_code')) {
             $withArray = ['optionValues' => function ($q) use ($request) {
 
@@ -179,33 +176,32 @@ class Company2Repository
                     $subQ->where('is_invariant', 1)
                         ->orWhere('zone_code', $request->zone_code);
                 });
-                
+
             }];
-        }else{
-            //if zone_code is not provided, we need to get the option values 
+        } else {
+            //if zone_code is not provided, we need to get the option values
             //for the company that have no zone_code and zone_id, i.e original data submitted by broker
-            $withArray = ['optionValues' => function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
-                    $subQ->where('zone_code', null)->where('zone_id',null);
+            $withArray = ['optionValues' => function ($q) {
+                $q->where(function ($subQ) {
+                    $subQ->where('zone_code', null)->where('zone_id', null);
                 });
-                
+
             }];
         }
 
-
         if ($request->has('language_code')) {
-           
+
             $withArray['optionValues.translations'] = function ($q) use ($request) {
                 $q->where('language_code', $request->language_code);
             };
         }
-        if(!empty($withArray)){
+        if (! empty($withArray)) {
             $query->with($withArray);
-        }else{
+        } else {
             $query->with('optionValues');
-            
+
         }
-       
+
     }
 
     /**

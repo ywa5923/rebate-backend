@@ -4,10 +4,17 @@ namespace App\Utilities;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @property string $public_value
+ * @property array $metadata
+ * @property string $name
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Translations\Models\Translation> $translations
+ *
+ * @method bool relationLoaded(string $relation)
  */
 trait TranslateTrait
 {
-    public function translate($field, $isOptionValueSlug = false)
+    public function translate(string $field, bool $isOptionValueSlug = false): ?string
     {
 
         //refactor this
@@ -35,11 +42,8 @@ trait TranslateTrait
 
     /**
      * Return the translated metadata for a given field
-     *
-     * @param  string  $field
-     * @return array|null
      */
-    public function translateOptionMeta($field)
+    public function translateOptionMeta(string $field): ?array
     {
 
         // if($this->$field===null)
@@ -55,7 +59,7 @@ trait TranslateTrait
         return $this->metadata;
     }
 
-    public function translateOptionPublicValue($propSlug)
+    public function translateOptionPublicValue(string $propSlug): ?string
     {
         ///for default language, translations relationship is not loaded, so just return the name
         if (! $this->relationLoaded('translations')) {
@@ -65,7 +69,7 @@ trait TranslateTrait
         return $this->getTranslatedProperty($propSlug) ?? $this->public_value;
     }
 
-    public function translateBrokerOption($prop)
+    public function translateBrokerOption(string $prop): ?string
     {
         //this function is used to translate only options not option values
 
@@ -78,7 +82,7 @@ trait TranslateTrait
 
     }
 
-    public function translateProp($prop)
+    public function translateProp(string $prop): ?string
     {
 
         if (! $this->relationLoaded('translations')) {
@@ -89,12 +93,14 @@ trait TranslateTrait
 
     }
 
-    public function getTranslatedProperty($prop)
+    public function getTranslatedProperty(string $prop): ?string
     {
         foreach ($this->translations as $translation) {
             if ($translation->property == $prop) {
                 return $translation->value;
             }
         }
+
+        return null;
     }
 }

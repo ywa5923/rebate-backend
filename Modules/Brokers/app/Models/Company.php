@@ -3,18 +3,12 @@
 namespace Modules\Brokers\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-
-
-
 
 class Company extends Model
 {
-    use HasFactory;
-
     /**
      * The table associated with the model.
      *
@@ -36,12 +30,13 @@ class Company extends Model
         return $this->belongsTo(Broker::class);
     }
 
-  
-
     public function optionValues(): MorphMany
     {
         return $this->morphMany(OptionValue::class, 'optionable');
     }
 
-   
+    public function regulators(): BelongsToMany
+    {
+        return $this->belongsToMany(Regulator::class);
+    }
 }
