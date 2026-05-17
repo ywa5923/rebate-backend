@@ -1,0 +1,121 @@
+label,value,order
+United States(US),united-states-us,1
+Canada(CA),canada-ca,2
+Mexico(MX),mexico-mx,3
+Argentina(AR),argentina-ar,4
+Brazil(BR),brazil-br,5
+Chile(CL),chile-cl,6
+Colombia(CO),colombia-co,7
+Peru(PE),peru-pe,8
+Venezuela(VE),venezuela-ve,9
+Uruguay(UY),uruguay-uy,10
+Paraguay(PY),paraguay-py,11
+Bolivia(BO),bolivia-bo,12
+Ecuador(EC),ecuador-ec,13
+Panama(PA),panama-pa,14
+Costa Rica(CR),costa-rica-cr,15
+Guatemala(GT),guatemala-gt,16
+Honduras(HN),honduras-hn,17
+El Salvador(SV),el-salvador-sv,18
+Nicaragua(NI),nicaragua-ni,19
+Dominican Republic(DO),dominican-republic-do,20
+Cuba(CU),cuba-cu,21
+Jamaica(JM),jamaica-jm,22
+Trinidad and Tobago(TT),trinidad-and-tobago-tt,23
+Bahamas(BS),bahamas-bs,24
+Barbados(BB),barbados-bb,25
+United Kingdom(GB),united-kingdom-gb,26
+Germany(DE),germany-de,27
+France(FR),france-fr,28
+Italy(IT),italy-it,29
+Spain(ES),spain-es,30
+Netherlands(NL),netherlands-nl,31
+Belgium(BE),belgium-be,32
+Switzerland(CH),switzerland-ch,33
+Austria(AT),austria-at,34
+Sweden(SE),sweden-se,35
+Norway(NO),norway-no,36
+Denmark(DK),denmark-dk,37
+Finland(FI),finland-fi,38
+Ireland(IE),ireland-ie,39
+Portugal(PT),portugal-pt,40
+Greece(GR),greece-gr,41
+Poland(PL),poland-pl,42
+Czech Republic(CZ),czech-republic-cz,43
+Hungary(HU),hungary-hu,44
+Romania(RO),romania-ro,45
+Bulgaria(BG),bulgaria-bg,46
+Croatia(HR),croatia-hr,47
+Slovakia(SK),slovakia-sk,48
+Slovenia(SI),slovenia-si,49
+Estonia(EE),estonia-ee,50
+Latvia(LV),latvia-lv,51
+Lithuania(LT),lithuania-lt,52
+Luxembourg(LU),luxembourg-lu,53
+Malta(MT),malta-mt,54
+Cyprus(CY),cyprus-cy,55
+Iceland(IS),iceland-is,56
+Russia(RU),russia-ru,57
+Ukraine(UA),ukraine-ua,58
+Belarus(BY),belarus-by,59
+Kazakhstan(KZ),kazakhstan-kz,60
+Armenia(AM),armenia-am,61
+Azerbaijan(AZ),azerbaijan-az,62
+Georgia(GE),georgia-ge,63
+Moldova(MD),moldova-md,64
+Uzbekistan(UZ),uzbekistan-uz,65
+Kyrgyzstan(KG),kyrgyzstan-kg,66
+Tajikistan(TJ),tajikistan-tj,67
+Turkmenistan(TM),turkmenistan-tm,68
+Saudi Arabia(SA),saudi-arabia-sa,69
+United Arab Emirates(AE),united-arab-emirates-ae,70
+Qatar(QA),qatar-qa,71
+Kuwait(KW),kuwait-kw,72
+Bahrain(BH),bahrain-bh,73
+Oman(OM),oman-om,74
+Israel(IL),israel-il,75
+Turkey(TR),turkey-tr,76
+Egypt(EG),egypt-eg,77
+Morocco(MA),morocco-ma,78
+Algeria(DZ),algeria-dz,79
+Tunisia(TN),tunisia-tn,80
+Jordan(JO),jordan-jo,81
+Lebanon(LB),lebanon-lb,82
+Iraq(IQ),iraq-iq,83
+Iran(IR),iran-ir,84
+South Africa(ZA),south-africa-za,85
+Nigeria(NG),nigeria-ng,86
+Kenya(KE),kenya-ke,87
+Ghana(GH),ghana-gh,88
+Ethiopia(ET),ethiopia-et,89
+Tanzania(TZ),tanzania-tz,90
+Uganda(UG),uganda-ug,91
+Angola(AO),angola-ao,92
+Zambia(ZM),zambia-zm,93
+Zimbabwe(ZW),zimbabwe-zw,94
+Botswana(BW),botswana-bw,95
+Namibia(NA),namibia-na,96
+Mozambique(MZ),mozambique-mz,97
+Rwanda(RW),rwanda-rw,98
+Senegal(SN),senegal-sn,99
+Ivory Coast(CI),ivory-coast-ci,100
+China(CN),china-cn,101
+Japan(JP),japan-jp,102
+South Korea(KR),south-korea-kr,103
+India(IN),india-in,104
+Singapore(SG),singapore-sg,105
+Hong Kong(HK),hong-kong-hk,106
+Australia(AU),australia-au,107
+New Zealand(NZ),new-zealand-nz,108
+Indonesia(ID),indonesia-id,109
+Malaysia(MY),malaysia-my,110
+Thailand(TH),thailand-th,111
+Philippines(PH),philippines-ph,112
+Vietnam(VN),vietnam-vn,113
+Pakistan(PK),pakistan-pk,114
+Bangladesh(BD),bangladesh-bd,115
+Sri Lanka(LK),sri-lanka-lk,116
+Cambodia(KH),cambodia-kh,117
+Laos(LA),laos-la,118
+Myanmar(MM),myanmar-mm,119
+Nepal(NP),nepal-np,120

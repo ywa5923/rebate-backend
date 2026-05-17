@@ -1,0 +1,10 @@
+label,value,order
+STP,stp,1
+ECN,ecn,2
+Market Maker,market-maker,3
+DMA,dma,4
+Market Execution,market-execution,5
+Instant Execution,instant-execution,6
+No Dealing Desk,no-dealing-desk,7
+Dealing Desk,dealing-desk,8
+Hybrid,hybrid,9

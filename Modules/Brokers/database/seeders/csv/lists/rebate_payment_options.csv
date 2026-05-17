@@ -1,0 +1,14 @@
+label,value,order
+Instant Rebates (FXRebate Wallet),instant-rebates-fxrebate-wallet,1
+Daily Rebates (FXRebate Wallet),daily-rebates-fxrebate-wallet,2
+Weekly Rebates (FXRebate Wallet),weekly-rebates-fxrebate-wallet,3
+Monthly Rebates (FXRebate Wallet),monthly-rebates-fxrebate-wallet,4
+Direct to Trading Account (Instant),direct-to-trading-account-instant,5
+Direct to Trading Account (Daily),direct-to-trading-account-daily,6
+Direct to Trading Account (Weekly),direct-to-trading-account-weekly,7
+Direct to Trading Account (Monthly),direct-to-trading-account-monthly,8
+Spread Reduction (Real Time Discount),spread-reduction-real-time-discount,9
+Commission Reduction (Real Time Discount),commission-reduction-real-time-discount,10
+Daily Rebates (Real Time Reports),daily-rebates-real-time-reports,11
+Weekly Rebates (Real Time Reports),weekly-rebates-real-time-reports,12
+Monthly Rebates (Real Time Reports),monthly-rebates-real-time-reports,13

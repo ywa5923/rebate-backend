@@ -1,0 +1,18 @@
+label,value,order
+Phone,phone,1
+Call-back request,call-back-request,2
+International toll-free,international-toll-free,3
+Live Chat 24/5,live-chat-24-5,4
+Live Chat 24/7,live-chat-24-7,5
+WhatsApp,whatsapp,6
+Telegram,telegram,7
+Viber,viber,8
+WeChat,wechat,9
+Facebook Messenger,facebook-messenger,10
+Instagram Direct Messaging,instagram-direct-messaging,11
+Line,line,12
+Email,email,13
+Ticket System,ticket-system,14
+Discord,discord,15
+AI Chatbot + Human escalation,ai-chatbot-human-escalation,16
+FAQ / Help Center,faq-help-center,17

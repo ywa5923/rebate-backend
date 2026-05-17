@@ -1,0 +1,15 @@
+label,value,order
+Instant Rebates (IB Wallet),instant-rebates-ib-wallet,1
+Daily Rebates (IB Wallet),daily-rebates-ib-wallet,2
+Weekly Rebates (IB Wallet),weekly-rebates-ib-wallet,3
+Monthly Rebates (IB Wallet),monthly-rebates-ib-wallet,4
+Direct to IB Trading Account (Instant),direct-to-ib-trading-account-instant,5
+Direct to IB Trading Account (Daily),direct-to-ib-trading-account-daily,6
+Direct to IB Trading Account (Weekly),direct-to-ib-trading-account-weekly,7
+Direct to IB Trading Account (Monthly),direct-to-ib-trading-account-monthly,8
+Split Between IB and Trader (Auto Rebate),split-between-ib-and-trader-auto-rebate,9
+Spread Reduction for Trader (Real Time Discount),spread-reduction-for-trader-real-time-discount,10
+Commission Reduction for Trader (Real Time Discount),commission-reduction-for-trader-real-time-discount,11
+Daily Rebates (Real Time Reports),daily-rebates-real-time-reports,12
+Weekly Rebates (Real Time Reports),weekly-rebates-real-time-reports,13
+Monthly Rebates (Real Time Reports),monthly-rebates-real-time-reports,14

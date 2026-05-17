@@ -1,0 +1,59 @@
+label,value,order
+MetaTrader 4 (MT4)(MetaTrader Platforms),metatrader-4-mt4,1
+MetaTrader 5 (MT5)(MetaTrader Platforms),metatrader-5-mt5,2
+MetaTrader Web(MetaTrader Platforms),metatrader-web,3
+MetaTrader Multiterminal(MetaTrader Platforms),metatrader-multiterminal,4
+cTrader(cTrader Platforms),ctrader,5
+cAlgo (cTrader Automate)(cTrader Platforms),calgo-ctrader-automate,6
+cTrader Copy(cTrader Platforms),ctrader-copy,7
+TradingView Web Platform(TradingView Platforms),tradingview-web-platform,8
+TradingView Desktop(TradingView Platforms),tradingview-desktop,9
+xStation (XTB)(Proprietary Forex Broker Platforms),xstation-xtb,10
+Next Generation Platform (CMC Markets)(Proprietary Forex Broker Platforms),next-generation-platform-cmc-markets,11
+IG Trading Platform(Proprietary Forex Broker Platforms),ig-trading-platform,12
+SaxoTraderGO(Proprietary Forex Broker Platforms),saxotradergo,13
+SaxoTraderPRO(Proprietary Forex Broker Platforms),saxotraderpro,14
+OANDA Trade(Proprietary Forex Broker Platforms),oanda-trade,15
+FXCM Trading Station(Proprietary Forex Broker Platforms),fxcm-trading-station,16
+ThinkTrader (ThinkMarkets)(Proprietary Forex Broker Platforms),thinktrader-thinkmarkets,17
+Plus500 WebTrader(Proprietary Forex Broker Platforms),plus500-webtrader,18
+eToro Platform(Proprietary Forex Broker Platforms),etoro-platform,19
+AvaTrade WebTrader(Proprietary Forex Broker Platforms),avatrade-webtrader,20
+Exness Terminal(Proprietary Forex Broker Platforms),exness-terminal,21
+Pepperstone Web Platform(Proprietary Forex Broker Platforms),pepperstone-web-platform,22
+Swissquote Advanced Trader(Proprietary Forex Broker Platforms),swissquote-advanced-trader,23
+Currenex(Institutional / ECN Platforms),currenex,24
+Integral(Institutional / ECN Platforms),integral,25
+LMAX Global(Institutional / ECN Platforms),lmax-global,26
+Match-Trader(Institutional / ECN Platforms),match-trader,27
+PrimeXM XCore(Institutional / ECN Platforms),primexm-xcore,28
+DXtrade (Devexperts)(Institutional / ECN Platforms),dxtrade-devexperts,29
+NinjaTrader(Futures Trading Platforms),ninjatrader,30
+TradeStation(Futures Trading Platforms),tradestation,31
+MultiCharts(Futures Trading Platforms),multicharts,32
+Sierra Chart(Futures Trading Platforms),sierra-chart,33
+CQG(Futures Trading Platforms),cqg,34
+Rithmic(Futures Trading Platforms),rithmic,35
+Trading Technologies (TT)(Futures Trading Platforms),trading-technologies-tt,36
+Bookmap(Futures Trading Platforms),bookmap,37
+MotiveWave(Futures Trading Platforms),motivewave,38
+Jigsaw Trading(Futures Trading Platforms),jigsaw-trading,39
+Quantower(Futures Trading Platforms),quantower,40
+Interactive Brokers TWS(Futures Trading Platforms),interactive-brokers-tws,41
+AMP Futures Platform(Futures Trading Platforms),amp-futures-platform,42
+EdgeClear Platform(Futures Trading Platforms),edgeclear-platform,43
+Optimus Flow(Futures Trading Platforms),optimus-flow,44
+Ironbeam Platform(Futures Trading Platforms),ironbeam-platform,45
+Tradovate(Futures Trading Platforms),tradovate,46
+ZuluTrade(Copy & Social Trading Platforms),zulutrade,47
+Myfxbook AutoTrade(Copy & Social Trading Platforms),myfxbook-autotrade,48
+DupliTrade(Copy & Social Trading Platforms),duplitrade,49
+MetaTrader Signals(Copy & Social Trading Platforms),metatrader-signals,50
+cTrader Copy(Copy & Social Trading Platforms),ctrader-copy-social,51
+eToro CopyTrader(Copy & Social Trading Platforms),etoro-copytrader,52
+Binance Futures(Crypto + Forex Hybrid Platforms),binance-futures,53
+Bybit(Crypto + Forex Hybrid Platforms),bybit,54
+OKX(Crypto + Forex Hybrid Platforms),okx,55
+Kraken Pro(Crypto + Forex Hybrid Platforms),kraken-pro,56
+Deribit(Crypto + Forex Hybrid Platforms),deribit,57
+BitMEX(Crypto + Forex Hybrid Platforms),bitmex,58

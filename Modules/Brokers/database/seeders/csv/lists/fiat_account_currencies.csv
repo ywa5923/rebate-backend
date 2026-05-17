@@ -1,0 +1,54 @@
+label,value,order
+US Dollar(USD),us-dollar-usd,1
+Euro(EUR),euro-eur,2
+British Pound Sterling(GBP),british-pound-sterling-gbp,3
+Japanese Yen(JPY),japanese-yen-jpy,4
+Swiss Franc(CHF),swiss-franc-chf,5
+Canadian Dollar(CAD),canadian-dollar-cad,6
+Australian Dollar(AUD),australian-dollar-aud,7
+New Zealand Dollar(NZD),new-zealand-dollar-nzd,8
+Chinese Yuan(CNY),chinese-yuan-cny,9
+Hong Kong Dollar(HKD),hong-kong-dollar-hkd,10
+Singapore Dollar(SGD),singapore-dollar-sgd,11
+Indian Rupee(INR),indian-rupee-inr,12
+Brazilian Real(BRL),brazilian-real-brl,13
+South African Rand(ZAR),south-african-rand-zar,14
+Mexican Peso(MXN),mexican-peso-mxn,15
+Turkish Lira(TRY),turkish-lira-try,16
+Russian Ruble(RUB),russian-ruble-rub,17
+Romanian Leu(RON),romanian-leu-ron,18
+Polish Zloty(PLN),polish-zloty-pln,19
+Swedish Krona(SEK),swedish-krona-sek,20
+Norwegian Krone(NOK),norwegian-krone-nok,21
+Danish Krone(DKK),danish-krone-dkk,22
+Czech Koruna(CZK),czech-koruna-czk,23
+Hungarian Forint(HUF),hungarian-forint-huf,24
+UAE Dirham(AED),uae-dirham-aed,25
+Saudi Riyal(SAR),saudi-riyal-sar,26
+Qatari Riyal(QAR),qatari-riyal-qar,27
+Kuwaiti Dinar(KWD),kuwaiti-dinar-kwd,28
+Bahraini Dinar(BHD),bahraini-dinar-bhd,29
+Omani Rial(OMR),omani-rial-omr,30
+Israeli Shekel(ILS),israeli-shekel-ils,31
+Egyptian Pound(EGP),egyptian-pound-egp,32
+Nigerian Naira(NGN),nigerian-naira-ngn,33
+Kenyan Shilling(KES),kenyan-shilling-kes,34
+Ghanaian Cedi(GHS),ghanaian-cedi-ghs,35
+Indonesian Rupiah(IDR),indonesian-rupiah-idr,36
+Malaysian Ringgit(MYR),malaysian-ringgit-myr,37
+Thai Baht(THB),thai-baht-thb,38
+Vietnamese Dong(VND),vietnamese-dong-vnd,39
+Philippine Peso(PHP),philippine-peso-php,40
+Pakistani Rupee(PKR),pakistani-rupee-pkr,41
+Bangladeshi Taka(BDT),bangladeshi-taka-bdt,42
+Sri Lankan Rupee(LKR),sri-lankan-rupee-lkr,43
+Argentine Peso(ARS),argentine-peso-ars,44
+Chilean Peso(CLP),chilean-peso-clp,45
+Colombian Peso(COP),colombian-peso-cop,46
+Peruvian Sol(PEN),peruvian-sol-pen,47
+Uruguayan Peso(UYU),uruguayan-peso-uyu,48
+Ukrainian Hryvnia(UAH),ukrainian-hryvnia-uah,49
+Kazakhstani Tenge(KZT),kazakhstani-tenge-kzt,50
+Serbian Dinar(RSD),serbian-dinar-rsd,51
+All(ALL),all,52
+Others(OTHERS),others,53

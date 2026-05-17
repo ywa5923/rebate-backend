@@ -1,0 +1,18 @@
+label,value,order
+Bitcoin(BTC),bitcoin-btc,1
+Ethereum(ETH),ethereum-eth,2
+Tether(USDT),tether-usdt,3
+XRP(XRP),xrp,4
+Binance Coin(BNB),binance-coin-bnb,5
+USD Coin(USDC),usd-coin-usdc,6
+Solana(SOL),solana-sol,7
+TRON(TRX),tron-trx,8
+Dogecoin(DOGE),dogecoin-doge,9
+Bitcoin Cash(BCH),bitcoin-cash-bch,10
+Cardano(ADA),cardano-ada,11
+CyberCoin(CC),cybercoin-cc,12
+ChainLink(LINK),chainlink-link,13
+Monero(XMR),monero-xmr,14
+Stellar(XLM),stellar-xlm,15
+All(ALL),all,16
+Others(OTHERS),others,17

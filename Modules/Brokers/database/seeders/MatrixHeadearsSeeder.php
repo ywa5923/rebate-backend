@@ -3,10 +3,9 @@
 namespace Modules\Brokers\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Brokers\Models\MatrixHeader;
 use Modules\Brokers\Models\FormType;
+use Modules\Brokers\Models\MatrixHeader;
 use Modules\Translations\Models\Translation;
-
 
 class MatrixHeadearsSeeder extends Seeder
 {
@@ -20,107 +19,149 @@ class MatrixHeadearsSeeder extends Seeder
         $this->translateChallengeColumns();
     }
 
-
     public function getChallengesRowsHeadears()
     {
         $challenges = [
             [
-                'id'=>17,
+                'id' => 17,
                 'type' => 'row',
-                'title' => 'Equity Growth Target',
-                'slug' => 'equity-growth-target',
+                'title' => 'Profit Target',
+                'is_percentage' => true,
+                'slug' => 'profit-target',
                 'group_name' => 'challenge',
-                'description' => 'Equity Growth Target',
+                'description' => 'Profit amount the client needs to achieve in order to pass to the next step of the program and be eligible to receive the payout',
             ],
             [
-                'id'=>18,
+                'id' => 18,
                 'type' => 'row',
-                'title' => 'Daily Drawdown Limit',
-                'slug' => 'daily-drawdown-limit',
+                'title' => 'Maximum Daily Loss',
+                'is_percentage' => true,
+                'slug' => 'maximum-daily-loss',
                 'group_name' => 'challenge',
-                'description' => 'Daily Drawdown Limit',
+                'description' => 'Maximum Daily Loss is the maximum amount a client account can lose in any given day',
             ],
             [
-                'id'=>19,
+                'id' => 19,
                 'type' => 'row',
-                'title' => 'Max Drawdown Limit',
-                'slug' => 'max-drawdown-limit',
+                'title' => 'Maximum Total Loss',
+                'is_percentage' => true,
+                'slug' => 'maximum-total-loss',
                 'group_name' => 'challenge',
-                'description' => 'Max Drawdown Limit',
+                'description' => 'Maximum Total Loss is the amount your equity or balance can\'t go below',
             ],
+
             [
-                'id'=>20,
-                'type' => 'row',
-                'title' => 'Inactivity Period',
-                'slug' => 'inactivity-period',
-                'group_name' => 'challenge',
-                'description' => 'Inactivity Period',
-            ],
-            [
-                'id'=>21,
+                'id' => 20,
                 'type' => 'row',
                 'title' => 'Leverage',
+                'is_percentage' => false,
                 'slug' => 'leverage',
                 'group_name' => 'challenge',
-                'description' => 'Leverage',
+                'description' => 'Maximum leverage a client account can have',
             ],
             [
-                'id'=>22,
+                'id' => 21,
                 'type' => 'row',
-                'title' => 'Stop Loss Requirement',
-                'slug' => 'stop-loss-requirement',
+                'title' => 'Consistency on Rewards ',
+                'is_percentage' => false,
+                'slug' => 'consistency-on-rewards',
                 'group_name' => 'challenge',
-                'description' => 'Stop Loss Requirement',
+                'description' => 'Best trading day profit cannot exceed the total profit with a specific %',
             ],
+
             [
-                'id'=>23,
+                'id' => 22,
                 'type' => 'row',
-                'title' => 'Positions Over Weekend',
-                'slug' => 'positions-over-weekend',
+                'title' => 'Minimum Trading Days',
+                'is_percentage' => false,
+                'slug' => 'minimum-trading-days',
                 'group_name' => 'challenge',
-                'description' => 'Positions Over Weekend',
+                'description' => 'Minimum number of days the client has to trade',
             ],
             [
-                'id'=>24,
-                'type' => 'row',
-                'title' => 'Max Time',
-                'slug' => 'max-time',
-                'group_name' => 'challenge',
-                'description' => 'Max Time',
-            ],
-            [
-                'id'=>25,
+                'id' => 23,
                 'type' => 'row',
                 'title' => 'Add-Ons',
+                'is_percentage' => false,
                 'slug' => 'add-ons',
                 'group_name' => 'challenge',
-                'description' => 'Add-Ons',
+                'description' => 'Any add-ons that can enhace the client challenge experience',
             ],
             [
-                'id'=>26,
+                'id' => 24,
                 'type' => 'row',
-                'title' => 'Reward Based on equity Growth',
-                'slug' => 'reward-based-on-equity-growth',
+                'title' => 'Refundable Fee',
+                'is_percentage' => false,
+                'slug' => 'refundable-fee',
                 'group_name' => 'challenge',
-                'description' => 'Reward Based on equity Growth',
+                'description' => 'The evaluation fee is reimbursed with the first payout, once the client become a funded trader',
             ],
             [
-                'id'=>27,
+                'id' => 25,
+                'type' => 'row',
+                'title' => 'Profit Split',
+                'is_percentage' => false,
+                'slug' => 'profit-split',
+                'group_name' => 'challenge',
+                'description' => 'Profit split value between the client and the prop firm',
+            ],
+            [
+                'id' => 26,
                 'type' => 'row',
                 'title' => 'Payout',
+                'is_percentage' => false,
                 'slug' => 'payout',
                 'group_name' => 'challenge',
-                'description' => 'Payout',
+                'description' => 'Frequency a client can get his payments',
             ],
+            [
+                'id' => 27,
+                'type' => 'row',
+                'title' => 'Evaluation Cost',
+                'is_percentage' => false,
+                'slug' => 'evaluation-cost',
+                'group_name' => 'challenge',
+                'description' => 'Purchase cost of a challenge',
+            ],
+            [
+                'id' => 28,
+                'type' => 'row',
+                'title' => 'Promo Code',
+                'is_percentage' => false,
+                'slug' => 'promo-code',
+                'group_name' => 'challenge',
+                'description' => 'Dedicated discount code for FXRebate applied to all challenges (if exist)',
+            ],
+            [
+                'id' => 29,
+                'type' => 'row',
+                'title' => 'Affiliate Commission',
+                'is_percentage' => false,
+                'slug' => 'affiliate-commission',
+                'group_name' => 'challenge',
+                'description' => 'What is the % prop firm pays FXRebate as an affiliate',
+            ],
+            [
+                'id' => 30,
+                'type' => 'row',
+                'title' => 'Client Rebate',
+                'is_percentage' => false,
+                'slug' => 'client-rebate',
+                'group_name' => 'challenge',
+                'description' => 'To be able to receive challenge purchase rebates link your trading account to your FXRebate profile',
+            ],
+
         ];
+
         return $challenges;
     }
+
     public function getChallengesColumnsHeadears()
     {
         $textType = FormType::where('name', 'Text')->first();
         $challenges = [
-            [   
-                'id'=>11,
+            [
+                'id' => 11,
                 'type' => 'column',
                 'title' => 'Funded Account',
                 'slug' => 'step-0-funded-account',
@@ -128,7 +169,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
             [
-                'id'=>12,
+                'id' => 12,
                 'type' => 'column',
                 'title' => 'Funded Account',
                 'slug' => 'step-1-funded-account',
@@ -136,7 +177,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
             [
-                'id'=>13,
+                'id' => 13,
                 'type' => 'column',
                 'title' => 'Step 1 Investiqa Assesments',
                 'slug' => 'step-1-investiqa-assesments',
@@ -144,7 +185,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
             [
-                'id'=>14,
+                'id' => 14,
                 'type' => 'column',
                 'title' => 'Funded Account',
                 'slug' => 'step-2-funded-account',
@@ -152,7 +193,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
             [
-                'id'=>15,
+                'id' => 15,
                 'type' => 'column',
                 'title' => 'Step 2 Investiqa Assesments',
                 'slug' => 'step-2-investiqa-assesments',
@@ -160,7 +201,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
             [
-                'id'=>16,
+                'id' => 16,
                 'type' => 'column',
                 'title' => 'Step 2 Investiqa Confirmation',
                 'slug' => 'step-2-investiqa-confirmation',
@@ -168,6 +209,7 @@ class MatrixHeadearsSeeder extends Seeder
                 'form_type_id' => $textType->id,
             ],
         ];
+
         return $challenges;
     }
 
@@ -175,52 +217,52 @@ class MatrixHeadearsSeeder extends Seeder
     {
         Translation::insert([
             [
-             "translation_type"=>"property",
-             "property"=>"title",
-             "value"=>"Ro Funded Account",
-             "language_code"=>"ro",
-             "translationable_id"=>11,
-             "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Funded Account',
+                'language_code' => 'ro',
+                'translationable_id' => 11,
+                'translationable_type' => MatrixHeader::class,
             ],
             [
-                "translation_type"=>"property",
-                "property"=>"title",
-                "value"=>"Ro Funded Account",
-                "language_code"=>"ro",
-                "translationable_id"=>12,
-                "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Funded Account',
+                'language_code' => 'ro',
+                'translationable_id' => 12,
+                'translationable_type' => MatrixHeader::class,
             ],
             [
-                "translation_type"=>"property",
-                "property"=>"title",
-                "value"=>"Ro Step 1 Investiqa Assesments",
-                "language_code"=>"ro",
-                "translationable_id"=>13,
-                "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Step 1 Investiqa Assesments',
+                'language_code' => 'ro',
+                'translationable_id' => 13,
+                'translationable_type' => MatrixHeader::class,
             ],
             [
-                "translation_type"=>"property",
-                "property"=>"title",
-                "value"=>"Ro Funded Account",
-                "language_code"=>"ro",
-                "translationable_id"=>14,
-                "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Funded Account',
+                'language_code' => 'ro',
+                'translationable_id' => 14,
+                'translationable_type' => MatrixHeader::class,
             ],
             [
-                "translation_type"=>"property",
-                "property"=>"title",
-                "value"=>"Ro Step 2 Investiqa Assesments",
-                "language_code"=>"ro",
-                "translationable_id"=>15,
-                "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Step 2 Investiqa Assesments',
+                'language_code' => 'ro',
+                'translationable_id' => 15,
+                'translationable_type' => MatrixHeader::class,
             ],
             [
-                "translation_type"=>"property",
-                "property"=>"title",
-                "value"=>"Ro Step 2 Investiqa Confirmation",
-                "language_code"=>"ro",
-                "translationable_id"=>16,
-                "translationable_type"=>MatrixHeader::class
+                'translation_type' => 'property',
+                'property' => 'title',
+                'value' => 'Ro Step 2 Investiqa Confirmation',
+                'language_code' => 'ro',
+                'translationable_id' => 16,
+                'translationable_type' => MatrixHeader::class,
             ],
         ]);
     }

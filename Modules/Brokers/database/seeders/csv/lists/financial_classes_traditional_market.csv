@@ -1,0 +1,18 @@
+label,value,order
+Forex,forex,1
+CFDs,cfds,2
+Metals,metals,3
+Commodities (Energies),commodities-energies,4
+Commodities (Agriculture),commodities-agriculture,5
+Equity Indices,equity-indices,6
+Futures,futures,7
+Shares,shares,8
+Cryptocurrencies,cryptocurrencies,9
+ETFs,etfs,10
+Options,options,11
+Treasuries,treasuries,12
+ETPs,etps,13
+Mutual Funds,mutual-funds,14
+Syntethics,syntethics,15
+Stock CFDs,stock-cfds,16
+Others,others,17

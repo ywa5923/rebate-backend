@@ -1,42 +1,46 @@
 <?php
+
 namespace Database\Seeders;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 
 class BatchImporter
 {
-
     protected string $tableName;
+
     protected array $rowMapping;
-    
+
     public function __construct(
         public string $filePath
-    ){}
-
-    public function setTableInfo(string $tableName,array $rowMapping)
-    {
-      $this->tableName=$tableName;
-      $this->rowMapping=$rowMapping;
+    ) {
     }
 
-
-    public function import($skip=0,$chunk=1000)
+    public function setTableInfo(string $tableName, array $rowMapping)
     {
-        $mp=  $this->rowMapping;
+        $this->tableName = $tableName;
+        $this->rowMapping = $rowMapping;
+    }
+
+    public function import($skip = 0, $chunk = 1000)
+    {
+        $mp = $this->rowMapping;
         DB::disableQueryLog();
         $this->createLazyCollection($this->filePath)
             ->skip($skip)
             ->chunk($chunk)
-            ->each(function (LazyCollection $chunk) use($mp) {
+            ->each(function (LazyCollection $chunk) use ($mp) {
 
                 $records = $chunk->map(function ($row) use ($mp) {
-                   
-                   $cols=array_keys($mp);
-                   $r=[];
-                   foreach($cols as $col)
-                   {
-                     $r[$col]=$row[$mp[$col]-1];
-                   }
+
+                    $cols = array_keys($mp);
+                    $r = [];
+                    foreach ($cols as $col) {
+                        $index = $mp[$col];
+                        // Negative index: use absolute value as a literal (not a CSV column).
+                        $r[$col] = $index < 0 ? abs($index) : $row[$index - 1];
+                    }
+
                     // return [
                     //     "id" => $row[1],
                     //     "name" => $row[2],
@@ -44,18 +48,18 @@ class BatchImporter
                     // ];
                     return $r;
                 })->toArray();
-               // dd($records);
+                // dd($records);
                 DB::table($this->tableName)->insert($records);
             });
     }
 
     protected function createLazyCollection($fileName)
     {
-       return  LazyCollection::make(function () use ($fileName) {
+        return LazyCollection::make(function () use ($fileName) {
 
-            $handle = fopen($fileName, "r");
+            $handle = fopen($fileName, 'r');
 
-            while (($cols = fgetcsv($handle, 4096)) !== FALSE) {
+            while (($cols = fgetcsv($handle, 4096)) !== false) {
                 // $line = implode(", ", $cols);
                 // $row = explode(",", $line);
 
@@ -65,7 +69,4 @@ class BatchImporter
             fclose($handle);
         });
     }
-
-    
-    
 }

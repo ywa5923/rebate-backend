@@ -1,0 +1,31 @@
+label,value,order
+English(US),english-us,1
+Chinese (Mandarin)(CN),chinese-mandarin-cn,2
+Hindi(IN),hindi-in,3
+Spanish(ES),spanish-es,4
+Arabic(SA),arabic-sa,5
+French(FR),french-fr,6
+Bengali(BD),bengali-bd,7
+Portuguese(BR),portuguese-br,8
+Russian(RU),russian-ru,9
+Indonesian(ID),indonesian-id,10
+Urdu(PK),urdu-pk,11
+German(DE),german-de,12
+Japanese(JP),japanese-jp,13
+Nigerian(NG),nigerian-ng,14
+Egyptian(EG),egyptian-eg,15
+Marathi(IN),marathi-in,16
+Vietnamese(VN),vietnamese-vn,17
+Telugu(IN),telugu-in,18
+Hausa(NG),hausa-ng,19
+Turkish(TR),turkish-tr,20
+Punjabi(PK),punjabi-pk,21
+Swahili(TZ),swahili-tz,22
+Tagalog(PH),tagalog-ph,23
+Tamil(IN),tamil-in,24
+Chinese (Cantonese)(HK),chinese-cantonese-hk,25
+Iranian Persian (Farsi)(IR),iranian-persian-farsi-ir,26
+Korean(KR),korean-kr,27
+Thai(TH),thai-th,28
+Javanese(ID),javanese-id,29
+All(ALL),all,30

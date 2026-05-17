@@ -1,0 +1,51 @@
+label,value,order
+Foreign Exchange (Forex),foreign-exchange-forex,1
+Spot Forex,spot-forex,2
+Futures Market,futures-market,3
+Options Market,options-market,4
+Derivatives Market,derivatives-market,5
+Commodities Market,commodities-market,6
+Precious Metals Market,precious-metals-market,7
+Energy Market,energy-market,8
+Agricultural Commodities Market,agricultural-commodities-market,9
+Equity Market (Stock Market),equity-market-stock-market,10
+Capital Market,capital-market,11
+Primary Market (IPO Market),primary-market-ipo-market,12
+Secondary Market,secondary-market,13
+Bond Market,bond-market,14
+Government Bonds Market,government-bonds-market,15
+Corporate Bonds Market,corporate-bonds-market,16
+Municipal Bonds Market,municipal-bonds-market,17
+Money Market,money-market,18
+Interbank Market,interbank-market,19
+Repo Market,repo-market,20
+Over-the-Counter (OTC) Market,over-the-counter-otc-market,21
+Exchange-Traded Market,exchange-traded-market,22
+ETF Market (Exchange-Traded Funds),etf-market-exchange-traded-funds,23
+Mutual Funds Market,mutual-funds-market,24
+Index Market,index-market,25
+CFD Market (Contracts for Difference),cfd-market-contracts-for-difference,26
+Cryptocurrency Market,cryptocurrency-market,27
+Digital Assets Market,digital-assets-market,28
+Stablecoins Market,stablecoins-market,29
+Tokenized Assets Market,tokenized-assets-market,30
+Structured Products Market,structured-products-market,31
+Credit Market,credit-market,32
+Credit Derivatives Market,credit-derivatives-market,33
+Swaps Market,swaps-market,34
+Interest Rate Market,interest-rate-market,35
+Fixed Income Market,fixed-income-market,36
+Real Estate Investment Market (REITs),real-estate-investment-market-reits,37
+Private Equity Market,private-equity-market,38
+Venture Capital Market,venture-capital-market,39
+Hedge Funds Market,hedge-funds-market,40
+Islamic Finance Market (Sukuk),islamic-finance-market-sukuk,41
+Carbon Credits Market,carbon-credits-market,42
+Emissions Trading Market,emissions-trading-market,43
+Insurance-Linked Securities Market,insurance-linked-securities-market,44
+Art & Collectibles Investment Market,art-collectibles-investment-market,45
+Metals Market (Industrial),metals-market-industrial,46
+Volatility Market (VIX & Volatility Products),volatility-market-vix-volatility-products,47
+Securities Lending Market,securities-lending-market,48
+Crowdfunding Market,crowdfunding-market,49
+Peer-to-Peer (P2P) Lending Market,peer-to-peer-p2p-lending-market,50

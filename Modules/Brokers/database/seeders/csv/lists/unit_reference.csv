@@ -1,0 +1,14 @@
+label,value,order
+per lot,per-lot,1
+per contract,per-contract,2
+per unit,per-unit,3
+of spread,of-spread,4
+of commission,of-commission,5
+per share,per-share,6
+per micro lot,per-micro-lot,7
+per mini lot,per-mini-lot,8
+per nano lot,per-nano-lot,9
+of notional value,of-notional-value,10
+per million,per-million,11
+commission reduction,commission-reduction,12
+spread reduction,spread-reduction,13

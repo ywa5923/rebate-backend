@@ -1,0 +1,8 @@
+label,value,order
+Pay Per Lot / Spread or Commission Rebate(PPL / SCR),pay-per-lot-spread-or-commission-rebate-ppl-scr,1
+Revenue Share(RevShare),revenue-share-revshare,2
+Cost Per Acquisition(CPA),cost-per-acquisition-cpa,3
+Multi-Tier IB(MLM),multi-tier-ib-mlm,4
+Hybrid (CPA + RevShare)(CPA+RevShare),hybrid-cpa-revshare-cpa-revshare,5
+Risk Sharing(B-Book),risk-sharing-b-book,6
+Hedging Commission(A-Book),hedging-commission-a-book,7

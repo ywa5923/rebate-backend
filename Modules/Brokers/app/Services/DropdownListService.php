@@ -238,4 +238,16 @@ class DropdownListService
             }
         });
     }
+
+    public function getListOptionsBySlug(string $slug): array
+    {
+        $dropdownCategory = $this->repository->getDropdownCategoryBySlug($slug);
+        if (! $dropdownCategory) {
+            return [];
+        }
+        return $dropdownCategory->dropdownOptions()
+            ->orderBy('order')
+            ->get(['label', 'value'])
+            ->toArray();
+    }
 }

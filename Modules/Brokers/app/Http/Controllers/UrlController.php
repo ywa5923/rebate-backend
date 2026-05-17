@@ -116,7 +116,8 @@ class UrlController extends Controller
         $zone = $request->validated('zone_code');
         $accountTypes = $this->urlService->getAccountTypesWithPlatformLinks($broker_id, $lang, $zone);
 
-        $currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
+        //$currencyList = $dropdownListService->getCurrencyListOptions(); // Assuming 1 is the ID for currency list
+        $currencyList = $dropdownListService->getListOptionsBySlug('currency');
         //affiliate links are stored in affiliate_links table
         $affliateLinksDTO = $this->urlService->getAffiliateLinks($broker_id, $lang, $zone);
 

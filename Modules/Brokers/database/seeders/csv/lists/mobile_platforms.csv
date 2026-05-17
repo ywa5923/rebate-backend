@@ -1,0 +1,43 @@
+label,value,order
+MetaTrader 4 (MT4) Mobile(MetaTrader Mobile Platforms),metatrader-4-mt4-mobile,1
+MetaTrader 5 (MT5) Mobile(MetaTrader Mobile Platforms),metatrader-5-mt5-mobile,2
+cTrader Mobile(cTrader Mobile Platforms),ctrader-mobile,3
+TradingView Mobile App(TradingView Mobile Platforms),tradingview-mobile-app,4
+xStation Mobile (XTB)(Proprietary Forex Broker Mobile Platforms),xstation-mobile-xtb,5
+Next Generation Mobile (CMC Markets)(Proprietary Forex Broker Mobile Platforms),next-generation-mobile-cmc-markets,6
+IG Trading App(Proprietary Forex Broker Mobile Platforms),ig-trading-app,7
+SaxoTraderGO Mobile(Proprietary Forex Broker Mobile Platforms),saxotradergo-mobile,8
+OANDA Mobile App(Proprietary Forex Broker Mobile Platforms),oanda-mobile-app,9
+FXCM Trading Station Mobile(Proprietary Forex Broker Mobile Platforms),fxcm-trading-station-mobile,10
+ThinkTrader Mobile(Proprietary Forex Broker Mobile Platforms),thinktrader-mobile,11
+Plus500 Mobile App(Proprietary Forex Broker Mobile Platforms),plus500-mobile-app,12
+eToro Mobile App(Proprietary Forex Broker Mobile Platforms),etoro-mobile-app,13
+AvaTradeGO(Proprietary Forex Broker Mobile Platforms),avatradego,14
+Exness Trade App(Proprietary Forex Broker Mobile Platforms),exness-trade-app,15
+Pepperstone Mobile Platform(Proprietary Forex Broker Mobile Platforms),pepperstone-mobile-platform,16
+Swissquote Mobile App(Proprietary Forex Broker Mobile Platforms),swissquote-mobile-app,17
+DXtrade Mobile(Institutional / ECN Mobile Platforms),dxtrade-mobile,18
+Match-Trader Mobile(Institutional / ECN Mobile Platforms),match-trader-mobile,19
+LMAX Mobile Access(Institutional / ECN Mobile Platforms),lmax-mobile-access,20
+NinjaTrader Mobile(Futures Trading Mobile Platforms),ninjatrader-mobile,21
+TradeStation Mobile(Futures Trading Mobile Platforms),tradestation-mobile,22
+CQG Mobile(Futures Trading Mobile Platforms),cqg-mobile,23
+Rithmic Mobile Access(Futures Trading Mobile Platforms),rithmic-mobile-access,24
+Trading Technologies (TT) Mobile(Futures Trading Mobile Platforms),trading-technologies-tt-mobile,25
+Interactive Brokers IBKR Mobile(Futures Trading Mobile Platforms),interactive-brokers-ibkr-mobile,26
+AMP Futures Mobile(Futures Trading Mobile Platforms),amp-futures-mobile,27
+EdgeClear Mobile Access(Futures Trading Mobile Platforms),edgeclear-mobile-access,28
+Ironbeam Mobile(Futures Trading Mobile Platforms),ironbeam-mobile,29
+Tradovate Mobile(Futures Trading Mobile Platforms),tradovate-mobile,30
+ZuluTrade Mobile(Copy & Social Trading Mobile Platforms),zulutrade-mobile,31
+Myfxbook Mobile(Copy & Social Trading Mobile Platforms),myfxbook-mobile,32
+DupliTrade Mobile Access(Copy & Social Trading Mobile Platforms),duplitrade-mobile-access,33
+MetaTrader Signals (Mobile)(Copy & Social Trading Mobile Platforms),metatrader-signals-mobile,34
+cTrader Copy Mobile(Copy & Social Trading Mobile Platforms),ctrader-copy-mobile,35
+eToro CopyTrader (Mobile)(Copy & Social Trading Mobile Platforms),etoro-copytrader-mobile,36
+Binance Mobile App(Crypto + Forex Hybrid Mobile Platforms),binance-mobile-app,37
+Bybit Mobile App(Crypto + Forex Hybrid Mobile Platforms),bybit-mobile-app,38
+OKX Mobile App(Crypto + Forex Hybrid Mobile Platforms),okx-mobile-app,39
+Kraken Pro Mobile(Crypto + Forex Hybrid Mobile Platforms),kraken-pro-mobile,40
+Deribit Mobile Access(Crypto + Forex Hybrid Mobile Platforms),deribit-mobile-access,41
+BitMEX Mobile(Crypto + Forex Hybrid Mobile Platforms),bitmex-mobile,42

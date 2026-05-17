@@ -1,0 +1,12 @@
+label,value,order
+%-Percent,percent,1
+USD,usd,2
+USD cents,usd-cents,3
+EUR,eur,4
+EUR cents,eur-cents,5
+GBP,gbp,6
+GBP cents,gbp-cents,7
+points,points,8
+point cents,point-cents,9
+pips,pips,10
+pip cents,pip-cents,11
