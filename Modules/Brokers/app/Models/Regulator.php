@@ -28,6 +28,8 @@ class Regulator extends Model
         'website',
         'year_established',
         'jurisdiction_type',
+        'notes',
+        'description',
         'status',
         'status_reason',
         'is_invariant',

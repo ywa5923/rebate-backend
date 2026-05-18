@@ -13,20 +13,22 @@ return new class extends Migration
     {
         Schema::create('matrix_headers', function (Blueprint $table) {
             $table->id();
-            $table->enum('type',['column','row']);
+            $table->enum('type', ['column', 'row']);
             $table->string('title');
             $table->string('slug');
             $table->string('group_name')->nullable();
             $table->integer('order')->default(0);
             $table->text('description')->nullable();
             $table->boolean('is_percentage')->default(false);
+            $table->decimal('percentage_value', 5, 2)->nullable();
+            $table->boolean('broker_can_see')->default(false);
             $table->boolean('is_invariant')->default(true);
             $table->foreignId('parent_id')->nullable()->constrained('matrix_headers')->nullOnDelete();
             $table->foreignId('form_type_id')->nullable()->constrained('form_types')->nullOnDelete();
             $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
             $table->foreignId('matrix_id')->nullable()->constrained('matrices')->nullOnDelete();
             $table->foreignId('broker_id')->nullable()->constrained('brokers')->nullOnDelete();
-          //  $table->unique(['slug', 'broker_id', 'matrix_id'], 'unique_slug_broker_matrix');
+            //  $table->unique(['slug', 'broker_id', 'matrix_id'], 'unique_slug_broker_matrix');
             $table->timestamps();
         });
     }

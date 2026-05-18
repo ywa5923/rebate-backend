@@ -1,0 +1,835 @@
+Regulator name,Acronym,Country,Zone,Tier classification,Rating,Investor protection scheme,Compensation limits,Retail leverage restrictions (typical),Notes,Regulator website URL,Year established,Regulatory jurisdiction type,Regulator description
+Financial Conduct Authority,FCA,United Kingdom,Europe,Tier-1,5 stars,FSCS (investments),"Up to £85,000 per person per firm",UK CFD caps aligned to ESMA-style limits (retail),Tiering is an internal Safegate convention.,https://www.fca.org.uk,2013,Multi-sector (conduct),"Financial Conduct Authority is the primary financial regulator for United Kingdom, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Prudential Regulation Authority,PRA,United Kingdom,Europe,Tier-1,5 stars,FSCS (prudential-linked protections),Varies by product / scheme,UK CFD caps aligned to ESMA-style limits (retail),PRA is prudential; include for completeness.,https://www.bankofengland.co.uk/prudential-regulation,2013,Prudential (banking/insurance),"Prudential Regulation Authority is the primary financial regulator for United Kingdom, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on prudential supervision—setting capital and risk-management expectations, supervising resilience, and safeguarding the stability of regulated firms.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Australian Securities and Investments Commission,ASIC,Australia,Asia-Pacific,Tier-1,5 stars,CSLR (last resort compensation),"Up to AUD 150,000 (CSLR cap)",ASIC CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),CSLR covers certain disputes; confirm applicability per case.,https://asic.gov.au,1998,Securities / financial services,"Australian Securities and Investments Commission is the primary financial regulator for Australia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Monetary Authority of Singapore,MAS,Singapore,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Product-specific / varies,No single universal retail leverage cap across products.,https://www.mas.gov.sg,1971,Multi-sector (central bank & supervisor),"Monetary Authority of Singapore is the primary financial regulator for Singapore, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Agency,JFSA/FSA,Japan,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Retail FX leverage cap: 25:1,Applies to retail FX; other products vary.,https://www.fsa.go.jp/en/,2000,Multi-sector (financial services),"Financial Services Agency is the primary financial regulator for Japan, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Futures Commission,SFC,Hong Kong,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.sfc.hk,1989,Securities,"Securities and Futures Commission is the primary financial regulator for Hong Kong, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Swiss Financial Market Supervisory Authority,FINMA,Switzerland,Europe,Tier-1,5 stars,National Investor Compensation Scheme (EEA) (where applicable),"Typically up to €20,000 (EEA ICS; verify national limit)",Varies,Switzerland not under ESMA.,https://www.finma.ch/en/,2009,Multi-sector (financial markets),"Swiss Financial Market Supervisory Authority is the primary financial regulator for Switzerland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Federal Financial Supervisory Authority,BaFin,Germany,Europe,Tier-1,5 stars,German investor compensation (statutory + possible voluntary),Varies (Germany scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),EEA ESMA-style product intervention.,https://www.bafin.de,2002,Multi-sector (financial supervisor),"Federal Financial Supervisory Authority is the primary financial regulator for Germany, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Autorité des Marchés Financiers,AMF,France,Europe,Tier-1,5 stars,French investor compensation scheme,Varies (France scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.amf-france.org/en,2003,Securities,"Autorité des Marchés Financiers is the primary financial regulator for France, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Authority for the Financial Markets,AFM,Netherlands,Europe,Tier-1,5 stars,Dutch investor compensation scheme,Varies (Netherlands scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.afm.nl/,2002,Securities,"Authority for the Financial Markets is the primary financial regulator for Netherlands, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervisory Authority,Finanstilsynet,Denmark,Europe,Tier-1,5 stars,Danish investor compensation scheme,Varies (Denmark scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.dfsa.dk/,1988,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for Denmark, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervisory Authority,Finansinspektionen,Sweden,Europe,Tier-1,5 stars,Swedish investor compensation scheme,Varies (Sweden scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.fi.se/,1991,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for Sweden, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervisory Authority,Finanstilsynet,Norway,Europe,Tier-1,5 stars,Norwegian investor compensation scheme,Varies (Norway scheme rules),ESMA-like / local rules,Norway is EEA; often similar constraints.,https://www.finanstilsynet.no/,1986,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for Norway, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervisory Authority,FIN-FSA,Finland,Europe,Tier-1,5 stars,Finnish investor compensation scheme,Varies (Finland scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.finanssivalvonta.fi/,2009,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for Finland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+U.S. Securities and Exchange Commission,SEC,United States,North America,Tier-1,5 stars,SIPC (for SIPC-member broker-dealers),"Up to $500,000 incl. $250,000 cash",Margin rules vary by security,SIPC is separate; included as key protection reference.,https://www.sec.gov,1934,Securities,"U.S. Securities and Exchange Commission is the primary financial regulator for United States, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Commodity Futures Trading Commission,CFTC,United States,North America,Tier-1,5 stars,Varies / may be none (verify),"SIPC: up to $500,000 (incl. $250,000 cash) for covered securities accounts (where applicable)",Retail FX leverage: 50:1 majors / 20:1 minors (NFA/CFTC rules),,https://www.cftc.gov,1974,Derivatives / commodities,"Commodity Futures Trading Commission is the primary financial regulator for United States, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on derivatives and/or commodity futures oversight—setting rules for intermediaries and trading venues, monitoring market integrity, and enforcing compliance for leveraged and derivatives products.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Futures Association,NFA,United States,North America,Tier-1,5 stars,Varies / may be none (verify),"SIPC: up to $500,000 (incl. $250,000 cash) for covered securities accounts (where applicable)",Retail FX leverage: 50:1 majors / 20:1 minors (NFA/CFTC rules),SRO under CFTC.,https://www.nfa.futures.org,1982,Derivatives SRO,"National Futures Association is the primary financial regulator for United States, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on derivatives and/or commodity futures oversight—setting rules for intermediaries and trading venues, monitoring market integrity, and enforcing compliance for leveraged and derivatives products.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Canadian Investment Regulatory Organization,CIRO,Canada,North America,Tier-1,5 stars,CIPF,Typically up to CAD $1 million (coverage policy),Varies (product-specific),CIRO (formerly IIROC/MFDA).,https://www.ciro.ca,2023,Securities SRO,"Canadian Investment Regulatory Organization is the primary financial regulator for Canada, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Industry Regulatory Authority,FINRA,United States,North America,Tier-1,5 stars,Varies / may be none (verify),"SIPC: up to $500,000 (incl. $250,000 cash) for covered securities accounts (where applicable)",Varies by product/regulator (verify),SRO; securities industry.,https://www.finra.org/,2007,Financial services / conduct,"Financial Industry Regulatory Authority is the primary financial regulator for United States, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Israel Securities Authority,ISA,Israel,Middle East & North Africa,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.gov.il/,1968,Securities,"Israel Securities Authority is the primary financial regulator for Israel, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+China Securities Regulatory Commission,CSRC,China,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,Mainland China rules vary by product.,https://www.csrc.gov.cn/,1992,Securities,"China Securities Regulatory Commission is the primary financial regulator for China, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Korea Financial Services Commission,FSC,South Korea,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.fsc.go.kr/,2008,Financial services / conduct,"Korea Financial Services Commission is the primary financial regulator for South Korea, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Korea Financial Supervisory Service,FSS,South Korea,Asia-Pacific,Tier-1,5 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.fss.or.kr/,1999,Multi-sector / other,"Korea Financial Supervisory Service is the primary financial regulator for South Korea, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Gobierno de Puerto Rico,OCIF,Puerto Rico (United States),North America,Tier-2,4 stars,SIPC (via SIPC-member broker-dealers),Varies / not applicable (verify),Varies,Jurisdictional nuance; treat as Tier-2 for Safegate unless US federal applies.,https://www.ocif.pr.gov/,1996,Securities,"Securities and Exchange Commission is the primary financial regulator for United States (Puerto Rico), responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Cyprus Securities and Exchange Commission,CySEC,Cyprus,Europe,Tier-2,4 stars,Investor Compensation Fund (ICF),"Up to €20,000 per client",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Common CFD/FX hub.,https://www.cysec.gov.cy,2001,Securities,"Cyprus Securities and Exchange Commission is the primary financial regulator for Cyprus, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Ireland,CBI,Ireland,Europe,Tier-2,4 stars,Irish Investor Compensation Scheme,"Typically up to €20,000 (scheme rules)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.centralbank.ie/,1943,Multi-sector (central bank & supervisor),"Central Bank of Ireland is the primary financial regulator for Ireland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Comisión Nacional del Mercado de Valores,CNMV,Spain,Europe,Tier-2,4 stars,Spanish investor compensation scheme,Varies (Spain scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.cnmv.es/,1988,Securities,"Comisión Nacional del Mercado de Valores is the primary financial regulator for Spain, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Commissione Nazionale per le Società e la Borsa,CONSOB,Italy,Europe,Tier-2,4 stars,Italian investor compensation scheme,Varies (Italy scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.consob.it/,1974,Multi-sector / other,"CONSOB is the primary financial regulator for Italy, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Market Authority,FMA,Austria,Europe,Tier-2,4 stars,Austrian investor compensation scheme,Varies (Austria scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.fma.gv.at/,2002,Financial services / conduct,"Financial Market Authority is the primary financial regulator for Austria, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services and Markets Authority,FSMA,Belgium,Europe,Tier-2,4 stars,Belgian investor compensation scheme,Varies (Belgium scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.fsma.be/,2011,Financial services / conduct,"Financial Services and Markets Authority is the primary financial regulator for Belgium, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Commission de Surveillance du Secteur Financier,CSSF,Luxembourg,Europe,Tier-2,4 stars,Luxembourg investor compensation scheme,Varies (Luxembourg scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.cssf.lu/,1998,Securities,"Commission de Surveillance du Secteur Financier is the primary financial regulator for Luxembourg, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Malta Financial Services Authority,MFSA,Malta,Europe,Tier-2,4 stars,Maltese investor compensation scheme,Varies (Malta scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.mfsa.mt/,2002,Securities,"Malta Financial Services Authority is the primary financial regulator for Malta, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Hellenic Capital Market Commission,HCMC,Greece,Europe,Tier-2,4 stars,Greek investor compensation scheme,Varies (Greece scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,http://www.hcmc.gr/,1991,Securities,"Hellenic Capital Market Commission is the primary financial regulator for Greece, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Polish Financial Supervision Authority,KNF,Poland,CIS & Eastern Europe,Tier-2,4 stars,Polish investor compensation scheme,Varies (Poland scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.knf.gov.pl/,2006,Securities,"Polish Financial Supervision Authority is the primary financial regulator for Poland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Czech National Bank,ČNB,Czech Republic,CIS & Eastern Europe,Tier-2,4 stars,Czech investor compensation scheme,Varies (Czech Republic scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.cnb.cz/,1993,Multi-sector / other,"Czech National Bank is the primary financial regulator for Czech Republic, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Hungarian National Bank,MNB,Hungary,CIS & Eastern Europe,Tier-2,4 stars,Hungarian investor compensation scheme,Varies (Hungary scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.mnb.hu/,1924,Multi-sector / other,"Hungarian National Bank is the primary financial regulator for Hungary, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervision Commission,FSC,Bulgaria,CIS & Eastern Europe,Tier-2,4 stars,Bulgarian investor compensation scheme,Varies (Bulgaria scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.fsc.bg/,2003,Multi-sector / other,"Financial Supervision Commission is the primary financial regulator for Bulgaria, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Estonian Financial Supervision Authority,Finantsinspektsioon,Estonia,Europe,Tier-2,4 stars,Estonian investor compensation scheme,Varies (Estonia scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.fi.ee/,2002,Financial services / conduct,"Estonian Financial Supervision Authority is the primary financial regulator for Estonia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Latvijas Bank,BoL,Latvia,Europe,Tier-2,4 stars,Latvian investor compensation scheme,Varies (Latvia scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.bank.lv/,1992,Securities,"Latvian Financial and Capital Market Commission is the primary financial regulator for Latvia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bank of Lithuania,Financial Supervision,Lithuania,Europe,Tier-2,4 stars,Lithuanian investor compensation scheme,Varies (Lithuania scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.lb.lt/,1990,Multi-sector / other,"Bank of Lithuania is the primary financial regulator for Lithuania, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Market Authority,FMA,Slovakia,CIS & Eastern Europe,Tier-2,4 stars,Slovak investor compensation scheme,Varies (Slovakia scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://nbs.sk/,1993,Financial services / conduct,"Financial Market Authority is the primary financial regulator for Slovakia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities Market Agency,ATVP,Slovenia,Europe,Tier-2,4 stars,Slovenian investor compensation scheme,Varies (Slovenia scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.a-tvp.si/,1994,Securities,"Securities Market Agency is the primary financial regulator for Slovenia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Croatian Financial Services Supervisory Agency,HANFA,Croatia,Europe,Tier-2,4 stars,Croatian investor compensation scheme,Varies (Croatia scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.hanfa.hr/,2006,Financial services / conduct,"Croatian Financial Services Supervisory Agency is the primary financial regulator for Croatia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Portuguese Securities Market Commission,CMVM,Portugal,Europe,Tier-2,4 stars,Portuguese investor compensation scheme,Varies (Portugal scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://www.cmvm.pt/,1991,Securities,"Portuguese Securities Market Commission is the primary financial regulator for Portugal, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Romanian Financial Supervisory Authority,ASF,Romania,CIS & Eastern Europe,Tier-2,4 stars,Romanian investor compensation scheme,Varies (Romania scheme rules),ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),,https://asfromania.ro/,1994,Financial services / conduct,"Romanian Financial Supervisory Authority is the primary financial regulator for Romania, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Dubai Financial Services Authority,DFSA,United Arab Emirates,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,DIFC regulator.,https://www.dfsa.ae/,2004,Financial services (IFC),"Dubai Financial Services Authority is the primary financial regulator for United Arab Emirates, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Regulatory Authority,FSRA,United Arab Emirates,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,ADGM regulator.,https://www.adgm.com/financial-services-regulatory-authority,2015,Financial services (IFC),"Financial Services Regulatory Authority is the primary financial regulator for United Arab Emirates, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Commodities Authority,SCA,United Arab Emirates,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,Onshore UAE regulator.,https://www.sca.gov.ae/,2000,Securities,"Securities and Commodities Authority is the primary financial regulator for United Arab Emirates, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Capital Markets Authority,CMA,Saudi Arabia,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://cma.gov.sa/,2003,Securities,"Capital Markets Authority is the primary financial regulator for Saudi Arabia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Bahrain,CBB,Bahrain,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.cbb.gov.bh/,2006,Multi-sector (central bank & supervisor),"Central Bank of Bahrain is the primary financial regulator for Bahrain, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Qatar Financial Centre Regulatory Authority,QFCRA,Qatar,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.qfcra.com/,2005,Financial services / conduct,"Qatar Financial Centre Regulatory Authority is the primary financial regulator for Qatar, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Capital Markets Board,CMB,Turkey,Middle East & North Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://cmb.gov.tr/,1982,Securities,"Capital Markets Board is the primary financial regulator for Turkey, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Markets Authority,FMA,New Zealand,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,Often used by brokers; protections vary.,https://www.fma.govt.nz/,2011,Financial services / conduct,"Financial Markets Authority is the primary financial regulator for New Zealand, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities Commission Malaysia,SC,Malaysia,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.sc.com.my/,1993,Securities,"Securities Commission Malaysia is the primary financial regulator for Malaysia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bank Negara Malaysia,BNM,Malaysia,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.bnm.gov.my/,1959,Multi-sector (central bank & supervisor),"Bank Negara Malaysia is the primary financial regulator for Malaysia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Exchange Commission,SEC,Thailand,Asia-Pacific,Tier-2,4 stars,SIPC (via SIPC-member broker-dealers),Varies / not applicable (verify),Varies,,https://www.sec.or.th/,1992,Securities,"Securities and Exchange Commission is the primary financial regulator for Thailand, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Exchange Commission,SEC,Philippines,Asia-Pacific,Tier-2,4 stars,SIPC (via SIPC-member broker-dealers),Varies / not applicable (verify),Varies,,https://www.sec.gov.ph/,1936,Securities,"Securities and Exchange Commission is the primary financial regulator for Philippines, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Taiwan Financial Supervisory Commission,FSC,Taiwan,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.fsc.gov.tw/,2004,Multi-sector / other,"Taiwan Financial Supervisory Commission is the primary financial regulator for Taiwan, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Exchange Board of India,SEBI,India,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.sebi.gov.in/,1988,Securities,"Securities and Exchange Board of India is the primary financial regulator for India, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Reserve Bank of India,RBI,India,Asia-Pacific,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.rbi.org.in/,1935,Multi-sector / other,"Reserve Bank of India is the primary financial regulator for India, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Sector Conduct Authority,FSCA,South Africa,Sub-Saharan Africa,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.fsca.co.za/,2018,Conduct / financial services,"Financial Sector Conduct Authority is the primary financial regulator for South Africa, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Comissão de Valores Mobiliários,CVM,Brazil,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.gov.br/cvm/,1976,Multi-sector / other,"Comissão de Valores Mobiliários is the primary financial regulator for Brazil, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Comisión Nacional Bancaria y de Valores,CNBV,Mexico,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.cnbv.gob.mx/,1995,Multi-sector / other,"Comisión Nacional Bancaria y de Valores is the primary financial regulator for Mexico, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Comisión para el Mercado Financiero,CMF,Chile,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.cmfchile.cl/,2017,Multi-sector / other,"Comisión para el Mercado Financiero is the primary financial regulator for Chile, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Superintendencia Financiera de Colombia,SFC,Colombia,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.superfinanciera.gov.co/,1989,Securities,"Superintendencia Financiera de Colombia is the primary financial regulator for Colombia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Superintendencia del Mercado de Valores,SMV,Peru,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.smv.gob.pe/,1968,Multi-sector / other,"Superintendencia del Mercado de Valores is the primary financial regulator for Peru, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Comisión Nacional de Valores,CNV,Argentina,Latin America & Caribbean,Tier-2,4 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.argentina.gob.ar/cnv,1968,Multi-sector / other,"Comisión Nacional de Valores is the primary financial regulator for Argentina, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities Commission of The Bahamas,SCB,Bahamas,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://scb.gov.bs/,1995,Securities,"Securities Commission of The Bahamas is the primary financial regulator for Bahamas, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Commission,FSC,Mauritius,Sub-Saharan Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.fscmauritius.org/,2001,Financial services / conduct,"Financial Services Commission is the primary financial regulator for Mauritius, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Authority,FSA,Seychelles,Sub-Saharan Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.fsaseychelles.sc/,2013,Financial services / conduct,"Financial Services Authority is the primary financial regulator for Seychelles, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Commission,FSC,Belize,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.belizefsc.org.bz/,1999,Financial services / conduct,"Financial Services Commission is the primary financial regulator for Belize, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+St. Vincent and the Grenadines Financial Services Authority,SVG FSA,St. Vincent and the Grenadines,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",Often registration/IBC; verify broker’s exact status.,https://fsasvg.com/,2011,Financial services / conduct,"St. Vincent and the Grenadines Financial Services Authority is the primary financial regulator for St. Vincent and the Grenadines, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Vanuatu Financial Services Commission,VFSC,Vanuatu,Asia-Pacific,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.vfsc.vu/,1993,Financial services / conduct,"Vanuatu Financial Services Commission is the primary financial regulator for Vanuatu, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Cayman Islands Monetary Authority,CIMA,Cayman Islands,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cima.ky/,1997,Financial services / conduct,"Cayman Islands Monetary Authority is the primary financial regulator for Cayman Islands, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+British Virgin Islands Financial Services Commission,BVI FSC,British Virgin Islands,Latin America & Caribbean,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.bvifsc.vg/,2001,Financial services / conduct,"British Virgin Islands Financial Services Commission is the primary financial regulator for British Virgin Islands, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Mwali International Services Authority,MISA,Comoros (Mwali),Sub-Saharan Africa,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://mwaliregistrar.org/,1998,Financial services / conduct,"Mwali International Services Authority is the primary financial regulator for Comoros (Mwali), responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Labuan Financial Services Authority,Labuan FSA,Malaysia (Labuan),Asia-Pacific,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",Offshore centre.,https://www.labuanfsa.gov.my/,1996,Financial services / conduct,"Labuan Financial Services Authority is the primary financial regulator for Malaysia (Labuan), responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Isle of Man Financial Services Authority,IOM FSA,Isle of Man,Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.iomfsa.im/,2015,Financial services / conduct,"Isle of Man Financial Services Authority is the primary financial regulator for Isle of Man, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Jersey Financial Services Commission,JFSC,Jersey,Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.jerseyfsc.org/,1998,Financial services / conduct,"Jersey Financial Services Commission is the primary financial regulator for Jersey, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Guernsey Financial Services Commission,GFSC,Guernsey,Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.gfsc.gg/,1987,Financial services / conduct,"Guernsey Financial Services Commission is the primary financial regulator for Guernsey, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Gibraltar Financial Services Commission,GFSC,Gibraltar,Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.fsc.gi/,1989,Financial services / conduct,"Gibraltar Financial Services Commission is the primary financial regulator for Gibraltar, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bermuda Monetary Authority,BMA,Bermuda,North America,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies,,https://www.bma.bm/,1969,Financial services / conduct,"Bermuda Monetary Authority is the primary financial regulator for Bermuda, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Curaçao and Sint Maarten Central Bank,CBCS,Curaçao,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.centralbank.cw/,2010,Multi-sector (central bank & supervisor),"Curaçao and Sint Maarten Central Bank is the primary financial regulator for Curaçao / Sint Maarten, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Curaçao and Sint Maarten Central Bank,CBCS,Sint Maarten,Latin America & Caribbean,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.centralbank.cw/,2010,Multi-sector (central bank & supervisor),"Curaçao and Sint Maarten Central Bank is the primary financial regulator for Curaçao / Sint Maarten, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Market Supervisory Authority,FMA,Liechtenstein,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.fma-li.li/,2005,Financial services / conduct,"Financial Market Supervisory Authority is the primary financial regulator for Liechtenstein, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Iceland,CBI,Iceland,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.cb.is/,1961,Financial services / conduct,"Financial Services Authority is the primary financial regulator for Iceland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bank of Lithuania,LB,Lithuania,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.lb.lt/,1990,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for Lithuania (legacy), responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Bank of Belgium,NBB,Belgium,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.nbb.be/,1850,Multi-sector / other,"National Bank of Belgium is the primary financial regulator for Belgium, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Banco de Portugal,BdP,Portugal,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.bportugal.pt/,1846,Multi-sector / other,"Banco de Portugal is the primary financial regulator for Portugal, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bank of Spain,BdE,Spain,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.bde.es/wbe/,1782,Multi-sector / other,"Bank of Spain is the primary financial regulator for Spain, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services and Markets Authority,FSMA,Belgium,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.fsma.be/,2011,Multi-sector / other,"Banque Nationale de Belgique / FSMA is the primary financial regulator for Belgium, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Malta,CBM,Malta,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.centralbankmalta.org/,1968,Multi-sector (central bank & supervisor),"Central Bank of Malta is the primary financial regulator for Malta, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Bank of Poland,NBP,Poland,CIS & Eastern Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.nbp.pl/,1945,Multi-sector / other,"National Bank of Poland is the primary financial regulator for Poland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Cyprus,CBC,Cyprus,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.centralbank.cy/,1963,Multi-sector (central bank & supervisor),"Central Bank of Cyprus is the primary financial regulator for Cyprus, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bank of Greece,BoG,Greece,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.bankofgreece.gr,1927,Multi-sector / other,"National Bank of Greece is the primary financial regulator for Greece, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Bank of Hungary,MNB,Hungary,CIS & Eastern Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.mnb.hu,1924,Multi-sector / other,"National Bank of Hungary is the primary financial regulator for Hungary, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+De Nederlandsche Bank,DNB,Netherlands,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.dnb.nl,1814,Multi-sector / other,"De Nederlandsche Bank is the primary financial regulator for Netherlands, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Banque Centrale du Luxembourg,BCL,Luxembourg,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.bcl.lu,1998,Multi-sector / other,"Banque Centrale du Luxembourg is the primary financial regulator for Luxembourg, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Austrian National Bank,OeNB,Austria,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.oenb.at,1816,Multi-sector / other,"Austrian National Bank is the primary financial regulator for Austria, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Swiss National Bank,SNB,Switzerland,Europe,Tier-2,4 stars,National investor compensation scheme (EEA),"Varies by country (commonly up to €20,000 under EEA ICS)",ESMA-style CFD caps: 30:1 FX majors; 20:1 minors/gold; 10:1 commodities; 5:1 equities; 2:1 crypto (retail),Use country-specific ICS values if needed.,https://www.snb.ch,1907,Multi-sector / other,"Swiss National Bank is the primary financial regulator for Switzerland, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Supervisory Authority,FSC,North Macedonia,CIS & Eastern Europe,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.fsc.mk,2002,Financial services / conduct,"Financial Supervisory Authority is the primary financial regulator for North Macedonia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities Commission,SEC,Serbia,CIS & Eastern Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.sec.gov.rs,1990,Securities,"Securities Commission is the primary financial regulator for Serbia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities Commission,SCMN,Montenegro,CIS & Eastern Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.sec.gov.me,2000,Securities,"Securities Commission is the primary financial regulator for Montenegro, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Securities and Stock Market Commission,NSSMC,Ukraine,CIS & Eastern Europe,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.nssmc.gov.ua/,1995,Securities,"National Securities and Stock Market Commission is the primary financial regulator for Ukraine, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of the Russian Federation,CBR,Russia,CIS & Eastern Europe,Tier-2,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies by product/regulator (verify),,https://www.cbr.ru/,1990,Multi-sector (central bank & supervisor),"Central Bank of the Russian Federation is the primary financial regulator for Russia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Astana Financial Services Authority,AFSA,Kazakhstan (AIFC),CIS & Eastern Europe,Tier-2,3 stars,Varies / may be none (verify),Varies / not applicable (verify),Varies by product/regulator (verify),,https://afsa.aifc.kz/,2018,Financial services / conduct,"Astana Financial Services Authority is the primary financial regulator for Kazakhstan (AIFC), responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Armenia,CBA,Armenia,CIS & Eastern Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cba.am/,1993,Multi-sector (central bank & supervisor),"Central Bank of Armenia is the primary financial regulator for Armenia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+National Bank of Georgia,NBG,Georgia,CIS & Eastern Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.nbg.gov.ge/,1991,Multi-sector / other,"National Bank of Georgia is the primary financial regulator for Georgia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Central Bank of Azerbaijan / Financial Markets,CBA,Azerbaijan,CIS & Eastern Europe,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cbar.az/,1990,Multi-sector (central bank & supervisor),"Central Bank of Azerbaijan / Financial Markets is the primary financial regulator for Azerbaijan, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Jordan Securities Commission,JSC,Jordan,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.jsc.gov.jo/,1998,Securities,"Jordan Securities Commission is the primary financial regulator for Jordan, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Egyptian Financial Regulatory Authority,FRA,Egypt,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://fra.gov.eg/,2009,Financial services / conduct,"Egyptian Financial Regulatory Authority is the primary financial regulator for Egypt, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Financial Services Authority,FSA,Oman,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://fsa.gov.om/,2021,Securities,"Capital Market Authority is the primary financial regulator for Oman, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Capital Markets Authority,CMA,Kuwait,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cma.gov.kw/,2010,Securities,"Capital Markets Authority is the primary financial regulator for Kuwait, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Capital Markets Authority,CMA,Lebanon,Middle East & North Africa,Tier-3,2 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cma.gov.lb/,2011,Securities,"Capital Markets Authority is the primary financial regulator for Lebanon, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Moroccan Capital Market Authority,AMMC,Morocco,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.ammc.ma/,2016,Securities,"Moroccan Capital Market Authority is the primary financial regulator for Morocco, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Tunisian Financial Market Council,CMF,Tunisia,Middle East & North Africa,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.cmf.tn/,1994,Multi-sector / other,"Tunisian Financial Market Council is the primary financial regulator for Tunisia, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It oversees a broad range of financial services activities—authorisation, ongoing supervision, conduct standards, and enforcement actions where needed.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+State Securities Commission,SSC,Vietnam,Asia-Pacific,Tier-3,3 stars,SIPC (via SIPC-member broker-dealers),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.ssc.gov.vn/,1996,Securities,"Securities and Exchange Commission is the primary financial regulator for Vietnam, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Securities and Exchange Commission,SECP,Pakistan,Asia-Pacific,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.secp.gov.pk/,1997,Securities,"Securities and Exchange Commission is the primary financial regulator for Pakistan, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+Bangladesh Securities and Exchange Commission,BSEC,Bangladesh,Asia-Pacific,Tier-3,3 stars,Varies / may be none (verify),Varies / not applicable (verify),"Often high (e.g., 1:200–1:500+), broker-dependent",,https://www.sec.gov.bd/,1993,Securities,"Bangladesh Securities and Exchange Commission is the primary financial regulator for Bangladesh, responsible for supervising entities under its remit to promote market integrity, fair treatment of clients, and confidence in the financial system.
+
+It focuses on securities and investment markets oversight—authorising and supervising investment firms, enforcing conduct rules, and monitoring market abuse and disclosure standards.
+
+Typical tools include licensing/authorisation requirements, ongoing reporting and audits, rules on client money handling, disclosure standards, and enforcement powers such as fines, restrictions, or licence actions.
+
+The exact protections available to a retail trader (compensation schemes, leverage caps, negative balance protection, etc.) depend on the regulated entity the client is onboarded to and the products offered under that licence."
+No Financial License or Regulation,N/A,Worldwide,All,N/A,1 star,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A

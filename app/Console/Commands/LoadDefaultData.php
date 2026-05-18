@@ -26,43 +26,44 @@ class LoadDefaultData extends Command
      */
     public function handle()
     {
-        DB::statement("use fxrebate");
-        $this->info("\\\\///...importing Option Categories");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder"]);
+        DB::statement('use fxrebate');
+        $this->info('\\\\///...importing Option Categories');
+        $this->call('db:seed', ['class' => '\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder']);
 
-        $this->info("\\\\///...importing URLs ");
-       // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
+        $this->info('\\\\///...importing URLs ');
+        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
 
-        $this->info("\\\\///...importing broker_options ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+        $this->info('\\\\///...importing broker_options ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
 
-         
-        $this->info("\\\\///...importing broker_types ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\BrokerTypesSeeder"]);
+        $this->info('\\\\///...importing broker_types ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\BrokerTypesSeeder"]);
 
-        $this->info("\\\\///...importing settings table ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\SettingsSeeder"]);
+        $this->info('\\\\///...importing settings table ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\SettingsSeeder"]);
 
-        $this->info("\\\\///...importing zones table ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ZonesSeeder"]);
+       $this->info('\\\\///...importing zones and countries table ');
+       $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\CountryAndZoneSeeder"]);
 
-        $this->info("\\\\///...importing dropdowns ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\DropdownSeeder"]);
+        $this->info('\\\\///...importing dropdowns ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\DropdownSeeder"]);
 
-        $this->info("\\\\///...importing form types ");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\FormTypesSeeder"]);
+        $this->info('\\\\///...importing form types ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\FormTypesSeeder"]);
 
-        $this->info("\\\\///...importing matrix headers");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\MatrixSeeder"]);
+        $this->info('\\\\///...importing matrix headers');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\MatrixSeeder"]);
 
-        $this->info("\\\\///...importing matrix headers 2");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\MatrixHeadearsSeeder"]);
+        $this->info('\\\\///...importing matrix headers 2');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\MatrixHeadearsSeeder"]);
 
-        $this->info("\\\\///...importing challenge categories");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\ChallengeSeeder"]);
+        $this->info('\\\\///...importing challenge categories');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\ChallengeSeeder"]);
 
-        $this->info("\\\\///...importing evaluation rules");
-        $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\EvaluationRulesSeeder"]);
+        $this->info('\\\\///...importing evaluation rules');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\EvaluationRulesSeeder"]);
 
+        $this->info('\\\\///...importing regulators');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\RegulatorsSeeder"]);
     }
 }

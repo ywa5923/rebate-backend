@@ -11,15 +11,26 @@ class BatchImporter
 
     protected array $rowMapping;
 
+    /** @var callable(array<string, mixed>, array<int, string>): array<string, mixed>|null */
+    protected $rowTransformer = null;
+
     public function __construct(
         public string $filePath
     ) {
     }
 
-    public function setTableInfo(string $tableName, array $rowMapping)
+    public function setTableInfo(string $tableName, array $rowMapping): void
     {
         $this->tableName = $tableName;
         $this->rowMapping = $rowMapping;
+    }
+
+    /**
+     * @param  callable(array<string, mixed>, array<int, string>): array<string, mixed>  $transformer
+     */
+    public function setRowTransformer(callable $transformer): void
+    {
+        $this->rowTransformer = $transformer;
     }
 
     public function import($skip = 0, $chunk = 1000)
@@ -32,20 +43,22 @@ class BatchImporter
             ->each(function (LazyCollection $chunk) use ($mp) {
 
                 $records = $chunk->map(function ($row) use ($mp) {
-
                     $cols = array_keys($mp);
                     $r = [];
                     foreach ($cols as $col) {
                         $index = $mp[$col];
-                        // Negative index: use absolute value as a literal (not a CSV column).
-                        $r[$col] = $index < 0 ? abs($index) : $row[$index - 1];
+                        if (is_string($index)) {
+                            $r[$col] = $index;
+                        } else {
+                            // Negative index: use absolute value as a literal (not a CSV column).
+                            $r[$col] = $index < 0 ? abs($index) : ($row[$index - 1] ?? null);
+                        }
                     }
 
-                    // return [
-                    //     "id" => $row[1],
-                    //     "name" => $row[2],
-                    //     "title" => $row[3]
-                    // ];
+                    if ($this->rowTransformer !== null) {
+                        $r = ($this->rowTransformer)($r, $row);
+                    }
+
                     return $r;
                 })->toArray();
                 // dd($records);
@@ -59,7 +72,7 @@ class BatchImporter
 
             $handle = fopen($fileName, 'r');
 
-            while (($cols = fgetcsv($handle, 4096)) !== false) {
+            while (($cols = fgetcsv($handle, 0)) !== false) {
                 // $line = implode(", ", $cols);
                 // $row = explode(",", $line);
 

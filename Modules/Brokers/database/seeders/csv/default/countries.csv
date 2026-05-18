@@ -1,0 +1,121 @@
+name,country_code,zone_code
+United States,US,NA
+Canada,CA,NA
+Mexico,MX,NA
+Argentina,AR,LATAM
+Brazil,BR,LATAM
+Chile,CL,LATAM
+Colombia,CO,LATAM
+Peru,PE,LATAM
+Venezuela,VE,LATAM
+Uruguay,UY,LATAM
+Paraguay,PY,LATAM
+Bolivia,BO,LATAM
+Ecuador,EC,LATAM
+Panama,PA,LATAM
+Costa Rica,CR,LATAM
+Guatemala,GT,LATAM
+Honduras,HN,LATAM
+El Salvador,SV,LATAM
+Nicaragua,NI,LATAM
+Dominican Republic,DO,LATAM
+Cuba,CU,LATAM
+Jamaica,JM,LATAM
+Trinidad and Tobago,TT,LATAM
+Bahamas,BS,LATAM
+Barbados,BB,LATAM
+United Kingdom,GB,EU
+Germany,DE,EU
+France,FR,EU
+Italy,IT,EU
+Spain,ES,EU
+Netherlands,NL,EU
+Belgium,BE,EU
+Switzerland,CH,EU
+Austria,AT,EU
+Sweden,SE,EU
+Norway,NO,EU
+Denmark,DK,EU
+Finland,FI,EU
+Ireland,IE,EU
+Portugal,PT,EU
+Greece,GR,EU
+Poland,PL,EU
+Czech Republic,CZ,EU
+Hungary,HU,EU
+Romania,RO,EU
+Bulgaria,BG,EU
+Croatia,HR,EU
+Slovakia,SK,EU
+Slovenia,SI,EU
+Estonia,EE,EU
+Latvia,LV,EU
+Lithuania,LT,EU
+Luxembourg,LU,EU
+Malta,MT,EU
+Cyprus,CY,EU
+Iceland,IS,EU
+Russia,RU,CEE/CIS
+Ukraine,UA,CEE/CIS
+Belarus,BY,CEE/CIS
+Kazakhstan,KZ,CEE/CIS
+Armenia,AM,CEE/CIS
+Azerbaijan,AZ,CEE/CIS
+Georgia,GE,CEE/CIS
+Moldova,MD,CEE/CIS
+Uzbekistan,UZ,CEE/CIS
+Kyrgyzstan,KG,CEE/CIS
+Tajikistan,TJ,CEE/CIS
+Turkmenistan,TM,CEE/CIS
+Saudi Arabia,SA,MENA
+United Arab Emirates,AE,MENA
+Qatar,QA,MENA
+Kuwait,KW,MENA
+Bahrain,BH,MENA
+Oman,OM,MENA
+Israel,IL,MENA
+Turkey,TR,MENA
+Egypt,EG,MENA
+Morocco,MA,MENA
+Algeria,DZ,MENA
+Tunisia,TN,MENA
+Jordan,JO,MENA
+Lebanon,LB,MENA
+Iraq,IQ,MENA
+Iran,IR,MENA
+South Africa,ZA,SSA
+Nigeria,NG,SSA
+Kenya,KE,SSA
+Ghana,GH,SSA
+Ethiopia,ET,SSA
+Tanzania,TZ,SSA
+Uganda,UG,SSA
+Angola,AO,SSA
+Zambia,ZM,SSA
+Zimbabwe,ZW,SSA
+Botswana,BW,SSA
+Namibia,NA,SSA
+Mozambique,MZ,SSA
+Rwanda,RW,SSA
+Senegal,SN,SSA
+Ivory Coast,CI,SSA
+China,CN,APAC
+Japan,JP,APAC
+South Korea,KR,APAC
+India,IN,APAC
+Singapore,SG,APAC
+Hong Kong,HK,APAC
+Australia,AU,APAC
+New Zealand,NZ,APAC
+Indonesia,ID,APAC
+Malaysia,MY,APAC
+Thailand,TH,APAC
+Philippines,PH,APAC
+Vietnam,VN,APAC
+Pakistan,PK,APAC
+Bangladesh,BD,APAC
+Sri Lanka,LK,APAC
+Cambodia,KH,APAC
+Laos,LA,APAC
+Myanmar,MM,APAC
+Nepal,NP,APAC
