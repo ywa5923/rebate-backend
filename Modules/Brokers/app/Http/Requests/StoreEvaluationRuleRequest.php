@@ -17,6 +17,12 @@ class StoreEvaluationRuleRequest extends BaseRequest
     {
         return null;
     }
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'broker_id' => $this->route('broker_id'),
+        ]);
+    }
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -45,6 +51,7 @@ class StoreEvaluationRuleRequest extends BaseRequest
         //   ]
         $formConfig = $this->getFormConfig();
         $constraints = $formConfig?->getFormConstraints() ?? [];
+        $constraints['broker_id'] = 'required|integer|exists:brokers,id';
 
         $getters_constraints = [];
         foreach ($constraints as $key => $value) {

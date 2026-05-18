@@ -61,9 +61,9 @@ class UrlController extends Controller
 
         $data = $request->validated();
         $storeAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
-        //$isAdmin = app('isAdmin');
+        $isAdmin = app('isAdmin');
 
-        $isAdmin = false;
+        
         $url = $this->urlService->createAffiliateLink($storeAffiliateLinkDto, $broker_id, $isAdmin);
 
         return response()->json([
@@ -74,8 +74,8 @@ class UrlController extends Controller
 
     public function updateBrokerAffiliateLink(StoreAffiliateLinkRequest $request, int $broker_id, int $url_id)
     {
-        //$isAdmin = app('isAdmin');
-        $isAdmin = true;
+        
+        $isAdmin = app('isAdmin');
         $data = $request->validated();
         $updateAffiliateLinkDto = StoreAffiliateLinkDTO::fromValidated($data);
 
@@ -137,8 +137,8 @@ class UrlController extends Controller
      */
     public function createAccountTypeUrl(StoreAccountTypeUrlRequest $request, int $broker_id): JsonResponse
     {
-        //$isAdmin = app('isAdmin');
-        $isAdmin = false;
+       
+        $isAdmin = app('isAdmin');
         $data = $request->validated();
         $createAccountTypeUrlsDto = AccountTypeUrlDTO::fromValidated($data);
         $urls = $this->urlService->createAccountTypeUrl($createAccountTypeUrlsDto, $broker_id, $isAdmin);
@@ -151,8 +151,8 @@ class UrlController extends Controller
 
     public function updateAccountTypeUrl(StoreAccountTypeUrlRequest $request, int $broker_id, int $url_id)
     {
-        //$isAdmin = app('isAdmin');
-        $isAdmin = false;
+        
+        $isAdmin = app('isAdmin');
         $data = $request->validated();
         $updateAccountTypeUrlsDto = AccountTypeUrlDTO::fromValidated($data);
         $url = $this->urlService->updateAccountTypeUrl($updateAccountTypeUrlsDto, $url_id, $isAdmin);

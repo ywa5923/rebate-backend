@@ -20,6 +20,8 @@ use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Models\Regulator;
 use Modules\Brokers\Models\Company;
 
+//Old code for broker filters
+//to ne edited, it is not used anymore
 class BrokerFilterController extends Controller
 {
     /**

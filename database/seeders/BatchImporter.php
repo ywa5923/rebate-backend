@@ -66,7 +66,7 @@ class BatchImporter
             });
     }
 
-    protected function createLazyCollection($fileName)
+    protected function createLazyCollection( string $fileName)
     {
         return LazyCollection::make(function () use ($fileName) {
 

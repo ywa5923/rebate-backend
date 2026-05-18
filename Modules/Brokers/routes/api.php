@@ -62,9 +62,9 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'superadmin-only'])->put('broker-options/{id}', [BrokerOptionController::class, 'update']);
     Route::middleware(['auth:sanctum', 'superadmin-only'])->delete('broker-options/{id}', [BrokerOptionController::class, 'delete']);
 
-    Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
+    //Route::apiResource('broker-filters', BrokerFilterController::class)->names('broker-filters');
 
-    //ROUTES FOR BROKER DASHBOARD
+    //=======================ROUTES FOR BROKER DASHBOARD=======================================================
     // OptionValue routes
     // Route::apiResource('option-values', OptionValueController::class)->names('option-values');
     // Multiple option values routes for brokers
@@ -83,23 +83,23 @@ Route::prefix('v1')->group(function () {
     //=================================== Account Type routes =================================
     Route::get('account-types/{broker_id}', [AccountTypeController::class, 'index']);
 
-    Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id}', [AccountTypeController::class, 'update']);
+    //Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id}', [AccountTypeController::class, 'update']);
     Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->delete('account-types/{id}/broker/{broker_id}', [AccountTypeController::class, 'destroy']);
     // Route::get('account-types/{id}/urls', [AccountTypeController::class, 'getUrlsGroupedByType']);
     // Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->post('account-types/{id?}/urls', [AccountTypeController::class, 'createUrls']);
     //Route::middleware(['auth:sanctum', 'can-admin:AccountType,id'])->put('account-types/{id?}/urls', [AccountTypeController::class, 'updateUrls']);
     // Route::middleware(['auth:sanctum', 'can-admin:AccountType,accountTypeId'])->delete('account-types/{accountTypeId}/urls/{urlId}', [AccountTypeController::class, 'deleteAccountTypeUrl']);
     //to do: add middleware to check if the user is admin or not
-    Route::post('account-type/broker/{broker_id}/url', [UrlController::class, 'createAccountTypeUrl']);
-    Route::put('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'updateAccountTypeUrl']);
-    Route::delete('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'deleteAccountTypeUrl']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('account-type/broker/{broker_id}/url', [UrlController::class, 'createAccountTypeUrl']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'updateAccountTypeUrl']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('account-type/broker/{broker_id}/url/{url_id}', [UrlController::class, 'deleteAccountTypeUrl']);
     //to do add delete4 acc type url
 
     //=================================== Url routes ========================================================
     Route::get('urls/broker/{broker_id}/affiliate-links', [UrlController::class, 'getBrokerAffiliateLinks']);
-    Route::post('urls/broker/{broker_id}/affiliate-link', [UrlController::class, 'createBrokerAffiliateLink']);
-    Route::put('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'updateBrokerAffiliateLink']);
-    Route::delete('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'deleteBrokerAffiliateLink']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('urls/broker/{broker_id}/affiliate-link', [UrlController::class, 'createBrokerAffiliateLink']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'updateBrokerAffiliateLink']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('urls/broker/{broker_id}/affiliate-link/{url_id}', [UrlController::class, 'deleteBrokerAffiliateLink']);
     //grouped urls are used for account types
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->get('urls/{broker_id}/{entity_type}/{entity_id}', [UrlController::class, 'getGroupedUrls']);
     Route::get('urls/account-type/{account_type_id}/affiliate-links/{broker_id}', [UrlController::class, 'getAccountTypeAffiliateLinks']);
@@ -107,12 +107,12 @@ Route::prefix('v1')->group(function () {
     //=================================== Company routes =================================
     Route::get('companies/{broker_id}', [CompanyController::class, 'index']);
     Route::get('companies/{company_id}/broker/{broker_id}/regulators', [CompanyController::class, 'getRegulators']);
-    Route::delete('companies/{id}/broker/{broker_id}', [CompanyController::class, 'destroy']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('companies/{id}/broker/{broker_id}', [CompanyController::class, 'destroy']);
 
     //=================================== Regulator routes =================================
     Route::get('regulators/list', [RegulatorController::class, 'getRegulatorsList']);
-    Route::post('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'attachRegulatorToCompany']);
-    Route::delete('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'detachRegulatorFromCompany']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'attachRegulatorToCompany']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'detachRegulatorFromCompany']);
     //=================================== Dynamic Tables routes =================================
     Route::get('evaluation-steps/{broker_id}', [EvaluationStepController::class, 'index']);
     //=================================== Promotion routes =================================
@@ -125,10 +125,10 @@ Route::prefix('v1')->group(function () {
 
     //=================================== Evaluation routes =================================
     Route::get('evaluation-rules/form-config', [EvaluationController::class, 'getFormConfig']);
-    Route::post('evaluation-rules/{broker_id}', [EvaluationController::class, 'create']);
-    Route::put('evaluation-rules/{broker_id}', [EvaluationController::class, 'update']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('evaluation-rules/{broker_id}', [EvaluationController::class, 'create']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('evaluation-rules/{broker_id}', [EvaluationController::class, 'update']);
     Route::get('evaluation-rules/{broker_id}', [EvaluationController::class, 'index']);
-    Route::delete('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'destroy']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('evaluation-rules/{broker_id}/{id}', [EvaluationController::class, 'destroy']);
 
     //=================================== Challenges table routes =================================
     Route::get('challenges/matrix/headers', [ChallengeController::class, 'getChallengeMatrixHeaders']);
@@ -141,10 +141,10 @@ Route::prefix('v1')->group(function () {
 
     Route::get('challenges/placeholders', [ChallengeController::class, 'showPlaceholders']);
     Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);
-    Route::post('challenges/{broker_id}/publish', [ChallengeController::class, 'toggleChallengePublish']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{broker_id}/publish', [ChallengeController::class, 'toggleChallengePublish']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'removeChallengeTab']);
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{tab_type}/{broker_id}', [ChallengeController::class, 'addChallengeTab']);
-    Route::put('challenges/{broker_id}/tabs/{tab_type}/order', [ChallengeController::class, 'saveChallengeTabOrder']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->put('challenges/{broker_id}/tabs/{tab_type}/order', [ChallengeController::class, 'saveChallengeTabOrder']);
 
     //=================================SUPERADMIN ONLY ROUTES======================================
     Route::middleware(['auth:sanctum', 'superadmin-only'])->get('zones/form-config', [ZoneController::class, 'getFormConfig']);

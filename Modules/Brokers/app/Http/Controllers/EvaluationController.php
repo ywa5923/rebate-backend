@@ -9,7 +9,7 @@ use Modules\Brokers\Http\Requests\StoreEvaluationRuleRequest;
 use Modules\Brokers\Http\Requests\EvaluationIndexRequest;
 use Modules\Brokers\Services\EvaluationRuleService;
 use Modules\Brokers\Transformers\BrokerEvaluationResource;
-use Modules\Brokers\Models\BrokerEvaluation;
+
 
 
 class EvaluationController extends Controller
@@ -46,9 +46,10 @@ class EvaluationController extends Controller
 
    
 
-    public function create(StoreEvaluationRuleRequest $request,$broker_id): JsonResponse
+    public function create(StoreEvaluationRuleRequest $request,int $broker_id): JsonResponse
     {
-        $is_admin=true;
+        $is_admin=app('isAdmin');
+        //$is_admin=true;
         $data = $request->validated();
         $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
         return response()->json([
@@ -58,9 +59,10 @@ class EvaluationController extends Controller
      /**
      * Store a new evaluation rule
      */
-    public function update(StoreEvaluationRuleRequest $request,$broker_id): JsonResponse
+    public function update(StoreEvaluationRuleRequest $request,int $broker_id): JsonResponse
     {
-        $is_admin=false;
+        //$is_admin=false;
+        $is_admin=app('isAdmin');
         $data = $request->validated();
         $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
         return response()->json([
