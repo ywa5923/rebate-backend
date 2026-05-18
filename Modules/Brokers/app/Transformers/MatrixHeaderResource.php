@@ -2,11 +2,13 @@
 
 namespace Modules\Brokers\Transformers;
 
+use App\Utilities\TranslateTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MatrixHeaderResource extends JsonResource
 {
+    use TranslateTrait;
     /**
      * Transform the resource into an array.
      */
