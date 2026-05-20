@@ -137,8 +137,8 @@ Route::prefix('v1')->group(function () {
     Route::get('challenges/categories/{broker_id}', [ChallengeController::class, 'getChallengeCategories']);
 
     Route::middleware(['auth:sanctum', 'superadmin-only'])->post('challenges/matrix/placeholders', [ChallengeController::class, 'storeMatrixPlaceholders']);
-    // Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{broker_id}', [ChallengeController::class, 'store']);
-    Route::post('challenges/{broker_id}', [ChallengeController::class, 'store']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post('challenges/{broker_id}', [ChallengeController::class, 'store']);
+    //Route::post('challenges/{broker_id}', [ChallengeController::class, 'store']);
 
     Route::get('challenges/placeholders', [ChallengeController::class, 'showPlaceholders']);
     Route::get('challenges/{broker_id}', [ChallengeController::class, 'show']);

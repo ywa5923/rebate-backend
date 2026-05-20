@@ -15,7 +15,7 @@ class EvaluationRuleService
         protected BrokerEvaluationRepository $brokerEvaluationRepository
     ) {}
 
-    public function insertOrUpdate(array $data, $broker_id, $is_admin, ?int $zone_id = null)
+    public function insertOrUpdate(array $data, int $broker_id, bool $is_admin, ?int $zone_id = null)
     {
         //Incoming data format:
         // array:8 [ /
@@ -38,7 +38,7 @@ class EvaluationRuleService
 
         foreach ($data as $key => $value) {
             if (!preg_match('/#(\d+)(?:_getter)?$/', $key, $m)) {
-                throw new \InvalidArgumentException("Invalid key: $key");
+                throw new \InvalidArgumentException("Invalid key112: $key");
             }
             $ruleId = (int) $m[1];
 

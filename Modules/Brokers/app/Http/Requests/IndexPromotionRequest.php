@@ -31,7 +31,7 @@ class IndexPromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'zone_code' => 'sometimes|string|exists:zones,code',
+            'zone_code' => 'sometimes|nullable|string|exists:zones,code',
             'sort_by' => 'sometimes|string|in:id,created_at,updated_at',
             'sort_direction' => 'sometimes|string|in:asc,desc',
             'per_page' => 'sometimes|integer',

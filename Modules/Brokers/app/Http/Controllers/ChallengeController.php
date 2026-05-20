@@ -65,9 +65,8 @@ class ChallengeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => array_filter($responseData, fn ($v) => $v !== null),
+                'data' => array_filter($responseData, fn($v) => $v !== null),
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -108,9 +107,8 @@ class ChallengeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => array_filter($responseData, fn ($v) => $v !== null),
+                'data' => array_filter($responseData, fn($v) => $v !== null),
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -149,36 +147,26 @@ class ChallengeController extends Controller
      */
     public function store(Request $request, int $broker_id): JsonResponse
     {
-        try {
-            $validatedData = $this->challengeService->validatePostRequestData($request);
-            // $brokerId = $validatedData['broker_id']??null;
-            $zoneId = $validatedData['zone_id'] ?? null;
-            //$isAdmin = $validatedData['is_admin'] ?? null;
-            $isPlaceholder = $validatedData['is_placeholder'];
 
-            //$isAdmin = app('isAdmin');
+        $validatedData = $this->challengeService->validatePostRequestData($request);
 
-            $isAdmin = true;
+        $zoneId = $validatedData['zone_id'] ?? null;
 
-            //process the request and update the challenge matrix and extra data using transaction
+        $isPlaceholder = $validatedData['is_placeholder'];
 
-            ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, $broker_id, $isPlaceholder, $isAdmin, $zoneId);
+        $isAdmin = $request->attributes->get('isAdmin', false);
 
-            //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
+        //process the request and update the challenge matrix and extra data using transaction
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
-                //'data' => $responseData
-            ], 201);
+        ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, $broker_id, $isPlaceholder, $isAdmin, $zoneId);
 
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create challenge matrix',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Challenge matrix with id ' . $challenge_id . ' created successfully',
+            //'data' => $responseData
+        ], 201);
     }
 
     public function storeMatrixPlaceholders(Request $request): JsonResponse
@@ -204,10 +192,9 @@ class ChallengeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
+                'message' => 'Challenge matrix with id ' . $challenge_id . ' created successfully',
 
             ], 201);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -317,7 +304,7 @@ class ChallengeController extends Controller
             }
 
             //  $this->challengeCategoryService->removeChallengeCategory($broker_id, $category_id);
-            return response()->json(['success' => true, 'message' => 'Challenge tab of type '.$tab_type->value.' removed successfully']);
+            return response()->json(['success' => true, 'message' => 'Challenge tab of type ' . $tab_type->value . ' removed successfully']);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -362,13 +349,13 @@ class ChallengeController extends Controller
         $this->challengeCategoryService->addChallengeTabToBroker(
             $tab_type,
             $default_tab_id_to_clone,
-            $tab_order, $broker_id,
+            $tab_order,
+            $broker_id,
             $broker_challenge_category_id,
             $amountCurrencies
         );
 
         return response()->json(['success' => true, 'message' => 'Challenge tab added successfully']);
-
     }
 
     /**

@@ -55,6 +55,7 @@ class EvaluationController extends Controller
     ): JsonResponse {
         $is_admin = $request->attributes->get('isAdmin', false);
         $data = $request->validated();
+        unset($data['broker_id']);
         $this->evaluationRuleService->insertOrUpdate(
             $data,
             $broker_id,

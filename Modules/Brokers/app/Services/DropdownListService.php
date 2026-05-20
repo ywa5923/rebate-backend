@@ -37,7 +37,7 @@ class DropdownListService
 
     public function getCurrencyListOptions(): array
     {
-        $currencyDropdownCategory = $this->repository->getDropdownCategoryBySlug('currency');
+        $currencyDropdownCategory = $this->repository->getDropdownCategoryBySlug('fiat_account_currencies');
 
         if (! $currencyDropdownCategory) {
             return [];

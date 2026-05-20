@@ -51,7 +51,7 @@ class StoreEvaluationRuleRequest extends BaseRequest
         //   ]
         $formConfig = $this->getFormConfig();
         $constraints = $formConfig?->getFormConstraints() ?? [];
-        $constraints['broker_id'] = 'required|integer|exists:brokers,id';
+       
 
         $getters_constraints = [];
         foreach ($constraints as $key => $value) {
@@ -59,7 +59,9 @@ class StoreEvaluationRuleRequest extends BaseRequest
         }
         //dd(array_merge($constraints, $getters_constraints));
        
-        return array_merge($constraints, $getters_constraints);
+        $rules= array_merge($constraints, $getters_constraints);
+        $rules['broker_id'] = 'required|integer|exists:brokers,id';
+        return $rules;
     }
 
     /**
