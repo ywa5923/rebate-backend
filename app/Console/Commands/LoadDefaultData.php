@@ -30,11 +30,8 @@ class LoadDefaultData extends Command
         $this->info('\\\\///...importing Option Categories');
         $this->call('db:seed', ['class' => '\\Modules\\Brokers\\Database\\Seeders\\OptionsCategoriesSeeder']);
 
-        $this->info('\\\\///...importing URLs ');
-        // $this->call('db:seed', ["class" => "\\Modules\\Brokers\\Database\\Seeders\\UrlsSeeder"]);
-
-        $this->info('\\\\///...importing broker_options ');
-        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
+       
+      
 
         $this->info('\\\\///...importing broker_types ');
         $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\BrokerTypesSeeder"]);
@@ -47,6 +44,9 @@ class LoadDefaultData extends Command
 
         $this->info('\\\\///...importing dropdowns ');
         $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\DropdownSeeder"]);
+
+        $this->info('\\\\///...importing broker_options ');
+        $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\DynamicOptionsSeeder"]);
 
         $this->info('\\\\///...importing form types ');
         $this->call('db:seed', ['class' => "\\Modules\\Brokers\\Database\\Seeders\FormTypesSeeder"]);
