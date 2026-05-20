@@ -17,23 +17,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->api(prepend: [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-
-        ]);
+        $middleware->api(
+            // If uncommented, Sanctum would treat certain frontend
+            // requests as “stateful”, meaning Laravel would support cookie/session-based authentication
+            // for SPA requests, usually from your frontend domain
+            prepend: [
+                // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            ],
+        );
 
         $middleware->alias([
-            // 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-            // 'set.is_admin' => \App\Http\Middleware\SetIsAdminFlag::class,
             'superadmin-only' => \App\Http\Middleware\RequireSuperAdmin::class,
             'can-admin' => \App\Http\Middleware\CanAdmin::class,
         ]);
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $shouldRenderJson = static fn (Request $request): bool => $request->is('api/*') || $request->expectsJson();
+        $shouldRenderJson = static fn (Request $request): bool => $request->is(
+            'api/*',
+        ) || $request->expectsJson();
 
-        $exceptions->render(function (ApiException $e, Request $request) use ($shouldRenderJson) {
+        $exceptions->render(function (ApiException $e, Request $request) use (
+            $shouldRenderJson,
+        ) {
             if (! $shouldRenderJson($request)) {
                 return null;
             }
@@ -50,41 +55,61 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json($response, $e->getStatusCode());
         });
 
-        $exceptions->render(function (ValidationException $e, Request $request) use ($shouldRenderJson) {
+        $exceptions->render(function (
+            ValidationException $e,
+            Request $request,
+        ) use ($shouldRenderJson) {
             if (! $shouldRenderJson($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
         });
 
-        $exceptions->render(function (ModelNotFoundException $e, Request $request) use ($shouldRenderJson) {
+        $exceptions->render(function (
+            ModelNotFoundException $e,
+            Request $request,
+        ) use ($shouldRenderJson) {
             if (! $shouldRenderJson($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Resource not found',
-            ], 404);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Resource not found',
+                ],
+                404,
+            );
         });
 
-        $exceptions->render(function (AuthorizationException $e, Request $request) use ($shouldRenderJson) {
+        $exceptions->render(function (
+            AuthorizationException $e,
+            Request $request,
+        ) use ($shouldRenderJson) {
             if (! $shouldRenderJson($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage() ?: 'This action is unauthorized.',
-            ], 403);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage() ?: 'This action is unauthorized.',
+                ],
+                403,
+            );
         });
 
-        $exceptions->render(function (\Throwable $e, Request $request) use ($shouldRenderJson) {
+        $exceptions->render(function (\Throwable $e, Request $request) use (
+            $shouldRenderJson,
+        ) {
             if (! $shouldRenderJson($request)) {
                 return null;
             }
@@ -100,4 +125,5 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json($response, 500);
         });
-    })->create();
+    })
+    ->create();

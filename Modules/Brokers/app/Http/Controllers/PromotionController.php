@@ -3,174 +3,51 @@
 namespace Modules\Brokers\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Services\PromotionService;
-use Modules\Brokers\Models\Promotion;
+use Modules\Brokers\Http\Requests\IndexPromotionRequest;
+use Modules\Brokers\DTOs\PromotionFilters;
+use Illuminate\Support\Facades\Response as ResponseFacade;
+use Modules\Brokers\Http\Requests\DeletePromotionRequest;
 use Modules\Brokers\Transformers\PromotionResource;
 
 class PromotionController extends Controller
 {
     protected PromotionService $promotionService;
-   
+
     public function __construct(PromotionService $promotionService)
     {
         $this->promotionService = $promotionService;
-       
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/promotions",
-     *     tags={"Promotion"},
-     *     summary="Get all promotions",
-     *     @OA\Parameter(
-     *         name="broker_id",
-     *         in="query",
-     *         description="Filter by broker ID",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
-     *         name="promotion_type",
-     *         in="query",
-     *         description="Filter by promotion type",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="is_active",
-     *         in="query",
-     *         description="Filter by active status",
-     *         required=false,
-     *         @OA\Schema(type="boolean")
-     *     ),
-     *     @OA\Parameter(
-     *         name="current_date",
-     *         in="query",
-     *         description="Filter by current date (active promotions)",
-     *         required=false,
-     *         @OA\Schema(type="boolean")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_by",
-     *         in="query",
-     *         description="Sort field",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort_direction",
-     *         in="query",
-     *         description="Sort direction",
-     *         required=false,
-     *         @OA\Schema(type="string", enum={"asc", "desc"})
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Items per page",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Promotion")),
-     *             @OA\Property(property="pagination", type="object", @OA\Property(property="current_page", type="integer"), @OA\Property(property="last_page", type="integer"), @OA\Property(property="per_page", type="integer"), @OA\Property(property="total", type="integer"))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-    public function index(Request $request,int $broker_id)
+    public function index(IndexPromotionRequest $request, int $broker_id): JsonResponse
     {
-        try {
-            $result = $this->promotionService->getPromotions($request,$broker_id);
-          
-            // Transform the data collection
-            $result['data'] = PromotionResource::collection($result['data']);
-            return $result;
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve promotions',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+
+        $validatedFilters = $request->validated();
+        $filters = PromotionFilters::from($validatedFilters);
+        $result = $this->promotionService->getPromotions($filters, $broker_id);
+
+        return ResponseFacade::json($result);
     }
 
-  
-
-   
-
-    /**
-     * @OA\Delete(
-     *     path="/api/v1/promotions/{id}",
-     *     tags={"Promotion"},
-     *     summary="Delete promotion",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Promotion ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
-     *         name="broker_id",
-     *         in="query",
-     *         description="Broker ID for authorization",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Promotion deleted successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Promotion deleted successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Promotion not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-    public function destroy(Request $request, $id): JsonResponse
+    public function destroy(DeletePromotionRequest $request, int $id, int $broker_id): JsonResponse
     {
-        // Check if broker ID is provided for authorization
-        $broker_id = $request->broker_id;
-      
-        if ($broker_id == null) {
-            throw new \Exception('Broker ID is required as a search parameter');
-        }
-      
-        try {
-            $this->promotionService->deletePromotion($id, $broker_id);
+        
+        $deletedModel = $this->promotionService->deletePromotion($id,$broker_id);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Promotion deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
+        if (! $deletedModel) {
+            return ResponseFacade::json([
                 'success' => false,
-                'message' => 'Failed to delete promotion',
-                'error' => $e->getMessage()
-            ], 500);
+                'data' => null,
+                'message' => 'Promotion not found or could not be deleted',
+            ], 404);
         }
+
+        return ResponseFacade::json([
+            'success' => true,
+            'data' => new PromotionResource($deletedModel),
+            'message' => 'Promotion deleted successfully',
+        ]);
+        
     }
 }

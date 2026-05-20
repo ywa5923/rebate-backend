@@ -115,13 +115,14 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('regulators/{regulator_id}/company/{company_id}/broker/{broker_id}', [RegulatorController::class, 'detachRegulatorFromCompany']);
     //=================================== Dynamic Tables routes =================================
     Route::get('evaluation-steps/{broker_id}', [EvaluationStepController::class, 'index']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('evaluation-steps/{id}/broker/{broker_id}', [EvaluationStepController::class, 'destroy']);
     //=================================== Promotion routes =================================
     Route::get('promotions/{broker_id}', [PromotionController::class, 'index']);
-    Route::delete('promotions/{id}', [PromotionController::class, 'destroy']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('promotions/{id}/broker/{broker_id}', [PromotionController::class, 'destroy']);
 
     //=================================== Contest routes =================================
     Route::get('contests/{broker_id}', [ContestController::class, 'index']);
-    Route::delete('contests/{id}', [ContestController::class, 'destroy']);
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete('contests/{id}/broker/{broker_id}', [ContestController::class, 'destroy']);
 
     //=================================== Evaluation routes =================================
     Route::get('evaluation-rules/form-config', [EvaluationController::class, 'getFormConfig']);

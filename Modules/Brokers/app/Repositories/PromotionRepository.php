@@ -3,11 +3,10 @@
 namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\Promotion;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-
+use Modules\Brokers\DTOs\PromotionFilters;
+use Illuminate\Database\Eloquent\Builder;
 class PromotionRepository
 {
     protected Promotion $model;
@@ -19,21 +18,24 @@ class PromotionRepository
 
     /**
      * Get paginated promotions with filters
+     * @param PromotionFilters $filters
+     * @param int $broker_id
+     * @return LengthAwarePaginator|Collection
      */
-    public function getPromotions(Request $request,int $broker_id): LengthAwarePaginator|Collection
+    public function getPromotions(PromotionFilters $filters,int $broker_id): LengthAwarePaginator|Collection
     {
         $query = $this->model->newQuery()->where('broker_id', $broker_id);
         
         // Apply filters
-        $this->applyFilters($query, $request);
+        $this->applyFilters($query, $filters);
 
         // Apply sorting
-        $this->applySorting($query, $request);
+        $this->applySorting($query, $filters);
 
-        if ($request->has('per_page') || $request->has('page')) {
+        if ($filters->base->perPage || $filters->base->page) {
             // Paginate with specific page
-            $perPage = $request->get('per_page', 15);
-            $page = $request->get('page', 1);
+            $perPage = $filters->base->perPage;
+            $page = $filters->base->page;
             return $query->paginate($perPage, ['*'], 'page', $page);
         } else {
             return $query->get();
@@ -42,6 +44,8 @@ class PromotionRepository
 
     /**
      * Get promotion by ID with relations
+     * @param int $id
+     * @return Promotion|null
      */
     public function findById(int $id): ?Promotion
     {
@@ -50,6 +54,9 @@ class PromotionRepository
 
     /**
      * Get promotion by ID without relations
+     * @param int $id
+     * @return Promotion|null
+
      */
     public function findByIdWithoutRelations(int $id): ?Promotion
     {
@@ -68,40 +75,42 @@ class PromotionRepository
 
     /**
      * Apply filters to the query
+     * @param Builder $query
+     * @param PromotionFilters $filters
      */
-    protected function applyFilters($query, Request $request): void
+    protected function applyFilters(Builder $query, PromotionFilters $filters): void
     {
         // Filter by broker ID
         // if ($request->has('broker_id')) {
         //     $query->where('broker_id', $request->broker_id);
         // }
 
-        if ($request->has('promotion_id')) {
-            $query->where('id', $request->promotion_id);
+        if ($filters->promotionId) {
+            $query->where('id', $filters->promotionId);
         }
 
         $withArray = [];
 
-        if ($request->has('zone_code')) {
-            $withArray['optionValues'] = function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
+        if ($filters->base->zoneCode) {
+            $withArray['optionValues'] = function ($q) use ($filters) {
+                $q->where(function ($subQ) use ($filters) {
                     $subQ->where('is_invariant', 1)
-                        ->orWhere('zone_code', $request->zone_code);
+                        ->orWhere('zone_code', $filters->base->zoneCode);
                 });
             };
         }else{
             //if zone_code is not provided, we need to get the option values 
             //for the account type that have no zone_code and zone_id, i.e original data submitted by broker
-            $withArray['optionValues'] = function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
+            $withArray['optionValues'] = function ($q){
+                $q->where(function ($subQ)  {
                     $subQ->where('zone_code', null)->where('zone_id',null);
                 });
             };
         }
 
-        if ($request->has('language_code')) {
-            $withArray['optionValues.translations'] = function ($q) use ($request) {
-                $q->where('language_code', $request->language_code);
+        if ($filters->base->languageCode) {
+            $withArray['optionValues.translations'] = function ($q) use ($filters) {
+                $q->where('language_code', $filters->base->languageCode);
             };
         }
 
@@ -110,19 +119,18 @@ class PromotionRepository
         } else {
             $query->with(['broker','optionValues']);
         }
-
-       
-
         
     }
 
     /**
      * Apply sorting to the query
+     * @param Builder $query
+     * @param PromotionFilters $filters
      */
-    protected function applySorting($query, Request $request): void
+    protected function applySorting(Builder $query, PromotionFilters $filters): void
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'asc');
+        $sortBy = $filters->base->sortBy ?? 'created_at';
+        $sortDirection = $filters->base->sortDirection ?? 'asc';
 
         // Validate sort direction
         if (!in_array($sortDirection, ['asc', 'desc'])) {

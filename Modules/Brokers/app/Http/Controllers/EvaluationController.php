@@ -5,66 +5,82 @@ namespace Modules\Brokers\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Modules\Brokers\Forms\EvaluationForm;
+use Modules\Brokers\Http\Requests\DeleteEvaluationRuleRequest;
+use Modules\Brokers\Http\Requests\IndexEvaluationRuleRequest;
 use Modules\Brokers\Http\Requests\StoreEvaluationRuleRequest;
-use Modules\Brokers\Http\Requests\EvaluationIndexRequest;
 use Modules\Brokers\Services\EvaluationRuleService;
 use Modules\Brokers\Transformers\BrokerEvaluationResource;
-
-
 
 class EvaluationController extends Controller
 {
     public function __construct(
         private readonly EvaluationForm $formConfig,
-        private readonly EvaluationRuleService $evaluationRuleService
-    ){}
-    
+        private readonly EvaluationRuleService $evaluationRuleService,
+    ) {
+    }
 
     /**
      * Get the form configuration for the evaluation rules
      */
     public function getFormConfig(): JsonResponse
     {
-      
         return response()->json([
             'success' => true,
-            'data' => $this->formConfig->getFormData()
+            'data' => $this->formConfig->getFormData(),
         ]);
     }
 
-    public function index(EvaluationIndexRequest $request, int $broker_id): JsonResponse
-    {
+    public function index(
+        IndexEvaluationRuleRequest $request,
+        int $broker_id,
+    ): JsonResponse {
         $data = $request->validated();
         $zone_id = $data['zone_id'] ?? null;
         $lang = $data['lang'] ?? 'en';
-        $evaluations = $this->evaluationRuleService->getEvaluations($broker_id,$lang, $zone_id);
+        $evaluations = $this->evaluationRuleService->getEvaluations(
+            $broker_id,
+            $lang,
+            $zone_id,
+        );
+
         return response()->json([
             'success' => true,
-            'data' => BrokerEvaluationResource::collection($evaluations)
+            'data' => BrokerEvaluationResource::collection($evaluations),
         ]);
     }
 
-   
-
-    public function create(StoreEvaluationRuleRequest $request,int $broker_id): JsonResponse
-    {
-        $is_admin=app('isAdmin');
-        //$is_admin=true;
+    public function create(
+        StoreEvaluationRuleRequest $request,
+        int $broker_id,
+    ): JsonResponse {
+        $is_admin = $request->attributes->get('isAdmin', false);
         $data = $request->validated();
-        $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
+        $this->evaluationRuleService->insertOrUpdate(
+            $data,
+            $broker_id,
+            $is_admin,
+        );
+
         return response()->json([
             'success' => true,
         ]);
     }
-     /**
+
+    /**
      * Store a new evaluation rule
      */
-    public function update(StoreEvaluationRuleRequest $request,int $broker_id): JsonResponse
-    {
-        //$is_admin=false;
-        $is_admin=app('isAdmin');
+    public function update(
+        StoreEvaluationRuleRequest $request,
+        int $broker_id,
+    ): JsonResponse {
+        $is_admin = $request->attributes->get('isAdmin', false);
         $data = $request->validated();
-        $this->evaluationRuleService->insertOrUpdate($data, $broker_id, $is_admin);
+        $this->evaluationRuleService->insertOrUpdate(
+            $data,
+            $broker_id,
+            $is_admin,
+        );
+
         return response()->json([
             'success' => true,
         ]);
@@ -73,15 +89,26 @@ class EvaluationController extends Controller
     /**
      * Delete a broker evaluation by id for the given broker.
      */
-    public function destroy(int $broker_id, int $id): JsonResponse
-    {
-        $deleted = $this->evaluationRuleService->deleteEvaluation($broker_id, $id);
+    public function destroy(
+        DeleteEvaluationRuleRequest $request,
+        int $broker_id,
+        int $id,
+    ): JsonResponse {
+        $data = $request->validated();
 
-        if (!$deleted) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Evaluation not found',
-            ], 404);
+        $deleted = $this->evaluationRuleService->deleteEvaluation(
+            $data['broker_id'],
+            $data['id'],
+        );
+
+        if (! $deleted) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Evaluation not found',
+                ],
+                404,
+            );
         }
 
         return response()->json(['success' => true]);

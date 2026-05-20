@@ -2,15 +2,16 @@
 
 namespace Modules\Brokers\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseRequest;
 use Modules\Brokers\Tables\DropdownListTableConfig;
+
 class DropdownListRequest extends BaseRequest
 {
     protected function tableConfigClass(): string
     {
         return DropdownListTableConfig::class;
     }
+
     protected function formConfigClass(): ?string
     {
         return null;
@@ -26,15 +27,17 @@ class DropdownListRequest extends BaseRequest
         $tableConfig = $this->getTableConfig();
         $filtersConstraints = $tableConfig?->getFiltersConstraints() ?? [];
         $sortableColumns = $tableConfig?->getSortableColumns() ?? [];
-     
-        $rules= [
+
+        $rules = [
             ...$filtersConstraints,
             //'order_by' => 'nullable|string|in:id,category_name,dropdown_list_attached,category_position,name,applicable_for,data_type,form_type,for_brokers,for_crypto,for_props,required,allow_sorting,default_loading,default_loading_position',
-            'order_by' => 'nullable|string|in:'.implode(',', array_keys($sortableColumns)),
+            'order_by' => 'nullable|string|in:'.
+                implode(',', array_keys($sortableColumns)),
             'order_direction' => 'nullable|string|in:asc,desc,ASC,DESC',
             // Pagination parameter
             'per_page' => 'nullable|integer|min:1|max:1000',
         ];
+
         return $rules;
         // return $rules;
         //     'per_page' => 'nullable|integer|min:1|max:100',
@@ -75,4 +78,3 @@ class DropdownListRequest extends BaseRequest
         ];
     }
 }
-

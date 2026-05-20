@@ -6,6 +6,7 @@ use App\Utilities\ModelHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Response as FacadeResponse;
 use Modules\Brokers\Models\AccountType;
 use Modules\Brokers\Models\Broker;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,17 +16,20 @@ class CanAdmin
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): \Symfony\Component\HttpFoundation\Response  $next
      */
-    public function handle(Request $request, Closure $next, string $resourceClass, string $routeParamKey): Response
-    {
+    public function handle(
+        Request $request,
+        Closure $next,
+        string $resourceClass,
+        string $routeParamKey,
+    ): Response {
         $isAdmin = false;
         $countryId = null;
         $zoneId = null;
         $brokerId = null;
         if (App::environment('local')) {
             //$isAdmin = true; // or false, depending on your test case
-
         }
         $resourceClassName = ModelHelper::getModelClassFromSlug($resourceClass);
         $user = $request->user();
@@ -33,7 +37,10 @@ class CanAdmin
         $resource = $resourceClassName::find($resourceId);
 
         if (! $resource) {
-            return response()->json(['success' => false, 'message' => 'Resource not found'], 404);
+            return response()->json(
+                ['success' => false, 'message' => 'Resource not found'],
+                404,
+            );
         }
         if ($resource instanceof Broker) {
             $brokerId = $resource->id;
@@ -47,22 +54,35 @@ class CanAdmin
             $zoneId = $country?->zone?->id;
         }
 
-        if ($user->tokenCan('zone:manage:'.$zoneId) || $user->tokenCan('zone:edit:'.$zoneId)) {
+        if (
+            $user->tokenCan('zone:manage:'.$zoneId) ||
+            $user->tokenCan('zone:edit:'.$zoneId)
+        ) {
             $isAdmin = true;
-        } elseif ($user->tokenCan('country:manage:'.$countryId) || $user->tokenCan('country:edit:'.$countryId)) {
+        } elseif (
+            $user->tokenCan('country:manage:'.$countryId) ||
+            $user->tokenCan('country:edit:'.$countryId)
+        ) {
             $isAdmin = true;
         }
 
         app()->instance('isAdmin', $isAdmin);
+        $request->attributes->set('isAdmin', $isAdmin);
 
-        if ($isAdmin || $user->tokenCan('broker:manage:'.$brokerId) || $user->tokenCan('broker:edit:'.$brokerId)) {
+        if (
+            $isAdmin ||
+            $user->tokenCan('broker:manage:'.$brokerId) ||
+            $user->tokenCan('broker:edit:'.$brokerId)
+        ) {
             return $next($request);
         } else {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+            return FacadeResponse::json(
+                ['success' => false, 'message' => 'Forbidden'],
+                403,
+            );
         }
 
         // Share it globally to all views
         // View::share('isAdmin', $isAdmin);
-
     }
 }
