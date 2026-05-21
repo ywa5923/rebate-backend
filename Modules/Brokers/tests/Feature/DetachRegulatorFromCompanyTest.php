@@ -40,6 +40,37 @@ class DetachRegulatorFromCompanyTest extends TestCase
         ]);
     }
 
+    public function test_it_detaches_only_the_requested_regulator(): void
+    {
+        $brokerType = BrokerType::query()->create(['name' => 'Broker']);
+        $broker = Broker::query()->create(['broker_type_id' => $brokerType->id]);
+        $company = Company::query()->create(['broker_id' => $broker->id]);
+        $fca = Regulator::query()->create([
+            'name' => 'FCA',
+            'acronym' => 'FCA',
+            'is_invariant' => true,
+        ]);
+        $sec = Regulator::query()->create([
+            'name' => 'SEC',
+            'acronym' => 'SEC',
+            'is_invariant' => true,
+        ]);
+        $company->regulators()->attach($fca->id);
+        $company->regulators()->attach($sec->id);
+
+        $this->deleteJson("/api/v1/regulators/{$fca->id}/company/{$company->id}/broker/{$broker->id}")
+            ->assertOk();
+
+        $this->assertDatabaseMissing('company_regulator', [
+            'company_id' => $company->id,
+            'regulator_id' => $fca->id,
+        ]);
+        $this->assertDatabaseHas('company_regulator', [
+            'company_id' => $company->id,
+            'regulator_id' => $sec->id,
+        ]);
+    }
+
     public function test_it_detaches_only_matching_pivot_zone_id(): void
     {
         $brokerType = BrokerType::query()->create(['name' => 'Broker']);

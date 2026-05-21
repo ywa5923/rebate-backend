@@ -44,11 +44,11 @@ class RegulatorRepository
         return $this->model->newQuery()->findOrFail($regulator_id);
     }
 
-    public function detachRegulatorFromCompany(int $regulator_id, int $company_id, ?int $zone_id = null): void
+    public function detachRegulatorFromCompany(int $regulator_id, int $company_id, ?int $zone_id = null):?Regulator
     {
         $company = Company::query()->findOrFail($company_id);
 
-        $relation = $company->regulators()->where('regulators.id', $regulator_id);
+        $relation = $company->regulators();
 
         if ($zone_id === null) {
             $relation->wherePivotNull('zone_id');
@@ -56,6 +56,9 @@ class RegulatorRepository
             $relation->wherePivot('zone_id', $zone_id);
         }
 
-        $relation->detach();
+        $detached= $relation->detach($regulator_id);
+
+        return $detached===0 ? null : $this->model->newQuery()->findOrFail($regulator_id);
+       
     }
 }

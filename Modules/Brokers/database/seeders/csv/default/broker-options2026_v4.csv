@@ -25,7 +25,7 @@ id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_c
 24,Negative Balance Protection,negative_balance_protection,broker,boolean,checkbox,1,"Risk management feature that ensures a trader cannot lose more money than he has deposited, preventing his account balance from falling below zero",NULL,1,1,0,0,1,en,2,NULL,,NULL,NULL
 25,Segregated Accounts,segregated_accounts,broker,boolean,checkbox,1,"Client funds being held separately from the brokers own operational funds, ensuring that clients money is protected and not used for the brokers business activities",NULL,1,1,0,0,1,en,2,NULL,,NULL,NULL
 26,Crypto Rebates,crypto_rebates,broker,boolean,checkbox,1,NULL,NULL,1,1,0,0,1,en,2,NULL,,NULL,NULL
-27,Supported Languages,support_languages ,broker,string,multiple_select,1,NULL,NULL,1,1,1,1,1,en,2,support_languages,,NULL,NULL
+27,Supported Languages,support_languages,broker,string,multiple_select,1,NULL,NULL,1,1,1,1,1,en,2,support_languages,,NULL,NULL
 28,24h Support,24h_support,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,,NULL,NULL
 29,Accept American clients,accept_american_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,,NULL,NULL
 30,Accept Japanese Clients,accept_japanese_clients,broker,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,2,NULL,,NULL,NULL
@@ -74,7 +74,7 @@ id,name,slug,applicable_for,data_type,form_type,is_public,tooltip,metadata,for_c
 73,Islamic Accounts,islamic_accounts,account_type,boolean,checkbox,1,NULL,NULL,1,1,1,0,1,en,6,NULL,,NULL,NULL
 74,Company Name,company_name,company,string,string,1,NULL,NULL,1,1,1,1,1,en,3,NULL,,NULL,NULL
 75,Short Description,company_description,company,text,textarea,1,NULL,NULL,1,1,1,0,1,en,3,NULL,,NULL,NULL
-76,Categories,company_categories,company,string,multiple_select,1,NULL,NULL,1,1,1,1,1,en,3,NULL,,NULL,NULL
+76,Categories,company_categories,company,string,textarea,1,NULL,NULL,1,1,1,1,1,en,3,NULL,,NULL,NULL
 77,Primary Category,primary_category,company,string,single_select,1,NULL,NULL,1,1,1,1,1,en,3,NULL,,NULL,NULL
 78,Highlights,highlights,company,text,notes,1,NULL,NULL,1,1,1,0,1,en,3,NULL,,NULL,NULL
 79,Year Founded,year_funded,company,data,data,1,NULL,NULL,1,1,1,0,1,en,3,NULL,,NULL,NULL

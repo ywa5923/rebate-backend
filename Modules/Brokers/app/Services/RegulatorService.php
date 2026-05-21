@@ -26,8 +26,8 @@ class RegulatorService
         return $this->repository->attachRegulatorToCompany($regulator_id, $company_id, $zone_id);
     }
 
-    public function detachRegulatorFromCompany(int $regulator_id, int $company_id, ?int $zone_id = null): void
+    public function detachRegulatorFromCompany(int $regulator_id, int $company_id, ?int $zone_id = null): ?Regulator
     {
-        $this->repository->detachRegulatorFromCompany($regulator_id, $company_id, $zone_id);
+        return $this->repository->detachRegulatorFromCompany($regulator_id, $company_id, $zone_id);
     }
 }

@@ -21,7 +21,7 @@ class DetachRegulatorFromCompanyRequest extends FormRequest
             'company_id' => (int) $this->route('company_id'),
             'broker_id' => (int) $this->route('broker_id'),
             'regulator_id' => (int) $this->route('regulator_id'),
-            'zone_id' => $this->input('zone_id'),
+            'zone_id' => $this->input('zone_id') ?? null,
         ]);
     }
 
