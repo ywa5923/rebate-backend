@@ -300,9 +300,9 @@ class OptionValueController extends Controller
     public function storeMultiple(Request $request, int $brokerId): JsonResponse
     {
        
-      // $isAdmin=app('isAdmin');
+       $isAdmin=app('isAdmin');
 
-        $isAdmin=false;
+       //$isAdmin=$request->attributes->get('isAdmin',false);
         //Example request
         // {
         //     "option_values": [
@@ -478,8 +478,8 @@ class OptionValueController extends Controller
     public function updateMultiple(Request $request, int $brokerId): JsonResponse
     {
         //$isAdmin=app('isAdmin');
-        $isAdmin=false;
-
+        
+        $isAdmin = $request->attributes->get('isAdmin', false);
        
    
         try {

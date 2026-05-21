@@ -265,6 +265,9 @@ class OptionValueService
                         //if isAdmin is false, set is_updated_entry to 1 for new records
                         if(!$isAdmin){
                             $optionValueData['is_updated_entry']=1;
+                        }else{
+                            //added now,niot tested
+                            $optionValueData['is_updated_entry']=0;
                         }
                        
                         $inserts[] = $optionValueData;
