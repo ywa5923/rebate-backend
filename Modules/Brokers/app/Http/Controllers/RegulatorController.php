@@ -2,15 +2,16 @@
 
 namespace Modules\Brokers\Http\Controllers;
 
+use App\DTO\ApiData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 use Modules\Brokers\Http\Requests\AttachRegulatorToCompanyRequest;
 use Modules\Brokers\Http\Requests\DetachRegulatorFromCompanyRequest;
 use Modules\Brokers\Http\Requests\GetRegulatorsListRequest;
 use Modules\Brokers\Services\RegulatorService;
 use Modules\Brokers\Transformers\RegulatorListResource;
 use Modules\Brokers\Transformers\RegulatorResource;
-use Illuminate\Support\Facades\Response as ResponseFacade;
 
 class RegulatorController extends Controller
 {
@@ -25,12 +26,11 @@ class RegulatorController extends Controller
         $language_code = $data['language_code'];
         $zone_id = $data['zone_id'] ?? null;
 
-        $result = $this->regulatorService->getRegulatorsList($language_code, $zone_id);
+        $regulators = $this->regulatorService->getRegulatorsList($language_code, $zone_id);
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => RegulatorListResource::collection($result),
-        ]);
+        return Response::json(ApiData::success(
+            data: RegulatorListResource::collection($regulators)->resolve(),
+        ));
     }
 
     public function attachRegulatorToCompany(AttachRegulatorToCompanyRequest $request, int $regulator_id, int $company_id, int $broker_id): JsonResponse
@@ -43,10 +43,9 @@ class RegulatorController extends Controller
             $data['zone_id'] ?? null,
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => new RegulatorResource($regulator),
-        ]);
+        return Response::json(ApiData::success(
+            data: (new RegulatorResource($regulator))->resolve(),
+        ));
     }
 
     public function detachRegulatorFromCompany(DetachRegulatorFromCompanyRequest $request): JsonResponse
@@ -59,17 +58,15 @@ class RegulatorController extends Controller
             $data['zone_id'] ?? null,
         );
 
-        if(!$detachedRegulator)
-        {
-            return ResponseFacade::json([
-                'success' => false,
-                'message' => 'Regulator not found in company',
-            ], 404);
+        if (! $detachedRegulator) {
+            return Response::json(ApiData::error(
+                message: 'Regulator not found in company',
+            ), 404);
         }
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => new RegulatorResource($detachedRegulator),
-        ]);
+        return Response::json(ApiData::success(
+            data: (new RegulatorResource($detachedRegulator))->resolve(),
+            message: 'Regulator detached from company successfully',
+        ));
     }
 }

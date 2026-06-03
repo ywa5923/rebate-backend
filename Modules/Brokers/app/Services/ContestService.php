@@ -2,10 +2,11 @@
 
 namespace Modules\Brokers\Services;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\Brokers\DTOs\ContestFilters;
 use Modules\Brokers\Models\Contest;
 use Modules\Brokers\Repositories\ContestRepository;
-use Modules\Brokers\Transformers\ContestResource;
 
 class ContestService
 {
@@ -18,37 +19,15 @@ class ContestService
 
     /**
      * Get paginated contests with filters
-     * @param ContestFilters $filters
-     * @param int $broker_id
-     * @return array
-     * @throws \Exception
      */
-    public function getContests(ContestFilters $filters, int $broker_id): array
+    public function getContests(ContestFilters $filters, int $broker_id): Collection|LengthAwarePaginator
     {
 
-        $contests = $this->repository->getContests($filters, $broker_id);
-
-        $response = [
-            'success' => true,
-            'data' => ContestResource::collection($contests),
-        ];
-
-        if ($filters->base->perPage || $filters->base->page) {
-            $response['pagination'] = [
-                'current_page' => $contests->currentPage(),
-                'last_page' => $contests->lastPage(),
-                'per_page' => $contests->perPage(),
-                'total' => $contests->total(),
-            ];
-        }
-
-        return $response;
+        return $this->repository->getContests($filters, $broker_id);
     }
 
     /**
      * Get contest by ID
-     * @param int $id
-     * @return Contest|null
      */
     public function getContestById(int $id): ?Contest
     {
@@ -57,9 +36,6 @@ class ContestService
 
     /**
      * Delete contest. Returns false when not found, wrong broker, or delete fails.
-     * @param int $id
-     * @param int $broker_id
-     * @return Contest|null
      */
     public function deleteContest(int $id, int $broker_id): ?Contest
     {
@@ -69,7 +45,7 @@ class ContestService
             return null;
         }
 
-        if (!$this->repository->delete($contest)) {
+        if (! $this->repository->delete($contest)) {
             return null;
         }
 

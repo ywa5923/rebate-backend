@@ -2,8 +2,9 @@
 
 namespace Modules\Brokers\Http\Controllers;
 
+use App\DTO\ApiData;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Response as ResponseFacade;
+use Illuminate\Support\Facades\Response;
 use Modules\Brokers\DTOs\AccountTypeUrlDTO;
 use Modules\Brokers\DTOs\StoreAffiliateLinkDTO;
 use Modules\Brokers\Enums\UrlTypeEnum;
@@ -15,6 +16,8 @@ use Modules\Brokers\Http\Requests\StoreAccountTypeUrlRequest;
 use Modules\Brokers\Http\Requests\StoreAffiliateLinkRequest;
 use Modules\Brokers\Services\DropdownListService;
 use Modules\Brokers\Services\UrlService;
+use Modules\Brokers\Transformers\AffiliateLinkResource;
+use Modules\Brokers\Transformers\URLResource;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UrlController extends Controller
@@ -47,9 +50,8 @@ class UrlController extends Controller
             $request->validated('language_code'),
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => [
+        return Response::json(ApiData::success(
+            data: [
                 'links_grouped_by_account_id' => $groupedUrlsDTO->linksGroupedByEntityId,
                 'master_links_grouped_by_type' => $groupedUrlsDTO->masterLinksGroupedByType,
                 'links_groups' => [
@@ -60,7 +62,7 @@ class UrlController extends Controller
                     UrlTypeEnum::COMMISSION->value,
                 ],
             ],
-        ]);
+        ));
     }
 
     /**
@@ -80,10 +82,9 @@ class UrlController extends Controller
             $isAdmin,
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $url,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new AffiliateLinkResource($url))->resolve(),
+        ));
     }
 
     public function updateBrokerAffiliateLink(
@@ -102,10 +103,9 @@ class UrlController extends Controller
             $isAdmin,
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $url,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new AffiliateLinkResource($url))->resolve(),
+        ));
     }
 
     public function deleteBrokerAffiliateLink(
@@ -115,10 +115,9 @@ class UrlController extends Controller
     ): JsonResponse {
         $data = $this->urlService->deleteAffiliateLink($broker_id, $url_id);
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $data,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new AffiliateLinkResource($data))->resolve(),
+        ));
     }
 
     /**
@@ -156,18 +155,14 @@ class UrlController extends Controller
             $zone,
         );
 
-        return ResponseFacade::json(
-            [
-                'success' => true,
-                'data' => [
-                    'account_types' => $accountTypes,
-                    'ib_affiliate_urls' => $affliateLinksDTO->ibAffiliateUrls,
-                    'sub_ib_affiliate_urls' => $affliateLinksDTO->subIbAffiliateUrls,
-                    'currency_list' => $currencyList,
-                ],
+        return Response::json(ApiData::success(
+            data: [
+                'account_types' => $accountTypes,
+                'ib_affiliate_urls' => $affliateLinksDTO->ibAffiliateUrls,
+                'sub_ib_affiliate_urls' => $affliateLinksDTO->subIbAffiliateUrls,
+                'currency_list' => $currencyList,
             ],
-            JsonResponse::HTTP_OK,
-        );
+        ));
     }
 
     /**
@@ -180,16 +175,15 @@ class UrlController extends Controller
         $isAdmin = $request->attributes->get('isAdmin', false);
         $data = $request->validated();
         $createAccountTypeUrlsDto = AccountTypeUrlDTO::fromValidated($data);
-        $urls = $this->urlService->createAccountTypeUrl(
+        $url = $this->urlService->createAccountTypeUrl(
             $createAccountTypeUrlsDto,
             $broker_id,
             $isAdmin,
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $urls,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new URLResource($url))->resolve(),
+        ));
     }
 
     public function updateAccountTypeUrl(
@@ -206,10 +200,9 @@ class UrlController extends Controller
             $isAdmin,
         );
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $url,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new URLResource($url))->resolve(),
+        ));
     }
 
     public function deleteAccountTypeUrl(
@@ -218,10 +211,15 @@ class UrlController extends Controller
         int $url_id,
     ): JsonResponse {
         $url = $this->urlService->deleteAccountTypeUrl($broker_id, $url_id);
+        if (! $url) {
+            return Response::json(ApiData::error(
+                message: 'URL not found',
+            ), 404);
+        }
 
-        return ResponseFacade::json([
-            'success' => true,
-            'data' => $url,
-        ]);
+        return Response::json(ApiData::success(
+            data: (new URLResource($url))->resolve(),
+            message: 'URL deleted successfully',
+        ));
     }
 }

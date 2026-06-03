@@ -3,8 +3,8 @@
 namespace Modules\Brokers\Transformers;
 
 use App\Utilities\TranslateTrait;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Modules\Brokers\Enums\UrlTypeEnum;
 use Modules\Brokers\Models\Url;
@@ -18,17 +18,17 @@ class AccountTypeUrlsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        //$urls = URLResource::collection($this->whenLoaded('urls'));
+        // $urls = URLResource::collection($this->whenLoaded('urls'));
 
         $platformUrls = $this->urls->where('url_type', UrlTypeEnum::TRADING_PLATFORM->value)->values()->map(
-            fn (Url $url) => Arr::only($url->toArray(), ['id', 'name'])
+            fn(Url $url) => Arr::only($url->toArray(), ['id', 'name'])
         );
 
         return [
             'account_type_id' => $this->id,
             // Relationships
-            //"broker_id" => $this->broker_id,
-            'account_type_name' => optional(OptionValueResource::collection($this->whenLoaded('optionValues'))[0])->value ?? 'unknown',
+            // "broker_id" => $this->broker_id,
+            'account_type_name' => optional(OptionValueResource::collection($this->whenLoaded('optionValues'))->first())->value ?? 'unknown',
             'platform_urls' => $platformUrls,
         ];
     }

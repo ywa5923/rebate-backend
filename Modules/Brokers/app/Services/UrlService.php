@@ -290,7 +290,7 @@ class UrlService
             //override metadata updated values
             $affiliateLinkRow['metadata'] = array_merge($oldMeta, [
                 'updated_fields' => [],
-               //previous relations values inherited from old metadata
+                //previous relations values inherited from old metadata
             ]);
 
         } else {
@@ -301,7 +301,7 @@ class UrlService
             if ((bool) $updateAffiliateLinkDto->isMasterLink !== (bool) $oldAffiliateLink->is_master_link) {
                 $affiliateLinkRow['is_updated_entry'] = true;
                 $updatedFields[] = 'is_master_link';
-                $previousValues['previous_is_master_link'] = (String)$oldAffiliateLink->is_master_link.' -> '.($oldMetaRelationsValues['previous_is_master_link']??'');
+                $previousValues['previous_is_master_link'] = (string) $oldAffiliateLink->is_master_link.' -> '.($oldMetaRelationsValues['previous_is_master_link'] ?? '');
             }
 
             $affiliateLinkRow['name'] = $updateAffiliateLinkDto->name;
@@ -326,37 +326,35 @@ class UrlService
             $oldPlatforms = $oldAffiliateLink->platformUrls()->pluck('id')->toArray();
             $newPlatforms = collect($updateAffiliateLinkDto->platformUrls->items)->pluck('id')->toArray();
             $platformUrlsDifference = $this->checkPlatformUrlsDifference($newPlatforms, $oldPlatforms);
-            
+
             if ($platformUrlsDifference) {
                 $previousValues['previous_platform_urls'] = array_merge(
-                empty($oldAffiliateLink->platformUrls()->pluck('name')->toArray()) ? ['empty'] : $oldAffiliateLink->platformUrls()->pluck('name')->toArray(),
-                ['->'],
-                $oldMetaRelationsValues['previous_platform_urls']??[]
-            );
+                    empty($oldAffiliateLink->platformUrls()->pluck('name')->toArray()) ? ['empty'] : $oldAffiliateLink->platformUrls()->pluck('name')->toArray(),
+                    ['->'],
+                    $oldMetaRelationsValues['previous_platform_urls'] ?? []
+                );
                 $updatedFields[] = 'platform_urls';
                 $affiliateLinkRow['is_updated_entry'] = true;
             }
             if ($updateAffiliateLinkDto->accountTypeId !== $oldAffiliateLink->account_type_id) {
                 $updatedFields[] = 'account_type_id';
-                $previousValues['previous_account_type_name'] = ($oldAffiliateLink->accountType?->optionValues?->first()?->value ?? 'empty').' -> '.($oldMetaRelationsValues['previous_account_type_name']??'');
-                $previousValues['previous_account_type_id'] = $oldAffiliateLink->account_type_id.' -> '.($oldMetaRelationsValues['previous_account_type_id']??'');
+                $previousValues['previous_account_type_name'] = ($oldAffiliateLink->accountType?->optionValues?->first()?->value ?? 'empty').' -> '.($oldMetaRelationsValues['previous_account_type_name'] ?? '');
+                $previousValues['previous_account_type_id'] = $oldAffiliateLink->account_type_id.' -> '.($oldMetaRelationsValues['previous_account_type_id'] ?? '');
                 $affiliateLinkRow['is_updated_entry'] = true;
             }
             if (! empty($updatedFields)) {
 
-
-               
                 $affiliateLinkRow['metadata'] = array_merge($affiliateLinkRow['metadata'] ?? [], [
                     'updated_fields' => array_values(array_unique(array_merge(
-                        $oldMeta['updated_fields']??[],
+                        $oldMeta['updated_fields'] ?? [],
                         $updatedFields
                     ))),
                     //merge and override previous relations values with new values
                     'previous_relations_values' => array_merge(
-                        $oldMeta['previous_relations_values']??[],
+                        $oldMeta['previous_relations_values'] ?? [],
                         $previousValues
                     ),
-                    
+
                 ]);
             }
         }
@@ -398,6 +396,7 @@ class UrlService
 
         return DB::transaction(function () use ($affiliateLink) {
             $this->affiliateLinkRepository->delete($affiliateLink);
+
             return $affiliateLink;
         });
     }
@@ -434,22 +433,22 @@ class UrlService
 
     /**
      * Delete a URL
-     * 
-     * @param int $brokerId
-     * @param int $urlId
+     *
      * @throws ApiException if URL not found or could not delete URL
-     * @return Url
      */
-    public function deleteAccountTypeUrl(int $brokerId, int $urlId): Url
+    public function deleteAccountTypeUrl(int $brokerId, int $urlId): ?Url
     {
         $url = $this->repository->find($urlId);
         if (! $url || $url->broker_id !== $brokerId) {
             throw new ApiException('URL not found', 404);
         }
 
-        if (! $this->repository->delete($url)) {
-            throw new ApiException('Could not delete URL', 500);
+        $deleted = $this->repository->delete($url);
+        if (! $deleted) {
+            return null;
         }
+
         return $url;
+
     }
 }
