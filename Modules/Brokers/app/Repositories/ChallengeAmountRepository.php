@@ -3,6 +3,7 @@
 namespace Modules\Brokers\Repositories;
 
 use Modules\Brokers\Models\ChallengeAmount;
+use App\Exceptions\ApiException;
 
 class ChallengeAmountRepository
 {
@@ -38,7 +39,7 @@ class ChallengeAmountRepository
     {
         $defaultAmount = $this->findDefaultAmountById($default_amount_id_to_clone);
         if (! $defaultAmount) {
-            throw new \Exception('Amount not found'.$default_amount_id_to_clone);
+            throw new ApiException('Amount not found'.$default_amount_id_to_clone, 404);
         }
 
         return $this->model->create([

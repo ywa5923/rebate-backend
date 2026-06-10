@@ -24,124 +24,10 @@ class ChallengeMatrixRepository
 
     /**
      * Clone matrix values for a challenge
+     *
+     * @return bool
      */
-    public function cloneMatrixValues(int $challengeId, array $newChallengeIds, ?int $zoneId = null): bool
-    {
-        try {
-            $matrixValues = $this->model->where('challenge_id', $challengeId)->where('zone_id', $zoneId)->get();
-
-            foreach ($matrixValues as $matrixValue) {
-                foreach ($newChallengeIds as $newChallengeId) {
-                    $matrixValue->replicate()->fill([
-                        'challenge_id' => $newChallengeId,
-                    ])->save();
-                }
-            }
-
-            return true;
-        } catch (\Throwable $e) {
-
-            return false;
-        }
-    }
-
-    /**
-     * Clone matrix values for a challenge using insert
-     */
-    public function cloneMatrixValues2(int $challengeId, array $newChallengeIds, int $brokerId, ?int $zoneId = null): bool
-    {
-        $matrixValues = $this->model->where('challenge_id', $challengeId)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->get();
-
-        if ($matrixValues->isEmpty()) {
-            return false;
-        }
-
-        //delete old matrix values
-        $this->model->whereIn('challenge_id', $newChallengeIds)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->delete();
-
-        $insertData = [];
-        $now = now();
-
-        foreach ($matrixValues as $matrixValue) {
-            // Exclude the ID and convert model attributes to an array
-            $attributes = $matrixValue->toArray();
-            unset($attributes['id']);
-
-            // 1. Manually json_encode the JSON fields so the raw DB insert accepts them:
-            foreach (['value', 'previous_value', 'public_value', 'previous_public_value'] as $jsonField) {
-                if (isset($attributes[$jsonField]) && (is_array($attributes[$jsonField]) || is_object($attributes[$jsonField]))) {
-                    $attributes[$jsonField] = json_encode($attributes[$jsonField]);
-                }
-            }
-
-            // 2. Build the insert payload
-            foreach ($newChallengeIds as $newChallengeId) {
-                $insertData[] = array_merge($attributes, [
-                    'challenge_id' => $newChallengeId,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            }
-        }
-
-        return $this->model->newQuery()->insert($insertData);
-    }
-
-    public function clone(int $challengeId, array $newChallengeIds, int $brokerId, ?int $zoneId = null)
-    {
-        $matrixRowsToClone = $this->model->where('challenge_id', $challengeId)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->get();
-
-        if ($matrixRowsToClone->isEmpty()) {
-            return false;
-        }
-
-        $insertData = [];
-        $now = now();
-        foreach ($newChallengeIds as $newChallengeId) {
-
-            $challengeMatrixRows = $this->model->newQuery()->where('challenge_id', $newChallengeId)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->get();
-            //if there are matrix rows for this challenge, copy public values from exitsing matrix rows and create a new batch of insert data
-            if ($challengeMatrixRows->isNotEmpty()) {
-                //copy public values from exitsing matrix rows and create a new batch of insert data
-                foreach ($matrixRowsToClone as $matrixRowToClone) {
-
-                    $challengeMatrixRow = $challengeMatrixRows->where('row_id', $matrixRowToClone->row_id)->where('column_id', $matrixRowToClone->column_id)->first();
-                    if ($challengeMatrixRow) {
-                        $insertData[] = array_merge($matrixRowToClone->toArray(), [
-                            'challenge_id' => $newChallengeId,
-                            'value' => json_encode($challengeMatrixRow->value),
-                            'previous_value' => json_encode($challengeMatrixRow->value),
-                            'public_value' => json_encode($challengeMatrixRow->public_value),
-                            'previous_public_value' => json_encode($challengeMatrixRow->previous_public_value),
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ]);
-                    }
-                }
-                //now delete the old matrix rows
-                //first delete translations
-
-                $this->translationRepository->deleteByTranslationableTypeAndIds(ChallengeMatrixValue::class, $challengeMatrixRows->pluck('id')->toArray());
-                //TO DO: add some observer to make again the translations for the new matrix rows
-
-                //now delete the matrix rows
-                $this->model->whereIn('challenge_id', $newChallengeIds)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->delete();
-            } else {
-                //create a new batch of insert data
-                foreach ($matrixRowsToClone as $matrixRowToClone) {
-                    $insertData[] = array_merge($matrixRowToClone->toArray(), [
-                        'challenge_id' => $newChallengeId,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
-            }
-        }
-
-        return $this->model->newQuery()->insert($insertData);
-    }
-
-    public function clone3(int $challengeId, array $newChallengeIds, int $brokerId, bool $isAdmin, ?int $zoneId = null)
+    public function clone(int $challengeId, array $newChallengeIds, int $brokerId, bool $isAdmin, ?int $zoneId = null)
     {
         $matrixRowsToClone = $this->model->where('challenge_id', $challengeId)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->get();
 
@@ -154,6 +40,8 @@ class ChallengeMatrixRepository
         foreach ($newChallengeIds as $newChallengeId) {
             //if there are matrix rows for this challenge, update the rows with values from $matrixRowsToClone
 
+            //these are exisitng matrix rows for the new challenge
+            //we need only to uodate them
             $challengeMatrixRows = $this->model->newQuery()->where('challenge_id', $newChallengeId)->where('broker_id', $brokerId)->where('zone_id', $zoneId)->get();
 
             if ($challengeMatrixRows->isNotEmpty()) {
@@ -214,7 +102,11 @@ class ChallengeMatrixRepository
             }
         }
 
-        return $this->model->newQuery()->insert($insertData);
+        if (! empty($insertData)) {
+            return $this->model->newQuery()->insert($insertData);
+        }
+
+        return true;
     }
 
     /**

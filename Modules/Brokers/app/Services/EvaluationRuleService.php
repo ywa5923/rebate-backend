@@ -2,18 +2,19 @@
 
 namespace Modules\Brokers\Services;
 
-use Modules\Brokers\Repositories\EvaluationRuleRepository;
-use Modules\Brokers\Repositories\BrokerEvaluationRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Modules\Brokers\Repositories\BrokerEvaluationRepository;
+use Modules\Brokers\Repositories\EvaluationRuleRepository;
 
 class EvaluationRuleService
 {
     public function __construct(
         protected EvaluationRuleRepository $evaluationRuleRepository,
         protected BrokerEvaluationRepository $brokerEvaluationRepository
-    ) {}
+    ) {
+    }
 
     public function insertOrUpdate(array $data, int $broker_id, bool $is_admin, ?int $zone_id = null)
     {
@@ -33,11 +34,11 @@ class EvaluationRuleService
         //2 The array value is the evaluation option id
         //3 If the key ends with _getter, the array value is the details and the evaluation_rule_id is the number after the # in the key
         //4 so we need to append the getter details to the entries array which contains the evaluation option id
-       
+
         $entries = [];
 
         foreach ($data as $key => $value) {
-            if (!preg_match('/#(\d+)(?:_getter)?$/', $key, $m)) {
+            if (! preg_match('/#(\d+)(?:_getter)?$/', $key, $m)) {
                 throw new \InvalidArgumentException("Invalid key112: $key");
             }
             $ruleId = (int) $m[1];
@@ -49,41 +50,41 @@ class EvaluationRuleService
             }
         }
         //for broker, get the existing entries to set the previous evaluation option id and details
-        if (!$is_admin) {
+        $existingEntries = collect();
+        if (! $is_admin) {
             $ruleIds = array_keys($entries);
             $existingEntries = $this->brokerEvaluationRepository->getByBrokerIdAndRuleIds($broker_id, $ruleIds);
         }
-
 
         $dbData = [];
         $detailsKey = $is_admin ? 'public_details' : 'details';
         $optionIdKey = $is_admin ? 'public_evaluation_option_id' : 'evaluation_option_id';
         foreach ($entries as $ruleId => $row) {
-            if (!isset($row['evaluation_option_id'])) {
+            if (! isset($row['evaluation_option_id'])) {
                 throw new \InvalidArgumentException("Missing option for rule $ruleId");
             }
             $item = [
-                'broker_id'           => $broker_id,
-                'evaluation_rule_id'  => $ruleId,
+                'broker_id' => $broker_id,
+                'evaluation_rule_id' => $ruleId,
                 $optionIdKey => $row['evaluation_option_id'],
-                $detailsKey             => $row['details'] ?? null,
+                $detailsKey => $row['details'] ?? null,
                 'is_updated_entry' => false,
                 'updated_at' => now(),
             ];
             //for broker, set the previous evaluation option id and details
-            if (!$is_admin) {
+            if (! $is_admin) {
                 $existingEntry = $existingEntries->get($ruleId);
                 if ($existingEntry) {
-                    if($existingEntry->evaluation_option_id != $row['evaluation_option_id']){
+                    if ($existingEntry->evaluation_option_id != $row['evaluation_option_id']) {
                         $item['previous_evaluation_option_id'] = $existingEntry->evaluation_option_id;
                         $item['is_updated_entry'] = true;
                     }
-                    if(isset($row['details']) && $existingEntry->details != $row['details']){
+                    if (isset($row['details']) && $existingEntry->details != $row['details']) {
                         $item['previous_details'] = $existingEntry->details;
                         $item['is_updated_entry'] = true;
                     }
                     //if the details is not set in the new data, set the previous details to the existing details
-                    if(!isset($row['details']) && $existingEntry->details != null){
+                    if (! isset($row['details']) && $existingEntry->details != null) {
                         $item['previous_details'] = $existingEntry->details;
                         $item['is_updated_entry'] = true;
                     }
@@ -93,7 +94,7 @@ class EvaluationRuleService
             $dbData[] = $item;
         }
 
-         //Note!!! Upsert doesnt works correctly with unique key when zone_id is null, so we use updateOrInsert instead
+        //Note!!! Upsert doesnt works correctly with unique key when zone_id is null, so we use updateOrInsert instead
         // if (!$is_admin) {
         //     $upsertArray = ['evaluation_option_id', 'details', 'previous_evaluation_option_id', 'previous_details', 'updated_at'];
         // } else {
@@ -119,17 +120,16 @@ class EvaluationRuleService
                     'evaluation_rule_id' => $row['evaluation_rule_id'],
                     'zone_id' => $row['zone_id'] ?? null, // NULL matches via whereNull
                 ],
-                Arr::except($row, ['broker_id','evaluation_rule_id','zone_id'])
+                Arr::except($row, ['broker_id', 'evaluation_rule_id', 'zone_id'])
             );
         }
     }
-
 
     /**
      * Get broker evaluations (scoped by optional zone).
      * Returns a collection for controller ->toArray().
      */
-    public function getEvaluations(int $brokerId,string $lang="en", ?int $zoneId = null): Collection
+    public function getEvaluations(int $brokerId, string $lang = 'en', ?int $zoneId = null): Collection
     {
         return $this->brokerEvaluationRepository->getByBrokerIdAndZone($brokerId, $lang, $zoneId);
     }

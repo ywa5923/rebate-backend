@@ -12,6 +12,7 @@ use Modules\Brokers\Repositories\CostDiscountRepository;
 use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Transformers\AffiliateLinkResource;
 use Modules\Brokers\Transformers\CostDiscountResource;
+use App\Exceptions\ApiException;
 
 class ChallengeService
 {
@@ -670,31 +671,30 @@ class ChallengeService
         });
     }
 
-    public function cloneChallengeMatrix(int $categoryId, int $stepId, int $amountId, int $brokerId, bool $isAdmin, ?int $zoneId = null): bool
+    public function cloneChallengeMatrix(int $categoryId, int $stepId, int $amountId, int $brokerId, bool $isAdmin, ?int $zoneId = null): void
     {
         $chalenge = $this->challengeRepository->exists(false, $categoryId, $stepId, $amountId, $brokerId, $zoneId);
         if (! $chalenge) {
-            throw new \RuntimeException('Challenge not found');
+            throw new ApiException('Challenge not found', 404);
         }
         //get all user amounts except the given amount id
         $amountsToClone = $this->challengeAmountRepository->getUserAmountsExcept($brokerId, $amountId, $categoryId);
 
         if (empty($amountsToClone)) {
-            throw new \RuntimeException('Amounts to clone not found');
+            throw new ApiException('Amounts to clone not found', 404);
         }
 
-        return DB::transaction(function () use ($categoryId, $stepId, $amountsToClone, $brokerId, $zoneId, $chalenge, $isAdmin) {
+        DB::transaction(function () use ($categoryId, $stepId, $amountsToClone, $brokerId, $zoneId, $chalenge, $isAdmin) {
 
             //get new challenges to clone, if a challenge already exists for the user for amount_id in $amountsToClone,
             // it will not be created again
-            $newChallengeIds = $this->challengeRepository->addChallengesForUser($categoryId, $stepId, $amountsToClone, $brokerId, $zoneId);
+            $newChallengeIds = $this->challengeRepository->addChallengesForUser($chalenge->is_published, $categoryId, $stepId, $amountsToClone, $brokerId, $zoneId);
 
             if (! empty($newChallengeIds)) {
                 //clone matrix values for the new challenges
                 //if matrix values already exist for the new challenges, they will be deleted and then cloned with the new values from the original challenge
 
-                //$this->challengeMatrixRepository->cloneMatrixValues2($chalenge->id, $newChallengeIds,$brokerId,$zoneId);
-                $this->challengeMatrixRepository->clone3($chalenge->id, $newChallengeIds, $brokerId, $isAdmin, $zoneId);
+                $this->challengeMatrixRepository->clone($chalenge->id, $newChallengeIds, $brokerId, $isAdmin, $zoneId);
                 //clone cost discounts for the new challenges
                 $this->costDiscountRepository->cloneCostDiscounts($chalenge->id, $newChallengeIds, $brokerId, $isAdmin, $zoneId);
 
@@ -703,7 +703,6 @@ class ChallengeService
 
             }
 
-            return true;
         });
     }
 }

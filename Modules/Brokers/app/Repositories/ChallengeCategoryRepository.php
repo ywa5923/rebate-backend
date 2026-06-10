@@ -4,15 +4,18 @@ namespace Modules\Brokers\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\ChallengeCategory;
-
+use Modules\Brokers\Repositories\ChallengeAmountRepository;
+use Illuminate\Support\Facades\DB;
+use App\Exceptions\ApiException;
 class ChallengeCategoryRepository
 {
-    protected ChallengeCategory $model;
+    
 
-    public function __construct(ChallengeCategory $model)
-    {
-        $this->model = $model;
-    }
+    public function __construct(
+        protected ChallengeCategory $model,
+        protected ChallengeAmountRepository $challengeAmountRepository,
+        protected ChallengeStepRepository $challengeStepRepository
+    ) {}
 
     /**
      * Get paginated challenge categories with filters
@@ -106,7 +109,6 @@ class ChallengeCategoryRepository
     /**
      * Add a challenge category
      *
-     * @param  string  $slug
      */
     public function cloneCategory(int $default_category_id, int $order, int $broker_id): ChallengeCategory
     {
@@ -114,8 +116,10 @@ class ChallengeCategoryRepository
         if (! $defaultCategory) {
             throw new \Exception('Default category not found');
         }
+       
 
-        return $this->model->create([
+       return DB::transaction(function () use ($defaultCategory, $order, $broker_id) {
+       $challengeCategory = $this->model->create([
             'slug' => $defaultCategory->slug,
             'name' => $defaultCategory->name,
             'description' => $defaultCategory->description,
@@ -123,5 +127,18 @@ class ChallengeCategoryRepository
             'order' => $order,
             'broker_id' => $broker_id,
         ]);
+        if(!$challengeCategory){
+            throw new ApiException('Failed to create challenge category', 500);
+        }
+         $defaultAmounts = $defaultCategory->amounts()->get();
+        foreach ($defaultAmounts as $defaultAmount) {
+            $this->challengeAmountRepository->cloneAmount($defaultAmount->id, $defaultAmount->order??0, $challengeCategory->id, $defaultAmount->currency);
+        }
+        $defaultSteps = $defaultCategory->steps()->get();
+        foreach ($defaultSteps as $defaultStep) {
+            $this->challengeStepRepository->cloneStep($defaultStep->id, $defaultStep->order??0, $challengeCategory->id);
+        }
+        return $challengeCategory;
+    });
     }
 }

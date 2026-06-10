@@ -32,6 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+
+        //this is a helper function to determine if the request should be rendered as json
         $shouldRenderJson = static fn (Request $request): bool => $request->is(
             'api/*',
         ) || $request->expectsJson();

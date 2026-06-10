@@ -150,7 +150,7 @@ class ChallengeRepository
     /**
      * Add challenges for user
      */
-    public function addChallengesForUser(int $categoryId, int $stepId, array $amountIds, int $brokerId, ?int $zoneId = null): array
+    public function addChallengesForUser(bool $isPublished, int $categoryId, int $stepId, array $amountIds, int $brokerId, ?int $zoneId = null): array
     {
         $insertData = [];
 
@@ -162,6 +162,11 @@ class ChallengeRepository
             ->where('zone_id', $zoneId)
             ->whereIn('challenge_amount_id', $amountIds)
             ->get();
+        //update is_published for the existing challenges
+        $existingChallenges->each(function ($challenge) use ($isPublished) {
+            $challenge->is_published = $isPublished;
+            $challenge->save();
+        });
 
         foreach ($amountIds as $amountId) {
 
@@ -171,6 +176,7 @@ class ChallengeRepository
 
             $insertData[] = [
                 'is_placeholder' => false,
+                'is_published' => $isPublished,
                 'challenge_category_id' => $categoryId,
                 'challenge_step_id' => $stepId,
                 'challenge_amount_id' => $amountId,

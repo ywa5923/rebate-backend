@@ -17,6 +17,7 @@ use Modules\Brokers\Models\Url;
 use Modules\Brokers\Repositories\ChallengeAmountRepository;
 use Modules\Brokers\Repositories\ChallengeCategoryRepository;
 use Modules\Brokers\Repositories\ChallengeStepRepository;
+use App\Exceptions\ApiException;
 
 class ChallengeCategoryService
 {
@@ -24,8 +25,7 @@ class ChallengeCategoryService
         protected ChallengeCategoryRepository $repository,
         protected ChallengeStepRepository $challengeStepRepository,
         protected ChallengeAmountRepository $challengeAmountRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get paginated challenge categories with filters
@@ -55,90 +55,71 @@ class ChallengeCategoryService
     }
 
     /**
+     * Not used-to be deleted
      * Create new challenge category
      */
-    public function createChallengeCategory(array $data): ChallengeCategory
-    {
-        return DB::transaction(function () use ($data) {
-            try {
-                // Validate data
-                $validatedData = $this->validateChallengeCategoryData($data);
+    // public function createChallengeCategory(array $data): ChallengeCategory
+    // {
+    //     return DB::transaction(function () use ($data) {
+    //         try {
+    //             // Validate data
+    //             $validatedData = $this->validateChallengeCategoryData($data);
 
-                // Create challenge category
-                $challengeCategory = $this->repository->create($validatedData);
+    //             // Create challenge category
+    //             $challengeCategory = $this->repository->create($validatedData);
 
-                return $challengeCategory->load(['steps', 'amounts']);
-            } catch (\Exception $e) {
-                Log::error('ChallengeCategoryService createChallengeCategory error: '.$e->getMessage());
-                throw $e;
-            }
-        });
-    }
+    //             return $challengeCategory->load(['steps', 'amounts']);
+    //         } catch (\Exception $e) {
+    //             throw new ApiException('Failed to create challenge category', 500, errors: [$e->getMessage()]);
+    //         }
+    //     });
+    // }
 
     /**
+     * Not used-to be deleted
      * Update challenge category
      */
-    public function updateChallengeCategory(int $id, array $data): ChallengeCategory
-    {
-        return DB::transaction(function () use ($id, $data) {
-            try {
-                $challengeCategory = $this->repository->findByIdWithoutRelations($id);
+    // public function updateChallengeCategory(int $id, array $data): ChallengeCategory
+    // {
+    //     return DB::transaction(function () use ($id, $data) {
+    //         try {
+    //             $challengeCategory = $this->repository->findByIdWithoutRelations($id);
 
-                if (! $challengeCategory) {
-                    throw new \Exception('Challenge category not found');
-                }
+    //             if (! $challengeCategory) {
+    //                 throw new \Exception('Challenge category not found');
+    //             }
 
-                // Validate data
-                $validatedData = $this->validateChallengeCategoryData($data, true);
+    //             // Validate data
+    //             $validatedData = $this->validateChallengeCategoryData($data, true);
 
-                // Update challenge category
-                $this->repository->update($challengeCategory, $validatedData);
+    //             // Update challenge category
+    //             $this->repository->update($challengeCategory, $validatedData);
 
-                return $challengeCategory->load(['steps', 'amounts']);
-            } catch (\Exception $e) {
-                Log::error('ChallengeCategoryService updateChallengeCategory error: '.$e->getMessage());
-                throw $e;
-            }
-        });
-    }
+    //             return $challengeCategory->load(['steps', 'amounts']);
+    //         } catch (\Exception $e) {
+
+    //             throw new ApiException('Failed to update challenge category', 500, errors: [$e->getMessage()]);
+    //         }
+    //     });
+    // }
 
     /**
      * Delete challenge category
      */
-    public function deleteChallengeCategory(int $id, ?int $broker_id = null): bool
+    public function deleteChallengeCategory(int $id, ?int $broker_id = null): void
     {
 
         $challengeCategory = $this->repository->findByIdWithoutRelations($id, $broker_id);
 
         if (! $challengeCategory) {
-            throw new \Exception('Challenge category not found');
+            throw new ApiException('Challenge category not found', 404);
         }
 
-        return DB::transaction(function () use ($challengeCategory) {
+        DB::transaction(function () use ($challengeCategory) {
 
             //delete challenges and matrix related data
             $challenges = $challengeCategory->challenges()->get();
-            // foreach($challenges as $challenge){
-            //     $challenge->delete();
-            //     $challenge->challengeMatrixValues()->delete();
-            //     $challenge->urls()->delete();
-            // }
 
-            // Delete challenges and their related data
-            // $challengeCategory->challenges()
-            //     ->select('id') // lighter
-            //     ->chunkById(500, function (Collection $chunk) {
-            //         $ids = $chunk->pluck('id');
-
-            //         // child tables first
-            //         ChallengeMatrixValue::whereIn('challenge_id', $ids)->delete();
-            //         Url::whereIn('urlable_id', $ids)
-            //             ->where('urlable_type', Challenge::class)
-            //             ->delete();
-
-            //         // then challenges
-            //         Challenge::whereIn('id', $ids)->delete();
-            //     });
 
             ChallengeMatrixValue::whereIn('challenge_id', $challenges->pluck('id'))->delete();
             Url::whereIn('urlable_id', $challenges->pluck('id'))
@@ -151,19 +132,17 @@ class ChallengeCategoryService
 
             // Delete challenge category
             $this->repository->delete($challengeCategory);
-
-            return true;
         });
     }
 
-    public function deleteChallengeCategoryStep(int $id, ?int $broker_id = null): bool
+    public function deleteChallengeCategoryStep(int $id, ?int $broker_id = null): void
     {
         $challengeStep = $this->challengeStepRepository->findById($id, $broker_id);
         if (! $challengeStep) {
-            throw new \Exception('Challenge step not found');
+            throw new ApiException('Challenge step not found', 404);
         }
 
-        return DB::transaction(function () use ($challengeStep) {
+        DB::transaction(function () use ($challengeStep) {
 
             //delete challenges and matrix related data
             $challenges = $challengeStep->challenges()->get();
@@ -175,20 +154,18 @@ class ChallengeCategoryService
             Challenge::whereIn('id', $challenges->pluck('id'))->delete();
 
             $challengeStep->delete();
-
-            return true;
         });
     }
 
-    public function deleteChallengeCategoryAmount(int $id, ?int $broker_id = null): bool
+    public function deleteChallengeCategoryAmount(int $id, ?int $broker_id = null): void
     {
 
         $challengeAmount = $this->challengeAmountRepository->findById($id, $broker_id);
         if (! $challengeAmount) {
-            throw new \Exception('Challenge amount not found');
+            throw new ApiException('Challenge amount not found', 404);
         }
 
-        return DB::transaction(function () use ($challengeAmount) {
+        DB::transaction(function () use ($challengeAmount) {
             //delete challenges and matrix related data
             $challenges = $challengeAmount->challenges()->get();
             ChallengeMatrixValue::whereIn('challenge_id', $challenges->pluck('id'))->delete();
@@ -198,8 +175,6 @@ class ChallengeCategoryService
             Challenge::whereIn('id', $challenges->pluck('id'))->delete();
 
             $challengeAmount->delete();
-
-            return true;
         });
     }
 
@@ -215,16 +190,16 @@ class ChallengeCategoryService
      *
      * @param  array<int,int>  $tabIds
      */
-    public function saveChallengeTabOrder(array $tabIds, int $brokerId, ChallengeTabEnum|string $tabType): bool
+    public function saveChallengeTabOrder(array $tabIds, int $brokerId, ChallengeTabEnum|string $tabType): void
     {
         if (empty($tabIds)) {
-            return true;
+            return;
         }
         $tabTypeEnum = $tabType instanceof ChallengeTabEnum ? $tabType : ChallengeTabEnum::from($tabType);
         // Normalize and deduplicate while preserving order
         $orderedIds = array_values(array_unique(array_map('intval', $tabIds)));
 
-        return DB::transaction(function () use ($orderedIds, $brokerId, $tabTypeEnum) {
+        DB::transaction(function () use ($orderedIds, $brokerId, $tabTypeEnum) {
 
             if ($tabTypeEnum === ChallengeTabEnum::CATEGORY) {
                 $existingRows = ChallengeCategory::query()
@@ -236,7 +211,7 @@ class ChallengeCategoryService
                 foreach ($orderedIds as $position => $id) {
                     $row = $existingRows->get($id);
                     if (! $row) {
-                        throw new \InvalidArgumentException("Category $id not found for broker $brokerId");
+                        throw new ApiException("Category $id not found for broker $brokerId");
                     }
                     $rows[] = [
                         'id' => $id,
@@ -251,14 +226,14 @@ class ChallengeCategoryService
             } elseif ($tabTypeEnum === ChallengeTabEnum::STEP) {
                 $existingRows = ChallengeStep::query()
                     ->whereIn('id', $orderedIds)
-                    ->whereHas('challengeCategory', fn ($q) => $q->where('broker_id', $brokerId))
+                    ->whereHas('challengeCategory', fn($q) => $q->where('broker_id', $brokerId))
                     ->get(['id', 'name', 'slug', 'challenge_category_id'])
                     ->keyBy('id');
                 $rows = [];
                 foreach ($orderedIds as $position => $id) {
                     $row = $existingRows->get($id);
                     if (! $row) {
-                        throw new \InvalidArgumentException("Step $id not found for broker $brokerId");
+                        throw new ApiException("Step $id not found for broker $brokerId");
                     }
                     $rows[] = [
                         'id' => $id,
@@ -273,14 +248,14 @@ class ChallengeCategoryService
             } else {
                 $existingRows = ChallengeAmount::query()
                     ->whereIn('id', $orderedIds)
-                    ->whereHas('challengeCategory', fn ($q) => $q->where('broker_id', $brokerId))
+                    ->whereHas('challengeCategory', fn($q) => $q->where('broker_id', $brokerId))
                     ->get(['id', 'amount', 'currency', 'challenge_category_id'])
                     ->keyBy('id');
                 $rows = [];
                 foreach ($orderedIds as $position => $id) {
                     $row = $existingRows->get($id);
                     if (! $row) {
-                        throw new \InvalidArgumentException("Amount $id not found for broker $brokerId");
+                        throw new ApiException("Amount $id not found for broker $brokerId");
                     }
                     $rows[] = [
                         'id' => $id,
@@ -293,37 +268,33 @@ class ChallengeCategoryService
                 }
                 ChallengeAmount::upsert($rows, ['id'], ['order', 'updated_at']);
             }
-
-            return true;
         });
     }
 
     /**
+     * Not used-to be deleted
      * Validate challenge category data
      */
-    public function validateChallengeCategoryData(array $data, bool $isUpdate = false): array
-    {
-        $rules = [
-            'name' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ];
+    // public function validateChallengeCategoryData(array $data, bool $isUpdate = false): array
+    // {
+    //     $rules = [
+    //         'name' => $isUpdate ? 'sometimes|required|string|max:255' : 'required|string|max:255',
+    //         'description' => 'nullable|string',
+    //         'is_active' => 'boolean',
+    //     ];
 
-        $validator = Validator::make($data, $rules);
+    //     $validator = Validator::make($data, $rules);
 
-        if ($validator->fails()) {
-            throw new \InvalidArgumentException($validator->errors()->first());
-        }
+    //     if ($validator->fails()) {
+    //         throw new ApiException($validator->errors()->first(), 400);
+    //     }
 
-        return $validator->validated();
-    }
+    //     return $validator->validated();
+    // }
 
     /**
      * Add a challenge tab,i.e category, step, amount
      * clone a default tab by id to a broker challenge tab
-     *
-     * @param  string  $tab_type
-     * @return bool
      */
     public function addChallengeTabToBroker(
         ChallengeTabEnum $tab_type,
@@ -333,6 +304,10 @@ class ChallengeCategoryService
         ?int $broker_challenge_category_id = null,
         ?string $amount_currency = null
     ): ChallengeCategory|ChallengeStep|ChallengeAmount {
+
+        if ($tab_type !== ChallengeTabEnum::CATEGORY && $broker_challenge_category_id === null) {
+            throw new ApiException('Broker challenge category id is required for step and amount tabs', 422);
+        }
 
         return match ($tab_type) {
             ChallengeTabEnum::CATEGORY => $this->repository->cloneCategory($default_tab_id_to_clone, $tab_order, $broker_id),
