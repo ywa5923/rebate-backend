@@ -303,4 +303,88 @@ class UrlRepository
     {
         return $url->delete();
     }
+
+    /**
+     * Clone challenge affiliate links
+     */
+    public function cloneChallengeAffiliateLinks(int $challenge_id, array $new_challenge_ids, int $broker_id, bool $isAdmin, ?int $zone_id = null): bool
+    {
+        $affiliateLinkToClone = $this->model->newQuery()
+            ->where('urlable_id', $challenge_id)
+            ->where('urlable_type', Challenge::class)
+            ->where('broker_id', $broker_id)
+            ->when(
+                $zone_id === null,
+                fn ($query) => $query->whereNull('zone_id'),
+                fn ($query) => $query->where('zone_id', $zone_id),
+            )
+            ->first();
+
+        if (! $affiliateLinkToClone) {
+            return false;
+        }
+
+        $insertData = [];
+        $now = now();
+
+        foreach ($new_challenge_ids as $newChallengeId) {
+            $challengeAffiliateLink = $this->model->newQuery()
+                ->where('urlable_id', $newChallengeId)
+                ->where('urlable_type', Challenge::class)
+                ->where('broker_id', $broker_id)
+                ->when(
+                    $zone_id === null,
+                    fn ($query) => $query->whereNull('zone_id'),
+                    fn ($query) => $query->where('zone_id', $zone_id),
+                )->first();
+            if ($challengeAffiliateLink) {
+                $isUpdatedEntry = $challengeAffiliateLink->url == $affiliateLinkToClone->url ? 0 : 1;
+                if ($isAdmin) {
+                    $challengeAffiliateLink->update([
+                        'public_url' => $affiliateLinkToClone->public_url,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    $challengeAffiliateLink->update([
+                        'url' => $affiliateLinkToClone->url,
+                        'is_updated_entry' => $isUpdatedEntry,
+                        'previous_url' => $challengeAffiliateLink->url,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            } else {
+                $attributes = $affiliateLinkToClone->toArray();
+                unset($attributes['id']);
+
+                if ($isAdmin) {
+                    //clone only public_url which exist in $attributes, other keys are overwritten
+                    $insertData[] = array_merge($attributes, [
+                        'urlable_id' => $newChallengeId,
+                        'urlable_type' => Challenge::class,
+                        'is_updated_entry' => 0,
+                        'previous_url' => null,
+                        'url' => null,
+                        'metadata' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    $insertData[] = array_merge($attributes, [
+                        'urlable_id' => $newChallengeId,
+                        'urlable_type' => Challenge::class,
+                        'is_updated_entry' => 0,
+                        'previous_url' => null,
+                        'public_url' => null,
+                        'metadata' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            }
+        }
+
+        return $this->model->newQuery()->insert($insertData);
+    }
 }

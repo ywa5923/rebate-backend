@@ -2,18 +2,21 @@
 
 namespace Modules\Brokers\Repositories;
 
-use Modules\Brokers\Models\Challenge;
-use Modules\Brokers\Models\ChallengeMatrixValue;
-use Modules\Brokers\Models\MatrixHeader;
-use Modules\Brokers\Models\ChallengeCategory;
-use Modules\Brokers\Models\ChallengeStep;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Brokers\Models\Challenge;
+use Modules\Brokers\Models\ChallengeCategory;
+use Modules\Brokers\Models\ChallengeMatrixValue;
+use Modules\Brokers\Models\ChallengeStep;
+use Modules\Brokers\Models\MatrixHeader;
 
 class ChallengeRepository
 {
     protected Challenge $model;
+
     const ZONE_ID_NULL = null;
+
     const BROKER_ID_NULL = null;
+
     const AMOUNT_ID_NULL = null;
 
     public function __construct(Challenge $model)
@@ -23,8 +26,6 @@ class ChallengeRepository
 
     /**
      * Create a new challenge
-     * @param array $data
-     * @return Challenge
      */
     public function create(array $data): Challenge
     {
@@ -33,8 +34,6 @@ class ChallengeRepository
 
     /**
      * Find challenge by ID
-     * @param int $id
-     * @return Challenge|null
      */
     public function findById(int $id): ?Challenge
     {
@@ -43,8 +42,6 @@ class ChallengeRepository
 
     /**
      * Get matrix headers by group names
-     * @param array $groupNames
-     * @return Collection
      */
     public function getMatrixHeadersByGroups(array $groupNames): Collection
     {
@@ -53,9 +50,6 @@ class ChallengeRepository
 
     /**
      * Get matrix header by slug and groups
-     * @param string $slug
-     * @param array $groupNames
-     * @return MatrixHeader|null
      */
     public function getMatrixHeaderBySlugAndGroups(string $slug, array $groupNames): ?MatrixHeader
     {
@@ -66,8 +60,6 @@ class ChallengeRepository
 
     /**
      * Bulk insert challenge matrix values
-     * @param array $values
-     * @return void
      */
     public function insertChallengeMatrixValues(array $values): void
     {
@@ -76,8 +68,6 @@ class ChallengeRepository
 
     /**
      * Delete challenge matrix values by challenge ID
-     * @param int $challengeId
-     * @return void
      */
     public function deleteChallengeMatrixValues(int $challengeId): void
     {
@@ -86,8 +76,6 @@ class ChallengeRepository
 
     /**
      * Get challenge matrix values by challenge ID
-     * @param int $challengeId
-     * @return Collection
      */
     public function getChallengeMatrixValues(int $challengeId, ?int $zoneId = null): Collection
     {
@@ -96,15 +84,8 @@ class ChallengeRepository
             ->get();
     }
 
-
     /**
      * Check if challenge exists and return it
-     * @param bool $isPlaceholder
-     * @param int $categoryId
-     * @param int $stepId
-     * @param int|null $amountId
-     * @param int $brokerId
-     * @return Challenge|null
      */
     public function exists(bool $isPlaceholder, int $categoryId, int $stepId, ?int $amountId, ?int $brokerId = null, ?int $zoneId = null): ?Challenge
     {
@@ -123,20 +104,19 @@ class ChallengeRepository
             $qb->where('broker_id', $brokerId);
         }
 
-
         if (isset($amountId)) {
             $qb->where('challenge_amount_id', $amountId);
         }
+
         return $qb->first();
     }
 
     /**
      * Get category slug by id
-     * @param int $categoryId]
-     * @param int $brokerId
-     * @return int
+     *
+     * @param  int  $categoryId]
      */
-    public function getPlaceholderCategoryId(int $categoryId, int $brokerId): int|null
+    public function getPlaceholderCategoryId(int $categoryId, int $brokerId): ?int
     {
         return ChallengeCategory::query()
             ->whereNull('broker_id')
@@ -151,14 +131,11 @@ class ChallengeRepository
 
     /**
      * Get step slug by id
-     * @param int $stepId
-     * @param int $brokerId
-     * @return int
      */
-    public function getPlaceholderStepId(int $stepId, ?int $brokerId = null): int|null
+    public function getPlaceholderStepId(int $stepId, ?int $brokerId = null): ?int
     {
         return ChallengeStep::query()
-            ->whereHas('challengeCategory', fn($q) => $q->whereNull('broker_id'))
+            ->whereHas('challengeCategory', fn ($q) => $q->whereNull('broker_id'))
             ->where('slug', function ($q) use ($stepId, $brokerId) {
                 $q->select('cs.slug')
                     ->from('challenge_steps as cs')
@@ -168,5 +145,56 @@ class ChallengeRepository
                     ->limit(1);
             })
             ->value('id');
+    }
+
+    /**
+     * Add challenges for user
+     */
+    public function addChallengesForUser(int $categoryId, int $stepId, array $amountIds, int $brokerId, ?int $zoneId = null): array
+    {
+        $insertData = [];
+
+        $existingChallenges = $this->model->newQuery()
+            ->where('is_placeholder', false)
+            ->where('challenge_category_id', $categoryId)
+            ->where('challenge_step_id', $stepId)
+            ->where('broker_id', $brokerId)
+            ->where('zone_id', $zoneId)
+            ->whereIn('challenge_amount_id', $amountIds)
+            ->get();
+
+        foreach ($amountIds as $amountId) {
+
+            if ($existingChallenges->contains('challenge_amount_id', $amountId)) {
+                continue;
+            }
+
+            $insertData[] = [
+                'is_placeholder' => false,
+                'challenge_category_id' => $categoryId,
+                'challenge_step_id' => $stepId,
+                'challenge_amount_id' => $amountId,
+                'broker_id' => $brokerId,
+                'zone_id' => $zoneId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        if ($this->model->newQuery()->insert($insertData)) {
+            return $this->model->newQuery()
+                ->where([
+                    'is_placeholder' => false,
+                    'challenge_category_id' => $categoryId,
+                    'challenge_step_id' => $stepId,
+                    'broker_id' => $brokerId,
+                    'zone_id' => $zoneId,
+                ])
+                ->whereIn('challenge_amount_id', $amountIds)
+                ->pluck('id')
+                ->toArray();
+        } else {
+            return [];
+        }
     }
 }

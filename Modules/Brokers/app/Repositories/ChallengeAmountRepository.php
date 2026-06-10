@@ -48,4 +48,14 @@ class ChallengeAmountRepository
             'challenge_category_id' => $broker_category_id,
         ]);
     }
+
+    /**
+     * Get all user amounts except the given id
+     */
+    public function getUserAmountsExcept(int $broker_id, int $exclude_id, int $category_id): array
+    {
+        return $this->model->newQuery()->whereHas('challengeCategory', function ($query) use ($broker_id, $category_id) {
+            $query->where('broker_id', $broker_id)->where('id', $category_id);
+        })->where('id', '!=', $exclude_id)->pluck('id')->toArray();
+    }
 }

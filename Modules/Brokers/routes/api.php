@@ -307,6 +307,10 @@ Route::prefix('v1')->group(function () {
         'challenges/{broker_id}/publish',
         [ChallengeController::class, 'toggleChallengePublish'],
     );
+    Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->post(
+        'challenges/{broker_id}/clone',
+        [ChallengeController::class, 'cloneChallenge']
+    );
     Route::middleware(['auth:sanctum', 'can-admin:Broker,broker_id'])->delete(
         'challenges/{tab_type}/{broker_id}',
         [ChallengeController::class, 'removeChallengeTab'],

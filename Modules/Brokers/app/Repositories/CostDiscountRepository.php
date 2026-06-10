@@ -4,27 +4,18 @@ namespace Modules\Brokers\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\CostDiscount;
+use Modules\Translations\Repositories\TranslationRepository;
 
 class CostDiscountRepository
 {
-    /**
-     * @var CostDiscount
-     */
-    protected CostDiscount $model;
-
-    /**
-     * Inject model instance.
-     * @param CostDiscount $model
-     */
-    public function __construct(CostDiscount $model)
+    public function __construct(
+        protected TranslationRepository $translationRepository,
+        protected CostDiscount $model)
     {
-        $this->model = $model;
     }
 
     /**
      * Create a new CostDiscount record.
-     * @param array $data
-     * @return CostDiscount
      */
     public function create(array $data): CostDiscount
     {
@@ -34,12 +25,10 @@ class CostDiscountRepository
     /**
      * Update an existing CostDiscount record using provided data.
      * Requires 'id' key in $data.
-     * @param array $data
-     * @return CostDiscount
      */
     public function update(array $data): CostDiscount
     {
-        if (!array_key_exists('id', $data)) {
+        if (! array_key_exists('id', $data)) {
             throw new \InvalidArgumentException("'id' is required to update CostDiscount");
         }
 
@@ -49,13 +38,12 @@ class CostDiscountRepository
         unset($data['id']);
 
         $costDiscount->update($data);
+
         return $costDiscount;
     }
 
     /**
      * Find a CostDiscount by id.
-     * @param int $id
-     * @return CostDiscount|null
      */
     public function find(int $id): ?CostDiscount
     {
@@ -64,10 +52,6 @@ class CostDiscountRepository
 
     /**
      * Get CostDiscounts filtered by broker, challenge and optional zone.
-     * @param int $brokerId
-     * @param int $challengeId
-     * @param int|null $zoneId
-     * @return Collection
      */
     public function findByBrokerAndChallenge(int $brokerId, int $challengeId, ?int $zoneId = null): Collection
     {
@@ -86,8 +70,7 @@ class CostDiscountRepository
 
     /**
      * Bulk upsert CostDiscount rows.
-     * @param array $rows
-     * @param array $uniqueBy
+     *
      * @return int Number of affected rows
      */
     public function upsertMany(array $rows, array $uniqueBy = ['broker_id', 'challenge_id', 'zone_id']): int
@@ -105,7 +88,7 @@ class CostDiscountRepository
 
     /**
      * Delete CostDiscounts by broker.
-     * @param int $brokerId
+     *
      * @return int Number of deleted rows
      */
     public function deleteByBroker(int $brokerId): int
@@ -115,9 +98,7 @@ class CostDiscountRepository
 
     /**
      * Delete CostDiscounts by challenge (optionally scoped to a broker and/or zone).
-     * @param int $challengeId
-     * @param int|null $brokerId
-     * @param int|null $zoneId
+     *
      * @return int Number of deleted rows
      */
     public function deleteByChallenge(int $challengeId, ?int $brokerId = null, ?int $zoneId = null): int
@@ -137,10 +118,7 @@ class CostDiscountRepository
 
     /**
      * Update CostDiscounts by challenge (optionally scoped to a broker and/or zone).
-     * @param int $challengeId
-     * @param array $attributes
-     * @param int|null $brokerId
-     * @param int|null $zoneId
+     *
      * @return int Number of affected rows
      */
     public function updateByChallengeId(int $challengeId, array $attributes, ?int $brokerId = null, ?int $zoneId = null): int
@@ -163,10 +141,6 @@ class CostDiscountRepository
 
     /**
      * Find CostDiscounts by challenge (optionally scoped to broker and zone).
-     * @param int $challengeId
-     * @param int|null $brokerId
-     * @param int|null $zoneId
-     * @return CostDiscount|null
      */
     public function findByChallengeId(int $challengeId, ?int $brokerId = null, ?int $zoneId = null): ?CostDiscount
     {
@@ -174,7 +148,7 @@ class CostDiscountRepository
 
         if ($brokerId !== null) {
             $query->where('broker_id', $brokerId);
-        }else{
+        } else {
             $query->whereNull('broker_id');
         }
 
@@ -188,10 +162,11 @@ class CostDiscountRepository
         return $query->orderBy('id', 'desc')->first();
     }
 
-    public function createCostDiscount(int $challengeId,string $costDiscount, int $brokerId, bool $isAdmin,bool $isPlaceholder,?int $zoneId = null): CostDiscount
+    public function createCostDiscount(int $challengeId, string $costDiscount, int $brokerId, bool $isAdmin, bool $isPlaceholder, ?int $zoneId = null): CostDiscount
     {
-        $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';   
-       return $this->create([
+        $field = ($isAdmin && ! $isPlaceholder) ? 'public_value' : 'value';
+
+        return $this->create([
             'challenge_id' => $challengeId,
             'broker_id' => $brokerId,
             'zone_id' => $zoneId,
@@ -202,63 +177,121 @@ class CostDiscountRepository
 
     /**
      * Upsert cost discount (update or insert)
-     * @param int $challengeId
-     * @param string $costDiscount
-     * @param int $brokerId
-     * @param bool $isAdmin
-     * @param bool $isPlaceholder
-     * @param int|null $zoneId
-     * @return void
      */
     public function upsertCostDiscount(
         int $challengeId,
-        string|null $costDiscount,
+        ?string $costDiscount,
         ?int $brokerId,
         bool $isAdmin,
         bool $isPlaceholder,
         ?int $zoneId = null,
-    ): void
-    {
+    ): void {
         // Check if record already exists
         $existingCostDiscount = $this->findByChallengeId($challengeId, $brokerId, $zoneId);
 
         if ($existingCostDiscount) {
             // Get the current value based on admin/placeholder status
             $oldDiscountValue = $isAdmin ? $existingCostDiscount->public_value : $existingCostDiscount->value;
-            
+
             // Compare values and update if different
-            if ($oldDiscountValue != $costDiscount && !is_null($costDiscount)) {
+            if ($oldDiscountValue != $costDiscount && ! is_null($costDiscount)) {
                 $updateData = [
                     ($isAdmin || $isPlaceholder) ? null : 'previous_value' => $oldDiscountValue,
-                    $isAdmin && !$isPlaceholder ? 'public_value' : 'value' => $costDiscount,
+                    $isAdmin && ! $isPlaceholder ? 'public_value' : 'value' => $costDiscount,
                     'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
                 ];
-                
+
                 // Remove null keys
-                $updateData = array_filter($updateData, function($key) {
+                $updateData = array_filter($updateData, function ($key) {
                     return $key !== null;
                 }, ARRAY_FILTER_USE_KEY);
-                
+
                 $existingCostDiscount->update($updateData);
             } elseif (is_null($costDiscount)) {
                 $existingCostDiscount->delete();
             }
         } else {
             // Create new record if cost discount is not empty
-            if (!empty($costDiscount)) {
-                $field = ($isAdmin && !$isPlaceholder) ? 'public_value' : 'value';
-                
+            if (! empty($costDiscount)) {
+                $field = ($isAdmin && ! $isPlaceholder) ? 'public_value' : 'value';
+
                 $this->create([
                     'challenge_id' => $challengeId,
                     'broker_id' => $brokerId,
                     'zone_id' => $zoneId,
                     $field => $costDiscount,
                     'is_placeholder' => $isPlaceholder,
-                    'is_updated_entry' => $isAdmin ? 0 : 1
+                    'is_updated_entry' => $isAdmin ? 0 : 1,
                 ]);
             }
         }
     }
+
+    public function cloneCostDiscounts(int $challenge_id, array $new_challenge_ids, int $broker_id, bool $isAdmin, ?int $zone_id = null): bool
+    {
+        $discountToClone = $this->model->where('challenge_id', $challenge_id)
+            ->where('broker_id', $broker_id)->where('zone_id', $zone_id)->first();
+        if (! $discountToClone) {
+            return false;
+        }
+
+        $insertData = [];
+        $now = now();
+        $attributesToClone = $discountToClone->toArray();
+        unset($attributesToClone['id']);
+
+        foreach ($new_challenge_ids as $new_challenge_id) {
+
+            //if a discount exists for this challenge, copy public value from existing discount and create a new batch of insert data
+            $challengeDiscount = $this->model->where('challenge_id', $new_challenge_id)->where('broker_id', $broker_id)->where('zone_id', $zone_id)->first();
+            if ($challengeDiscount) {
+                $isUpdatedEntry = $challengeDiscount->value == $attributesToClone['value'] ? 0 : 1;
+
+                if ($isAdmin) {
+                    $challengeDiscount->update([
+                        'public_value' => $attributesToClone['public_value'],
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    $challengeDiscount->update([
+                        'value' => $attributesToClone['value'],
+                        'is_updated_entry' => $isUpdatedEntry,
+                        'previous_value' => $challengeDiscount->value,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            } else {
+                if ($isAdmin) {
+                    //clone only public_value which exist in $attributesToClone, other keys are overwritten
+                    $insertData[] = array_merge($attributesToClone, [
+                        'challenge_id' => $new_challenge_id,
+                        'is_updated_entry' => 0,
+                        'previous_value' => null,
+                        'value' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                } else {
+                    //clone only value which exist in $attributesToClone, other keys are overwritten
+                    $insertData[] = array_merge($attributesToClone, [
+                        'challenge_id' => $new_challenge_id,
+                        'is_updated_entry' => 0,
+                        'previous_value' => null,
+                        'public_value' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                }
+            }
+        }
+
+        //first delete translations
+        // $this->translationRepository->deleteByTranslationableTypeAndIds(CostDiscount::class, $existingChallengeDiscountIds);
+        //TO DO: add some observer to make again the translations for the new discounts
+
+        return $this->model->newQuery()->insert($insertData);
+
+    }
 }
-
-

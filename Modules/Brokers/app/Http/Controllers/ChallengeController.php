@@ -30,9 +30,7 @@ class ChallengeController extends Controller
      */
     public function show(Request $request, int $broker_id): JsonResponse
     {
-
         try {
-
             $validatedData = $request->validate([
                 'category_id' => 'required|integer|exists:challenge_categories,id',
                 'step_id' => 'required|integer|exists:challenge_steps,id',
@@ -45,7 +43,7 @@ class ChallengeController extends Controller
             $categoryId = $validatedData['category_id'];
             $stepId = $validatedData['step_id'];
 
-            //the chalenge row for the current parameters
+            // the chalenge row for the current parameters
             $challenge = $this->challengeService->findChallengeByParams(
                 false,
                 $categoryId,
@@ -65,7 +63,7 @@ class ChallengeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => array_filter($responseData, fn($v) => $v !== null),
+                'data' => array_filter($responseData, fn ($v) => $v !== null),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -78,7 +76,6 @@ class ChallengeController extends Controller
 
     public function showPlaceholders(Request $request): JsonResponse
     {
-
         try {
             $validatedData = $request->validate([
                 'category_id' => 'required|integer|exists:challenge_categories,id',
@@ -86,13 +83,13 @@ class ChallengeController extends Controller
                 'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
             ]);
 
-            $amountId = null; //for placeholders, the amount id is null
+            $amountId = null;  // for placeholders, the amount id is null
 
             $zoneId = $validatedData['zone_id'] ?? null;
             $categoryId = $validatedData['category_id'];
             $stepId = $validatedData['step_id'];
 
-            //the chalenge row for the current parameters
+            // the chalenge row for the current parameters
             $challenge = $this->challengeService->findChallengeByParams(
                 true,
                 $categoryId,
@@ -107,7 +104,7 @@ class ChallengeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => array_filter($responseData, fn($v) => $v !== null),
+                'data' => array_filter($responseData, fn ($v) => $v !== null),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -147,7 +144,6 @@ class ChallengeController extends Controller
      */
     public function store(Request $request, int $broker_id): JsonResponse
     {
-
         $validatedData = $this->challengeService->validatePostRequestData($request);
 
         $zoneId = $validatedData['zone_id'] ?? null;
@@ -156,44 +152,41 @@ class ChallengeController extends Controller
 
         $isAdmin = $request->attributes->get('isAdmin', false);
 
-        //process the request and update the challenge matrix and extra data using transaction
+        // process the request and update the challenge matrix and extra data using transaction
 
         ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, $broker_id, $isPlaceholder, $isAdmin, $zoneId);
 
-        //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
+        // $responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
 
         return response()->json([
             'success' => true,
-            'message' => 'Challenge matrix with id ' . $challenge_id . ' created successfully',
-            //'data' => $responseData
+            'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
+            // 'data' => $responseData
         ], 201);
     }
 
     public function storeMatrixPlaceholders(Request $request): JsonResponse
     {
-
         try {
-
             $validatedData = $request->validate([
                 'category_id' => 'required|integer|exists:challenge_categories,id',
                 'step_id' => 'required|integer|exists:challenge_steps,id',
-                //'step_slug' => 'nullable|string',
+                // 'step_slug' => 'nullable|string',
                 'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
                 'matrix' => 'required|array',
                 'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
             ]);
             $zoneId = $validatedData['zone_id'] ?? null;
 
-            //process the request and update the challenge matrix and extra data using transaction
+            // process the request and update the challenge matrix and extra data using transaction
 
             ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, null, true, true, $zoneId);
 
-            //$responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
+            // $responseData=$this->challengeService->getChallengeData($processResult['challenge_id'], $broker_id, $isPlaceholder, $zoneId);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Challenge matrix with id ' . $challenge_id . ' created successfully',
-
+                'message' => 'Challenge matrix with id '.$challenge_id.' created successfully',
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
@@ -212,7 +205,6 @@ class ChallengeController extends Controller
         $responseData = [
             'default_challenge_categories' => ChallengeCategoryResource::collection($challengeCategories),
             'amount_currencies' => $amountCurrencies,
-
         ];
         $response = [
             'success' => true,
@@ -277,7 +269,6 @@ class ChallengeController extends Controller
      */
     public function removeChallengeTab(string $tab_type, int $broker_id, Request $request): JsonResponse
     {
-
         try {
             $validatedData = $request->validate([
                 'category_id' => 'sometimes|integer|exists:challenge_categories,id',
@@ -304,7 +295,7 @@ class ChallengeController extends Controller
             }
 
             //  $this->challengeCategoryService->removeChallengeCategory($broker_id, $category_id);
-            return response()->json(['success' => true, 'message' => 'Challenge tab of type ' . $tab_type->value . ' removed successfully']);
+            return response()->json(['success' => true, 'message' => 'Challenge tab of type '.$tab_type->value.' removed successfully']);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -321,7 +312,6 @@ class ChallengeController extends Controller
      */
     public function addChallengeTab(string $tab_type, int $broker_id, Request $request): JsonResponse
     {
-
         $validatedData = $request->validate([
             'default_tab_id_to_clone' => 'required|string|max:145',
             'tab_order' => 'sometimes|integer',
@@ -365,7 +355,6 @@ class ChallengeController extends Controller
      */
     public function saveChallengeTabOrder(Request $request, int $broker_id, string $tab_type): JsonResponse
     {
-
         try {
             $validatedData = $request->validate([
                 'tab_ids' => 'required|array',
@@ -410,5 +399,26 @@ class ChallengeController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Failed to toggle challenge publish', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Clone a challenge matrix
+     *
+     * @throws \Exception
+     */
+    public function cloneChallenge(Request $request, int $broker_id): JsonResponse
+    {
+        $isAdmin = $request->attributes->get('isAdmin', false);
+        $validatedData = $request->validate([
+            'category_id' => 'required|integer|exists:challenge_categories,id',
+            'step_id' => 'required|integer|exists:challenge_steps,id',
+            'amount_id' => 'required|integer|exists:challenge_amounts,id',
+        ]);
+        $category_id = $validatedData['category_id'];
+        $step_id = $validatedData['step_id'];
+        $amount_id = $validatedData['amount_id'];
+        $this->challengeService->cloneChallengeMatrix($category_id, $step_id, $amount_id, $broker_id, $isAdmin);
+
+        return response()->json(['success' => true, 'message' => 'Challenge cloned successfully']);
     }
 }
