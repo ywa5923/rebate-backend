@@ -5,14 +5,15 @@ namespace Modules\Brokers\Repositories;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Brokers\Models\ChallengeMatrixValue;
 use Modules\Translations\Repositories\TranslationRepository;
+use Modules\Brokers\DTOs\ChallengeMatrixCellDTO;
+use App\Exceptions\ApiException;
 
 class ChallengeMatrixRepository
 {
     public function __construct(
         protected TranslationRepository $translationRepository,
         protected ChallengeMatrixValue $model
-    ) {
-    }
+    ) {}
 
     /**
      * Get challenge matrix values by challenge ID
@@ -50,9 +51,13 @@ class ChallengeMatrixRepository
                     $matrixRowToClone = $matrixRowsToClone->where('row_id', $challengeMatrixRow->row_id)->where('column_id', $challengeMatrixRow->column_id)->first();
                     if ($matrixRowToClone) {
                         $isUpdatedEntry = $challengeMatrixRow->value == $matrixRowToClone->value ? 0 : 1;
+                        $isUpdatedPublicEntry = $challengeMatrixRow->public_value == $matrixRowToClone->public_value ? 0 : 1;
                         if ($isAdmin) {
                             $challengeMatrixRow->update([
                                 'public_value' => $matrixRowToClone->public_value,
+                                'previous_public_value' => $isUpdatedPublicEntry
+                                    ? $this->buildPreviousValueHistory($challengeMatrixRow->public_value, $challengeMatrixRow->previous_public_value)
+                                    : $challengeMatrixRow->previous_public_value,
                                 'created_at' => $now,
                                 'updated_at' => $now,
                             ]);
@@ -67,10 +72,8 @@ class ChallengeMatrixRepository
                                 'updated_at' => $now,
                             ]);
                         }
-
                     }
                 }
-
             } else {
                 //create a new batch of insert data
                 foreach ($matrixRowsToClone as $matrixRowToClone) {
@@ -109,45 +112,71 @@ class ChallengeMatrixRepository
         return true;
     }
 
-    /**
-     * Build the previous value history as valid JSON for the json column,
-     * chaining the value being replaced in front of the existing history:
-     * {"text": "latestValue->prevValue->olderValue"}.
-     *
-     * @param  string|null  $currentValueJson  Raw JSON of the value being replaced, e.g. {"text": "7"}
-     * @param  string|null  $previousValueJson  Raw JSON of the existing history, e.g. {"text": "5->3"}
-     */
-    public function buildPreviousValueHistory(?string $currentValueJson, ?string $previousValueJson): ?string
+    
+
+    
+     /**
+      * Build the previous value history as valid JSON for the json column,
+      */
+    public function buildPreviousValueHistory(?string $currentValue, ?string $previousValue): ?string
     {
-        $historyParts = array_filter(
-            [$this->extractTextFromJson($currentValueJson), $this->extractTextFromJson($previousValueJson)],
-            fn (?string $text): bool => $text !== null && $text !== ''
-        );
-
-        if ($historyParts === []) {
-            return null;
-        }
-
-        return json_encode(['text' => implode('->', $historyParts)]);
+        return $currentValue . '->' . $previousValue;
     }
 
-    /**
-     * Extract the "text" key from a raw JSON string like {"text": "7"}.
-     */
-    private function extractTextFromJson(?string $json): ?string
+  
+
+    public function updateChallengeMatrixValue(bool $isPlaceholder, ChallengeMatrixCellDTO $cellDTO, int $challengeId, ?int $brokerId, ?bool $isAdmin = null, ?int $zoneId = null): void
     {
-        if ($json === null || $json === '') {
-            return null;
+
+        //first get the existing cell value to compare and set the previous value and is_updated_entry
+        $existingCell = $this->model
+            ->where('challenge_id', $challengeId)
+            ->where('id', $cellDTO->id)
+            ->where('broker_id', $brokerId)
+            ->when(
+                $zoneId === null,
+                fn($query) => $query->whereNull('zone_id'),
+                fn($query) => $query->where('zone_id', $zoneId)
+            )
+            // ->whereHas('row', function($query) use ($cellDTO){
+            //     $query->where('slug', $cellDTO->rowSlug);
+            // })->whereHas('column', function($query) use ($cellDTO){
+            //     $query->where('slug', $cellDTO->colSlug);
+            // })
+            ->first();
+        if (!$existingCell) {
+            throw new ApiException('Cell not found', 404);
         }
+        //for placeholder mode, placeholder texts are stored in public_value
+        if($isPlaceholder){
+            $existingCell->update([
+                'value' => $cellDTO->value,
+                'is_updated_entry' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            return;
+        } 
+        if (!$isAdmin) {
 
-        $decoded = json_decode($json, true);
+            if ($existingCell->value != $cellDTO->value) {
 
-        if (! is_array($decoded)) {
-            return null;
+                $existingCell->update([
+                    'value' => $cellDTO->value,
+                    'previous_value' => ($existingCell->value??'empty') . '->' . $existingCell->previous_value,
+                    'is_updated_entry' => 1,
+                ]);
+            }
+        } else {
+
+            //for admin we need to update is_updated_entry to 0 even if the public value is not changed
+            //this will clear the red flag in the frontend
+            $existingCell->update([
+                    'previous_public_value' => ($existingCell->public_value??'empty') . '->' . ($existingCell?->previous_public_value??''),
+                    'public_value' => $cellDTO->publicValue,
+                    'is_updated_entry' => 0,
+                ]);
+            
         }
-
-        $text = $decoded['text'] ?? null;
-
-        return $text === null ? null : (string) $text;
     }
 }

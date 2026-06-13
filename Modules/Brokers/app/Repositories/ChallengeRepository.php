@@ -112,36 +112,42 @@ class ChallengeRepository
     }
 
     /**
-     * Get category slug by id
-     *
-     * @param  int  $categoryId]
+     * Get default category  id by broker category id and broker id
+     * Default category and step are the ones defined by admin with broker_id=null that have same slugs with the ones
+     *  cloned for the broker at registration time.
+
      */
-    public function getPlaceholderCategoryId(int $categoryId, int $brokerId): ?int
+    public function getPlaceholderCategoryId(int $brokerCategoryId, int $brokerId): ?int
     {
         return ChallengeCategory::query()
             ->whereNull('broker_id')
-            ->where('slug', function ($q) use ($categoryId, $brokerId) {
+            ->where('slug', function ($q) use ($brokerCategoryId, $brokerId) {
                 $q->select('slug')
                     ->from('challenge_categories')
-                    ->where('id', $categoryId)
+                    ->where('id', $brokerCategoryId)
                     ->where('broker_id', $brokerId)
                     ->limit(1);
             })->value('id');
     }
 
     /**
-     * Get step slug by id
+     * Get default step id by broker step id and default category id received from getPlaceholderCategoryId method
+     * Default category and step are the ones defined by admin with broker_id=null that have same slugs 
+     * with the ones cloned for the broker at registration time.
      */
-    public function getPlaceholderStepId(int $stepId, ?int $brokerId = null): ?int
+    public function getPlaceholderStepId(int $brokerStepId, int $defaultCategoryId): ?int
     {
+        
         return ChallengeStep::query()
             ->whereHas('challengeCategory', fn ($q) => $q->whereNull('broker_id'))
-            ->where('slug', function ($q) use ($stepId, $brokerId) {
+            ->where('challenge_category_id', $defaultCategoryId)
+            ->where('slug', function ($q) use ($brokerStepId) {
                 $q->select('cs.slug')
                     ->from('challenge_steps as cs')
-                    ->join('challenge_categories as cc', 'cc.id', '=', 'cs.challenge_category_id')
-                    ->where('cs.id', $stepId)
-                    ->where('cc.broker_id', $brokerId)
+                    //->join('challenge_categories as cc', 'cc.id', '=', 'cs.challenge_category_id')
+                    ->where('cs.id', $brokerStepId)
+                    //->where('cc.broker_id', $brokerId)
+
                     ->limit(1);
             })
             ->value('id');
@@ -150,7 +156,7 @@ class ChallengeRepository
     /**
      * Add challenges for user
      */
-    public function addChallengesForUser(bool $isPublished, int $categoryId, int $stepId, array $amountIds, int $brokerId, ?int $zoneId = null): array
+    public function syncChallengesForAmounts(array $amountIds,bool $isPublished, int $categoryId, int $stepId, int $brokerId, ?int $zoneId = null): array
     {
         $insertData = [];
 

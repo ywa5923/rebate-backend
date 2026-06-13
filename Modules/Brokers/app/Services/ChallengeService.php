@@ -13,7 +13,7 @@ use Modules\Brokers\Repositories\UrlRepository;
 use Modules\Brokers\Transformers\AffiliateLinkResource;
 use Modules\Brokers\Transformers\CostDiscountResource;
 use App\Exceptions\ApiException;
-
+use Modules\Brokers\DTOs\ChallengeMatrixCellDTO;
 class ChallengeService
 {
     public function __construct(
@@ -25,61 +25,19 @@ class ChallengeService
     ) {
     }
 
-    /**
-     * Validate post request data recive in ChallengeController::store method
-     */
-    public function validatePostRequestData(Request $request): array
-    {
-        return $request->validate([
-            'category_id' => 'required|integer|exists:challenge_categories,id',
-            'step_id' => 'required|integer|exists:challenge_steps,id',
-            'step_slug' => 'nullable|string',
-            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-            'is_placeholder' => 'nullable|boolean',
-            'matrix' => 'required|array',
-            'broker_id' => 'nullable|integer|exists:brokers,id',
-            'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-
-            'evaluation_cost_discount' => 'sometimes|nullable|string',
-            'affiliate_link' => 'sometimes|nullable|string',
-            'affiliate_master_link' => 'sometimes|nullable|string',
-
-        ]);
-    }
-
-    /**
-     * Validate get request data recive in ChallengeController::show method
-     */
-    public function validateGetRequestData(Request $request): array
-    {
-        return $request->validate([
-            'category_id' => 'required|integer|exists:challenge_categories,id',
-            'step_id' => 'required|integer|exists:challenge_steps,id',
-            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
-            'is_placeholder' => 'required|boolean',
-            'broker_id' => 'nullable|integer|exists:brokers,id',
-            'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
-        ]);
-    }
-
+    
     /**
      * Store challenge with matrix data
      */
     public function processRequest(array $validatedData, ?int $brokerId, bool $isPlaceholder, bool $isAdmin, ?int $zoneId = null): array
     {
 
-        // $brokerId = $validatedData['broker_id']??null;
-        // $zoneId = $validatedData['zone_id'] ?? null;
-        // $isAdmin = $validatedData['is_admin'] ?? null;
-        // $isPlaceholder = $validatedData['is_placeholder'];
-
-        DB::beginTransaction();
-
-        try {
+        return DB::transaction(function () use ($validatedData, $brokerId, $isPlaceholder, $isAdmin, $zoneId) {
             //check if challenge already exists
             //if it exist delete it
-            $challenge = $this->challengeRepository->exists((int) $isPlaceholder, $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId);
+            $challenge = $this->challengeRepository->exists((int) $isPlaceholder, $validatedData['category_id'], $validatedData['step_id'], $validatedData['amount_id'] ?? null, $brokerId, $zoneId);
 
+           
             if (! $challenge) {
 
                 //create a new challenge if it does not exist even in placeholder mode
@@ -94,7 +52,8 @@ class ChallengeService
 
                 ]);
                 // Save matrix data
-                $this->saveMatrixData($validatedData['matrix'], $challenge->id, $brokerId, $zoneId, $isAdmin);
+                //for placeholder mode, placeholder texts are stored in public_value
+                $this->saveMatrixData($isPlaceholder, $validatedData['matrix'], $challenge->id, $brokerId, $isAdmin,$zoneId);
 
                 $this->saveNewMatrixExtraData($validatedData, $challenge->id, $brokerId, $isPlaceholder, $isAdmin, $zoneId);
             } else {
@@ -113,26 +72,27 @@ class ChallengeService
                 //to the backend : for admin will be sent only public_values of the links and discounts, for placeholder and user will be sent only their values.
 
                 //if a user is updating the matrix, set cell's previous_value to the cell's value
-                $newMatrix = ($isPlaceholder || $isAdmin) ? $validatedData['matrix'] : $this->setPreviousValueInMatrixData(
-                    $this->getChallengeMatrixData($challenge->id, $zoneId),
-                    $validatedData['matrix'],
-                );
-                //remove old chalenge's matrix values
-                $this->challengeRepository->deleteChallengeMatrixValues($challenge->id); // Save matrix data
-                //save the new matrix data
-                $this->saveMatrixData($newMatrix, $challenge->id, $brokerId, $zoneId, $isAdmin);
+
+                
+                //the admin update public values of the matrix cells, the user update the values,in placeholder mode the values are updated
+                $this->updateMatrix($isPlaceholder, $validatedData['matrix'], $challenge->id, $brokerId, $isAdmin,$zoneId);
 
                 //Compare and update the existing matrix and extra data(affiliate link, affiliate master link, evaluation cost discount)
                 $this->updateMatrixAndExtraData($validatedData, $challenge->id, $brokerId, $isPlaceholder, $isAdmin, $zoneId);
             }
 
-            // Create challenge
-            DB::commit();
-
             return ['challenge_id' => $challenge->id];
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            throw $e;
+        });
+        
+    }
+
+    public function updateMatrix(bool $isPlaceholder, array $newMatrix, int $challengeId, ?int $brokerId,  ?bool $isAdmin = null, ?int $zoneId = null): void
+    {
+        foreach($newMatrix as $rowIndex => $rowData){
+            foreach($rowData as $colIndex => $cellData){
+                $cellDTO = ChallengeMatrixCellDTO::fromValidated($cellData);
+                $this->challengeMatrixRepository->updateChallengeMatrixValue($isPlaceholder, $cellDTO,$challengeId, $brokerId, $isAdmin, $zoneId);
+            }
         }
     }
 
@@ -150,6 +110,7 @@ class ChallengeService
      */
     public function saveNewMatrixExtraData(array $validatedData, int $challengeId, ?int $brokerId, bool $isPlaceholder, ?bool $isAdmin = null, ?int $zoneId = null): void
     {
+       
         //broker id is nullable for placeholder data
         if (! empty($validatedData['affiliate_link'])) {
             $this->urlRepository->saveAffiliateLink(
@@ -190,7 +151,7 @@ class ChallengeService
     /**
      * Save matrix data to challenge_matrix_values table
      */
-    private function saveMatrixData(array $matrixData, int $challengeId, ?int $brokerId, ?int $zoneId = null, ?bool $isAdmin = null): void
+    private function saveMatrixData(bool $isPlaceholder, array $matrixData, int $challengeId, ?int $brokerId, ?bool $isAdmin = null,?int $zoneId = null ): void
     {
         $challengeMatrixValues = [];
         $groupNames = ['challenge', 'step-0', 'step-1', 'step-2'];
@@ -203,24 +164,23 @@ class ChallengeService
         //dd($matrixData);
         foreach ($matrixData as $rowIndex => $rowData) {
             foreach ($rowData as $colIndex => $cellData) {
-                $rowHeaderSlug = $cellData['rowHeader'];
-                $colHeaderSlug = $cellData['colHeader'];
+                $rowHeaderSlug = $cellData['row_slug'];
+                $colHeaderSlug = $cellData['col_slug'];
 
                 // Get matrix headers
                 $rowHeader = $headersBySlug->get($rowHeaderSlug);
                 $colHeader = $headersBySlug->get($colHeaderSlug);
 
                 if (! $rowHeader || ! $colHeader) {
-                    throw new \Exception('Row or column header not found for: '.$rowHeaderSlug.' or '.$colHeaderSlug);
+                    throw new ApiException('Row or column header not found for: '.$rowHeaderSlug.' or '.$colHeaderSlug, 404);
                 }
 
                 $challengeMatrixValues[] = [
-                    'previous_value' => ! empty($cellData['previous_value']) ? json_encode($cellData['previous_value']) : null,
-                    'value' => ! empty($cellData['value']) ? json_encode($cellData['value']) : null,
-                    'public_value' => ! empty($cellData['public_value']) ? json_encode($cellData['public_value']) : null,
-                    // 'is_updated_entry' => $isAdmin ? 0 : (int)($cellData['is_updated_entry'] ?? 0),
-                    'is_updated_entry' => $cellData['is_updated_entry'] ?? 0,
-                    'is_invariant' => isset($zoneId) ? false : true,
+                    'previous_value' => $cellData['previous_value']??null,
+                    //'value' => ($isAdmin && ! $isPlaceholder) ? $cellData['public_value']??null : $cellData['value']??null,
+                    'value' => $cellData['value']??null,
+                    'public_value' => $cellData['public_value']??null,
+                    'is_updated_entry' => 0,
                     'zone_id' => $zoneId,
                     'challenge_id' => $challengeId,
                     'row_id' => $rowHeader->id,
@@ -295,7 +255,7 @@ class ChallengeService
             return [];
         }
 
-        // Group by row headers
+        // Group by row slug
         $groupedByRow = $matrixValues->groupBy('row.slug');
 
         $matrix = [];
@@ -307,13 +267,19 @@ class ChallengeService
             foreach ($rowValues as $value) {
                 $row[] = [
                     'id' => $value->id,
-                    'previous_value' => json_decode($value->previous_value, true) ?: [],
-                    'value' => json_decode($value->value, true) ?: [],
-                    'public_value' => json_decode($value->public_value, true) ?: [],
+                    'previous_value' => $value->previous_value,
+                    'previous_public_value' => $value->previous_public_value,
+                    'value' => $value->value,
+                    'public_value' => $value->public_value,
                     'is_updated_entry' => $value->is_updated_entry,
-                    'rowHeader' => $value->row->slug,
-                    'colHeader' => $value->column->slug,
-                    'type' => $value->column->formType->name ?? 'Text',
+                    'row_slug' => $value->row->slug,
+                    'col_slug' => $value->column->slug,
+                    'zone_id' => $value->zone_id,
+                    'row_id' => $value->row_id,
+                    'column_id' => $value->column_id,
+                    'created_at' => $value->created_at,
+                    'updated_at' => $value->updated_at,
+                   
                 ];
             }
 
@@ -339,7 +305,8 @@ class ChallengeService
             foreach ($row as $cell) {
                 $key = ($cell['rowHeader'] ?? '').'|'.($cell['colHeader'] ?? '');
                 $previousByKey[$key] = [
-                    'previous_value' => $cell['value'] ?? null,
+                    'value' => $cell['value'] ?? null,
+                    'previous_value' => $cell['previous_value'] ?? null,
                     /// 'is_updated_entry' => $cell['is_updated_entry'] ?? 0,
                     //NEW
                     'is_updated_entry' => $cell['is_updated_entry'] ?? 0,
@@ -351,13 +318,13 @@ class ChallengeService
             foreach ($row as &$cell) {
                 $key = ($cell['rowHeader'] ?? '').'|'.($cell['colHeader'] ?? '');
                 if (isset($previousByKey[$key])) {
-                    $previousValue = $previousByKey[$key]['previous_value'];
+                    $previousValue = $previousByKey[$key]['value'];
                     $currentValue = $cell['value'];
-                    if ($previousValue && $currentValue && ! empty(array_diff_assoc($previousValue, $currentValue))) {
-                        $cell['previous_value'] = $previousByKey[$key]['previous_value'];
+                    if( $previousValue != $currentValue){
+                        $cell['previous_value'] = $previousValue.'->'.$previousByKey[$key]['previous_value'];
                         $cell['is_updated_entry'] = true;
                     }
-                    //NEW
+                  
                     if ($previousByKey[$key]['is_updated_entry']) {
                         $cell['is_updated_entry'] = true;
                     }
@@ -427,13 +394,8 @@ class ChallengeService
     /**
      * Add placeholder data if needed
      *
-     * @param  array  $matrix
-     * @param  CostDiscountResource|null  $discount
-     * @param  AffiliateLinkResource|null  $affiliateLink
-     * @param  AffiliateLinkResource|null  $affiliateMasterLink
-     * @param  array  $validatedData
      */
-    public function addPlaceholderData(array &$responseArray, int $brokerId, int $categoryId, int $stepId, ?int $zoneId): void
+    public function addPlaceholderData(array &$responseArray, int $brokerId, int $brokerCategoryId, int $brokerStepId, ?int $zoneId): void
     {
         //#When the admin save a challenge matrix data for placeholders, the challenge category id and step id are
         //the ones defined by admin which have broker_id=null.
@@ -443,28 +405,30 @@ class ChallengeService
         //2. Same logic for challenge steps within one query and inner join
         //So originalCatId and originalStepId are the ones defined by admin with broker_id=null that have same slugs with the ones cloned for the broker at registration time.
 
-        $originalCatId = $this->challengeRepository->getPlaceholderCategoryId($categoryId, $brokerId);
-        $originalStepId = $this->challengeRepository->getPlaceholderStepId($stepId, $brokerId);
+        //defaultCatId and defaultStepId are the ones defined by admin with broker_id=null that have same slugs with the ones cloned for the broker at registration time.
+        $defaultCatId = $this->challengeRepository->getPlaceholderCategoryId($brokerCategoryId, $brokerId);
+        $defaultStepId = $this->challengeRepository->getPlaceholderStepId($brokerStepId,$defaultCatId);
 
-        if (! $originalCatId || ! $originalStepId) {
+        if (! $defaultCatId || ! $defaultStepId) {
             throw new \Exception('Original Category id or step id not found');
         }
 
         $placeholderChallenge = $this->findChallengeByParams(
             true,
-            $originalCatId,
-            $originalStepId,
+            $defaultCatId,
+            $defaultStepId,
             ChallengeRepository::AMOUNT_ID_NULL,
             ChallengeRepository::BROKER_ID_NULL,
             $zoneId
         );
 
-        if (! $placeholderChallenge?->id) {
+        if ( !$placeholderChallenge?->id) {
             return;
+          
         }
 
         $responseArray['matrix_placeholders_array'] = $this->getMatrixPlaceholderArray($placeholderChallenge->id);
-        $responseArray['evaluation_cost_discount_placeholder'] = $this->findDiscountByChallengeId($placeholderChallenge->id, null, $zoneId)?->value;
+        $responseArray['evaluation_cost_discount_placeholder'] = $this->findDiscountByChallengeId($placeholderChallenge->id,null)?->value;
         $responseArray['affiliate_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, $placeholderChallenge->id, null, true, $zoneId)?->url;
         $responseArray['affiliate_master_link_placeholder'] = $this->findUrlByUrlableTypeAndId(Challenge::class, null, null, true, $zoneId)?->url;
     }
@@ -492,7 +456,7 @@ class ChallengeService
     public function getMatrixPlaceholderArray(int $placeholderChallengeId, ?int $challengeId = null): array
     {
         $placeholderMatrix = $this->getChallengeMatrixData($placeholderChallengeId);
-        $challengeMatrix = ($challengeId) ? $this->getChallengeMatrixData($challengeId) : null;
+        //$challengeMatrix = ($challengeId) ? $this->getChallengeMatrixData($challengeId) : null;
 
         return $this->extractPlaceholderValuesFromMatrix($placeholderMatrix);
     }
@@ -507,15 +471,15 @@ class ChallengeService
         if ($matrix) {
             foreach ($matrix as $rowIndex => $row) {
                 foreach ($row as $colIndex => $cell) {
-                    if (empty($cell['value']['text']) || (is_array($cell['value']['text']) && empty(array_filter($cell['value']['text'])))) {
-                        $placeholders[$cell['rowHeader'].'-'.$cell['colHeader']] = $placeholderMatrix[$rowIndex][$colIndex]['value']['text'];
+                    if (empty($cell['value']) ) {
+                        $placeholders[$cell['row_slug'].'-'.$cell['col_slug']] = $placeholderMatrix[$rowIndex][$colIndex]['value'];
                     }
                 }
             }
         } else {
             foreach ($placeholderMatrix as $rowIndex => $row) {
                 foreach ($row as $colIndex => $cell) {
-                    $placeholders[$cell['rowHeader'].'-'.$cell['colHeader']] = $cell['value']['text'];
+                    $placeholders[$cell['row_slug'].'-'.$cell['col_slug']] = $cell['value'];
                 }
             }
         }
@@ -525,6 +489,7 @@ class ChallengeService
 
     public function getChallengeData(?int $chId, ?int $brokerId, bool $isPlaceholder, ?int $zoneId): array
     {
+        //for plceholder data $brokerId is null
         $matrix = $chId ? $this->getChallengeMatrixData($chId) : null;
         $discount = $chId ? $this->findDiscountByChallengeId($chId, $brokerId) : null;
         $affiliateLink = $chId ? $this->findUrlByUrlableTypeAndId(Challenge::class, $chId, $brokerId, $isPlaceholder, $zoneId) : null;
@@ -688,7 +653,7 @@ class ChallengeService
 
             //get new challenges to clone, if a challenge already exists for the user for amount_id in $amountsToClone,
             // it will not be created again
-            $newChallengeIds = $this->challengeRepository->addChallengesForUser($chalenge->is_published, $categoryId, $stepId, $amountsToClone, $brokerId, $zoneId);
+            $newChallengeIds = $this->challengeRepository->syncChallengesForAmounts($amountsToClone,$chalenge->is_published, $categoryId, $stepId,  $brokerId, $zoneId);
 
             if (! empty($newChallengeIds)) {
                 //clone matrix values for the new challenges

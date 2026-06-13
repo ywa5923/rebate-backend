@@ -43,10 +43,7 @@ class ChallengeCategoryResource extends JsonResource
             
             // Translations (if loaded)
             'translations' => TranslationResource::collection($this->whenLoaded('translations')),
-            
-            // Timestamps
-           // 'created_at' => $this->created_at,
-           // 'updated_at' => $this->updated_at,
+           
         ];
     }
 }

@@ -56,15 +56,14 @@ class ChallengeController extends Controller
         );
         $chId = $challenge?->id ?? null;
 
-        $responseData = $this->challengeService->getChallengeData($chId, $broker_id, false, $zoneId);
+        $responseData = $this->challengeService->getChallengeData( $chId, $broker_id, false, $zoneId);
 
-        $isPublished = ($chId) ? $challenge->is_published : true;
-        $responseData['is_published'] = $isPublished;
+        $responseData['is_published'] = $challenge->is_published??true;
 
         $this->challengeService->addPlaceholderData($responseData, $broker_id, $categoryId, $stepId, $zoneId);
 
         return Response::json(ApiData::success(
-            data: array_filter($responseData, fn ($v) => $v !== null),
+            data: array_filter($responseData, fn($v) => $v !== null),
         ));
     }
 
@@ -99,7 +98,7 @@ class ChallengeController extends Controller
         $responseData = $this->challengeService->getChallengeData($chId, null, true, $zoneId);
 
         return Response::json(ApiData::success(
-            data: array_filter($responseData, fn ($v) => $v !== null),
+            data: array_filter($responseData, fn($v) => $v !== null),
         ));
     }
 
@@ -120,11 +119,26 @@ class ChallengeController extends Controller
      */
     public function store(Request $request, int $broker_id): JsonResponse
     {
-        $validatedData = $this->challengeService->validatePostRequestData($request);
+        
+        $validatedData =  $request->validate([
+            'category_id' => 'required|integer|exists:challenge_categories,id',
+            'step_id' => 'required|integer|exists:challenge_steps,id',
+            'step_slug' => 'nullable|string',
+            'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
+            'is_placeholder' => 'nullable|boolean',
+            'matrix' => 'required|array',
+            'broker_id' => 'nullable|integer|exists:brokers,id',
+            'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+            'evaluation_cost_discount' => 'sometimes|nullable|string|max:255',
+            'affiliate_link' => 'sometimes|nullable|string|max:255',
+            'affiliate_master_link' => 'sometimes|nullable|string|max:255',
+            
+        ]);
 
+        
         $zoneId = $validatedData['zone_id'] ?? null;
 
-        $isPlaceholder = $validatedData['is_placeholder'];
+        $isPlaceholder = $validatedData['is_placeholder'] ?? false;
 
         $isAdmin = $request->attributes->get('isAdmin', false);
 
@@ -133,8 +147,8 @@ class ChallengeController extends Controller
         ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, $broker_id, $isPlaceholder, $isAdmin, $zoneId);
 
         return Response::json(ApiData::success(
-            message: 'Challenge matrix with id '.$challenge_id.' created successfully',
-            data: $this->challengeService->getChallengeData($challenge_id, $broker_id, $isPlaceholder, $zoneId),
+            message: 'Challenge matrix with id ' . $challenge_id . ' created successfully',
+           // data: $this->challengeService->getChallengeData($challenge_id, $broker_id, $isPlaceholder, $zoneId),
         ), 201);
     }
 
@@ -150,6 +164,10 @@ class ChallengeController extends Controller
             'amount_id' => 'nullable|integer|exists:challenge_amounts,id',
             'matrix' => 'required|array',
             'zone_id' => 'sometimes|nullable|integer|exists:zones,id',
+            'evaluation_cost_discount' => 'sometimes|nullable|string|max:255',
+            'affiliate_link' => 'sometimes|nullable|string|max:255',
+            'affiliate_master_link' => 'sometimes|nullable|string|max:255',
+
         ]);
         $zoneId = $validatedData['zone_id'] ?? null;
 
@@ -158,7 +176,7 @@ class ChallengeController extends Controller
         ['challenge_id' => $challenge_id] = $this->challengeService->processRequest($validatedData, null, true, true, $zoneId);
 
         return Response::json(ApiData::success(
-            message: 'Challenge matrix with id '.$challenge_id.' created successfully',
+            message: 'Challenge matrix with id ' . $challenge_id . ' created successfully',
             data: $this->challengeService->getChallengeData($challenge_id, null, true, $zoneId),
         ), 201);
     }
@@ -247,7 +265,7 @@ class ChallengeController extends Controller
         //  $this->challengeCategoryService->removeChallengeCategory($broker_id, $category_id);
 
         return Response::json(ApiData::success(
-            message: 'Challenge tab of type '.$tab_type->value.' removed successfully',
+            message: 'Challenge tab of type ' . $tab_type->value . ' removed successfully',
         ));
     }
 

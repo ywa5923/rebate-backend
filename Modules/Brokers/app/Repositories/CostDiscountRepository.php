@@ -162,7 +162,7 @@ class CostDiscountRepository
         return $query->orderBy('id', 'desc')->first();
     }
 
-    public function createCostDiscount(int $challengeId, string $costDiscount, int $brokerId, bool $isAdmin, bool $isPlaceholder, ?int $zoneId = null): CostDiscount
+    public function createCostDiscount(int $challengeId, string $costDiscount, ?int $brokerId, bool $isAdmin, bool $isPlaceholder, ?int $zoneId = null): CostDiscount
     {
         $field = ($isAdmin && ! $isPlaceholder) ? 'public_value' : 'value';
 
@@ -192,11 +192,12 @@ class CostDiscountRepository
         if ($existingCostDiscount) {
             // Get the current value based on admin/placeholder status
             $oldDiscountValue = $isAdmin ? $existingCostDiscount->public_value : $existingCostDiscount->value;
+            $oldDiscountPreviousValue = $existingCostDiscount->previous_value??'';
 
             // Compare values and update if different
-            if ($oldDiscountValue != $costDiscount && ! is_null($costDiscount)) {
+            if ($oldDiscountValue != $costDiscount ) {
                 $updateData = [
-                    ($isAdmin || $isPlaceholder) ? null : 'previous_value' => $oldDiscountValue,
+                    ($isAdmin || $isPlaceholder) ? null : 'previous_value' => ($oldDiscountValue??'empty').'->'.$oldDiscountPreviousValue,
                     $isAdmin && ! $isPlaceholder ? 'public_value' : 'value' => $costDiscount,
                     'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
                 ];
@@ -207,14 +208,19 @@ class CostDiscountRepository
                 }, ARRAY_FILTER_USE_KEY);
 
                 $existingCostDiscount->update($updateData);
-            } elseif (is_null($costDiscount)) {
-                $existingCostDiscount->delete();
+            } else if($isAdmin){
+                //for admin we need to update is_updated_entry to 0 even if the public value is not changed
+                //this will clear the red flag in the frontend
+                $existingCostDiscount->update([
+                    'is_updated_entry' => 0,
+                ]);
             }
         } else {
             // Create new record if cost discount is not empty
+            
             if (! empty($costDiscount)) {
                 $field = ($isAdmin && ! $isPlaceholder) ? 'public_value' : 'value';
-
+               
                 $this->create([
                     'challenge_id' => $challengeId,
                     'broker_id' => $brokerId,

@@ -170,14 +170,14 @@ class UrlRepository
         ?int $challengeId,
         string $affiliateLink,
         string $affiliateLinkName,
-        int $brokerId,
+        ?int $brokerId,
         ?bool $isAdmin = null,
         ?bool $isPlaceholder = false,
         ?int $zoneId = null,
     ): void {
         $field = ($isAdmin && ! $isPlaceholder) ? 'public_url' : 'url';
 
-        //dd($isAdmin, $isPlaceholder);
+       
 
         $this->create([
             'urlable_type' => Challenge::class,
@@ -217,11 +217,11 @@ class UrlRepository
         if ($existingUrl) {
             // Get the current value based on admin/placeholder status
             $oldAffiliateLinkValue = $isAdmin ? $existingUrl->public_url : $existingUrl->url;
-
+            $oldPreviousUrlValue = $existingUrl->previous_url??'';
             // Compare values and update if different
-            if ($oldAffiliateLinkValue != $affiliateLink && ! is_null($affiliateLink)) {
+            if ($oldAffiliateLinkValue != $affiliateLink ) {
                 $updateData = [
-                    ($isAdmin || $isPlaceholder) ? null : 'previous_url' => $existingUrl->url,
+                    ($isAdmin || $isPlaceholder) ? null : 'previous_url' => ($existingUrl->url??'empty')."->".$oldPreviousUrlValue,
                     $isAdmin && ! $isPlaceholder ? 'public_url' : 'url' => $affiliateLink,
                     'is_updated_entry' => ($isAdmin || $isPlaceholder) ? false : true,
                 ];
@@ -232,8 +232,12 @@ class UrlRepository
                 }, ARRAY_FILTER_USE_KEY);
 
                 $existingUrl->update($updateData);
-            } elseif (is_null($affiliateLink)) {
-                $existingUrl->delete();
+            } else if($isAdmin){
+                //for admin we need to update is_updated_entry to 0 even if the public value is not changed
+                //this will clear the red flag in the frontend
+                $existingUrl->update([
+                    'is_updated_entry' => 0,
+                ]);
             }
         } else {
             // Create new record if affiliate link is not empty
@@ -251,39 +255,13 @@ class UrlRepository
                     'broker_id' => $brokerId,
                     'is_placeholder' => $isPlaceholder,
                     'zone_id' => $zoneId,
-                    'is_updated_entry' => $isAdmin ? 0 : 1,
+                   // 'is_updated_entry' => $isAdmin ? 0 : 1,
                 ]);
             }
         }
     }
 
-    // public function getMasterAccountTypeLinks(int $broker_id, string $lang, ?string $zone = null): Collection
-    // {
-    //     return Url::query()
-    //         ->where('broker_id', $broker_id)
-    //         ->where('urlable_type', AccountType::class)
-    //         ->whereNull('urlable_id')
-    //         ->whereIn('url_type', [
-    //             UrlTypeEnum::IB_AFFILIATE_LINK->value,
-    //             UrlTypeEnum::SUB_IB_AFFILIATE_LINK->value,
-    //             UrlTypeEnum::WEBPLATFORM->value,
-    //         ])
-    //         ->where(function ($q) use ($zone) {
-    //             if ($zone === null) {
-    //                 $q->whereNull('zone_id');
-    //             } else {
-    //                 $q->where('zone_id', $zone);
-    //             }
-    //         })
-    //         ->with([
-    //             'translations' => fn ($t) => $t->where('language_code', $lang),
-    //             'associatedUrls' => fn ($q) => $zone === null
-    //                 ? $q->wherePivotNull('zone_id')
-    //                 : $q->wherePivot('zone_id', $zone),
-    //         ])
-    //         ->orderBy('url_type', 'asc')
-    //         ->get();
-    // }
+    
 
     public function getMasterLinks(int $broker_id, string $lang, array $linkTypes, ?string $zone = null): Collection
     {
