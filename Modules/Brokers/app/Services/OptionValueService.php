@@ -14,6 +14,7 @@ use Modules\Brokers\Models\MatrixHeader;
 use Modules\Brokers\Models\OptionValue;
 use Modules\Brokers\Repositories\MatrixHeaderRepository;
 use Modules\Brokers\Repositories\OptionValueRepository;
+use App\Exceptions\ApiException;
 
 class OptionValueService
 {
@@ -59,9 +60,8 @@ class OptionValueService
     public function saveModelInstance(string $modelClass, $brokerId): ?int
     {
         if (! class_exists($modelClass)) {
-            throw new \InvalidArgumentException(
-                "Model class {$modelClass} not found",
-            );
+           
+            throw new ApiException("Model class {$modelClass} not found", 400);
         }
 
         // For Broker model, return the brokerId directly since we're not creating a new broker
@@ -72,7 +72,7 @@ class OptionValueService
         // For other models (like Company, AccountType, etc.), create with broker_id
         $instance = $modelClass::create([
             'broker_id' => $brokerId,
-            //'name' => 'New Company',
+            
         ]);
 
         return $instance->id;
@@ -95,9 +95,7 @@ class OptionValueService
     ): void {
         // Validate input
         if (empty($optionValuesData)) {
-            throw new \InvalidArgumentException(
-                'Option values data cannot be empty',
-            );
+           throw new ApiException("Option values data is empty", 400);
         }
 
         // Prepare data for bulk insert
@@ -107,9 +105,7 @@ class OptionValueService
 
         foreach ($optionValuesData as $index => $optionValueData) {
             if (! is_array($optionValueData)) {
-                throw new \InvalidArgumentException(
-                    "Option value data at index {$index} must be an array",
-                );
+                    throw new ApiException("Option value data at index {$index} must be an array", 400);
             }
             $slug = $optionValueData['option_slug'];
             $optionValueData['broker_id'] = $brokerId;
@@ -118,7 +114,7 @@ class OptionValueService
             $optionValueData['broker_option_id'] = $options[$slug];
             $optionValueData['optionable_id'] = $entityId;
             $optionValueData['optionable_type'] = $modelClass;
-            $optionValueData['metadata'] = $this->formatMetadata($optionValueData['metadata'], $isAdmin);
+            $optionValueData['metadata'] = $this->formatMetadata($optionValueData['metadata']??null, $isAdmin);
 
             if ($isAdmin) {
                 //when admin save the data copy value to public_value
@@ -127,6 +123,13 @@ class OptionValueService
 
             $bulkData[] = $optionValueData;
         }
+        //transform jsonMetadata
+        foreach ($bulkData as &$row) {
+            if (is_array($row['metadata'] ?? null)) {
+                $row['metadata'] = json_encode($row['metadata']);
+            }
+        }
+        unset($row);
 
         // Bulk insert all option values in one query
         $this->repository->bulkCreate($bulkData);
@@ -135,15 +138,30 @@ class OptionValueService
 
     /**
      * Format metadata for insert
-     * @param array $metadata
-     * @param bool $isAdmin
-     * @return array|null
      */
     public function formatMetadata(?array $metadata, bool $isAdmin): ?array
     {
+        //Pentru numberWithUnit, fronendul trimite
+        // {
+        //     "option_slug": "minimum_trade_size2",
+        //     "value": "100",
+        //     "metadata": { "unit": "USD" }
+        //}
+        //Aceasta metoda returneaza:
+        // {
+        //     "public_value": { "unit": "USD" },
+        //     "value":        { "unit": "USD" }
+        // }
+        //sau pt broker:
+        // {
+        //     "value": { "unit": "USD" },
+        // }
         if (empty($metadata) || !is_array($metadata)) {
             return null;
         }
+        //for types numberWithUnit, we need to add the unit to the metadata
+        //unit stored in metadata also have publicvalue and value
+        
         if ($isAdmin) {
             $metadata = [
                 'public_value' => $metadata,
@@ -185,7 +203,7 @@ class OptionValueService
             $isAdmin,
             $zoneId,
         ) {
-            try {
+            
                 $now = now();
                 $updatesByCondition = [];
                 $inserts = [];
@@ -257,11 +275,11 @@ class OptionValueService
                     } elseif ($id) {
                         // Check if this is an existing option value that needs comparison
                         if (! $isAdmin && $existingValue) {
-                            $existingAdminMetadata = $existingValue->metadata['public_value'] ?? [];
+                            $existingAdminMetadata = ($existingValue->metadata ?? [])['public_value'] ?? [];
 
                             //extract the broker value from metadata which is "value" key
                             //keep only broker metadata to compare with new value by using the hasValueChanged function
-                            $existingValue->metadata = $existingValue->metadata['value'] ?? null;
+                            $existingValue->metadata = ($existingValue->metadata ?? [])['value'] ?? null;
 
                             //$optionValueData come from the clien with metadata  "metadata": {"unit": "eur"}
                             //and $existingValue->metadata is ["public_value"=>["unit"=>"eur"],"value"=>["unit"=>"eur"]]
@@ -306,9 +324,9 @@ class OptionValueService
                             isset($optionValueData['metadata'])
                         ) {
                             //get existing broker metadata and add to admin metadata
-                            $existingMetadata = $existingValue->metadata;
-                            $existingBrokerMetadata =
-                                $existingMetadata['value'] ?? [];
+                            $existingMetadata = $existingValue->metadata??[];
+                            $existingBrokerMetadata = $existingMetadata['value'] ?? [];
+                                
                             $newAdminMetadata = $optionValueData['metadata'];
 
                             $optionValueData['metadata'] = [
@@ -355,6 +373,7 @@ class OptionValueService
                     //             // Admin-provided metadata goes under public_value
                     //             $insert['metadata'] = json_encode([
                     //                 'public_value' => $insert['metadata'],
+                    //                 'value' => $insert['metadata'],
                     //             ]);
                     //         } else {
                     //             // Broker-provided metadata goes under value
@@ -364,18 +383,21 @@ class OptionValueService
                     //         }
                     //     }
                     // }
+
+                    //transform metadata to json
+                    if (! empty($inserts)) {
+                        foreach ($inserts as &$insert) {
+                            if (is_array($insert['metadata'] ?? null)) {
+                                $insert['metadata'] = json_encode($insert['metadata']);
+                            }
+                        }
+                        unset($insert);
+                    }
                     $this->repository->bulkCreate($inserts);
                 }
 
                 return true;
-            } catch (\Exception $e) {
-                Log::error(
-                    'OptionValueService updateMultipleOptionValues error: ' .
-                        $e->getMessage(),
-                );
-                Log::error('Stack trace: ' . $e->getTraceAsString());
-                throw $e;
-            }
+            
         });
     }
 
@@ -424,6 +446,7 @@ class OptionValueService
             'contest',
             'promotion',
             'company',
+            'evaluation-step',
         ];
         $modelClass = ModelHelper::getModelClassFromSlug($entityType);
 

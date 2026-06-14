@@ -60,8 +60,8 @@ class StoreOptionValueRequest extends FormRequest
             'option_values.*.id' => 'nullable|integer|exists:option_values,id',
             'option_values.*.option_slug' => 'required|string|max:255',
             'option_values.*.value' => 'nullable',
-            'option_values.*.metadata' => 'nullable|array',
-            'option_values.*.metadata.*.unit' => 'sometimes|nullable|string|max:255',
+            'option_values.*.metadata' => 'sometimes|nullable|array',
+            'option_values.*.metadata.unit' => 'sometimes|nullable|string|max:255',
         ];
     }
 }

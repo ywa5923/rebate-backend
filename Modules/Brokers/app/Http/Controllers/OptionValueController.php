@@ -105,6 +105,8 @@ class OptionValueController extends Controller
             );
 
             if (str_contains($modelClass, 'AccountType')) {
+                //for account type, save the account type name in the matrix headers table
+                //this name appears in rebate matrix as a column name
                 $accountNameOption = array_filter($optionValues, function (
                     $optionValue,
                 ) {
